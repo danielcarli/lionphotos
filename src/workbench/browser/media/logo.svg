@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- palette: teal #0194B2 · yellow #EECD25 · pink #D976AB · deep pink #B03977 -->
+  <defs><clipPath id="r"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <g clip-path="url(#r)">
+    <rect width="512" height="512" fill="#0194b2"/>
+    <circle cx="322" cy="200" r="96" fill="#eecd25"/>
+    <path d="M-10 410 L156 248 L380 470 V522 H-10 Z" fill="#d976ab"/>
+    <path d="M110 522 L350 300 L522 440 V522 Z" fill="#b03977"/>
+  </g>
+</svg>

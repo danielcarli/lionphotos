@@ -1,0 +1,171 @@
+{
+  "name": "lionphotos",
+  "version": "1.37.2",
+  "description": "LionPhotos — fast photo & video browser and organizer. Browse folders of pictures and videos as small cached thumbnails, regenerated only when a file changes, and organize them safely.",
+  "main": "src/code/electron-main/main.js",
+  "desktopName": "lionphotos.desktop",
+  "scripts": {
+    "start": "electron .",
+    "dist": "npx --yes electron-builder@26.18.0 --publish never",
+    "dist:win": "npx --yes electron-builder@26.18.0 --win --publish never",
+    "dist:mac": "npx --yes electron-builder@26.18.0 --mac --publish never",
+    "dist:linux": "npx --yes electron-builder@26.18.0 --linux --publish never",
+    "test:e2e": "electron tools/e2e.js",
+    "test:i18n": "node tools/check-i18n.js",
+    "test:faces": "node tools/test-faces.js",
+    "test:openwith": "node tools/test-openwith.js",
+    "test:plugins": "node tools/test-plugins.js",
+    "plugin": "node tools/build-plugin.js",
+    "shots": "electron tools/shots.js",
+    "nls": "python3 tools/nls/build.py",
+    "release:assets": "node tools/make-release.js",
+    "fixtures": "python3 tools/make-fixtures.py"
+  },
+  "author": "LionPhotos Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^45.2.3"
+  },
+  "productName": "LionPhotos",
+  "build": {
+    "appId": "br.dmdc.lionphotos",
+    "productName": "LionPhotos",
+    "copyright": "Copyright © 2026 LionPhotos Team",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "src/platform/library/node/catalogReader.js",
+      "src/platform/library/node/libraryDatabase.js",
+      "src/platform/geo/**"
+    ],
+    "publish": null,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "legalTrademarks": "LionPhotos",
+      "artifactName": "LionPhotos-${version}-win-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "LionPhotos",
+      "include": "build/installer.nsh",
+      "uninstallDisplayName": "LionPhotos — photo & video browser",
+      "multiLanguageInstaller": true,
+      "installerLanguages": [
+        "en_US",
+        "pt_BR",
+        "pt_PT",
+        "es_ES",
+        "fr_FR",
+        "de_DE",
+        "it_IT",
+        "zh_CN",
+        "ja_JP",
+        "ko_KR"
+      ],
+      "license": "LICENSE",
+      "perMachine": false,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "LionPhotos-Setup-${version}-${arch}.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "category": "public.app-category.photography",
+      "icon": "build/icon.png",
+      "hardenedRuntime": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "artifactName": "LionPhotos-mac-${arch}.${ext}",
+      "identity": "-"
+    },
+    "dmg": {
+      "title": "LionPhotos ${version}"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
+      "category": "Graphics",
+      "icon": "build/icons",
+      "executableName": "lionphotos",
+      "synopsis": "Photo & video browser and organizer",
+      "description": "Browse folders of photos and videos as small cached thumbnails (regenerated only when a file changes) and organize them into folders by date. Every file change requires a typed confirmation code.",
+      "vendor": "LionPhotos Team",
+      "maintainer": "LionPhotos Team <danielcarli@users.noreply.github.com>",
+      "desktop": {
+        "entry": {
+          "Name": "LionPhotos",
+          "GenericName": "Photo Browser",
+          "Comment": "Photo & video browser and organizer",
+          "Keywords": "photos;pictures;images;videos;thumbnails;organize;gallery;",
+          "StartupWMClass": "LionPhotos"
+        }
+      },
+      "artifactName": "LionPhotos-${version}-linux-${arch}.${ext}"
+    },
+    "deb": {
+      "artifactName": "lionphotos_${arch}.${ext}"
+    },
+    "rpm": {
+      "artifactName": "lionphotos.${arch}.${ext}"
+    },
+    "appImage": {
+      "artifactName": "LionPhotos-${arch}.${ext}"
+    }
+  },
+  "keywords": [
+    "photos",
+    "photo-viewer",
+    "thumbnails",
+    "video",
+    "gallery",
+    "photo-organizer",
+    "electron"
+  ],
+  "contributors": [
+    "Daniel Michelon De Carli (creator)"
+  ],
+  "homepage": "https://github.com/danielcarli/lionphotos",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danielcarli/lionphotos.git"
+  },
+  "bugs": {
+    "url": "https://github.com/danielcarli/lionphotos/issues"
+  }
+}

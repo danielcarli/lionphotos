@@ -1,0 +1,193 @@
+# LionPhotos — publishes a GitHub release when a version tag (vX.Y.Z) is pushed.
+#
+# The release holds:
+#   - graphical installers: LionPhotos-Setup.exe (Windows, Inno Setup wizard of about 2 MB that downloads
+#     and verifies the app during setup, like the LEBR installer), LionPhotos-mac-universal.dmg (macOS),
+#     lionphotos_amd64.deb / lionphotos.x86_64.rpm / LionPhotos-x86_64.AppImage (Linux);
+#   - the command-line installers (install.ps1, install.cmd, install.sh);
+#   - the small files they download: the app source bundle, manifest.txt and SHA256SUMS.
+# The Windows wizard and the scripts download the Electron runtime from Electron's own GitHub releases and
+# verify it against Electron's published checksums. Every asset is listed in SHA256SUMS and gets a signed
+# build-provenance attestation (Sigstore), which users can check with
+#   gh attestation verify <file> --repo danielcarli/lionphotos
+name: Release
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  macos:
+    name: macOS package (.dmg)
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build the .dmg (universal, ad-hoc signed until there is an Apple Developer ID)
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx --yes electron-builder@26.18.0 --mac dmg --universal --publish never
+      - name: The app is signed (ad hoc) and universal
+        run: |
+          app="dist/mac-universal/LionPhotos.app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          lipo -archs "$app/Contents/MacOS/LionPhotos"
+          plutil -extract CFBundleIdentifier raw "$app/Contents/Info.plist"
+          ls -la dist/*.dmg
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: installer-macos
+          path: dist/*.dmg
+          if-no-files-found: error
+
+  linux:
+    name: Linux packages (.deb, .rpm, AppImage)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build the packages
+        timeout-minutes: 15
+        run: |
+          # rpmbuild is needed for the .rpm; apt never gets to wait for long
+          if ! command -v rpmbuild >/dev/null; then
+            export DEBIAN_FRONTEND=noninteractive
+            sudo -E timeout 120 apt-get update -qq -o Acquire::Retries=2 -o Acquire::http::Timeout=20 </dev/null
+            sudo -E timeout 180 apt-get install -y -qq --no-install-recommends rpm </dev/null >/dev/null
+          fi
+          npx --yes electron-builder@26.18.0 --linux deb rpm AppImage --x64 --publish never
+      - name: The .deb installs and the app starts
+        timeout-minutes: 6
+        run: |
+          pkgs=(./dist/lionphotos_amd64.deb)
+          command -v xvfb-run >/dev/null || pkgs+=(xvfb) # comes with the runner image
+          sudo DEBIAN_FRONTEND=noninteractive timeout 180 apt-get install -y -qq "${pkgs[@]}" </dev/null >/dev/null
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          xvfb-run -a lionphotos --disable-gpu >/dev/null 2>&1 &
+          sleep 12
+          pgrep -f /opt/LionPhotos/lionphotos >/dev/null || { echo "the app did not start"; exit 1; }
+          pkill -f /opt/LionPhotos/lionphotos || true
+          sudo apt-get remove -y -qq lionphotos >/dev/null
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: installer-linux
+          path: |
+            dist/*.deb
+            dist/*.rpm
+            dist/*.AppImage
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: [ci, macos, linux]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write       # create the release and upload its assets
+      id-token: write       # sign the provenance attestation (Sigstore, keyless)
+      attestations: write   # store the attestation on GitHub
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Tag must match package.json
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          v="$(node -p "require('./package.json').version")"
+          [ "$TAG" = "v$v" ] || { echo "::error::Tag $TAG does not match package.json version $v"; exit 1; }
+
+      - name: Build release assets
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          export SOURCE_DATE_EPOCH
+          node tools/make-release.js --tag "$TAG"
+          (cd dist-release && sha256sum -c SHA256SUMS)
+
+      - name: Graphical installers from the other jobs
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: installer-*
+          path: dist-release
+          merge-multiple: true
+
+      - name: SHA256SUMS for every asset
+        run: |
+          cd dist-release
+          find . -maxdepth 1 -type f ! -name SHA256SUMS -printf '%f\n' | LC_ALL=C sort | xargs sha256sum > "$RUNNER_TEMP/SHA256SUMS"
+          mv "$RUNNER_TEMP/SHA256SUMS" SHA256SUMS
+          cat SHA256SUMS
+          ls -la
+
+      - name: Release notes from CHANGELOG.md
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          v="${TAG#v}"
+          awk -v v="$v" '
+            $0 ~ "^## \\[" v "\\]" { on = 1; next }
+            on && /^## \[/ { exit }
+            on { print }' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          cat >> "$RUNNER_TEMP/notes.md" <<EOF
+
+          ## Install or update
+
+          | System | Download |
+          |---|---|
+          | **Windows** 10/11 (x64, ARM) | [LionPhotos-Setup.exe](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/LionPhotos-Setup.exe) — setup wizard (about 2 MB) that downloads and checks the app |
+          | **macOS** 11+ (Apple Silicon, Intel) | [LionPhotos-mac-universal.dmg](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/LionPhotos-mac-universal.dmg) |
+          | **Ubuntu, Debian, Mint…** | [lionphotos_amd64.deb](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/lionphotos_amd64.deb) |
+          | **Fedora, RHEL, openSUSE…** | [lionphotos.x86_64.rpm](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/lionphotos.x86_64.rpm) |
+          | **Any Linux** | [LionPhotos-x86_64.AppImage](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/LionPhotos-x86_64.AppImage) |
+
+          Command line: \`irm https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/install.ps1 | iex\` (Windows) or
+          \`curl -fsSL https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/install.sh | bash\` (macOS, Linux).
+
+          The installers are not signed with a paid certificate yet: Windows may show "Windows protected your PC" (More info › Run anyway) and macOS asks you to confirm in System Settings › Privacy & Security › Open Anyway. Every file is listed in SHA256SUMS and has a build-provenance attestation. See [docs/INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/docs/INSTALL.md).
+          EOF
+          cat "$RUNNER_TEMP/notes.md"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist-release/*
+
+      - name: Publish the GitHub release
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: LionPhotos ${{ github.ref_name }}
+          body_path: ${{ runner.temp }}/notes.md
+          files: dist-release/*
+          fail_on_unmatched_files: true
+          make_latest: true

@@ -1,0 +1,9 @@
+lensfun.json — the lens correction profiles of the Lensfun database (https://lensfun.github.io),
+converted to a compact form by tools/lensfun/build.py (lenses, cameras and their calibration data,
+unchanged in substance; the revision is written in the file's "about").
+
+Copyright © the Lensfun contributors.
+Licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported licence (CC BY-SA 3.0):
+https://creativecommons.org/licenses/by-sa/3.0/
+This file, being an adaptation of that data, is under the same licence.
+Only the data is used; none of Lensfun's code (LGPL) is part of LionPhotos.

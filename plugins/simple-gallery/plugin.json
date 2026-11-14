@@ -1,0 +1,19 @@
+{
+  "id": "simple-gallery",
+  "version": "1.0.0",
+  "kind": "export",
+  "name": { "en": "Simple gallery", "pt-BR": "Galeria simples", "pt-PT": "Galeria simples", "es": "Galería sencilla", "fr": "Galerie simple", "de": "Einfache Galerie", "it": "Galleria semplice", "zh-CN": "简单相册", "ja": "シンプルなギャラリー", "ko": "간단한 갤러리" },
+  "shortName": {"en": "Gallery", "pt-BR": "Galeria", "pt-PT": "Galeria", "es": "Galería", "fr": "Galerie", "de": "Galerie", "it": "Galleria", "zh-CN": "画廊", "ja": "ギャラリー", "ko": "갤러리"},
+  "description": { "en": "A light page with every album or project, its photos and their file names.", "pt-BR": "Uma página leve com cada álbum ou projeto, suas fotos e os nomes dos arquivos." },
+  "author": "LionPhotos Team",
+  "accepts": ["album", "project", "person", "pet", "place"],
+  "entry": "index.html",
+  "folderName": "Galeria",
+  "icon": "assets/icon.svg",
+  "photo": { "sizes": [1600, 2048], "thumb": 480 },
+  "options": [
+    { "id": "theme", "type": "choice", "label": { "en": "Theme", "pt-BR": "Tema" }, "default": "light",
+      "choices": [ { "value": "light", "label": { "en": "Light", "pt-BR": "Claro" } }, { "value": "dark", "label": { "en": "Dark", "pt-BR": "Escuro" } } ] },
+    { "id": "showDetails", "type": "bool", "label": { "en": "Show date and camera", "pt-BR": "Mostrar data e câmera" }, "default": true }
+  ]
+}

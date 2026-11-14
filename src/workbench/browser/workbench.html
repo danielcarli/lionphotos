@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- LionPhotos — Copyright (C) 2026 LionPhotos Team. Created and conceived by Daniel Michelon De Carli. MIT License. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: lionthumb: lionmedia:; media-src lionthumb: lionmedia:; connect-src 'self' lionmedia:; worker-src 'self'">
+  <title>LionPhotos</title>
+  <link rel="icon" href="media/logo.svg">
+  <link rel="stylesheet" href="media/workbench.css">
+  <script type="module" src="bootstrap.js"></script>
+</head>
+<body>
+  <div id="workbench" class="workbench"></div>
+  <!-- loading screen: painted before any script runs, removed once the UI (and the last collection) is ready -->
+  <div id="boot" class="boot" role="status" aria-live="polite">
+    <div class="boot-card">
+      <img class="boot-logo" src="media/logo.svg" alt="">
+      <div class="boot-name">LionPhotos</div>
+      <div class="boot-track"><div class="boot-bar"></div></div>
+      <div class="boot-status"></div>
+      <div class="boot-detail"></div>
+      <button type="button" class="boot-skip btn btn-ghost btn-sm" hidden></button>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,105 @@
+/*---------------------------------------------------------------------------------------------
+ *  LionPhotos — Copyright (C) 2026 LionPhotos Team.
+ *  Created and conceived by Daniel Michelon De Carli.
+ *  Licensed under the MIT License. See LICENSE in the project root.
+ *--------------------------------------------------------------------------------------------*/
+// Native Language Support for the renderer (UI) — a small take on VS Code's vs/nls.
+//
+//   t('photos.search')                         → plain message
+//   t('common.showIn', { explorer: 'Explorer' }) → message with {placeholders}
+//   tn('common.files', 3)                      → plural: picks "common.files.one" / ".other" (Intl.PluralRules)
+//
+// Messages live in src/nls/<locale>.json (flat "namespace.key": "text" objects).
+// Missing keys fall back to English, then to the key itself.
+
+const PREF_KEY = 'lionphotos.locale';
+
+let locale = 'en';
+let messages = {};
+let fallback = {};
+let pluralRules = new Intl.PluralRules('en');
+let numberFormat = new Intl.NumberFormat('en');
+let locales = [];
+
+/** Picks the best supported locale for a list of BCP 47 tags (e.g. navigator.languages). */
+export function negotiateLocale(requested, supported = locales.map((l) => l.id)) {
+  for (const raw of requested || []) {
+    const tag = String(raw).toLowerCase();
+    const exact = supported.find((s) => s.toLowerCase() === tag);
+    if (exact) return exact;
+    const [lang, region] = tag.split(/[-_]/);
+    const has = (id) => supported.includes(id);
+    if (lang === 'pt') {
+      const pt = region === 'br' ? 'pt-BR' : 'pt-PT';
+      if (has(pt)) return pt;
+      if (has('pt-BR')) return 'pt-BR';
+      continue;
+    }
+    if (lang === 'zh') {
+      // Traditional Chinese is not supported yet: only Simplified (mainland / Singapore / "Hans").
+      if ((!region || ['cn', 'sg', 'hans'].includes(region)) && has('zh-CN')) return 'zh-CN';
+      continue;
+    }
+    const base = supported.find((s) => s.toLowerCase() === lang);
+    if (base) return base;
+  }
+  return 'en';
+}
+
+/** Loads the catalogs and makes t()/tn() ready. Must run before the workbench modules are imported. */
+export async function initNls(baseUrl) {
+  locales = await (await fetch(new URL('locales.json', baseUrl))).json();
+  const pref = getLocalePreference();
+  locale = pref === 'auto' ? negotiateLocale(navigator.languages?.length ? navigator.languages : [navigator.language]) : pref;
+  if (!locales.some((l) => l.id === locale)) locale = 'en';
+  const load = async (id) => (await fetch(new URL(`${id}.json`, baseUrl))).json();
+  [fallback, messages] = await Promise.all([load('en'), locale === 'en' ? Promise.resolve(null) : load(locale)]);
+  messages = messages || fallback;
+  pluralRules = new Intl.PluralRules(locale);
+  numberFormat = new Intl.NumberFormat(locale);
+  document.documentElement.lang = locale;
+  return locale;
+}
+
+export const getLocale = () => locale;
+export const getLocales = () => locales;
+
+export function getLocalePreference() {
+  try { return localStorage.getItem(PREF_KEY) || 'auto'; } catch { return 'auto'; }
+}
+
+/**
+ * Saves the language choice and reloads the window (like VS Code, the UI is rebuilt in the new language).
+ * The library comes back from the catalog; thumbnails are reused from the cache.
+ * @param {string} pref 'auto' or a locale id
+ */
+export function setLocalePreference(pref) {
+  try {
+    localStorage.setItem(PREF_KEY, pref);
+  } catch { /* storage unavailable */ }
+  // The window blocks navigations started by the page, so the reload is asked to the main process.
+  if (globalThis.host?.reloadWindow) globalThis.host.reloadWindow();
+  else location.reload();
+}
+
+function format(message, params) {
+  if (!params) return message;
+  return message.replace(/\{(\w+)\}/g, (m, name) => {
+    if (!(name in params)) return m;
+    const v = params[name];
+    return typeof v === 'number' ? numberFormat.format(v) : String(v);
+  });
+}
+
+/** Translates a key. Unknown keys return the English text, then the key itself. */
+export function t(key, params) {
+  return format(messages[key] ?? fallback[key] ?? key, params);
+}
+
+/** Plural-aware translation: uses `${key}.${rule}` (zero/one/two/few/many/other), falling back to `.other`. */
+export function tn(key, count, params) {
+  // CLDR puts 0 in the "one" category for Portuguese, but Brazilian usage prefers the plural for zero.
+  const rule = count === 0 && locale === 'pt-BR' ? 'other' : pluralRules.select(count);
+  const pick = (cat) => cat[`${key}.${rule}`] ?? cat[`${key}.other`];
+  return format(pick(messages) ?? pick(fallback) ?? key, { count, ...params });
+}

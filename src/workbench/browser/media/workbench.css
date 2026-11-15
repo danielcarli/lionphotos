@@ -3126,6 +3126,7 @@ body.is-resizing-panel { cursor: col-resize; user-select: none; }
 
 /* "See all the photos of the day": discreet, at the foot of Organization */
 .ip-day { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 2px 0; font-size: 12px; color: var(--text-muted); }
+.ip-head .ip-day { margin-top: 4px; }
 .ip-day:hover { color: var(--accent); }
 .ip-day-n { font-variant-numeric: tabular-nums; opacity: 0.8; }
 

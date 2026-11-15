@@ -19,7 +19,7 @@ import { t, tn } from '../../../base/common/nls.js';
 import { formatBytes, formatDateTime, formatNumber } from '../../../base/common/format.js';
 import { KIND, dateOf, MARK_NAMES } from '../../services/library/browser/libraryService.js';
 import { detailsLine } from '../info/infoPanel.js';
-import { organizeSection } from '../photos/selectionSummary.js';
+import { dayLink, organizeSection } from '../photos/selectionSummary.js';
 import { metadataSections } from '../photos/descriptionSection.js';
 import { adjustSection } from '../photos/adjustSection.js';
 import { fileSection, infoFooter } from '../photos/infoSections.js';
@@ -782,6 +782,7 @@ export class Viewer {
     const head = () => h('div.ip-head.vw-ip-head',
       h('div.ip-name', { title: d.path }, d.name, adjustOf(it) ? h('span.ip-edited', t('adjust.edited')) : null),
       h('div.ip-meta', [detailsLine(d), dims].filter(Boolean).join(' · ')),
+      dayLink(this, [it], { onLeave: () => this.close() }),
       h('div.ip-tools',
         h('span.ip-sp'),
         h('button.icon-button', { title: t('common.showIn', { explorer: this.actions.explorerName }), 'aria-label': t('info.reveal'), html: icon('reveal', 15), onclick: () => this.actions.reveal(it) }),

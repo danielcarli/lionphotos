@@ -24,7 +24,7 @@ import { detailsLine } from '../info/infoPanel.js';
 import { showMoveDialog } from '../organize/moveDialog.js';
 import { showLabelsDialog } from '../labels/labelsDialog.js';
 import { removeFromAlbum, removeFromLabel, editLabel, albumMenuItem } from '../albums/albumDialogs.js';
-import { organizeSection, selectionFacts, selectionList } from './selectionSummary.js';
+import { dayLink, organizeSection, selectionFacts, selectionList } from './selectionSummary.js';
 import { metadataSections } from './descriptionSection.js';
 import { collapsible, fileSection, infoFooter } from './infoSections.js';
 import { panelTab, setPanelTab, sectionsFor, asOnly, usableTab, tabBar, TAB_KEYS, attachResizer } from './panelTabs.js';
@@ -1201,6 +1201,7 @@ export class PhotosView extends ViewPane {
         h('div.info-thumb', this.#thumb(it, 'info-img')),
         h('div.ip-name', { title: d.path }, d.name, adjustOf(it) ? h('span.ip-edited', t('adjust.edited')) : null),
         h('div.ip-meta', [detailsLine(d), dims].filter(Boolean).join(' · ')),
+        dayLink(this, [it]),
         h('div.ip-tools',
           this.#marks([id], MARK_NAMES[it.mark || 0], 'info-mark-btns'),
           h('span.ip-sp'),

@@ -2040,7 +2040,7 @@
   "lens.found.other": "프로필 {count}개",
   "lens.forMany.one": "사진 {count}장",
   "lens.forMany.other": "사진 {count}장",
-  "lens.manual": "수동",
+  "lens.manual": "보정",
   "lens.manualReset": "초기화",
   "lens.manualHint": "프로필이 있든 없든 사용할 수 있습니다. +는 배럴 왜곡을 펴고, 위쪽이나 오른쪽을 넓히고, 모서리를 밝게 합니다. 슬라이더를 두 번 클릭하면 0으로 돌아갑니다.",
   "lens.geometry": "기하",

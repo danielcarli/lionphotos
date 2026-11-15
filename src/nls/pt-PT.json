@@ -2040,7 +2040,7 @@
   "lens.found.other": "{count} perfis",
   "lens.forMany.one": "{count} fotografia",
   "lens.forMany.other": "{count} fotografias",
-  "lens.manual": "À mão",
+  "lens.manual": "Correções",
   "lens.manualReset": "Repor",
   "lens.manualHint": "Com ou sem perfil. + endireita o barril, abre o topo ou o lado direito, aclara os cantos. Duplo clique num controlo: volta a 0.",
   "lens.geometry": "Geometria",

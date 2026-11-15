@@ -2040,7 +2040,7 @@
   "lens.found.other": "{count} Profile",
   "lens.forMany.one": "{count} Foto",
   "lens.forMany.other": "{count} Fotos",
-  "lens.manual": "Von Hand",
+  "lens.manual": "Korrekturen",
   "lens.manualReset": "Zurücksetzen",
   "lens.manualHint": "Mit oder ohne Profil. + begradigt eine Tonne, öffnet oben oder rechts, hellt die Ecken auf. Doppelklick auf einen Regler: zurück auf 0.",
   "lens.geometry": "Geometrie",

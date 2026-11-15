@@ -2040,7 +2040,7 @@
   "lens.found.other": "{count} profiles",
   "lens.forMany.one": "{count} photo",
   "lens.forMany.other": "{count} photos",
-  "lens.manual": "By hand",
+  "lens.manual": "Corrections",
   "lens.manualReset": "Reset",
   "lens.manualHint": "With or without a profile. + straightens a barrel, opens the top or the right side, lightens the corners. Double-click a slider: back to 0.",
   "lens.geometry": "Geometry",

@@ -2,6 +2,17 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.41.2] — 2026-11-15
+
+### Changed
+- **Photos of the day** is by the file's name, at the top of the side panel and of the viewer's panel — in every tab (Adjust, Describe, Info), not only at the foot of *Organization*. With several photos of one day selected it stays in *Organization*.
+- In the lens adjustments, *By hand* is now **Corrections**.
+
+## [1.41.1] — 2026-11-15
+
+### Fixed
+- **Windows setup:** its window comes in front of the other windows when it opens (it could stay behind the browser it was downloaded with, as if nothing had happened); opening it a second time says it is already open instead of starting another one; and its log says when the window appeared.
+
 ## [1.41.0] — 2026-11-15
 
 ### Added

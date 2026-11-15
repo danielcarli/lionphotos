@@ -84,6 +84,20 @@ const KINDS = [
  * Organization: the category, then one line per kind of label the items have — its chips (a click opens its
  * photos; × takes it off) and + to add more — and one "Add to" line for the kinds they have none of.
  */
+/**
+ * "Photos of the day": every photo of the day these were taken, in Photos — out of the album, the person or the
+ * viewer they are being seen in (photos of one day only; not for the Limbo's). Null where it would change nothing.
+ */
+export function dayLink({ library, layout }, items, { onLeave } = {}) {
+  const day = items.length && items.every((it) => (it.mark || 0) !== MARK.reject && dayOf(it) === dayOf(items[0])) ? dayOf(items[0]) : '';
+  if (!day || (library.filter.day === day && layout.activeView === 'photos' && !onLeave)) return null;
+  const others = library.allItems.filter((x) => (x.mark || 0) !== MARK.reject && dayOf(x) === day).length;
+  return h('button.link-button.ip-day', {
+    type: 'button', title: t('info.dayTitle', { day: formatDate(dateOf(items[0])) }),
+    onclick: () => { onLeave?.(); library.showDay(items[0].id); layout.openView('photos'); },
+  }, h('span', { html: icon('calendar', 12) }), t('info.dayAll'), h('span.ip-day-n', formatNumber(others)));
+}
+
 export function organizeSection(s, items, { title, onLeave } = {}) {
   const { labels, library, layout } = s;
   const ids = items.map((it) => it.id);
@@ -122,12 +136,7 @@ export function organizeSection(s, items, { title, onLeave } = {}) {
 
   // discreet, at the foot: every photo of the day this one was taken, in Photos — out of the album, the person
   // or the viewer it is being seen in (photos of one day only; not for the Limbo's)
-  const day = items.length && items.every((it) => (it.mark || 0) !== MARK.reject && dayOf(it) === dayOf(items[0])) ? dayOf(items[0]) : '';
-  const others = day ? library.allItems.filter((x) => (x.mark || 0) !== MARK.reject && dayOf(x) === day).length : 0;
-  const sameDay = day && !(library.filter.day === day && layout.activeView === 'photos' && !onLeave) ? h('button.link-button.ip-day', {
-    type: 'button', title: t('info.dayTitle', { day: formatDate(dateOf(items[0])) }),
-    onclick: () => { onLeave?.(); library.showDay(items[0].id); layout.openView('photos'); },
-  }, h('span', { html: icon('calendar', 12) }), t('info.dayAll'), h('span.ip-day-n', formatNumber(others))) : null;
+  const sameDay = items.length > 1 ? dayLink(s, items, { onLeave }) : null;   // one photo: the link is by its name
 
   // closed: the category and the names, in a line
   const sphere = labels.sphereOf?.(items[0]);

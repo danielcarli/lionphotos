@@ -2040,7 +2040,7 @@
   "lens.found.other": "{count} 件のプロファイル",
   "lens.forMany.one": "{count} 枚の写真",
   "lens.forMany.other": "{count} 枚の写真",
-  "lens.manual": "手動",
+  "lens.manual": "補正",
   "lens.manualReset": "リセット",
   "lens.manualHint": "プロファイルの有無にかかわらず使えます。+ で樽型を直し、上または右を広げ、四隅を明るくします。スライダーをダブルクリックで 0 に戻ります。",
   "lens.geometry": "ジオメトリ",

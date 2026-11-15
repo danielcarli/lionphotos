@@ -559,7 +559,7 @@ app.whenReady().then(async () => {
       lib.setFilter({ year: new Date(it.taken || it.mtime).getFullYear(), query: it.name.slice(0, 6) }); await wait(300);
       lib.setSelection([it.id]); await wait(500);
       const pv = window.__lionphotos.views.photos; if (!pv.infoOpen) pv.toggleInfo(); pv.rerenderInfo(); await wait(500);
-      const link = document.querySelector('.info-panel .ip-sec[data-sec="organize"] .ip-day');
+      const link = document.querySelector('.info-panel .ip-head .ip-day');
       res.link = (link?.textContent || '').trim();
       link?.click(); await wait(600);
       const d = new Date(it.taken || it.mtime), day = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');

@@ -2040,7 +2040,7 @@
   "lens.found.other": "{count} profili",
   "lens.forMany.one": "{count} foto",
   "lens.forMany.other": "{count} foto",
-  "lens.manual": "A mano",
+  "lens.manual": "Correzioni",
   "lens.manualReset": "Azzera",
   "lens.manualHint": "Con o senza profilo. + raddrizza il barilotto, apre l’alto o il lato destro, schiarisce gli angoli. Doppio clic su un cursore: torna a 0.",
   "lens.geometry": "Geometria",

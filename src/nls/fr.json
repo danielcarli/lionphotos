@@ -2040,7 +2040,7 @@
   "lens.found.other": "{count} profils",
   "lens.forMany.one": "{count} photo",
   "lens.forMany.other": "{count} photos",
-  "lens.manual": "À la main",
+  "lens.manual": "Corrections",
   "lens.manualReset": "Réinitialiser",
   "lens.manualHint": "Avec ou sans profil. + redresse le barillet, ouvre le haut ou le côté droit, éclaircit les coins. Double-clic sur un curseur : retour à 0.",
   "lens.geometry": "Géométrie",

@@ -2040,7 +2040,7 @@
   "lens.found.other": "{count} 个配置文件",
   "lens.forMany.one": "{count} 张照片",
   "lens.forMany.other": "{count} 张照片",
-  "lens.manual": "手动",
+  "lens.manual": "校正",
   "lens.manualReset": "重置",
   "lens.manualHint": "有无配置文件都可使用。+ 拉直桶形畸变、展开上方或右侧、提亮四角。双击滑块恢复为 0。",
   "lens.geometry": "几何",

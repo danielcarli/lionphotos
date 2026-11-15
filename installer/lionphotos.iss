@@ -52,6 +52,8 @@ SolidCompression=yes
 CloseApplications=force
 RestartApplications=no
 SetupLogging=yes
+; one Setup at a time: opening it again says it is already open, instead of a second window
+SetupMutex=LionPhotosSetup-10F3A9B6-64DA-4D56-BE79-9E2BE938402D
 OutputDir=..\dist-installer
 OutputBaseFilename=LionPhotos-Setup
 ; SignTool=signing
@@ -417,8 +419,20 @@ end;
 
 { /UPDATE: the update was already confirmed (in the app, or by choosing the "Update" shortcut), so the
   "Ready to install" page - which Setup always shows when it is the first page - starts it right away. }
+var
+  WizardShown: Boolean;
+
 procedure CurPageChanged(CurPageID: Integer);
 begin
+  { the first page: the window comes in front of the others (it could open behind the browser it was
+    downloaded with), and the log says when it appeared - what happens before this line is Windows
+    checking the downloaded file, not Setup }
+  if not WizardShown then
+  begin
+    WizardShown := True;
+    Log('Wizard window shown');
+    if not WizardSilent then BringToFrontAndRestore;
+  end;
   if (CurPageID = wpReady) and UpdateMode and not WizardSilent then
     PostMessage(WizardForm.NextButton.Handle, $00F5 { BM_CLICK }, 0, 0);
 end;

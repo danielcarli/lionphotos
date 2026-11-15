@@ -2,6 +2,16 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.45.3] — 2026-11-15
+
+### Changed
+- README, "What it is — and what it is not": the other editors are called *more dedicated* software, not *more advanced*.
+
+## [1.45.2] — 2026-11-15
+
+### Changed
+- **README, in the ten languages: "What it is — and what it is not".** LionPhotos is an organizer and a catalog first; it edits and corrects for quick, light work; it is not meant to replace Lightroom, Photoshop or other editors dedicated to developing digital photos, which keep the work with layers of treatment.
+
 ## [1.45.1] — 2026-11-15
 
 ### Changed

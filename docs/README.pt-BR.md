@@ -11,7 +11,7 @@ Trabalha com as suas pastas como elas são: miniaturas pequenas feitas uma vez, 
 
 [English](../README.md) · **Português (Brasil)** · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versão 1.45.1](https://img.shields.io/badge/version-1.45.1-161214)
+![Versão 1.45.3](https://img.shields.io/badge/version-1.45.3-161214)
 ![Status: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -44,6 +44,14 @@ Coleções de fotos crescem mais rápido do que dá para organizar: anos de trab
 - **"O disco está cheio de coisa que não preciso."** Marque os descartes enquanto olha e mande para o Limbo; ache arquivos repetidos pelo conteúdo. Tudo sai pela Lixeira, nunca apagado de vez.
 - **"Meu trabalho fica preso num computador."** Álbuns, pessoas, marcações, descrições, ajustes e recortes também ficam numa pasta oculta dentro da coleção, e o mesmo HD externo abre com tudo isso em outro computador, com qualquer letra de unidade.
 - **"Preciso entregar."** Edição rápida e recortes para cada rede social, legendas e audiodescrição para acessibilidade, e exportação com nomes de arquivo padronizados e os metadados que você escolher. Os originais nunca mudam.
+
+## O que ele é — e o que não é
+
+O LionPhotos é um **organizador e um catálogo**. Sua principal função é organizar o trabalho e manter um catálogo fácil, acessível e intuitivo: achar uma foto, separar um ensaio, montar álbuns e projetos e entregar o resultado.
+
+Ele também **edita e corrige**, para o trabalho rápido e leve de que a maioria das fotos precisa — exposição, cor, preto e branco, recorte e endireitamento, correções de lente, revelação de RAW — e nisso já é bastante capaz e entrega resultados rápidos.
+
+Ele **não tem como objetivo substituir o Lightroom, o Photoshop e outros editores dedicados à revelação de fotos digitais**. Trabalhos com camadas de tratamento, retoque localizado e composição ficam a cargo desses softwares mais dedicados; o LionPhotos abre a foto neles (*Abrir com*) e traz o resultado de volta para o catálogo.
 
 ## Para quem é
 
@@ -264,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.45.1**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.45.3**.
 
 ## Créditos
 

@@ -11,7 +11,7 @@ Works on your folders as they are: small thumbnails made once, the metadata that
 
 **English** · [Português (Brasil)](docs/README.pt-BR.md) · [Português (Portugal)](docs/README.pt-PT.md) · [Español](docs/README.es.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Italiano](docs/README.it.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md)
 
-![Version 1.45.1](https://img.shields.io/badge/version-1.45.1-161214)
+![Version 1.45.3](https://img.shields.io/badge/version-1.45.3-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -44,6 +44,14 @@ Photo collections grow faster than anyone can sort them: years of shoots spread 
 - **"The disk is full of things I don't need."** Mark rejects as you go and send them to the Limbo; find repeated files by their content. Everything leaves through the Recycle Bin, never deleted for good.
 - **"My work stays on one computer."** Albums, people, marks, descriptions, adjustments and crops are also kept in a hidden folder inside the collection, so the same external drive opens with all of it on another computer, under any drive letter.
 - **"I need to deliver."** Quick edits and crops for each social network, captions and audio descriptions for accessibility, and exports with consistent file names and the metadata you choose. The originals never change.
+
+## What it is — and what it is not
+
+LionPhotos is an **organizer and a catalog**. Its main job is to put the work in order and to keep a catalog that is easy, accessible and intuitive: finding a photo, sorting a shoot, building albums and projects, and delivering the result.
+
+It also **edits and corrects**, for the quick, light work that most photos need — exposure, colour, black and white, crop and straightening, lens corrections, raw development — and for that it is already quite capable and gives results fast.
+
+It is **not meant to replace Lightroom, Photoshop or other editors dedicated to developing digital photos**. Work with layers of treatment, local retouching and compositing stays with that more dedicated software; LionPhotos opens the photo in them (*Open with*) and takes the result back into the catalog.
 
 ## Who it is for
 
@@ -264,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.45.1**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.45.3**.
 
 ## Credits
 

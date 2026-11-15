@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · **简体中文** · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![版本 1.45.1](https://img.shields.io/badge/version-1.45.1-161214)
+![版本 1.45.3](https://img.shields.io/badge/version-1.45.3-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -44,6 +44,14 @@
 - **“磁盘里塞满了不需要的东西。”** 边看边标记废片并送进 Limbo；按内容找出重复文件。所有删除都经过回收站，绝不永久删除。
 - **“我的整理成果只在一台电脑上。”** 相册、人物、标记、描述、调整和裁剪也保存在收藏内的一个隐藏文件夹中，同一块移动硬盘在另一台电脑上、无论盘符是什么，打开后一切都在。
 - **“我要交付作品。”** 快速编辑和适配各个社交网络的裁剪，为无障碍准备的说明文字和音频描述，以及统一文件名、可选元数据的导出。原始文件永远不变。
+
+## 它是什么，以及它不是什么
+
+LionPhotos 是一个**整理工具和目录**。它的主要功能是把工作整理好，并维护一个简单、易用、直观的目录：找到照片、筛选一次拍摄、建立相册和项目，并交付成果。
+
+它也能**编辑和校正**，用于大多数照片所需的快速、轻量的处理——曝光、色彩、黑白、裁剪和校正水平、镜头校正、RAW 显影——在这方面它已经相当能干，出结果也快。
+
+它**并不打算取代 Lightroom、Photoshop 以及其他专门用于数码照片显影的编辑器**。使用处理图层的工作、局部修饰和合成，交给那些更专业的软件；LionPhotos 可以在其中打开照片（*打开方式*），并把结果带回目录。
 
 ## 适合谁
 
@@ -264,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.45.1**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.45.3**。
 
 ## 致谢
 

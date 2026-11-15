@@ -11,7 +11,7 @@ Travaille sur vos dossiers tels qu'ils sont : de petites miniatures créées une
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · **Français** · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Version 1.45.1](https://img.shields.io/badge/version-1.45.1-161214)
+![Version 1.45.3](https://img.shields.io/badge/version-1.45.3-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -44,6 +44,14 @@ Les collections de photos grandissent plus vite qu’on ne peut les trier : des 
 - **« Le disque est plein de choses inutiles. »** Marquez les rebuts au fil de l’eau et envoyez-les dans les Limbes ; trouvez les fichiers en double par leur contenu. Tout part par la Corbeille, jamais supprimé définitivement.
 - **« Mon travail reste sur un seul ordinateur. »** Albums, personnes, marques, descriptions, réglages et recadrages sont aussi gardés dans un dossier caché au sein de la collection : le même disque externe s’ouvre avec tout cela sur un autre ordinateur, quelle que soit la lettre de lecteur.
 - **« Je dois livrer. »** Retouche rapide et recadrages pour chaque réseau social, légendes et audiodescription pour l’accessibilité, et export avec des noms de fichiers cohérents et les métadonnées de votre choix. Les originaux ne changent jamais.
+
+## Ce qu’il est — et ce qu’il n’est pas
+
+LionPhotos est un **organisateur et un catalogue**. Sa fonction principale est d’organiser le travail et de tenir un catalogue simple, accessible et intuitif : retrouver une photo, trier une séance, créer des albums et des projets et livrer le résultat.
+
+Il **retouche et corrige** aussi, pour le travail rapide et léger dont la plupart des photos ont besoin — exposition, couleur, noir et blanc, recadrage et redressement, corrections d’objectif, développement RAW — et il y est déjà très capable, avec des résultats rapides.
+
+Il **n’a pas pour but de remplacer Lightroom, Photoshop ni d’autres éditeurs dédiés au développement des photos numériques**. Le travail avec des calques de traitement, la retouche locale et le photomontage restent à la charge de ces logiciels plus spécialisés ; LionPhotos y ouvre la photo (*Ouvrir avec*) et ramène le résultat dans le catalogue.
 
 ## Pour qui
 
@@ -264,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.45.1**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.45.3**.
 
 ## Crédits
 

@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · **日本語** · [한국어](README.ko.md)
 
-![バージョン 1.45.1](https://img.shields.io/badge/version-1.45.1-161214)
+![バージョン 1.45.3](https://img.shields.io/badge/version-1.45.3-161214)
 ![ステータス：ベータテスト](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![ライセンス: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![対応: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -44,6 +44,14 @@
 - **「ディスクが要らないものでいっぱい」** 見ながら不要な写真に印を付けて Limbo へ。内容が同じファイルも見つけられます。削除はすべてごみ箱経由で、完全に消すことはありません。
 - **「作業が 1 台のパソコンから出られない」** アルバム、人物、マーク、説明、調整、トリミングはコレクション内の隠しフォルダーにも保存されるので、同じ外付けドライブを別のパソコンで、どのドライブ文字でも、すべてそのまま開けます。
 - **「納品しなければ」** クイック編集と SNS ごとのトリミング、アクセシビリティのためのキャプションと音声解説、統一したファイル名と選んだメタデータでの書き出し。元のファイルは決して変わりません。
+
+## LionPhotos とは — そして、そうでないもの
+
+LionPhotos は**整理ツールであり、カタログ**です。主な役割は、作業を整理し、簡単で、利用しやすく、直感的なカタログを保つことです。写真を見つけ、撮影をより分け、アルバムやプロジェクトを作り、成果を納品します。
+
+また、ほとんどの写真に必要な手早く軽い作業のための**編集と補正**も備えています。露出、色、白黒、切り抜きと傾き補正、レンズ補正、RAW 現像などで、すでに十分な力があり、すばやく結果が得られます。
+
+**Lightroom や Photoshop など、デジタル写真の現像に特化したエディターを置き換えることは目的としていません**。処理レイヤーを使う作業、部分的なレタッチ、合成は、そうしたより専門的なソフトウェアに任せます。LionPhotos は写真をそれらで開き（*プログラムから開く*）、結果をカタログに戻します。
 
 ## 対象となる人
 
@@ -264,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 変更履歴
 
-[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.45.1**。
+[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.45.3**。
 
 ## クレジット
 

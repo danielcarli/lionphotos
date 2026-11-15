@@ -11,7 +11,7 @@ import { h } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { formatBytes, formatDate, formatNumber } from '../../../base/common/format.js';
-import { dateOf, dayOf, MARK } from '../../services/library/browser/libraryService.js';
+import { adjustOf, dateOf, dayOf, editsOf, MARK } from '../../services/library/browser/libraryService.js';
 import { showLabelsDialog } from '../labels/labelsDialog.js';
 import { addToAlbum, removeFromAlbum } from '../albums/albumDialogs.js';
 import { sphereSection } from '../labels/sphereSection.js';
@@ -84,6 +84,19 @@ const KINDS = [
  * Organization: the category, then one line per kind of label the items have — its chips (a click opens its
  * photos; × takes it off) and + to add more — and one "Add to" line for the kinds they have none of.
  */
+/**
+ * A photo's name at the top of its panel: its title (written here, else the file's own) large, with the file's
+ * name small under it; without a title, the file's name alone.
+ * @param {object} it the item @param {{name:string, path:string, meta?:object}} d its details
+ */
+export function nameLines(it, d) {
+  const title = String(editsOf(it).headline || d.meta?.headline || '').trim();
+  const edited = adjustOf(it) ? h('span.ip-edited', t('adjust.edited')) : null;
+  return title
+    ? [h('div.ip-name', { title }, title, edited), h('div.ip-file', { title: d.path }, d.name)]
+    : [h('div.ip-name', { title: d.path }, d.name, edited)];
+}
+
 /**
  * "Photos of the day": every photo of the day these were taken, in Photos — out of the album, the person or the
  * viewer they are being seen in (photos of one day only; not for the Limbo's). Null where it would change nothing.

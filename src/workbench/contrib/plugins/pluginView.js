@@ -53,32 +53,50 @@ export class PluginView extends ViewPane {
     const all = groups.flatMap((g) => g.list.map((x) => x.l.id));
     // what was checked and since deleted (or emptied) does not count
     for (const id of [...chosen]) if (!all.includes(id)) chosen.delete(id);
-    const photos = [...chosen].reduce((a, id) => a + plugins.itemsOf(id).length, 0);
 
+    // Checking a collection changes only what says so — its card, the button, the count — in place: the page is
+    // not drawn again, so it stays where it was scrolled to (it used to jump back to the top).
+    const cards = new Map();
+    const exportLabel = h('span');
     const exportBtn = h('button.btn.btn-primary', { onclick: () => showExportDialog(this.services, { pluginId: p.id, labelIds: [...chosen] }) },
-      h('span', { html: icon('external', 14) }), chosen.size ? tn('plugins.view.exportChosen', chosen.size) : t('plugins.export.button'));
+      h('span', { html: icon('external', 14) }), exportLabel);
     const pick = all.length ? h('button.btn.btn-secondary', {
-      onclick: () => { if (chosen.size === all.length) chosen.clear(); else all.forEach((id) => chosen.add(id)); this.render(); },
-    }, chosen.size === all.length ? t('plugins.view.clear') : t('plugins.view.selectAll')) : null;
+      onclick: () => { if (chosen.size === all.length) chosen.clear(); else all.forEach((id) => chosen.add(id)); sync(); },
+    }) : null;
+    const summary = h('span.small.muted.plg-summary', { 'aria-live': 'polite' });
+    const sync = () => {
+      for (const [id, el] of cards) {
+        const on = chosen.has(id);
+        el.classList.toggle('is-on', on); el.setAttribute('aria-pressed', String(on));
+        el.querySelector('.plg-check').innerHTML = on ? icon('check', 14) : '';
+      }
+      const photos = [...chosen].reduce((a, id) => a + plugins.itemsOf(id).length, 0);
+      exportLabel.textContent = chosen.size ? tn('plugins.view.exportChosen', chosen.size) : t('plugins.export.button');
+      if (pick) pick.textContent = chosen.size === all.length ? t('plugins.view.clear') : t('plugins.view.selectAll');
+      summary.textContent = chosen.size ? tn('plugins.export.count', photos, { collections: tn('plugins.export.collections', chosen.size) }) : (all.length ? t('plugins.view.pickHint') : '');
+    };
 
     const card = ({ l, n, s }) => {
-      const on = chosen.has(l.id);
       const spec = LABEL_TYPES.find((x) => x.type === l.type);
-      return h('button.card.lbl-card.plg-card', {
-        class: `card lbl-card plg-card${on ? ' is-on' : ''}`, 'aria-pressed': String(on), title: l.name,
-        onclick: () => { if (on) chosen.delete(l.id); else chosen.add(l.id); this.render(); },
+      const el = h('button.card.lbl-card.plg-card', {
+        title: l.name, onclick: () => { if (chosen.has(l.id)) chosen.delete(l.id); else chosen.add(l.id); sync(); },
       },
       h('span.lbl-thumbs', s?.sample.length
         ? s.sample.map((it) => focusImage(this.thumbs.shown(h('img', { alt: '', draggable: false }), it), it))
         : h('span.lbl-thumbs-empty', { html: icon(spec?.icon || 'album', 26) })),
-      h('span.plg-check', { 'aria-hidden': 'true', html: on ? icon('check', 14) : '' }),
+      h('span.plg-check', { 'aria-hidden': 'true' }),
       h('span.lbl-card-body',
         h('span.lbl-name', l.name),
         h('span.small.muted', tn('common.items', n)),
         l.notes ? h('span.small.muted.plg-notes', l.notes) : null));
+      cards.set(l.id, el);
+      return el;
     };
 
     const meta = [t('plugins.view.version', { version: p.version }), p.author].filter(Boolean).join(' · ');
+    // drawn again for another reason (an album changed, photos indexed): the same place on the page
+    const scroll = this.element.dataset.plugin === p.id ? this.element.scrollTop : 0;
+    this.element.dataset.plugin = p.id;
     setChildren(this.element,
       h('div.view-header.plg-header',
         h('div.eyebrow', h('span', { html: icon('package', 14) }), t('plugins.eyebrow')),
@@ -87,7 +105,7 @@ export class PluginView extends ViewPane {
           h('div', h('h1.view-title', textOf(p.name)), h('p.muted.small.plg-meta', meta))),
         textOf(p.description) ? h('p.muted', textOf(p.description)) : null),
       h('div.lbl-create.plg-actions', exportBtn, pick,
-        h('span.small.muted.plg-summary', chosen.size ? tn('plugins.export.count', photos, { collections: tn('plugins.export.collections', chosen.size) }) : (all.length ? t('plugins.view.pickHint') : '')),
+        summary,
         h('span.toolbar-spacer'),
         h('button.btn.btn-ghost', { onclick: () => showSettingsDialog(this.services) }, h('span', { html: icon('gear', 14) }), t('plugins.view.manage'))),
       groups.length
@@ -96,5 +114,7 @@ export class PluginView extends ViewPane {
           h('div.lbl-grid', g.list.map(card))))
         : h('div.empty-state', h('span', { html: icon('package', 28) }), h('h3', t('plugins.view.empty')), h('p.muted', t('plugins.view.emptyHint', { types: types.map((ty) => t(`views.${ty}`)).join(', ') }))),
       h('p.choice-note.plg-note', h('span', { html: icon('info', 14) }), h('span', t('plugins.export.note'))));
+    sync();
+    this.element.scrollTop = scroll;
   }
 }

@@ -32,8 +32,13 @@ export class SidebarPart {
     this.treeBody = h('div.tree', { role: 'tree' });
     this.treeWrap = h('div.tree-wrap', this.treeBody);
     this.panelBody = h('div.side-panel-wrap');
-    this.element = h('aside.part.sidebar', this.head, this.status, this.treeWrap, this.panelBody, this.#sash());
-    this.element.hidden = !this.#shown();
+    // Hiding the navigation belongs to the navigation: a button at the end of its title hides it, leaving a
+    // narrow strip with the button that brings it back (Ctrl+B does both). Only the views that have this bar
+    // show either — it used to be a button in the activity bar, there in every view.
+    this.hideBtn = h('button.icon-button.side-hide', { type: 'button', title: t('sidebar.hide', { key: 'Ctrl+B' }), 'aria-label': t('sidebar.hide', { key: 'Ctrl+B' }), html: icon('sidebar', 15), onclick: () => this.layout.toggleSidebar() });
+    this.showBtn = h('button.side-show', { type: 'button', title: t('sidebar.show', { key: 'Ctrl+B' }), 'aria-label': t('sidebar.show', { key: 'Ctrl+B' }), 'aria-expanded': 'false', html: icon('sidebar', 15), onclick: () => this.layout.toggleSidebar() });
+    this.element = h('aside.part.sidebar', this.head, this.status, this.treeWrap, this.panelBody, this.#sash(), this.showBtn);
+    this.#place();
     this.layout.onDidChangePanel(() => { this.renderHead(); this.renderPanel(); });
     // the dates follow the collection, the filter and the dates read from the photos (only while shown)
     const later = () => {
@@ -56,7 +61,7 @@ export class SidebarPart {
     this.library.onDidChangeFilter(() => this.renderTree());
     // the view decides what it lists: the folders, or the albums or projects
     const showSide = () => {
-      this.element.hidden = !this.#shown();
+      this.#place();
       const mode = this.#mode();
       if (mode === this.lastMode) return;
       this.lastMode = mode;
@@ -76,8 +81,15 @@ export class SidebarPart {
   /** The folders (and the dates) only make sense in Photos browsing the collection: the other views are
    *  organized their own way (albums, people, pets, places, projects, the Limbo, the tools), and so is a
    *  project, album, person, pet or place opened into Photos — its photos come from any folder. */
-  #shown() {
-    if (!this.layout.sidebarVisible) return false;
+  #shown() { return this.layout.sidebarVisible && this.#wanted(); }
+
+  /** Here or not (the view decides), and open or folded to its strip (the person decides). */
+  #place() {
+    this.element.hidden = !this.#wanted();
+    this.element.classList.toggle('is-collapsed', !this.layout.sidebarVisible);
+  }
+
+  #wanted() {
     return this.#mode() !== 'folders' || (this.layout.activeView === 'photos' && !this.library.filter.labelId);
   }
 
@@ -98,7 +110,7 @@ export class SidebarPart {
     if (mode !== 'folders') {
       const n = this.labels.ofType(mode).length;
       setChildren(this.head, h('button.side-collection.side-labels-title', { title: t(`views.${mode}`), onclick: () => this.layout.openView(mode) },
-        h('span', { html: icon(mode === 'album' ? 'album' : 'layers', 15) }), h('span.side-collection-name', t(`views.${mode}`)), h('span.tree-size', n ? formatNumber(n) : '')));
+        h('span', { html: icon(mode === 'album' ? 'album' : 'layers', 15) }), h('span.side-collection-name', t(`views.${mode}`)), h('span.tree-size', n ? formatNumber(n) : '')), this.hideBtn);
       return;
     }
     setChildren(this.head,
@@ -109,7 +121,7 @@ export class SidebarPart {
       library.root ? h('div.side-panes', { role: 'tablist' }, PANELS.map((p) => h('button', {
         class: `side-pane${panel === p.id ? ' active' : ''}`, role: 'tab', 'aria-selected': String(panel === p.id), title: p.label, 'aria-label': p.label,
         html: icon(p.icon, 15), onclick: () => this.layout.openPanel(p.id),
-      }))) : null);
+      }))) : null, this.hideBtn);
   }
 
   #collectionMenu(button) {

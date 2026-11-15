@@ -10,6 +10,7 @@ import { icon } from '../../../base/browser/icons.js';
 import { formatNumber } from '../../../base/common/format.js';
 import { VIEWS, TOOLS } from '../../services/layout/browser/layoutService.js';
 import { showSettingsDialog } from '../../contrib/settings/settingsDialog.js';
+import { showAboutDialog } from '../../contrib/about/aboutDialog.js';
 import { t } from '../../../base/common/nls.js';
 import { textOf } from '../../services/plugins/browser/pluginsService.js';
 
@@ -37,8 +38,9 @@ export class ActivitybarPart {
     this.element = h('nav.part.activitybar', { 'aria-label': t('activitybar.ariaLabel') },
       h('div.activity-top', lib, this.pluginSlot, h('div.activity-sep'), limboBtn, tools),
       h('div.activity-bottom',
-        h('button.activity-item.activity-small', { title: `${t('activitybar.toggleSidebar', { key: 'Ctrl+B' })} · ${t('settings.focus')} (\\)`, 'aria-label': t('activitybar.toggleSidebar', { key: 'Ctrl+B' }), onclick: () => layout.toggleSidebar() },
-          h('span.activity-icon', { html: icon('sidebar', 19) })),
+        // who made it, the license, the version: by name, in sight (it was only a small link inside Settings)
+        h('button.activity-item.activity-about', { title: t('about.title'), 'aria-label': t('about.title'), onclick: () => showAboutDialog(services.host) },
+          h('span.activity-icon', { html: icon('info', 19) }), h('span.activity-label', t('about.short'))),
         h('button.activity-item.activity-small', { title: t('settings.title'), 'aria-label': t('settings.title'), onclick: () => showSettingsDialog(services) },
           h('span.activity-icon', { html: icon('gear', 19) }))));
     plugins?.onDidChange(() => this.#renderPlugins());

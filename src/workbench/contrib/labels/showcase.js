@@ -163,18 +163,30 @@ export function renderPhotoShowcase(services, items, { onOpen }) {
     thumbs.shown(img, it);
     focusImage(img, it);
     const frame = h('button.sc-photo', { title: t('showcase.photoOpen'), 'aria-label': `${t('showcase.photoOpen')}: ${title}`, onclick: open }, img);
-    frame.addEventListener('sc-visible', () => { const r = frame.getBoundingClientRect(); if (r.width) sharpenCover(services, it, img, r.width, r.height); });
+    const titleBtn = h('button.sc-name-btn', { onclick: open }, title);
+    const fileLine = h('li.sc-file', { hidden: title === name }, name);
+    frame.addEventListener('sc-visible', () => {
+      const r = frame.getBoundingClientRect(); if (r.width) sharpenCover(services, it, img, r.width, r.height);
+      // no title written here: the file's own (read now, as the row comes into sight) goes large, the file's name small
+      if (title !== name) return;
+      services.host.library.details(it.id).then((d) => {
+        const own = String(d?.meta?.headline || '').trim();
+        if (!own || !titleBtn.isConnected) return;
+        titleBtn.textContent = own; fileLine.hidden = false;
+        frame.setAttribute('aria-label', `${t('showcase.photoOpen')}: ${own}`);
+      }).catch(() => {});
+    });
     seen.observe(frame);
     return h('article.sc-row.sc-photo-row',
       h('div.sc-text',
         h('p.sc-eyebrow', dayOf(it)),
-        h('h2.sc-name.sc-photo-title', h('button.sc-name-btn', { onclick: open }, title)),
+        h('h2.sc-name.sc-photo-title', titleBtn),
         h('ul.sc-meta',
           h('li.sc-marks', h('span', h('span', { html: icon(it.mark === 1 ? 'star' : 'okCircle', 12) }), t(it.mark === 1 ? 'marks.great' : 'marks.ok'))),
           it.camera ? h('li', it.camera) : null,
           place ? h('li', place) : null,
           it.by || it.author ? h('li', it.by || it.author) : null,
-          title !== name ? h('li.sc-file', name) : null),
+          fileLine),
         caption && caption !== title ? h('p.sc-desc', caption) : null,
         h('button.sc-open', { onclick: open }, t('showcase.photoOpen'))),
       h('div.sc-media', frame));

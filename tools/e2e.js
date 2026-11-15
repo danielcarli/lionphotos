@@ -730,7 +730,8 @@ app.whenReady().then(async () => {
       const ids = [${md.jpg.id}, ${md.raw.id}];
       lib.setSelection([ids[0]]); await wait(500); OPEN();
       const order1 = [...document.querySelectorAll('.info-panel .ip-sec')].map((x) => x.dataset.sec).join();
-      const name = document.querySelector('.info-panel .ip-name')?.textContent;
+      // the photo has a title: the title large, the file's name small under it
+      const name = document.querySelector('.info-panel .ip-name')?.textContent, fileName = document.querySelector('.info-panel .ip-file')?.textContent;
       // folded: a summary
       const placeHead = document.querySelector('.ip-sec[data-sec="place"] .ip-sec-h');
       placeHead.click(); await wait(50);
@@ -760,7 +761,7 @@ app.whenReady().then(async () => {
       const moved = [...lib.selection].join() === String(second), refocused = document.activeElement?.dataset?.desc;
       document.activeElement?.blur(); lib.clearSelection();
       await lib.describe(ids, { edits: { headline: 'Escolas no Planetário' } });
-      return { order1, order2, name, nameOk: name === lib.byId.get(ids[0]).name, summary, added, undoOne, removed, mixedText, picked, moved, refocused };
+      return { order1, order2, name, nameOk: name === 'Escolas no Planetário' && fileName === lib.byId.get(ids[0]).name, summary, added, undoOne, removed, mixedText, picked, moved, refocused };
     })()`);
     check(pn.order1 === 'organize,adjust,describe,place,file' && pn.order2 === 'organize,adjust,describe,place,files' && pn.nameOk && /Santa Maria|Planetário/.test(pn.summary)
       && pn.added.every((k) => k === 'astronomia|escolas|ufsm') && pn.undoOne === 'keywords' && pn.removed.every((k) => k === 'astronomia|escolas')
@@ -1067,10 +1068,16 @@ app.whenReady().then(async () => {
         const title = v.querySelector('.view-title')?.textContent, cards = v.querySelectorAll('.plg-card').length;
         [...v.querySelectorAll('.plg-card')].find((c) => c.title === 'Export Test')?.click(); await wait(50);
         const btn = v.querySelector('.plg-actions .btn-primary').textContent, active = b.classList.contains('active');
+        // checking a collection keeps the page where it was (a small window, scrolled down), the card drawn once
+        const one = [...v.querySelectorAll('.plg-card')].find((c) => c.title === 'Export Test');
+        v.style.maxHeight = '160px'; v.scrollTop = 120; await wait(50);
+        const at = v.scrollTop; one.click(); await wait(80);
+        const stay = { at, after: v.scrollTop, same: [...v.querySelectorAll('.plg-card')].includes(one), off: !one.classList.contains('is-on') };
+        one.click(); await wait(50); stay.on = one.classList.contains('is-on') && one.getAttribute('aria-pressed') === 'true'; v.style.maxHeight = ''; v.scrollTop = 0;
         await ${S}.plugins.setEnabled('simple-gallery', false); await wait(100);
         const gone = !document.querySelector('[data-view="plugin:simple-gallery"]'), view = ${S}.layout.activeView;
         await ${S}.plugins.setEnabled('simple-gallery', true);
-        return { order, title, cards, btn, active, gone, view }; })()`);
+        return { order, title, cards, btn, active, gone, view, stay }; })()`);
       const rm = await op('removePlugin', { id: 'simple-gallery' });
       const after = await js(`${S}.plugins.refresh().then((l) => l.length)`);
       await js(`${S}.labels.remove(${aid})`);
@@ -1080,6 +1087,30 @@ app.whenReady().then(async () => {
         'export: a new folder with the page, the photos as JPEG, file names, descriptions and audio descriptions, and a .zip of it all', JSON.stringify({ n: ids.length, ...page, files: (page.files || []).slice(0, 2) }));
       check(tab.order.indexOf('plugin:simple-gallery') === tab.order.indexOf('project') + 1 && !!tab.title && tab.cards >= 1 && /1/.test(tab.btn) && tab.active && tab.gone && tab.view === 'project',
         'an installed plugin has its tab after Projects, with its page; turned off, the tab goes', JSON.stringify(tab));
+      check(tab.stay.at > 0 && tab.stay.after === tab.stay.at && tab.stay.same && tab.stay.off && tab.stay.on, 'in a plugin page, checking a collection keeps the page where it was scrolled', JSON.stringify(tab.stay));
+      // hiding the navigation is done in the navigation: a button at the end of its title folds it to a strip
+      // with the button that brings it back; the activity bar has no such button
+      const fold = await js(`(async () => { const s = ${S}, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        s.library.goHome(); s.layout.openView('album'); await wait(400);
+        const side = document.querySelector('aside.sidebar'), res = { inBar: !!document.querySelector('.activitybar .activity-small .activity-icon svg') && document.querySelectorAll('.activitybar .activity-small').length };
+        res.open = !side.hidden && !side.classList.contains('is-collapsed') && !!side.querySelector('.side-head .side-hide');
+        side.querySelector('.side-head .side-hide').click(); await wait(200);
+        res.folded = !side.hidden && side.classList.contains('is-collapsed') && side.getBoundingClientRect().width < 40 && getComputedStyle(side.querySelector('.tree-wrap')).display === 'none';
+        s.layout.openView('person'); await wait(300); res.noneElsewhere = side.hidden;
+        s.layout.openView('album'); await wait(300);
+        side.querySelector('.side-show').click(); await wait(200);
+        res.back = !side.classList.contains('is-collapsed') && side.getBoundingClientRect().width > 150;
+        s.layout.openView('photos'); await wait(200);
+        return res; })()`);
+      check(fold.inBar === 1 && fold.open && fold.folded && fold.noneElsewhere && fold.back, 'the navigation is hidden and shown from itself (a strip when hidden), not from the activity bar', JSON.stringify(fold));
+      // the credits by name in the activity bar: "About" opens who made it, the license and the version
+      const about = await js(`(async () => { const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        const b = document.querySelector('.activitybar .activity-about'); b?.click(); await wait(400);
+        const d = document.querySelector('.about-dialog');
+        const res = { label: b?.querySelector('.activity-label')?.textContent, credit: d?.querySelector('.about-credit')?.textContent || '' };
+        d?.querySelector('.cm-actions .btn')?.click(); await wait(100); res.closed = !document.querySelector('.about-dialog');
+        return res; })()`);
+      check(about.label === 'About' && /Daniel Michelon De Carli/.test(about.credit) && about.closed, 'About, by name in the activity bar, shows the credits', JSON.stringify(about));
       check(rm.res.ok && after === 0, 'a plugin is removed (Recycle Bin)', JSON.stringify({ ok: rm.res.ok, error: rm.res.error, after }));
       fs.rmSync(expDir, { recursive: true, force: true });
     }

@@ -481,3 +481,7 @@ _merge(MESSAGES, {'export': {'more': '옵션 더 보기', 'less': '옵션 접기
 _merge(MESSAGES, {'backup': {'catalog': {'current': '카탈로그(앨범, 인물, 표시, 설명, 조정)도 백업에 있습니다({when} 기준).', 'older': '백업에 있는 카탈로그 사본이 오래되었습니다({when}). 이후에 만든 앨범, 인물, 조정은 들어 있지 않습니다.', 'missing': '백업에 카탈로그 사본이 없습니다. 사진은 있지만 앨범, 인물, 설명, 조정은 없습니다.', 'copy': '카탈로그를 백업에 복사', 'copied': '카탈로그를 백업에 복사했습니다.'}}, 'portable': {'locked': '{by}에서 열려 있습니다({when}부터). 그쪽에서 닫을 때까지 여기서는 컬렉션 폴더에 아무것도 기록하지 않습니다. 여기서 한 작업은 이 컴퓨터의 카탈로그에 남고 나중에 폴더에 기록됩니다.', 'takeOver': '그래도 여기서 사용', 'takeOverTitle': '이 컴퓨터에서 컬렉션 폴더에 기록합니다. 다른 컴퓨터에서 LionPhotos가 실제로 열려 있지 않을 때만 사용하세요.', 'lockedToast': '이 컬렉션은 다른 컴퓨터({by})에서 열려 있습니다. 그쪽에서 닫을 때까지 여기서 한 작업은 이 컴퓨터의 카탈로그에 남습니다.'}})
 
 _merge(MESSAGES, {'albums': {'setAsCover': '앨범 표지로 설정'}})
+
+_merge(MESSAGES, {'about': {'short': '정보'}})
+
+_merge(MESSAGES, {'sidebar': {'hide': '탐색 숨기기 ({key})', 'show': '탐색 표시 ({key})'}})

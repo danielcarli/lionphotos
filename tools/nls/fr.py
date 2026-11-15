@@ -484,3 +484,7 @@ _merge(MESSAGES, {'export': {'more': 'Plus d’options', 'less': 'Moins d’opti
 _merge(MESSAGES, {'backup': {'catalog': {'current': 'Le catalogue (albums, personnes, marques, descriptions, réglages) est aussi dans la sauvegarde, en date du {when}.', 'older': 'La sauvegarde a une copie plus ancienne du catalogue ({when}) : les albums, personnes et réglages faits depuis n’y sont pas.', 'missing': 'La sauvegarde n’a pas de copie du catalogue : elle a les photos, mais pas les albums, personnes, descriptions et réglages.', 'copy': 'Copier le catalogue dans la sauvegarde', 'copied': 'Le catalogue a été copié dans la sauvegarde.'}}, 'portable': {'locked': 'Ouverte sur {by} (depuis {when}) : d’ici, rien n’est écrit dans le dossier de la collection tant qu’elle n’y est pas fermée. Ce que vous faites ici reste dans le catalogue de cet ordinateur et ira dans le dossier ensuite.', 'takeOver': 'Utiliser ici quand même', 'takeOverTitle': 'Écrit dans le dossier de la collection depuis cet ordinateur. Seulement si LionPhotos n’est pas vraiment ouvert sur l’autre.', 'lockedToast': 'Cette collection est ouverte sur un autre ordinateur ({by}). Ce que vous faites ici reste dans le catalogue de cet ordinateur jusqu’à sa fermeture là-bas.'}})
 
 _merge(MESSAGES, {'albums': {'setAsCover': 'Définir comme couverture de l’album'}})
+
+_merge(MESSAGES, {'about': {'short': 'À propos'}})
+
+_merge(MESSAGES, {'sidebar': {'hide': 'Masquer la navigation ({key})', 'show': 'Afficher la navigation ({key})'}})

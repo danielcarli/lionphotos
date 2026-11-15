@@ -2,6 +2,29 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.42.4] — 2026-11-15
+
+### Changed
+- **Hiding the navigation is done in the navigation.** The button is at the end of the side bar's title (Albums, Projects, the collection's folders); hidden, the bar leaves a narrow strip with the button that brings it back. `Ctrl+B` does both. The button in the activity bar is gone — it was there in every view, and few have this bar.
+
+## [1.42.3] — 2026-11-15
+
+### Changed
+- **About, in sight:** the credits (who created LionPhotos, the team, the license, the version) open from an *About* button, by name, at the foot of the activity bar. It was only a small link at the end of Settings (still there).
+
+## [1.42.2] — 2026-11-15
+
+### Changed
+- **A photo with a title shows the title large and the file's name small:** at the top of the side panel and of the viewer's panel, and in the large view of the starred photos — where the title the file itself carries now counts too, not only one written in LionPhotos.
+
+## [1.42.1] — 2026-11-15
+
+### Fixed
+- **A plugin's page stays where it is.** Checking a collection far down the page sent it back to the top; now only the card, the button and the count change, and the page keeps its place (also when an album changes meanwhile).
+
+### Changed
+- In a plugin's page, the *Export* button and the count of what is checked stay in sight at the top while the collections scroll.
+
 ## [1.42.0] — 2026-11-15
 
 ### Added

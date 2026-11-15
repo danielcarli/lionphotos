@@ -19,7 +19,7 @@ import { t, tn } from '../../../base/common/nls.js';
 import { formatBytes, formatDateTime, formatNumber } from '../../../base/common/format.js';
 import { KIND, dateOf, MARK_NAMES } from '../../services/library/browser/libraryService.js';
 import { detailsLine } from '../info/infoPanel.js';
-import { dayLink, organizeSection } from '../photos/selectionSummary.js';
+import { dayLink, nameLines, organizeSection } from '../photos/selectionSummary.js';
 import { metadataSections } from '../photos/descriptionSection.js';
 import { adjustSection } from '../photos/adjustSection.js';
 import { fileSection, infoFooter } from '../photos/infoSections.js';
@@ -780,7 +780,7 @@ export class Viewer {
     for (const p of [this.side, this.sideLeft]) { p.dataset.id = String(it.id); p.dataset.split = String(split); }
     const canAdjust = it.kind === KIND.image && (WEB_IMAGES.has(it.ext) || raw || HEIF_IMAGES.has(String(it.ext).toLowerCase()));
     const head = () => h('div.ip-head.vw-ip-head',
-      h('div.ip-name', { title: d.path }, d.name, adjustOf(it) ? h('span.ip-edited', t('adjust.edited')) : null),
+      ...nameLines(it, d),
       h('div.ip-meta', [detailsLine(d), dims].filter(Boolean).join(' · ')),
       dayLink(this, [it], { onLeave: () => this.close() }),
       h('div.ip-tools',

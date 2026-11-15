@@ -481,3 +481,7 @@ _merge(MESSAGES, {'export': {'more': '更多选项', 'less': '收起选项'}})
 _merge(MESSAGES, {'backup': {'catalog': {'current': '目录（相册、人物、标记、描述、调整）也已在备份中，日期为 {when}。', 'older': '备份中的目录副本较旧（{when}）：之后创建的相册、人物和调整不在其中。', 'missing': '备份中没有目录副本：只有照片，没有相册、人物、描述和调整。', 'copy': '将目录复制到备份', 'copied': '目录已复制到备份。'}}, 'portable': {'locked': '已在 {by} 上打开（自 {when} 起）：在那里关闭之前，这里不会向收藏文件夹写入任何内容。你在这里所做的会保存在本机目录中，之后再写入文件夹。', 'takeOver': '仍在此处使用', 'takeOverTitle': '从本机写入收藏文件夹。仅当另一台电脑上确实没有打开 LionPhotos 时使用。', 'lockedToast': '此收藏已在另一台电脑（{by}）上打开。在那里关闭之前，你在这里所做的会保存在本机目录中。'}})
 
 _merge(MESSAGES, {'albums': {'setAsCover': '设为相册封面'}})
+
+_merge(MESSAGES, {'about': {'short': '关于'}})
+
+_merge(MESSAGES, {'sidebar': {'hide': '隐藏导航 ({key})', 'show': '显示导航 ({key})'}})

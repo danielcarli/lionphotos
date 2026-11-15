@@ -11,6 +11,7 @@
 // change; undoing sends the exported files to the Recycle Bin.
 import { h } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
+import { namePieces, defaultPattern, localizePattern } from './nameTokens.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { formatBytes } from '../../../base/common/format.js';
 import { adjustOf, KIND } from '../../services/library/browser/libraryService.js';
@@ -20,8 +21,8 @@ import { SIZES, SHARPEN, WATERMARK_PLACES, targetSize, resizeCanvas, copyCanvas,
 
 const LAST_KEY = 'lionphotos.export.last';
 const PRESETS_KEY = 'lionphotos.export.presets';
-const DEFAULT_PATTERN = '{data}-{álbum}-{fotógrafo}-{nº}';
-const PIECES = { data: 'date', 'álbum': 'work', 'fotógrafo': 'author', 'nº': 'number', nome: 'name' };
+// the title of each piece's chip (export.pieces.*)
+const PIECE_TITLE = { date: 'date', work: 'work', author: 'author', n: 'number', name: 'name' };
 const MODES = ['all', 'noGps', 'author', 'none'];
 
 /** Ready-made settings for where photos usually go. */
@@ -33,6 +34,7 @@ export const BUILT_IN = {
 };
 const SETTING_KEYS = ['format', 'quality', 'size', 'long', 'sharpen', 'metadata', 'pattern', 'ascii', 'keepName', 'watermark', 'markText', 'markPlace', 'markOpacity'];
 
+const MORE_KEY = 'lionphotos.export.more';
 const read = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* storage unavailable */ } };
 
@@ -73,10 +75,12 @@ function showDialog(s, items, skipped) {
   const last = read(LAST_KEY, {});
   const saved = read(PRESETS_KEY, []);
   const v = {
-    ...BUILT_IN.social, pattern: DEFAULT_PATTERN, ascii: false, keepName: false,
+    ...BUILT_IN.social, pattern: defaultPattern(), ascii: false, keepName: false,
     watermark: false, markText: '', markPlace: 'bottomRight', markOpacity: 70, preset: 'social', ...last,
     dest: last.dest || '', work: workOf(s, items),
   };
+  // a pattern kept from another language of the app: its pieces in this one
+  v.pattern = localizePattern(v.pattern) || defaultPattern();
   v.subfolder ??= true;
   // the new folder follows the album's name until it is typed in
   let subTyped = false;
@@ -84,6 +88,7 @@ function showDialog(s, items, skipped) {
   v.subName = subDefault();
   const edited = items.filter((it) => adjustOf(it)).length;
 
+  let more = read(MORE_KEY, false) === true;
   return new Promise((resolve) => {
     const body = h('div.xp-body');
     const preview = h('ul.xp-names');
@@ -97,7 +102,7 @@ function showDialog(s, items, skipped) {
         try {
           const r = await host.exports.names({ ids: items.slice(0, 3).map((it) => it.id), count: 3, dest: v.dest || '', subfolder: v.subfolder ? v.subName : '', pattern: v.pattern, work: v.work, ascii: v.ascii, keepName: v.keepName, format: v.format });
           preview.replaceChildren(...r.names.map((n) => h('li', n)), items.length > 3 ? h('li.muted', '…') : null);
-          authorNote.textContent = r.noAuthor && !v.keepName && /fot[oó]grafo|autor/i.test(v.pattern) ? t('export.noAuthorHint') : '';
+          authorNote.textContent = r.noAuthor && !v.keepName && /\{(fot[oó]graf[oe]?|autor|author|photograph(er|e))\}/i.test(v.pattern) ? t('export.noAuthorHint') : '';
         } catch { preview.replaceChildren(); }
       }, 150);
     };
@@ -132,12 +137,12 @@ function showDialog(s, items, skipped) {
 
       // the names
       const pattern = h('input.text-input.mono.xp-pattern', { value: v.pattern, disabled: v.keepName, 'aria-label': t('export.pattern'), oninput: (e) => set({ pattern: e.target.value }, false) });
-      const pieces = h('div.xp-pieces', Object.entries(PIECES).map(([p, key]) => h('button.chip-token', { disabled: v.keepName, title: t(`export.pieces.${key}`), onclick: () => {
+      const pieces = h('div.xp-pieces', namePieces().map(([p, key]) => h('button.chip-token', { disabled: v.keepName, title: t(`export.pieces.${PIECE_TITLE[key]}`), onclick: () => {
         const at = pattern.selectionStart ?? pattern.value.length;
         const sep = at && !/[-_ ]$/.test(pattern.value.slice(0, at)) ? '-' : '';
         set({ pattern: pattern.value.slice(0, at) + `${sep}{${p}}` + pattern.value.slice(at) });
       } }, `{${p}}`)),
-      h('button.chip-token.xp-reset', { disabled: v.pattern === DEFAULT_PATTERN || v.keepName, onclick: () => set({ pattern: DEFAULT_PATTERN }) }, t('export.patternReset')));
+      h('button.chip-token.xp-reset', { disabled: v.pattern === defaultPattern() || v.keepName, onclick: () => set({ pattern: defaultPattern() }) }, t('export.patternReset')));
       const work = h('input.text-input', { value: v.work, placeholder: t('export.workPlaceholder'), 'aria-label': t('export.work'), oninput: (e) => {
         set({ work: e.target.value }, false);
         if (!subTyped) { v.subName = subDefault(); const box = body.querySelector('.xp-sub'); if (box) box.value = v.subName; }
@@ -156,22 +161,28 @@ function showDialog(s, items, skipped) {
           h('select.text-input', { 'aria-label': t('export.watermarkPlace'), onchange: (e) => { v.markPlace = e.target.value; } }, WATERMARK_PLACES.map((p) => h('option', { value: p, selected: v.markPlace === p }, t(`export.places.${p}`)))),
           h('label.xp-range', h('span.small', t('export.opacity')), h('input', { type: 'range', min: 20, max: 100, step: 5, value: v.markOpacity, oninput: (e) => { v.markOpacity = Number(e.target.value); } }))) : null);
 
-      body.replaceChildren(
+      // compact at first: the preset, where, what the preset does in a line, and the first names; "More options"
+      // (remembered) opens the file, the names, the metadata and the signature
+      const brief = [t(`export.formats.${v.format}`) + (v.format === 'jpeg' && v.quality ? ` ${v.quality}` : ''), t(`export.sizes.${v.size}`), t(`export.modes.${v.metadata}`), v.watermark ? t('export.watermark') : null].filter(Boolean).join(' · ');
+      const moreBtn = h('button.link-button.xp-more', { type: 'button', 'aria-expanded': String(more), onclick: () => { more = !more; write(MORE_KEY, more); draw(); } },
+        h('span', { html: icon(more ? 'chevronDown' : 'chevronRight', 12) }), t(more ? 'export.less' : 'export.more'));
+      body.replaceChildren(...[
         presets,
         h('section.xp-section', h('h3', t('export.where')), dest, h('div.xp-row', sub, subName)),
-        h('section.xp-section.xp-grid', h('h3', t('export.file')),
+        h('div.xp-brief', h('span.xp-brief-text', { title: brief }, brief), moreBtn),
+        more ? h('section.xp-section.xp-grid', h('h3', t('export.file')),
           field(t('export.format'), seg('format', ['jpeg', 'png', 'tiff'], t('export.format'), { label: (f) => t(`export.formats.${f}`), title: (f) => t(`export.formats.${f}Hint`) })),
           quality ? field(t('export.quality'), quality) : h('span'),
           field(t('export.size'), h('div.xp-row', size, long)),
-          field(t('export.sharpen'), sharpen)),
+          field(t('export.sharpen'), sharpen)) : null,
         h('section.xp-section', h('h3', t('export.names')),
-          h('div.xp-row', pattern), pieces,
-          h('div.xp-row', field(t('export.work'), work),
-            h('label.xp-check', h('input', { type: 'checkbox', checked: v.ascii, onchange: (e) => set({ ascii: e.target.checked }, false) }), h('span', t('export.ascii'))),
-            h('label.xp-check', h('input', { type: 'checkbox', checked: v.keepName, onchange: (e) => set({ keepName: e.target.checked }) }), h('span', t('export.keepName')))),
+          more ? [h('div.xp-row', pattern), pieces,
+            h('div.xp-row', field(t('export.work'), work),
+              h('label.xp-check', h('input', { type: 'checkbox', checked: v.ascii, onchange: (e) => set({ ascii: e.target.checked }, false) }), h('span', t('export.ascii'))),
+              h('label.xp-check', h('input', { type: 'checkbox', checked: v.keepName, onchange: (e) => set({ keepName: e.target.checked }) }), h('span', t('export.keepName'))))] : null,
           h('div.xp-preview', h('span.small.muted', t('export.preview')), preview), authorNote),
-        h('section.xp-section', h('h3', t('export.metadata')), meta),
-        h('section.xp-section', mark));
+        more ? h('section.xp-section', h('h3', t('export.metadata')), meta) : null,
+        more ? h('section.xp-section', mark) : null].filter(Boolean));
       confirm.disabled = !v.dest;
       names();
     };

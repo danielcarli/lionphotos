@@ -7,10 +7,11 @@
 // Three lists: the photos in both (in the same place or elsewhere), only in the master, only in the
 // backup — each grouped by folder — and the copy of what is missing, into the same folder layout or into
 // date folders.
+import { pageIntro } from '../../browser/pageIntro.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
-import { formatBytes, bytesParts, formatNumber, formatDate } from '../../../base/common/format.js';
+import { formatBytes, bytesParts, formatNumber, formatDate, formatDateTime } from '../../../base/common/format.js';
 import { ViewPane } from '../../browser/viewPane.js';
 
 const PAGE = 400;
@@ -50,12 +51,13 @@ export class BackupView extends ViewPane {
     const line = !on ? t('portable.off')
       : s.state === 'saved' || s.state === 'synced' ? t('portable.saved', { when, size: s.size ? formatBytes(s.size) : '' })
         : s.state === 'imported' ? t('portable.read', { when, by: s.by || '?' })
+          : s.state === 'locked' ? t('portable.locked', { by: s.by || '?', when: s.at ? formatDateTime(s.at) : '' })
           : s.state === 'readOnly' ? t('portable.readOnly')
             : s.state === 'full' ? t('portable.full')
               : s.state === 'newer' ? t('portable.newer')
                 : s.state === 'error' ? t('portable.error', { error: s.error || '' })
                   : s.pending ? t('portable.pending') : t('portable.waiting');
-    const bad = ['readOnly', 'full', 'newer', 'error'].includes(s.state);
+    const bad = ['readOnly', 'full', 'newer', 'error', 'locked'].includes(s.state);
     return h('div.card.pc-card',
       h('div.pc-head',
         h('span.pc-icon', { html: icon('disk', 18) }),
@@ -66,7 +68,8 @@ export class BackupView extends ViewPane {
         h('label.tb-switch', { class: `tb-switch${on ? ' on' : ''}`, title: t('portable.switchTitle') },
           h('input', { type: 'checkbox', checked: on, onchange: (e) => p.setEnabled(e.target.checked) }), h('span.tb-switch-track'), t('portable.switch'))),
       on ? h('div.pc-actions',
-        h('button.btn.btn-secondary.btn-sm', { onclick: () => p.saveNow() }, h('span', { html: icon('check', 13) }), t('portable.saveNow')),
+        s.state === 'locked' ? h('button.btn.btn-secondary.btn-sm.pc-takeover', { title: t('portable.takeOverTitle'), onclick: () => p.takeOver() }, t('portable.takeOver')) : null,
+        h('button.btn.btn-secondary.btn-sm', { disabled: s.state === 'locked', onclick: () => p.saveNow() }, h('span', { html: icon('check', 13) }), t('portable.saveNow')),
         h('button.btn.btn-ghost.btn-sm', { onclick: () => p.reveal(), title: s.folder || '' }, h('span', { html: icon('folderOpen', 13) }), t('portable.reveal'))) : null);
   }
 
@@ -98,10 +101,10 @@ export class BackupView extends ViewPane {
         h('div.small.muted', label),
         h('button.btn.btn-secondary.btn-sm', { onclick: () => b.cancel() }, t('common.cancel')));
     }
+    const intro = pageIntro('backup', t('backup.lead'), 'p.muted.bk-lead');
     return h('div.card.bk-intro',
-      h('div.eyebrow', h('span', { html: icon('backup', 14) }), t('backup.eyebrow')),
-      h('h1.view-title', t('backup.title')),
-      h('p.muted.bk-lead', t('backup.lead')),
+      h('div.view-title-row', h('h1.view-title', t('backup.title')), intro.help),
+      intro.body,
       h('div.bk-slots',
         this.#slot('master'),
         h('button.icon-button.bk-swap', { title: t('backup.swap'), 'aria-label': t('backup.swap'), html: icon('swap', 18), onclick: () => b.swap(), disabled: b.status === 'running' }),
@@ -134,10 +137,17 @@ export class BackupView extends ViewPane {
         h('span.bk-tile-size', `${parts.int}${parts.dec} ${parts.unit}`),
         sub ? h('span.bk-tile-sub', sub) : null);
     };
-    return h('div.bk-tiles',
+    // the catalog: albums, people, marks, descriptions and adjustments are not in the photos' files
+    const c = r.catalog;
+    const catalog = c?.master ? h(`div.bk-catalog${c.current ? '' : '.is-behind'}`,
+      h('span', { html: icon('disk', 15) }),
+      h('span.bk-catalog-text', c.current ? t('backup.catalog.current', { when: formatDate(c.master.at) })
+        : c.backup ? t('backup.catalog.older', { when: formatDate(c.backup.at) }) : t('backup.catalog.missing')),
+      c.current ? null : h('button.btn.btn-secondary.btn-sm', { onclick: () => this.backup.copyCatalog() }, t('backup.catalog.copy'))) : null;
+    return h('div.bk-summary', catalog, h('div.bk-tiles',
       tile('onlyMaster', s.onlyMasterCount, s.onlyMasterBytes, s.onlyMasterCount ? t('backup.sub.missingInBackup') : t('backup.sub.allBackedUp'), 'master'),
       tile('both', s.bothCount, s.bothBytes, t('backup.sub.both', { same: formatNumber(s.samePlace), elsewhere: formatNumber(s.elsewhere) }), 'both'),
-      tile('onlyBackup', s.onlyBackupCount, s.onlyBackupBytes, s.onlyBackupCount ? t('backup.sub.missingInMaster') : t('backup.sub.nothingExtra'), 'backup'));
+      tile('onlyBackup', s.onlyBackupCount, s.onlyBackupBytes, s.onlyBackupCount ? t('backup.sub.missingInMaster') : t('backup.sub.nothingExtra'), 'backup')));
   }
 
   #thumb(f) {

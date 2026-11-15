@@ -110,5 +110,25 @@ const still = again.groups.filter((x) => x.kind !== 'keep');
 check(!still.length, 'a second run proposes nothing (stable)', still.map((x) => `${x.src || x.from}→${x.dest}`).join(', '));
 check(r.stats.moveFolders > 5 && r.stats.keep >= 3, 'stats', JSON.stringify(r.stats));
 
+// a folder of copies: named as a backup, or holding photos that are also elsewhere — it stays (Repeated files deals with it)
+{
+  const T = Date.UTC(2019, 11, 15, 10), day = 864e5;
+  const mk = (id, rel, t) => ({ id, rel, kind: 1, taken: t, mtime: t });
+  const its = [
+    ...[0, 1, 2, 3, 4, 5].map((i) => mk(100 + i, `2019/Rome/IMG_${i}.jpg`, T + i * 40 * day)),
+    mk(200, 'Backup antigo/IMG_0.jpg', T), mk(201, 'Backup antigo/IMG_77.jpg', T + 900 * day),
+    ...[0, 1, 2, 3, 4].map((i) => mk(300 + i, `Rome (2)/IMG_${i}.jpg`, T + i * 40 * day)),
+  ];
+  const p = proposeReorganization({ items: its });
+  const of = (src) => p.groups.find((x) => x.src === src);
+  check(of('Backup antigo')?.kind === 'keep' && of('Backup antigo').reason === 'backup' && of('Backup antigo').twins === 1, 'a folder named as a backup stays, with how many of its photos are elsewhere', JSON.stringify(of('Backup antigo')));
+  check(of('Rome (2)')?.kind === 'keep' && of('Rome (2)').reason === 'copies' && of('Rome (2)').twins === 5, 'a folder whose photos are all elsewhere is a copy: it stays', JSON.stringify(of('Rome (2)')));
+  check(of('2019/Rome')?.kind === 'theme', 'the folder the copies came from is still a subject', JSON.stringify(of('2019/Rome')));
+  // two folders that are copies of each other: one is the original
+  const pair = proposeReorganization({ items: [...[0, 1, 2].map((i) => mk(i, `A trip/IMG_${i}.jpg`, T + i * day)), ...[0, 1, 2].map((i) => mk(10 + i, `B trip/IMG_${i}.jpg`, T + i * day))] });
+  const kinds = ['A trip', 'B trip'].map((d) => pair.groups.find((x) => x.src === d)?.reason).join();
+  check(kinds === 'eventDays,copies', 'of two folders that are copies of each other, the first stays a subject and the other is the copy', kinds);
+}
+
 console.log(failures ? `\n${failures} failure(s)` : '\nall passed');
 process.exit(failures ? 1 : 0);

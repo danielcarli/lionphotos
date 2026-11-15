@@ -2,6 +2,59 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.41.0] — 2026-11-15
+
+### Added
+- **Two photos side by side** (`V`, the *More* menu, a button in the viewer): to pick the best of a sequence. Both are shown as edited and zoom and move together; ← → change the photo of the active side (Tab or a click changes side), `1` `2` `3` `0` mark it.
+- **Keyboard shortcuts** in one window: the `?` key, or the keyboard button in the status bar.
+- **Export from the viewer** (a button, `Ctrl+E`), and the export window opens compact — the preset, where, a line saying what the preset does and the first names — with *More options* (remembered) for the file, the names, the metadata and the signature.
+- **One computer at a time.** The collection's folder gets a lock (`.lionphotos/lock`) saying which computer has it open. A second computer writes nothing to the folder (its own catalog goes on working) until the lock is gone or stale (10 minutes), or the person chooses *Use here anyway*; it says so in a notice and in Backup.
+- **The catalog goes to the backup.** Backup says whether the backup folder has the collection's catalog (albums, people, marks, descriptions, adjustments), and copies it — by a button, and after every copy of photos to the backup. Only LionPhotos' own folder is written; what was there stays as `.bak`.
+
+### Changed
+- **File-name pieces in the app's language:** `{date}-{album}-{photographer}-{n}` in English, `{data}-{álbum}-{fotógrafo}-{nº}` in Portuguese, and so on, in Export and Organize. Every language's words are understood, so a pattern kept from before goes on working.
+- **The list fits its space:** no sideways scroll, the name first and the date whole; the less needed columns leave as the list narrows (counting the panel beside it). The category is a small mark, not "Not categorized" down every row.
+- **Reorganize knows a copy:** a folder named as a backup, or whose photos are also in other folders, stays where it is, with a link to Repeated files, instead of becoming a theme.
+- Inside an album, a person, a place…: the path says *Albums › Rome* (a click goes back), and a small one (up to 60 photos) has its months with their year, without the large year heading.
+- A page's explanation (Albums, People, Pets, Places, Projects, Limbo, Repeated files, Recycle Bin history, Backup) is shown the first time, with *Got it*; after that a "?" beside the title shows it. The "Labels" line above those titles is gone.
+- The status bar has one theme button with a menu, instead of the five themes side by side.
+- In the viewer, *Adjusted · hold to see the original* is a button to press (the `\` key still works).
+- People and Pets with nothing yet lead with *Index now*; creating one by hand comes second.
+
+## [1.40.1] — 2026-11-15
+
+### Added
+- **See all the photos of the day.** A discreet link at the foot of *Organization*, in the side panel and in the viewer: it leaves the album, person, search or viewer the photo is being seen in and shows, in Photos, every photo and video taken that day (the photo stays selected). The day appears among the filters in use, with its × to show every day again.
+
+## [1.40.0] — 2026-11-15
+
+### Changed
+- **The side panel by task: Adjust · Describe · Info.** Three tabs at the top of the panel, the same in the photos' panel and in the viewer, the last one remembered: Adjust has the adjustments; Describe has the title, caption and audio description, then the organization (category, albums, people…), then author and place; Info has the file and camera. `E`, `D` and `I` open the panel on their tab (the same key again folds it), and `H` shows or folds the panel, as the *Edit* button does.
+- **Two panels in a wide viewer.** From 1680 px, the viewer shows Describe and Info on the left and Adjust on the right, with no tab to switch; a button keeps one panel instead (and goes back). The arrows keep clear of both panels.
+- **Panels as wide as you want:** drag a panel's inner edge (300–480 px; the arrow keys on the focused edge, 20 px a step); the width is remembered, and a double-click puts it back.
+- **Adjustments as an accordion:** opening a group folds the others, and a folded group says what was changed in it ("Exposure +0.3 · Contrast +12"). The lens's corrections *By hand* stay folded until asked for (or while one is in use). On short windows the histogram is lower.
+- Section titles in plain sentence case; the note on how things are saved is one line ("Saved in the catalog · 7 fields not in the file yet"), its full explanation one click away.
+
+### Fixed
+- The crop's summary and *Undo crop* no longer run into each other in a narrow panel.
+- The update window's title no longer turns with its icon; only the small icon turns, while checking or downloading.
+- In the viewer's dark panel, the caption and the audio description were drawn in black, almost invisible; they now have the panel's text colour.
+
+## [1.39.1] — 2026-11-15
+
+### Changed
+- **The version is back in the bottom-right corner of the status bar**, as in LionOrganizer, so both apps keep it in the same place; a click still opens the update window. README (10 languages) and `docs/INSTALL.md` say where it is.
+
+## [1.39.0] — 2026-11-15
+
+### Added
+- **New versions, from the bottom-left corner.** The version now sits in the bottom-left corner of the status bar; a click opens a window that checks GitHub for a newer release and, when there is one, shows both versions, says how this copy is updated and asks. *Update now* uses the installer of the platform the app came from: the Windows setup wizard (in update mode) or `install.ps1`; on macOS the new `.dmg` (opened, the app closes to be replaced) or `install.sh`; on Linux the new AppImage put in place of this one, the `.deb` or `.rpm` opened in the system's software installer, or `install.sh`. Anything else opens the release page. Every download is kept only if its SHA-256 matches the release's `SHA256SUMS`, with progress shown in the window.
+- **The only network access of the app, and only when asked:** nothing is checked in the background; the window says what is read and that nothing about the person or the photos is sent. README (10 languages) and `docs/INSTALL.md` say so.
+
+### Changed
+- **The same toolbar on every page:** in Photos and inside an album, a person, a pet, a place or a project, where you are (the path) comes first and the view modes are at the end of the row, as on the Albums, People, Pets, Places and Projects pages — then the info panel's switch, beside the panel.
+- Inside an album, a person, a pet, a place or a project, *Show all photos* is gone: the back button and the Photos tab already lead there.
+
 ## [1.38.1] — 2026-11-14
 
 ### Changed

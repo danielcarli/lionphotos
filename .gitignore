@@ -6,4 +6,7 @@ dist-installer/
 shots/
 __pycache__/
 models/
+# the message of the next commit, written beside the code (never committed)
 commit.txt
+# the script that publishes a version to GitHub (git-publish.cmd/.ps1/.sh: add, commit with commit.txt, tag, push)
+git-publish.*

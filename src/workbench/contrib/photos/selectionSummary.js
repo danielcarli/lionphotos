@@ -11,7 +11,7 @@ import { h } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { formatBytes, formatDate, formatNumber } from '../../../base/common/format.js';
-import { dateOf, MARK } from '../../services/library/browser/libraryService.js';
+import { dateOf, dayOf, MARK } from '../../services/library/browser/libraryService.js';
 import { showLabelsDialog } from '../labels/labelsDialog.js';
 import { addToAlbum, removeFromAlbum } from '../albums/albumDialogs.js';
 import { sphereSection } from '../labels/sphereSection.js';
@@ -84,7 +84,7 @@ const KINDS = [
  * Organization: the category, then one line per kind of label the items have — its chips (a click opens its
  * photos; × takes it off) and + to add more — and one "Add to" line for the kinds they have none of.
  */
-export function organizeSection(s, items, { title } = {}) {
+export function organizeSection(s, items, { title, onLeave } = {}) {
   const { labels, library, layout } = s;
   const ids = items.map((it) => it.id);
   const total = items.length;
@@ -120,6 +120,15 @@ export function organizeSection(s, items, { title } = {}) {
     h('span.ip-addto-k', t('info.addTo')),
     empty.map((k) => h('button.ip-add-chip', { 'data-kind': k.type, onclick: addFor(k.type) }, h('span', { html: icon(k.icon, 12) }), t(`labels.type.${k.type}.one`)))) : null;
 
+  // discreet, at the foot: every photo of the day this one was taken, in Photos — out of the album, the person
+  // or the viewer it is being seen in (photos of one day only; not for the Limbo's)
+  const day = items.length && items.every((it) => (it.mark || 0) !== MARK.reject && dayOf(it) === dayOf(items[0])) ? dayOf(items[0]) : '';
+  const others = day ? library.allItems.filter((x) => (x.mark || 0) !== MARK.reject && dayOf(x) === day).length : 0;
+  const sameDay = day && !(library.filter.day === day && layout.activeView === 'photos' && !onLeave) ? h('button.link-button.ip-day', {
+    type: 'button', title: t('info.dayTitle', { day: formatDate(dateOf(items[0])) }),
+    onclick: () => { onLeave?.(); library.showDay(items[0].id); layout.openView('photos'); },
+  }, h('span', { html: icon('calendar', 12) }), t('info.dayAll'), h('span.ip-day-n', formatNumber(others))) : null;
+
   // closed: the category and the names, in a line
   const sphere = labels.sphereOf?.(items[0]);
   const sameSphere = sphere && items.every((it) => labels.sphereOf(it) === sphere);
@@ -127,5 +136,5 @@ export function organizeSection(s, items, { title } = {}) {
   const summary = names.length || sameSphere
     ? h('span', [sameSphere ? t(`sphere.${sphere}`) : null, ...names.slice(0, 4)].filter(Boolean).join(' · ') + (names.length > 4 ? ` +${names.length - 4}` : ''))
     : h('span.muted', t('info.notOrganized'));
-  return collapsible({ id: 'organize', icon: 'tag', title: t('info.organize'), summary, body: [sphereSection(s, items, { segmented: true }), ...rows, addTo] });
+  return collapsible({ id: 'organize', icon: 'tag', title: t('info.organize'), summary, body: [sphereSection(s, items, { segmented: true }), ...rows, addTo, sameDay] });
 }

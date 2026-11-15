@@ -5,6 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 // Workbench startup: creates the services once and injects them into the layout parts — the same
 // principle as VS Code (and LionOrganizer), in a lean version.
+import { showShortcuts } from '../contrib/help/shortcutsDialog.js';
 import { LayoutService, VIEWS } from '../services/layout/browser/layoutService.js';
 import { NotificationService } from '../services/notification/browser/notificationService.js';
 import { ConfirmationService } from '../services/dialog/browser/confirmationService.js';
@@ -34,6 +35,7 @@ import { PeopleView } from '../contrib/faces/peopleView.js';
 import { FacesService } from '../services/faces/browser/facesService.js';
 import { BackupView } from '../contrib/backup/backupView.js';
 import { PluginsService } from '../services/plugins/browser/pluginsService.js';
+import { UpdateService } from '../services/update/browser/updateService.js';
 import { PluginView } from '../contrib/plugins/pluginView.js';
 import { BackupService } from '../services/backup/browser/backupService.js';
 import { PortableService } from '../services/portable/browser/portableService.js';
@@ -67,6 +69,7 @@ services.pets = new FacesService(services, { api: 'pets' });
 services.backup = new BackupService(services);
 services.portable = new PortableService(services);
 services.plugins = new PluginsService(services);
+services.update = new UpdateService(services);
 services.viewer = new Viewer(services);
 
 // ---- editor views (contributions) ----
@@ -146,7 +149,7 @@ root.append(
 
 // ---- keyboard shortcuts ----
 window.addEventListener('keydown', (e) => {
-  if (services.viewer.isOpen || document.querySelector('.cm-overlay')) return;
+  if (services.viewer.isOpen || document.querySelector('.cm-overlay, .cmp')) return;
   const mod = e.ctrlKey || e.metaKey;
   const key = e.key.toLowerCase();
   if (mod && key === 'o') { e.preventDefault(); services.actions.openFolder(); }
@@ -164,6 +167,8 @@ window.addEventListener('keydown', (e) => {
     if (key === 'y' || e.shiftKey) redoDescribe(services); else undoDescribe(services);
   }
   else if (e.key === 'F5') { e.preventDefault(); services.library.refresh(); }
+  // ? : the keyboard shortcuts (not while typing)
+  else if (e.key === '?' && !mod && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '') && !document.activeElement?.isContentEditable) { e.preventDefault(); showShortcuts(); }
   // \ : focus mode — only the photos (not while typing)
   else if (e.key === '\\' && !mod && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '')) { e.preventDefault(); services.layout.toggleFocus(); }
   // F2: rename the folder chosen in the tree (not while typing in a field)

@@ -31,6 +31,13 @@ contextBridge.exposeInMainWorld('host', {
   setLocale: (locale) => ipcRenderer.send('nls:setLocale', locale),
   reloadWindow: () => ipcRenderer.send('window:reload'),
   appInfo: () => ipcRenderer.invoke('app:info'),
+  // new versions: only when the person asks (the version in the status bar)
+  update: {
+    check: () => ipcRenderer.invoke('update:check'),
+    install: () => ipcRenderer.invoke('update:install'),
+    openReleasePage: () => ipcRenderer.invoke('update:openReleasePage'),
+    onProgress: on('update:progress'),
+  },
 
   pickFolder: () => ipcRenderer.invoke('dialog:pickFolder'),
   pickExportFolder: (last) => ipcRenderer.invoke('dialog:pickExportFolder', last),
@@ -68,6 +75,7 @@ contextBridge.exposeInMainWorld('host', {
     saveNow: () => ipcRenderer.invoke('portable:saveNow'),
     reveal: () => ipcRenderer.invoke('portable:reveal'),
     setEnabled: (on) => ipcRenderer.invoke('portable:setEnabled', !!on),
+    takeOver: () => ipcRenderer.invoke('portable:takeOver'),
     onStatus: on('portable:status'),
   },
   thumbs: {
@@ -143,6 +151,7 @@ contextBridge.exposeInMainWorld('host', {
   backup: {
     compare: (opts) => ipcRenderer.invoke('backup:compare', opts),
     cancel: () => ipcRenderer.invoke('backup:cancel'),
+    copyCatalog: (session) => ipcRenderer.invoke('backup:copyCatalog', session),
     onProgress: on('backup:progress'),
   },
   ops: {

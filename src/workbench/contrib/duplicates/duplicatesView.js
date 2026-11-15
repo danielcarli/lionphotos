@@ -5,6 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 // "Repeated files": identical copies (same content, SHA-256) shown side by side with their thumbnails;
 // the person picks the copy to keep and the others go to the Recycle Bin with a typed code.
+import { pageIntro } from '../../browser/pageIntro.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
@@ -29,11 +30,12 @@ export class DuplicatesView extends ViewPane {
     const p = d.progress;
     const pct = p && p.bytesTotal ? Math.min(100, Math.round((p.bytesDone / p.bytesTotal) * 100)) : 0;
 
+    const dupIntro = pageIntro('duplicates', t('dupes.lead'));
     const intro = h('div.card.dup-intro',
       h('div',
         h('div.eyebrow', h('span', { html: icon('hash', 14) }), t('dupes.eyebrow')),
-        h('h1.view-title', t('dupes.title')),
-        h('p.muted', t('dupes.lead')),
+        h('div.view-title-row', h('h1.view-title', t('dupes.title')), dupIntro.help),
+        dupIntro.body,
         d.status === 'running'
           ? h('div.dup-progress',
               h('div.progress-bar', h('span', { style: { width: `${pct}%` } })),

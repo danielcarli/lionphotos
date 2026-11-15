@@ -6,6 +6,7 @@
 // One view per kind of label — Projects and Places (People and Pets have their own, with recognition):
 // create, rename and delete them, see how many items each one has and when they were taken, as a grid of
 // cards or a list, by year, and open them in Photos.
+import { pageIntro } from '../../browser/pageIntro.js';
 import { sphereScope } from './sphereIcons.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
@@ -49,11 +50,11 @@ export class LabelsView extends ViewPane {
     name.addEventListener('keydown', (e) => { if (e.key === 'Enter') create(); });
     const shown = type === 'project' && this.statusFilter ? list.filter((l) => labels.sheetOf(l).status === this.statusFilter) : list;
 
+    const intro = pageIntro(type, t(`labels.type.${type}.lead`));
     setChildren(this.element,
       h('div.view-header',
-        h('div.eyebrow', h('span', { html: icon(this.spec.icon, 14) }), t('labels.eyebrow')),
-        h('div.view-title-row', h('h1.view-title', t(`labels.type.${type}.plural`)), sphereScope(this.library)),
-        h('p.muted', t(`labels.type.${type}.lead`))),
+        h('div.view-title-row', h('h1.view-title', t(`labels.type.${type}.plural`)), sphereScope(this.library), intro.help),
+        intro.body),
       h('div.lbl-create', name, h('button.btn.btn-primary', { onclick: create }, h('span', { html: icon('plus', 14) }), t(`labels.type.${type}.new`)),
         // a plugin can make a page of them
         type === 'project' ? h('button.btn.btn-secondary', { title: t('plugins.export.buttonTitle'), onclick: () => showExportDialog(this.services, { type }) },

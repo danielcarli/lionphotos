@@ -11,7 +11,7 @@ Trabaja con sus carpetas tal como están: miniaturas pequeñas hechas una sola v
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · **Español** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versión 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
+![Versión 1.41.0](https://img.shields.io/badge/version-1.41.0-161214)
 ![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -55,7 +55,7 @@ Las colecciones de fotos crecen más rápido de lo que nadie puede ordenarlas: a
 ## Puntos fuertes
 
 - **Sus carpetas, tal como están.** Sin importación y sin biblioteca cerrada: las fotos se quedan donde las puso, y sus otros programas siguen trabajando con ellas.
-- **Local y privado.** Sin cuenta, sin telemetría, sin red; el reconocimiento de caras y mascotas funciona en su ordenador. Solo lee la carpeta que elija y sus subcarpetas.
+- **Local y privado.** Sin cuenta, sin telemetría; solo se conecta a internet cuando le pide buscar una nueva versión. El reconocimiento de caras y mascotas funciona en su ordenador. Solo lee la carpeta que elija y sus subcarpetas.
 - **Rápido a cualquier escala.** La cuadrícula dibuja solo lo que está en pantalla; las miniaturas son pequeñas, se guardan en un único archivo de caché y se hacen una sola vez. Las colecciones grandes en discos externos siguen fluidas.
 - **Todos los formatos, con decodificadores propios.** JPEG, HEIC/HEIF, TIFF, PSD/PSB, RAW de las principales marcas (CR3, CR2, NEF, ARW, RAF, DNG…) y vídeos (MP4, MOV, MTS, AVI…).
 - **Seguro por diseño.** Cada cambio en los archivos muestra antes su plan, pide un código de 3 caracteres escrito a mano y se puede deshacer; borrar siempre envía a la Papelera.
@@ -102,7 +102,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | | |
 |---|---|
 | **Fotos** | Cuadrícula por mes o lista con carpeta, tipo, dimensiones, tamaño, fecha y detalles; selección con clic, Ctrl y Mayús; zoom; filtros por tipo, año, marca, categoría y subcarpetas, mostrados como etiquetas que se quitan con un clic. El árbol de carpetas (o los años) a la izquierda y el panel de información a la derecha — ambos se pueden ocultar, o todo con el modo enfoque (`\`). **La búsqueda en la barra de título** (Ctrl+K o Ctrl+F) busca en toda la colección mientras escribe — fotos, álbumes, proyectos, personas, lugares, fotógrafos, cámaras, palabras clave, carpetas — y, cuando los filtros lo ocultan todo, la página dice cuáles, con un botón para quitar cada uno. Dentro de un álbum, persona, mascota, lugar o proyecto: mosaico, cuadrícula uniforme, lista o destacados. |
-| **Visor** | Tamaño completo al instante (primero la miniatura), archivos RAW a tamaño completo mediante el JPEG que guardó la cámara, ← → para avanzar, `I` para información, zoom al tamaño real; los vídeos se reproducen con controles. El control de zoom va del tamaño de la pantalla al 400 %; la rueda acerca donde está el puntero, arrastrar mueve la foto, `Z` alterna entre ajustar y tamaño real. *Editar* (o `I`) muestra u oculta el mismo panel de edición del panel de información — categoría, álbumes, ajustes, descripción, autor y lugar; una foto llevada a una categoría fuera del filtro sigue a la vista, en gris, con un aviso que dice dónde está ahora. HEIC, HEIF e HIF también se abren a tamaño real; las fotos HDR (PQ, HLG) se convierten para una pantalla común, en el visor y en las miniaturas. Doble clic: zoom al 100 % en el punto, y vuelta. Supr envía la foto al Limbo con una confirmación simple. |
+| **Visor** | Tamaño completo al instante (primero la miniatura), archivos RAW a tamaño completo mediante el JPEG que guardó la cámara, ← → para avanzar, `I` para información, zoom al tamaño real; los vídeos se reproducen con controles. El control de zoom va del tamaño de la pantalla al 400 %; la rueda acerca donde está el puntero, arrastrar mueve la foto, `Z` alterna entre ajustar y tamaño real. *Editar* (o `H`) muestra u oculta el mismo panel de edición del panel de información — categoría, álbumes, ajustes, descripción, autor y lugar; una foto llevada a una categoría fuera del filtro sigue a la vista, en gris, con un aviso que dice dónde está ahora. HEIC, HEIF e HIF también se abren a tamaño real; las fotos HDR (PQ, HLG) se convierten para una pantalla común, en el visor y en las miniaturas. Doble clic: zoom al 100 % en el punto, y vuelta. Supr envía la foto al Limbo con una confirmación simple. El panel muestra una tarea a la vez —Ajustar, Describir, Info— y, en una ventana de 1680 px o más, Describir e Info a la izquierda y Ajustar a la derecha; arrastre el borde de un panel para ensancharlo. |
 | **Ajustes** | Exposición, contraste, sombras y saturación en el panel de información, para una foto o varias, con histograma y vista previa al instante (en la tarjeta gráfica, o en el procesador si no hay); cópielos y péguelos en otras fotos. El archivo nunca cambia: los ajustes están en el catálogo (se deshacen con Ctrl+Z), las miniaturas y el visor los muestran (mantenga `\` para ver el original) y *Guardar copia editada* escribe un JPEG nuevo junto al original, con sus metadatos. *Exportar fotos* (Ctrl+E) crea archivos nuevos de las fotos editadas en cualquier carpeta — JPEG, PNG o TIFF, al tamaño de una red social o de una impresión, con nitidez de salida, nombres como `2026-07-24-Graduacion-Ana-Souza-001.jpg`, con todos los metadatos o sin la ubicación y una firma opcional — con el perfil sRGB; los originales nunca cambian. |
 | **Edición** | Iluminaciones, blancos, negros, balance de blancos (temperatura, matiz y cuentagotas), intensidad, blanco y negro con mezcla por color, viñeta y — en la tarjeta gráfica — nitidez, textura y claridad; *Automático*, ajustes preestablecidos y antes y después en el visor (`Y`). **Recortar y enderezar** (`C`): libre o con una proporción — las comunes y las de redes sociales (Instagram 4:5 y 3:4, Stories/Reels/TikTok 9:16, YouTube 16:9, enlace 1,91:1, Pinterest, cabeceras de X y LinkedIn) —, giros de 90° y enderezar trazando una línea sobre el horizonte. Todo queda en el catálogo; el archivo nunca cambia. |
 | **Corrección del objetivo** | Distorsión, esquinas oscuras y franjas de color del objetivo deshechas con su perfil — toda la base de [Lensfun](https://lensfun.github.io), unos 1600 objetivos, hallada por el nombre que escribió la cámara o elegida en una lista con búsqueda — y a mano: distorsión, perspectiva vertical y horizontal (edificios que caen hacia atrás), escala, esquinas y franjas. En la tarjeta gráfica; el archivo nunca cambia. |
@@ -181,7 +181,9 @@ Haga doble clic en **`build-installer.bat`** (o ejecute `npm run dist`). Los ins
 | `Alt+←` · `Alt+Home` | Volver de un álbum, proyecto o persona · toda la colección, sin filtros |
 | `Ctrl+B` · `\` | Mostrar/ocultar la barra lateral · modo enfoque (solo las fotos) |
 | `1` `2` `3` · `0` | Marcar la selección como excelente · bien · candidata a borrar · quitar |
-| `Ctrl+A` · `Enter` · `I` · `Supr` · `F2` · `Esc` | Seleccionar todo · abrir · panel de información · Papelera · renombrar · quitar la selección |
+| `Ctrl+A` · `Enter` · `H` · `Supr` · `F2` · `Esc` | Seleccionar todo · abrir · panel de información · Papelera · renombrar · quitar la selección |
+| `E` · `D` · `I` | Panel lateral en Ajustar · Describir · Info (la misma tecla otra vez lo pliega) |
+| `V` · `?` | Comparar lado a lado · Atajos de teclado |
 | `Ctrl+E` | Exportar fotos (la selección, o las fotos mostradas) |
 | `←` `→` · `Espacio` · `Esc` | Visor: anterior/siguiente · reproducir/pausar · cerrar |
 | `P` · `F` · `A` | Visor: presentación · pantalla completa · añadir a un álbum |
@@ -200,7 +202,7 @@ El idioma sigue al del sistema y se puede cambiar en la barra de estado. Los nú
 
 ## Privacidad
 
-LionPhotos nunca se conecta a la red: sin cuenta, sin telemetría, sin comprobación de actualizaciones. El reconocimiento de caras y mascotas se ejecuta en este equipo, con modelos incluidos en la aplicación.
+LionPhotos solo se conecta a la red cuando usted lo pide: al hacer clic en la versión, en la esquina inferior derecha, busca una nueva versión en GitHub, y al actualizar descarga el instalador de su sistema, verificado (SHA-256) antes de usarlo. Sin cuenta, sin telemetría, no se envía nada sobre usted ni sus fotos. El reconocimiento de caras y mascotas se ejecuta en este equipo, con modelos incluidos en la aplicación.
 
 El catálogo y las miniaturas están en un único archivo en su equipo:
 
@@ -262,7 +264,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Historial de cambios
 
-Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.38.1**.
+Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.41.0**.
 
 ## Créditos
 

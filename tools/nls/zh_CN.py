@@ -10,7 +10,7 @@ MESSAGES = {
    'forFiles': '{count} 个项目的标签',
    'folderHint': '应用于此文件夹中的所有内容，包括子文件夹。只更改 LionPhotos 的目录，不会修改任何文件。',
    'filesHint': '应用于所选文件。文件自身的类别和项目优先于文件夹的；人物、宠物和地点会叠加。',
-   'back': '返回{view}', 'backTitle': '返回{view}（{key}）', 'showAll': '显示所有照片',
+   'back': '返回{view}', 'backTitle': '返回{view}（{key}）',
    'none': '（无）', 'save': '保存', 'edit': '编辑', 'add': '添加', 'open': '在照片中查看', 'rename': '重命名', 'delete': '删除',
    'inherited': '来自文件夹：{names}', 'fromFolder': '来自文件夹', 'noneYet': '还没有项目、人物、宠物或地点。',
    'noPhotosGroup': '还没有照片',
@@ -453,3 +453,29 @@ _merge(MESSAGES, {'main': {'meta': {'write': {'both': '图像内部，以及旁�
 _merge(MESSAGES, {'describe': {'safeCollection': '输入即保存：保存在目录中，并在收藏文件夹 (.lionphotos) 中自动写入恢复副本。只有在你要求写入时，照片文件才会改变。', 'safeLocal': '输入即保存，保存在本机目录中。只有在你要求写入时，照片文件才会改变。', 'safeWhen': '恢复副本写入于 {when}', 'notInFile': '尚未写入文件的字段：{count} 个', 'inFile': '文件中已有这些数据。', 'writeHint': '将这些元数据和标记（作为评级）写入文件，供其他程序和发送使用：JPEG 写入内部和旁边的 .xmp；其他格式写入旁边的 .xmp'}, 'main': {'meta': {'write': {'message': '到目前为止，这些更改只在目录（及其恢复副本）中。现在元数据（作者、说明、音频描述、地点、关键词……）和标记（作为评级）将写入文件本身，供其他程序和发送使用。'}}}})
 # 1.38.0: Watermelon and City blue
 _merge(MESSAGES, {'statusbar': {'themeTeal': '西瓜', 'themeTealTitle': '西瓜主题——标志的青色、粉色和白色', 'themeCity': '城市蓝', 'themeCityTitle': '城市蓝主题——钴蓝、珊瑚色和白色，如同城市规划图'}})
+
+# 1.39.0: new versions, only when asked (the version in the bottom-right corner)
+_merge(MESSAGES, {'update': {'status': {'title': 'LionPhotos 版本 — 点击检查新版本', 'checking': '正在检查新版本…', 'currentTitle': '你使用的是最新版本。点击查看详情。', 'errorTitle': '无法检查新版本。点击重试。', 'available': '新版本 {version}', 'availableTitle': '{version} 版本已发布。点击更新。'}, 'dialog': {'installed': '已安装版本', 'newVersion': '新版本', 'availableTitle': '有新版本可用', 'howInstaller': 'LionPhotos 将关闭，安装程序会下载、校验并安装新版本，然后重新打开。你的设置和目录会被保留。', 'howScript': 'LionPhotos 将关闭，安装程序（PowerShell）会下载、校验并安装新版本。你的设置和目录会被保留。', 'howDownload': '新版本的下载页面将在浏览器中打开。请下载适用于你系统的安装程序并打开它。你的设置和目录会被保留。', 'question': '现在更新吗？', 'whatsNew': '查看此版本的新功能', 'updateNow': '立即更新', 'openDownload': '打开下载页面', 'notNow': '暂不', 'checking': '正在检查新版本…', 'currentTitle': 'LionPhotos 已是最新版本', 'currentText': '你使用的是最新版本。', 'errorTitle': '无法检查更新', 'errorText': '请检查网络连接后重试。', 'checkAgain': '重新检查', 'closing': '正在关闭 LionPhotos 以进行更新…', 'howDmg': '新版本（.dmg）将下载到“下载”文件夹，经校验后打开，LionPhotos 将关闭。请将 LionPhotos 拖到“应用程序”并选择“替换”。你的设置和目录会被保留。', 'howSh': 'LionPhotos 将关闭，安装程序（install.sh）会下载、校验并安装新版本，然后重新打开。你的设置和目录会被保留。', 'howAppImage': '新的 AppImage 将被下载并校验，替换当前文件后打开。你的设置和目录会被保留。', 'howDeb': '新的软件包（.deb）将下载到“下载”文件夹，经校验后在系统的软件安装程序中打开，安装时会要求输入密码。完成后请重新打开 LionPhotos。你的设置和目录会被保留。', 'howRpm': '新的软件包（.rpm）将下载到“下载”文件夹，经校验后在系统的软件安装程序中打开，安装时会要求输入密码。完成后请重新打开 LionPhotos。你的设置和目录会被保留。', 'downloading': '正在下载并校验新版本…', 'progress': '{name}：{done} / {total}', 'progressNoTotal': '{name}：{done}', 'preparing': '正在获取新版本的文件…', 'closingDmg': '正在关闭 LionPhotos：请在打开的窗口中将其拖到“应用程序”并选择“替换”。', 'privacy': '只有在你打开此窗口时，LionPhotos 才会连接互联网：它会读取 GitHub 上已发布版本中的一个小文件。更新时会下载适用于你系统的安装程序，并在使用前进行校验（SHA-256）。不会发送任何关于你或你照片的数据。'}, 'failed': '无法开始更新：{error}', 'downloadOpened': '已在浏览器中打开下载页面。', 'packageOpened': '新版本已在系统安装程序中打开。安装完成后请重新打开 LionPhotos。', 'saved': '新版本位于 {file}：打开它即可安装。', 'error': {'checksum': '下载的文件与公布的校验和不符，已被丢弃', 'network': '无法连接 GitHub — 请检查网络连接'}}})
+
+# 1.40.0: the panel by task (tabs, two panels in a wide viewer)
+_merge(MESSAGES, {'panel': {'tab': {'adjust': '调整', 'describe': '描述', 'info': '信息'}, 'tabs': '面板显示的内容', 'describeInfo': '描述和信息', 'oneTitle': '单个面板（调整、描述和信息分为标签页）', 'twoTitle': '两个面板：左侧为描述和信息，右侧为调整', 'resize': '拖动以调整面板宽度（双击：恢复默认宽度）'}, 'describe': {'safeShort': '已保存到目录'}})
+
+_merge(MESSAGES, {'viewer': {'editTitle': '显示或收起编辑面板：类别、相册、调整、描述、作者和地点（H）'}})
+
+# 1.40.1: all the photos of the day
+_merge(MESSAGES, {'info': {'dayAll': '查看当天的所有照片', 'dayTitle': '离开此处，在“照片”中显示 {day} 的所有照片和视频'}, 'photos': {'clearDay': '显示所有日期', 'why': {'day': '仅 {day} 的照片'}}})
+
+_merge(MESSAGES, {'info': {'dayAll': '当天的照片'}})
+
+# 1.41.0
+_merge(MESSAGES, {'intro': {'help': '此页面的用途', 'gotIt': '知道了'}})
+
+_merge(MESSAGES, {'adjust': {'holdOriginal': '按住查看原图'}, 'labels': {'emptyFind': {'person': '让 LionPhotos 在本机查找照片中的人物。', 'pet': '让 LionPhotos 在本机查找照片中的宠物。'}, 'emptyOr': '也可以在上方的输入框中手动创建。'}})
+
+_merge(MESSAGES, {'reorganize': {'reasons': {'backup': '副本：名称表明如此（{count} 张中有 {twins} 张也在其他位置）— 保持不动', 'copies': '副本：{count} 张中有 {twins} 张也在其他文件夹中 — 保持不动'}, 'seeDuplicates': '查看重复文件'}})
+
+_merge(MESSAGES, {'keys': {'title': '键盘快捷键', 'search': '搜索整个收藏', 'open': '打开文件夹', 'refresh': '查找新增和更改的文件', 'views': '照片 · 相册 · 待定区', 'sidebar': '侧边栏 · 仅显示照片', 'undo': '撤销 · 重做', 'back': '从相册返回 · 整个收藏', 'this': '此列表', 'marks': '很棒 · 可以 · 待删除 · 清除标记', 'select': '打开 · 全选 · 取消选择', 'files': '重命名 · 复制 · 导出', 'compare': '并排比较', 'tabs': '调整 · 描述 · 信息（再按一次：收起）', 'hide': '显示或隐藏面板', 'nav': '上一张 · 下一张 · 第一张 · 最后一张', 'zoom': '适应 ↔ 实际大小 · 放大 · 缩小', 'edit': '裁剪 · 前后对比 · 按住查看原图', 'show': '幻灯片 · 全屏 · 添加到相册', 'viewerMore': '与下一张比较 · 导出', 'limbo': '移到待定区', 'close': '关闭', 'button': '键盘快捷键 (?)', 'group': {'everywhere': '任何界面', 'photos': '照片', 'panel': '侧面板', 'viewer': '查看器'}}, 'compare': {'title': '并排比较', 'hint': '← → 更换标记一侧的照片 · Tab 切换一侧 · 1 2 3 标记 · 滚轮同时缩放两张', 'left': '左侧照片', 'right': '右侧照片', 'prev': '上一张', 'next': '下一张', 'menu': '并排比较', 'viewerTitle': '与下一张照片比较'}})
+
+_merge(MESSAGES, {'export': {'more': '更多选项', 'less': '收起选项'}})
+
+_merge(MESSAGES, {'backup': {'catalog': {'current': '目录（相册、人物、标记、描述、调整）也已在备份中，日期为 {when}。', 'older': '备份中的目录副本较旧（{when}）：之后创建的相册、人物和调整不在其中。', 'missing': '备份中没有目录副本：只有照片，没有相册、人物、描述和调整。', 'copy': '将目录复制到备份', 'copied': '目录已复制到备份。'}}, 'portable': {'locked': '已在 {by} 上打开（自 {when} 起）：在那里关闭之前，这里不会向收藏文件夹写入任何内容。你在这里所做的会保存在本机目录中，之后再写入文件夹。', 'takeOver': '仍在此处使用', 'takeOverTitle': '从本机写入收藏文件夹。仅当另一台电脑上确实没有打开 LionPhotos 时使用。', 'lockedToast': '此收藏已在另一台电脑（{by}）上打开。在那里关闭之前，你在这里所做的会保存在本机目录中。'}})

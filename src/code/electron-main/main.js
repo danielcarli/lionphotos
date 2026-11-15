@@ -29,6 +29,7 @@ const { DialogMainService } = require('../../platform/dialogs/electron-main/dial
 const { LabelsMainService } = require('../../platform/labels/electron-main/labelsMainService');
 const { FacesMainService } = require('../../platform/faces/electron-main/facesMainService');
 const { BackupMainService } = require('../../platform/backup/electron-main/backupMainService');
+const { UpdateMainService } = require('../../platform/update/electron-main/updateMainService');
 const { SCHEMES, registerMediaProtocols, setHeifCacheDir } = require('../../platform/media/electron-main/mediaProtocol');
 const { setLocale } = require('../../platform/nls/common/nls');
 
@@ -234,7 +235,8 @@ if (gotTheLock) app.whenReady().then(() => {
   const labels = new LabelsMainService(library);
   labels.recognizers = [faces, pets];
   // the tests (and benchmarks in tools/) reach the main services
-  if (process.env.LIONPHOTOS_E2E) globalThis.__lionphotosMain = { library, thumbs, faces, pets, scenes, labels, portable };
+  const update = new UpdateMainService(APP_ROOT, () => mainWindow?.webContents);
+  if (process.env.LIONPHOTOS_E2E) globalThis.__lionphotosMain = { library, thumbs, faces, pets, scenes, labels, portable, update };
   const services = [
     new DialogMainService(),
     library,
@@ -254,6 +256,7 @@ if (gotTheLock) app.whenReady().then(() => {
     faces,
     pets,
     scenes,
+    update,
   ];
   ops.backup = backup;
   services.forEach((s) => s.registerChannels(ipcMain));

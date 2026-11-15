@@ -10,7 +10,7 @@ MESSAGES = {
    'forFiles': '{count} 項目のラベル',
    'folderHint': 'このフォルダー内のすべて（サブフォルダーを含む）に適用されます。変わるのは LionPhotos のカタログだけで、ファイルは変更されません。',
    'filesHint': '選択したファイルに適用されます。ファイル自身の分類とプロジェクトがフォルダーのものより優先され、人物・ペット・場所は追加されます。',
-   'back': '{view}に戻る', 'backTitle': '{view}に戻る（{key}）', 'showAll': 'すべての写真を表示',
+   'back': '{view}に戻る', 'backTitle': '{view}に戻る（{key}）',
    'none': '（なし）', 'save': '保存', 'edit': '編集', 'add': '追加', 'open': '写真で見る', 'rename': '名前の変更', 'delete': '削除',
    'inherited': 'フォルダーから: {names}', 'fromFolder': 'フォルダーから', 'noneYet': 'プロジェクト、人物、ペット、場所はまだありません。',
    'noPhotosGroup': 'まだ写真がありません',
@@ -453,3 +453,29 @@ _merge(MESSAGES, {'main': {'meta': {'write': {'both': '画像の中と、隣の 
 _merge(MESSAGES, {'describe': {'safeCollection': '入力と同時に保存: カタログに保存し、コレクションのフォルダー (.lionphotos) にも復元用コピーを自動で書き込みます。写真のファイルは、書き込みを指示したときだけ変わります。', 'safeLocal': '入力と同時に、このコンピューターのカタログに保存します。写真のファイルは、書き込みを指示したときだけ変わります。', 'safeWhen': '復元用コピーの書き込み: {when}', 'notInFile': 'まだファイルにない項目: {count}', 'inFile': 'ファイルにはすでにこのデータがあります。', 'writeHint': 'このメタデータと印（レーティングとして）をファイルに書き込みます（他のソフトや送信用）。JPEG には内部と隣の .xmp に、その他の形式は隣の .xmp に'}, 'main': {'meta': {'write': {'message': 'これまでこの変更はカタログ（と復元用コピー）にだけありました。これからメタデータ（作者、キャプション、音声説明、場所、キーワードなど）と印（レーティング）をファイル自体に書き込みます。他のソフトや送信用です。'}}}})
 # 1.38.0: Watermelon and City blue
 _merge(MESSAGES, {'statusbar': {'themeTeal': 'スイカ', 'themeTealTitle': 'スイカ テーマ — ロゴのティール、ピンク、白', 'themeCity': 'シティブルー', 'themeCityTitle': 'シティブルー テーマ — 都市計画図のようなコバルト、コーラル、白'}})
+
+# 1.39.0: new versions, only when asked (the version in the bottom-right corner)
+_merge(MESSAGES, {'update': {'status': {'title': 'LionPhotos のバージョン — クリックして新しいバージョンを確認', 'checking': '新しいバージョンを確認しています…', 'currentTitle': '最新バージョンを使用しています。クリックで詳細を表示。', 'errorTitle': '新しいバージョンを確認できませんでした。クリックして再試行。', 'available': '新バージョン {version}', 'availableTitle': 'バージョン {version} が利用できます。クリックして更新。'}, 'dialog': {'installed': 'インストール済みのバージョン', 'newVersion': '新しいバージョン', 'availableTitle': '新しいバージョンがあります', 'howInstaller': 'LionPhotos を閉じ、インストーラーが新しいバージョンをダウンロード・検証・インストールして、もう一度開きます。設定とカタログは保持されます。', 'howScript': 'LionPhotos を閉じ、インストーラー（PowerShell）が新しいバージョンをダウンロード・検証・インストールします。設定とカタログは保持されます。', 'howDownload': '新しいバージョンのダウンロード ページがブラウザーで開きます。お使いのシステム用のインストーラーをダウンロードして開いてください。設定とカタログは保持されます。', 'question': '今すぐ更新しますか？', 'whatsNew': 'このバージョンの新機能を見る', 'updateNow': '今すぐ更新', 'openDownload': 'ダウンロード ページを開く', 'notNow': '後で', 'checking': '新しいバージョンを確認しています…', 'currentTitle': 'LionPhotos は最新です', 'currentText': '最新バージョンを使用しています。', 'errorTitle': '確認できませんでした', 'errorText': 'インターネット接続を確認して、もう一度お試しください。', 'checkAgain': 'もう一度確認', 'closing': '更新のため LionPhotos を閉じています…', 'howDmg': '新しいバージョン（.dmg）が「ダウンロード」フォルダーにダウンロード・検証されて開き、LionPhotos は閉じます。LionPhotos を「アプリケーション」にドラッグし、「置き換える」を選んでください。設定とカタログは保持されます。', 'howSh': 'LionPhotos を閉じ、インストーラー（install.sh）が新しいバージョンをダウンロード・検証・インストールして、もう一度開きます。設定とカタログは保持されます。', 'howAppImage': '新しい AppImage をダウンロード・検証し、現在のものと置き換えて開きます。設定とカタログは保持されます。', 'howDeb': '新しいパッケージ（.deb）が「ダウンロード」フォルダーにダウンロード・検証され、システムのソフトウェア インストーラーで開きます（パスワードを求められます）。その後 LionPhotos をもう一度開いてください。設定とカタログは保持されます。', 'howRpm': '新しいパッケージ（.rpm）が「ダウンロード」フォルダーにダウンロード・検証され、システムのソフトウェア インストーラーで開きます（パスワードを求められます）。その後 LionPhotos をもう一度開いてください。設定とカタログは保持されます。', 'downloading': '新しいバージョンをダウンロードして検証しています…', 'progress': '{name}：{done} / {total}', 'progressNoTotal': '{name}：{done}', 'preparing': '新しいバージョンのファイルを取得しています…', 'closingDmg': 'LionPhotos を閉じています：開いたウインドウで「アプリケーション」にドラッグし、「置き換える」を選んでください。', 'privacy': 'LionPhotos がインターネットに接続するのは、このウインドウを開いたときだけです。GitHub で公開されているバージョンの小さなファイルを読み取ります。更新では、お使いのシステム用のインストーラーをダウンロードし、使用前に検証（SHA-256）します。あなたや写真に関するデータは送信されません。'}, 'failed': '更新を開始できませんでした: {error}', 'downloadOpened': 'ダウンロード ページをブラウザーで開きました。', 'packageOpened': '新しいバージョンをシステムのインストーラーで開きました。インストールしてから LionPhotos をもう一度開いてください。', 'saved': '新しいバージョンは {file} にあります。開いてインストールしてください。', 'error': {'checksum': 'ダウンロードしたファイルが公開されたチェックサムと一致しなかったため、破棄しました', 'network': 'GitHub に接続できません — インターネット接続を確認してください'}}})
+
+# 1.40.0: the panel by task (tabs, two panels in a wide viewer)
+_merge(MESSAGES, {'panel': {'tab': {'adjust': '調整', 'describe': '説明', 'info': '情報'}, 'tabs': 'パネルの表示内容', 'describeInfo': '説明と情報', 'oneTitle': '1 つのパネル（調整・説明・情報をタブで切り替え）', 'twoTitle': '2 つのパネル：左に説明と情報、右に調整', 'resize': 'ドラッグしてパネルの幅を変更（ダブルクリック：既定の幅に戻す）'}, 'describe': {'safeShort': 'カタログに保存済み'}})
+
+_merge(MESSAGES, {'viewer': {'editTitle': '編集パネルを表示または折りたたむ：カテゴリ、アルバム、補正、説明、作者と場所（H）'}})
+
+# 1.40.1: all the photos of the day
+_merge(MESSAGES, {'info': {'dayAll': 'この日の写真をすべて見る', 'dayTitle': 'ここを離れ、{day} の写真とビデオをすべて「写真」に表示します'}, 'photos': {'clearDay': 'すべての日を表示', 'why': {'day': '{day} の写真のみ'}}})
+
+_merge(MESSAGES, {'info': {'dayAll': 'この日の写真'}})
+
+# 1.41.0
+_merge(MESSAGES, {'intro': {'help': 'このページの使い方', 'gotIt': 'わかりました'}})
+
+_merge(MESSAGES, {'adjust': {'holdOriginal': '押している間は元の写真を表示'}, 'labels': {'emptyFind': {'person': 'このコンピューター上で、LionPhotos に写真の中の人物を探させましょう。', 'pet': 'このコンピューター上で、LionPhotos に写真の中のペットを探させましょう。'}, 'emptyOr': 'または、上の欄で手動で作成します。'}})
+
+_merge(MESSAGES, {'reorganize': {'reasons': {'backup': 'コピー：名前から判断（{count} 枚中 {twins} 枚が他の場所にもあります）— そのまま', 'copies': 'コピー：{count} 枚中 {twins} 枚が他のフォルダーにもあります — そのまま'}, 'seeDuplicates': '重複ファイルを見る'}})
+
+_merge(MESSAGES, {'keys': {'title': 'キーボードショートカット', 'search': 'コレクション全体を検索', 'open': 'フォルダーを開く', 'refresh': '新しいファイルと変更されたファイルを探す', 'views': '写真 · アルバム · リンボ', 'sidebar': 'サイドバー · 写真のみ', 'undo': '元に戻す · やり直す', 'back': 'アルバムから戻る · コレクション全体', 'this': 'この一覧', 'marks': '最高 · OK · 削除候補 · マークを消す', 'select': '開く · すべて選択 · 選択解除', 'files': '名前の変更 · 複製 · 書き出し', 'compare': '並べて比較', 'tabs': '調整 · 説明 · 情報（もう一度：閉じる）', 'hide': 'パネルの表示／非表示', 'nav': '前 · 次 · 最初 · 最後', 'zoom': '全体表示 ↔ 実寸 · 拡大 · 縮小', 'edit': '切り抜き · 前後比較 · 押している間は元の写真', 'show': 'スライドショー · 全画面 · アルバムに追加', 'viewerMore': '次の写真と比較 · 書き出し', 'limbo': 'リンボへ送る', 'close': '閉じる', 'button': 'キーボードショートカット (?)', 'group': {'everywhere': 'どの画面でも', 'photos': '写真', 'panel': 'サイドパネル', 'viewer': 'ビューアー'}}, 'compare': {'title': '並べて比較', 'hint': '← → で印のある側の写真を変更 · Tab で側を切り替え · 1 2 3 でマーク · ホイールで両方を拡大', 'left': '左の写真', 'right': '右の写真', 'prev': '前の写真', 'next': '次の写真', 'menu': '並べて比較', 'viewerTitle': '次の写真と比較'}})
+
+_merge(MESSAGES, {'export': {'more': '詳細オプション', 'less': 'オプションを閉じる'}})
+
+_merge(MESSAGES, {'backup': {'catalog': {'current': 'カタログ（アルバム、人物、マーク、説明、調整）もバックアップにあります（{when} 時点）。', 'older': 'バックアップにあるカタログのコピーは古いものです（{when}）。それ以降のアルバム、人物、調整は含まれていません。', 'missing': 'バックアップにカタログのコピーがありません。写真はありますが、アルバム、人物、説明、調整はありません。', 'copy': 'カタログをバックアップにコピー', 'copied': 'カタログをバックアップにコピーしました。'}}, 'portable': {'locked': '{by} で開かれています（{when} から）。向こうで閉じるまで、ここからコレクションのフォルダーには何も書き込みません。ここでの作業はこのコンピューターのカタログに残り、後でフォルダーに書き込まれます。', 'takeOver': 'それでもここで使う', 'takeOverTitle': 'このコンピューターからコレクションのフォルダーに書き込みます。もう一方で LionPhotos が本当に開いていない場合のみ。', 'lockedToast': 'このコレクションは別のコンピューター（{by}）で開かれています。向こうで閉じるまで、ここでの作業はこのコンピューターのカタログに残ります。'}})

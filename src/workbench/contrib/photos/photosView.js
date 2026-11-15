@@ -9,6 +9,8 @@
 // Virtualized: only the rows on screen (plus a margin) exist in the page, so a folder with 100 000 items
 // scrolls as smoothly as one with 100. The items on screen are reported to the main process, which makes
 // their missing thumbnails first.
+import { showCompare, comparable } from '../compare/compareView.js';
+import { pageIntro } from '../../browser/pageIntro.js';
 import { h, clear, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
@@ -25,6 +27,7 @@ import { removeFromAlbum, removeFromLabel, editLabel, albumMenuItem } from '../a
 import { organizeSection, selectionFacts, selectionList } from './selectionSummary.js';
 import { metadataSections } from './descriptionSection.js';
 import { collapsible, fileSection, infoFooter } from './infoSections.js';
+import { panelTab, setPanelTab, sectionsFor, asOnly, usableTab, tabBar, TAB_KEYS, attachResizer } from './panelTabs.js';
 import { showExportDialog } from '../plugins/exportDialog.js';
 import { renderProjectPanel } from '../labels/projectPanel.js';
 import { showContextMenu } from '../../browser/contextMenu.js';
@@ -49,6 +52,7 @@ const mosaicKey = (type) => (type === 'album' ? MOSAIC_KEY : `lionphotos.mosaic.
 const SPOT_KEY = 'lionphotos.labelHighlights'; // inside a label: only its photos marked great or OK, as a portfolio
 const MOSAIC_GAP = 8;
 const MOSAIC_COL = 330;      // about how wide a column of the mosaic is
+const COMPACT_MAX = 60; // photos in a label up to which the year headings are left out
 const LIST_ROW_H = 46;
 const OVERSCAN = 2; // rows above and below the screen
 const LAYOUT_KEY = 'lionphotos.photosLayout';
@@ -100,6 +104,8 @@ export class PhotosView extends ViewPane {
     this.rail = h('div.date-rail', { hidden: true, role: 'scrollbar', 'aria-orientation': 'vertical', 'aria-label': t('photos.timeline'), 'aria-controls': '' }, this.railMarks, this.railNow, this.railTip);
     this.#railEvents();
     this.info = h('aside.info-panel');
+    // its left edge is dragged to make it wider (300–480 px, remembered)
+    this.infoGrip = attachResizer(this.info, 'grid', 'right');
     // Alt+↓ / Alt+↑ in the panel (even in a field): the next / previous photo, the same field keeps the focus
     this.info.addEventListener('keydown', (e) => {
       if (e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'ArrowDown' || e.key === 'ArrowUp') && this.library.selection.size <= 1) {
@@ -107,7 +113,7 @@ export class PhotosView extends ViewPane {
       }
     }, true);
     this.element.append(...(this.banner ? [this.banner] : []), this.labelBar, this.projectPanel, this.toolbar, this.selbar,
-      h('div.photos-body', h('div.photos-main', this.listHead, this.scroller, this.empty, this.spot, this.stamp, this.rail), this.info));
+      h('div.photos-body', h('div.photos-main', this.listHead, this.scroller, this.empty, this.spot, this.stamp, this.rail), this.infoGrip, this.info));
 
     this.scroller.addEventListener('scroll', () => { this.thumbs.hold(); this.#schedule(); }, { passive: true });
     this.scroller.addEventListener('keydown', (e) => this.#onKey(e));
@@ -185,6 +191,8 @@ export class PhotosView extends ViewPane {
       // a search made in the title bar: shown here, with its ×, as the other filters (it hides everything → it stands out)
       f.query ? Object.assign(chip('search', `“${f.query}”`, t('photos.clearSearch'), () => library.setFilter({ query: '' })), { className: `chip filter-chip is-query${totals.images + totals.videos ? '' : ' is-culprit'}` }) : null,
       f.year && !this.limbo ? chip('calendar', String(f.year), t('home.allYears'), () => library.setFilter({ year: 0 })) : null,
+      // "all the photos of the day", asked from a photo's panel
+      f.day && !this.limbo ? chip('calendar', formatDate(new Date(`${f.day}T12:00:00`).getTime()), t('photos.clearDay'), () => library.setFilter({ day: '' })) : null,
       f.kind !== 'all' ? chip(f.kind === 'video' ? 'film' : 'image', f.kind === 'video' ? t('photos.kind.videos') : t('photos.kind.images'), t('photos.clearFilters'), () => library.setFilter({ kind: 'all' })) : null,
       f.mark && !this.limbo ? chip(f.mark === 'great' || f.mark === 'picks' ? 'star' : f.mark === 'ok' ? 'okCircle' : null, t(`marks.${f.mark}`), t('marks.all'), () => library.setFilter({ mark: '' })) : null,
       f.category && !this.limbo ? chip(null, t(`category.${f.category}`), t('photos.clearFilters'), () => library.setFilter({ category: '' }), h('span.swatch', { style: { background: categoryColor(f.category) } })) : null,
@@ -194,17 +202,6 @@ export class PhotosView extends ViewPane {
     const sorts = [['date', t('photos.sort.newest')], ['dateAsc', t('photos.sort.oldest')], ['name', t('photos.sort.name')], ['size', t('photos.sort.size')]];
     const sortName = (sorts.find(([v]) => v === f.sort) || sorts[0])[1];
     setChildren(this.toolbar,
-      // grid or list: first in the row
-      h('div.view-mode', { role: 'radiogroup', 'aria-label': t('photos.modeLabel') },
-        // inside a label, as the Albums page: mosaic, even grid, list and its highlights (only the photos marked great or OK)
-        (this.#labelType()
-          ? [['mosaic', 'mosaic', t('albums.modeMosaic')], ['grid', 'grid', t('albums.modeEven')], ['list', 'list', t('photos.modeList')], ['spot', 'showcase', t('photos.spotOn')]]
-          : [['grid', 'grid', t('photos.modeGrid')], ['list', 'list', t('photos.modeList')]]).map(([m, ic, label]) => {
-          const now = this.#spotOn() ? 'spot' : this.#mosaicOn() ? 'mosaic' : this.mode;
-          const on = m === now;
-          return h('button', { class: `view-mode-btn${on ? ' active' : ''}`, role: 'radio', 'aria-checked': String(on), title: label, 'aria-label': label, 'data-mode': m, onclick: () => this.#setMode(m) },
-            h('span', { html: icon(ic, 16) }));
-        })),
       // where: the start page, the folders down to the one in focus, and how many items are shown
       this.#crumbs(count),
       h('span.toolbar-spacer'),
@@ -215,11 +212,23 @@ export class PhotosView extends ViewPane {
       h('button.btn.btn-secondary.btn-sm.filters-btn', { class: `btn btn-secondary btn-sm filters-btn${chips.length ? ' is-active' : ''}`, title: t('photos.filtersTitle'), 'aria-haspopup': 'menu', onclick: (e) => this.#filtersMenu(e.currentTarget) },
         h('span', { html: icon('filter', 14) }), t('photos.filters'), chips.length ? h('span.filters-count', String(chips.length)) : null),
       chips.length ? h('div.filter-chips', chips) : null,
-      this.#viewControls());
+      this.#viewControls(false),
+      // how the photos are shown: at the end of the row, as on every page (left: where and what to do; right: how it is seen) — the info panel's switch after it, beside the panel
+      h('div.view-mode', { role: 'radiogroup', 'aria-label': t('photos.modeLabel') },
+        // inside a label, as the Albums page: mosaic, even grid, list and its highlights (only the photos marked great or OK)
+        (this.#labelType()
+          ? [['mosaic', 'mosaic', t('albums.modeMosaic')], ['grid', 'grid', t('albums.modeEven')], ['list', 'list', t('photos.modeList')], ['spot', 'showcase', t('photos.spotOn')]]
+          : [['grid', 'grid', t('photos.modeGrid')], ['list', 'list', t('photos.modeList')]]).map(([m, ic, label]) => {
+          const now = this.#spotOn() ? 'spot' : this.#mosaicOn() ? 'mosaic' : this.mode;
+          const on = m === now;
+          return h('button', { class: `view-mode-btn${on ? ' active' : ''}`, role: 'radio', 'aria-checked': String(on), title: label, 'aria-label': label, 'data-mode': m, onclick: () => this.#setMode(m) },
+            h('span', { html: icon(ic, 16) }));
+        })),
+      this.#infoToggle());
   }
 
   /** Sort, zoom and the info panel: in the header, and in the selection bar too (they stay at hand). */
-  #viewControls() {
+  #viewControls(withInfo = true) {
     const { library } = this;
     const f = library.filter;
     const sorts = [['date', t('photos.sort.newest')], ['dateAsc', t('photos.sort.oldest')], ['name', t('photos.sort.name')], ['size', t('photos.sort.size')]];
@@ -234,7 +243,11 @@ export class PhotosView extends ViewPane {
             onchange: (e) => library.setSetting('tileSize', Number(e.target.value)),
           })
         : null,
-      h('button.icon-button.info-toggle', { class: `icon-button info-toggle${this.infoOpen ? ' active' : ''}`, title: t('photos.toggleInfo', { key: 'I' }), html: icon('info', 16), onclick: () => this.toggleInfo() }));
+      withInfo ? this.#infoToggle() : null);
+  }
+
+  #infoToggle() {
+    return h('button.icon-button.info-toggle', { class: `icon-button info-toggle${this.infoOpen ? ' active' : ''}`, title: t('photos.toggleInfo', { key: 'H' }), html: icon('info', 16), onclick: () => this.toggleInfo() });
   }
 
   /** Start page › folder › subfolder · how many items are shown and their size. */
@@ -250,6 +263,14 @@ export class PhotosView extends ViewPane {
         html: icon('home', 15), onclick: () => { library.goHome(); this.layout.openView('photos'); },
       }),
     ];
+    // inside an album, a person, a place…: Albums › Rome (not the folder the collection is in)
+    const label = !this.limbo && library.filter.labelId ? this.labels.get(library.filter.labelId) : null;
+    if (label) {
+      parts.push(h('span.crumb-sep', { html: icon('chevronRight', 12) }),
+        h('button.crumb', { title: t(`labels.type.${label.type}.plural`), onclick: () => { library.closeLabel(); this.layout.openView(label.type); } }, t(`labels.type.${label.type}.plural`)),
+        h('span.crumb-sep', { html: icon('chevronRight', 12) }), h('span.crumb.current', this.labels.nameOf(label)));
+      return h('nav.photos-crumbs', { 'aria-label': t('editor.breadcrumbsLabel') }, parts, h('span.crumb-meta', count));
+    }
     const names = [this.limbo ? t('limbo.title') : baseName(library.root || '')];
     parts.push(h('span.crumb-sep', { html: icon('chevronRight', 12) }), crumb(names[0], '', segs.length === 0));
     // long paths keep the first and the last two folders
@@ -270,11 +291,12 @@ export class PhotosView extends ViewPane {
     const list = this.library.rejectCandidates();
     const bytes = list.reduce((s, it) => s + it.size, 0);
     const b = bytesParts(bytes);
+    const limboIntro = pageIntro('limbo', t('limbo.lead'), 'div.limbo-lead');
     setChildren(this.banner,
       h('span.limbo-icon', { html: icon('binQuestion', 22) }),
       h('div.limbo-text',
-        h('div.limbo-title.view-title-row', h('span', t('limbo.title')), sphereScope(this.library)),
-        h('div.limbo-lead', t('limbo.lead'))),
+        h('div.limbo-title.view-title-row', h('span', t('limbo.title')), sphereScope(this.library), limboIntro.help),
+        limboIntro.body),
       list.length ? h('div.limbo-size', h('span.limbo-size-number', b.int, h('span.limbo-size-dec', b.dec), h('span.limbo-size-unit', b.unit)), h('span.limbo-size-label', tn('limbo.items', list.length))) : null,
       list.length ? h('div.limbo-actions',
         h('button.btn.btn-danger.btn-sm.trash-rejects', {
@@ -327,8 +349,8 @@ export class PhotosView extends ViewPane {
         h('span', { html: icon('external', 13) }), t('plugins.export.button')) : null,
       // a person or a pet: their faces (and the suggestions to check), in People / Pets
       faces ? h('button.btn.btn-secondary.btn-sm', { title: t(`${faces.k}.review`), onclick: () => this.services.reviewFaces?.(label.type, label.id) },
-        h('span', { html: icon('face', 13) }), t(`${faces.k}.reviewBar`)) : null,
-      h('button.btn.btn-ghost.btn-sm', { onclick: () => { this.library.closeLabel(); } }, h('span', { html: icon('image', 14) }), t('labels.showAll')));
+        h('span', { html: icon('face', 13) }), t(`${faces.k}.reviewBar`)) : null);
+      // no "Show all photos" here: the back button and the Photos tab already lead there
   }
 
   /** The photos shown (an album's), as a slideshow from the focused one or the first. */
@@ -373,8 +395,8 @@ export class PhotosView extends ViewPane {
         ...['picks', 'great', 'ok', 'none'].map((m) => ({ label: t('marks.option', { name: t(`marks.${m}`), count: formatNumber(counts[m]) }), checked: f.mark === m, run: pick({ mark: m }) }))] });
     }
     if (!this.limbo) items.push({ label: t('photos.subfolders'), icon: 'folder', title: t('photos.subfoldersHint'), checked: !!f.recursive, run: pick({ recursive: !f.recursive }) });
-    const any = f.kind !== 'all' || (!this.limbo && (f.year || f.mark || f.category || f.noAlbum || !f.recursive));
-    if (any) items.push('-', { label: t('photos.clearFilters'), icon: 'close', run: pick({ kind: 'all', year: 0, mark: '', category: '', noAlbum: false, recursive: true }) });
+    const any = f.kind !== 'all' || (!this.limbo && (f.year || f.day || f.mark || f.category || f.noAlbum || !f.recursive));
+    if (any) items.push('-', { label: t('photos.clearFilters'), icon: 'close', run: pick({ kind: 'all', year: 0, day: '', mark: '', category: '', noAlbum: false, recursive: true }) });
     showContextMenu(r.left, r.bottom + 4, items);
   }
 
@@ -472,6 +494,7 @@ export class PhotosView extends ViewPane {
           { label: t('photos.moveTo'), icon: 'folder', run: () => showMoveDialog(this, ids) },
           { label: t('photos.duplicate'), icon: 'copy', hint: 'Ctrl+D', run: () => this.operations.duplicate(ids) },
           exportMenuItem(this.services, sel),
+          { label: t('compare.menu'), icon: 'columns', hint: 'V', disabled: !comparable(this.services, sel).length, run: () => this.compareSelection() },
           { label: t('photos.organize'), icon: 'calendar', run: () => this.layout.openView('organize') },
           ...(videos.length ? [{ label: t('previews.generate'), icon: 'film', run: () => this.thumbs.generatePreviews({ ids: videos.map((v) => v.id) }, tn('previews.scope.selected', videos.length)) }] : []),
           ...(heics.length ? [{ label: t('convert.button'), icon: 'image', title: t('convert.buttonTitle'), run: () => this.operations.convertHeic(heics.map((it) => it.id)) }] : []),
@@ -564,13 +587,16 @@ export class PhotosView extends ViewPane {
       this.tileW = Math.floor((width - PAD * 2 - GAP * (this.cols - 1)) / this.cols);
       let i = 0;
       let year = null;
+      // a small album (or person, place…): the months only, each with its year — a large year number above one
+      // or two photos is more heading than photos
+      const compact = !this.limbo && !!this.library.filter.labelId && list.length <= COMPACT_MAX;
       while (i < list.length) {
         let end = list.length;
         if (groups) {
           const d = dateOf(list[i]);
           // a new year: its number, large
           const y0 = new Date(d).getFullYear();
-          if (y0 !== year) {
+          if (y0 !== year && !compact) {
             year = y0;
             let e = i;
             while (e < list.length && new Date(dateOf(list[e])).getFullYear() === y0) e++;
@@ -581,7 +607,7 @@ export class PhotosView extends ViewPane {
           end = i;
           let lo = d, hi = d;
           while (end < list.length && monthKey(dateOf(list[end])) === key) { const t0 = dateOf(list[end]); if (t0 < lo) lo = t0; if (t0 > hi) hi = t0; end++; }
-          rows.push({ type: 'header', y, h: HEADER_H, label: formatMonthName(d), days: formatDayRange(lo, hi), month: formatMonth(d), start: i, count: end - i, at: d });
+          rows.push({ type: 'header', y, h: HEADER_H, label: compact ? formatMonth(d) : formatMonthName(d), days: formatDayRange(lo, hi), month: formatMonth(d), start: i, count: end - i, at: d });
           y += HEADER_H;
         }
         if (mosaic) y = this.#mosaicRows(rows, i, end, y, width);
@@ -943,17 +969,18 @@ export class PhotosView extends ViewPane {
     this.listHead.hidden = this.mode !== 'list';
     if (this.mode !== 'list') return;
     setChildren(this.listHead,
-      h('span'), h('span'), h('span', t('list.name')), h('span', t('list.folder')), h('span', t('list.type')), h('span', t('sphere.label')), h('span', t('list.dimensions')),
+      h('span'), h('span'), h('span', t('list.name')), h('span', t('list.folder')), h('span', t('list.type')), h('span', { title: t('sphere.label'), 'aria-label': t('sphere.label') }), h('span', t('list.dimensions')),
       h('span.num', t('list.size')), h('span', t('list.date')), h('span', t('list.details')), h('span', t('marks.label')), h('span'));
   }
 
-  /** The category column of the list: personal, professional or not categorized — always said. */
+  /** The category column of the list: a mark for personal or professional. */
   #sphereCell(it) {
     const key = this.labels.sphereOf(it) || 'none';
-    // not categorized: plain muted text, so the categorized ones stand out
-    if (key === 'none') return h('span.row-sphere.cat-none', t('sphere.none'));
-    return h('span.row-sphere', h('span', { class: `sphere-pill is-${key}` },
-      h('span', { html: icon(key === 'personal' ? 'home' : key === 'professional' ? 'briefcase' : 'sphere', 11) }), t(`sphere.${key}`)));
+    // a small mark only (its name on hover); not categorized: nothing, so the categorized ones stand out and the
+    // same words are not repeated down the whole list
+    if (key === 'none') return h('span.row-sphere.cat-none', { title: t('sphere.none'), 'aria-label': t('sphere.none') });
+    return h('span.row-sphere', h('span', { class: `sphere-pill is-${key} is-mark`, title: t(`sphere.${key}`), 'aria-label': t(`sphere.${key}`) },
+      h('span', { html: icon(key === 'personal' ? 'home' : key === 'professional' ? 'briefcase' : 'sphere', 12) })));
   }
 
   #listRow(it) {
@@ -1044,12 +1071,17 @@ export class PhotosView extends ViewPane {
     if (mod && e.key.toLowerCase() === 'a') { e.preventDefault(); this.picking = true; library.setSelection(this.list.map((it) => it.id)); return; }
     // Ctrl+D: duplicate the selection (copies next to the originals, with the typed code)
     if (mod && !e.shiftKey && e.key.toLowerCase() === 'd' && library.selection.size && !this.limbo) { e.preventDefault(); this.operations.duplicate([...library.selection]); return; }
+    // V: two photos side by side — the selected ones, or the one selected and the next
+    if (!mod && !e.altKey && e.key.toLowerCase() === 'v' && library.selection.size) { e.preventDefault(); this.compareSelection(); return; }
     // Ctrl+E: export the selection (or, with none, the photos shown)
     if (mod && !e.shiftKey && e.key.toLowerCase() === 'e') { e.preventDefault(); exportPhotos(this.services, library.selection.size ? library.selectedItems() : this.list); return; }
     // Delete: to the Limbo (a confirmation); in the Limbo, to the Recycle Bin (typed code)
     if (e.key === 'Delete' && library.selection.size) { e.preventDefault(); if (this.limbo) this.operations.trash([...library.selection]); else applyMark(library, [...library.selection], 'reject'); return; }
     if (e.key === 'Enter' && this.focusId) { e.preventDefault(); this.#openViewer(this.focusId); return; }
-    if (e.key === 'i' || e.key === 'I') { e.preventDefault(); this.toggleInfo(); return; }
+    // E · D · I: the panel's tabs (Adjust, Describe, Info); H shows or folds the panel
+    const tabKey = !mod && !e.altKey && !e.shiftKey && TAB_KEYS[e.key.toLowerCase()];
+    if (tabKey) { e.preventDefault(); this.showTab(tabKey, true); return; }
+    if (!mod && !e.altKey && (e.key === 'h' || e.key === 'H')) { e.preventDefault(); this.toggleInfo(); return; }
     if (e.key === 'Escape' && library.selection.size) { e.preventDefault(); library.clearSelection(); return; }
     // 1 great · 2 OK · 3 candidate to delete · 0 no mark — on the selection (or the focused item)
     if (!mod && !e.altKey && /^[0-3]$/.test(e.key)) {
@@ -1123,12 +1155,14 @@ export class PhotosView extends ViewPane {
     const rerender = () => this.#renderInfo();
     if (sel.size > 1) {
       const items = this.library.selectedItems();
+      const images = items.filter((x) => x.kind === KIND.image);
+      const tab = usableTab(panelTab(), { adjust: images.length > 0 });
       const md = metadataSections(this, items, { rerender });
       const f = selectionFacts(this, items);
       const shown = items.slice(0, items.length > 4 ? 3 : 4);
       const marks = Object.entries(f.marks).filter(([k, n]) => n && k !== 'none');
       const same = MARK_NAMES[items[0].mark || 0];
-      setChildren(this.info, this.#infoClose(),
+      setChildren(this.info, this.#infoClose(), this.#tabs(tab, images.length > 0),
         h('div.ip-head.ip-head-many',
           h('div.ip-head-top',
             h('div.ip-mosaic', { class: `ip-mosaic n${Math.min(items.length, 4)}` }, shown.map((it) => this.#thumb(it, 'ip-mos-img')), items.length > 4 ? h('span.ip-mos-more', `+${formatNumber(items.length - 3)}`) : null),
@@ -1139,11 +1173,12 @@ export class PhotosView extends ViewPane {
             this.#marks(items.map((it) => it.id), items.every((it) => MARK_NAMES[it.mark || 0] === same) ? same : null, 'info-mark-btns'),
             h('span.ip-sp'),
             marks.length ? h('span.ip-mark-counts', marks.map(([k, n]) => h('span', { class: `sel-mark ${k}` }, h('span', { html: icon(k === 'great' ? 'star' : k === 'ok' ? 'okCircle' : 'binQuestion', 11) }), formatNumber(n)))) : null)),
-        h('div.ip-secs',
-          organizeSection(this, items),
-          items.some((x) => x.kind === KIND.image) ? adjustSection(this, items.filter((x) => x.kind === KIND.image)) : null,
-          md.describe, md.place,
-          collapsible({ id: 'files', icon: 'folder', title: t('info.selectionFiles'), summary: h('span', selectionFacts(this, items).fmtText), body: selectionList(this, items) })),
+        asOnly(sectionsFor(tab, {
+          organize: () => organizeSection(this, items),
+          adjust: () => (images.length ? adjustSection(this, images) : null),
+          describe: md.describe, place: md.place,
+          file: () => collapsible({ id: 'files', icon: 'folder', title: t('info.selectionFiles'), summary: h('span', selectionFacts(this, items).fmtText), body: selectionList(this, items) }),
+        })),
         infoFooter(this, items));
       return;
     }
@@ -1157,9 +1192,11 @@ export class PhotosView extends ViewPane {
     if (!it) return;
     const dims = d.width && d.height ? `${formatNumber(d.width)} × ${formatNumber(d.height)}` : null;
     const md = metadataSections(this, [it], { fileMeta: d.meta || null, rerender });
+    const image = it.kind === KIND.image;
+    const tab = usableTab(panelTab(), { adjust: image });
     const index = this.indexOf.get(id);
     const hasNext = index !== undefined && index < this.list.length - 1;
-    setChildren(this.info, this.#infoClose(),
+    setChildren(this.info, this.#infoClose(), this.#tabs(tab, image),
       h('div.ip-head',
         h('div.info-thumb', this.#thumb(it, 'info-img')),
         h('div.ip-name', { title: d.path }, d.name, adjustOf(it) ? h('span.ip-edited', t('adjust.edited')) : null),
@@ -1170,11 +1207,12 @@ export class PhotosView extends ViewPane {
           h('button.icon-button', { title: t('common.showIn', { explorer: this.actions.explorerName }), 'aria-label': t('info.reveal'), html: icon('reveal', 15), onclick: () => this.host.shell.reveal(id) }),
           h('button.icon-button', { title: t('info.openDefault'), 'aria-label': t('info.openDefault'), html: icon('external', 15), onclick: () => this.host.shell.open(id) }),
           h('button.icon-button', { title: t('info.copyPath'), 'aria-label': t('info.copyPath'), html: icon('copy', 15), onclick: () => this.actions.copyPath({ id }) }))),
-      h('div.ip-secs',
-        organizeSection(this, [it], { title: it.name }),
-        it.kind === KIND.image ? adjustSection(this, [it], { live: () => this.info.querySelector('.ip-head .info-thumb') }) : null,
-        md.describe, md.place,
-        fileSection(d)),
+      asOnly(sectionsFor(tab, {
+        organize: () => organizeSection(this, [it], { title: it.name }),
+        adjust: () => (image ? adjustSection(this, [it], { live: () => this.info.querySelector('.ip-head .info-thumb') }) : null),
+        describe: md.describe, place: md.place,
+        file: () => fileSection(d),
+      })),
       infoFooter(this, [it], { pending: md.pending, onNext: hasNext ? () => this.#stepInfo(1) : null }));
     // after "Next photo": the same field takes the focus again
     if (this.refocus) {
@@ -1184,8 +1222,37 @@ export class PhotosView extends ViewPane {
     }
   }
 
+  /** Side by side: the selected photos (two or more), or the one selected with the photos shown, starting at the next. */
+  compareSelection() {
+    const sel = comparable(this.services, this.library.selectedItems());
+    if (sel.length >= 2) return showCompare(this.services, sel);
+    if (!sel.length) return false;
+    const all = comparable(this.services, this.list);
+    const at = all.findIndex((x) => x.id === sel[0].id);
+    return showCompare(this.services, all, at, at + 1 < all.length ? at + 1 : at - 1);
+  }
+
   /** Draws the info panel again (after copying adjustments, a value picked for all…). */
   rerenderInfo() { this.#renderInfo(); }
+
+  /** The panel's tabs: Adjust · Describe · Info (Adjust only with photos). */
+  #tabs(tab, adjust) {
+    return tabBar(tab, (x) => {
+      setPanelTab(x);
+      this.#renderInfo().then(() => this.info.querySelector(`.ip-tab[data-tab="${x}"]`)?.focus());
+    }, { adjust });
+  }
+
+  /**
+   * E, D, I: the panel on that tab — opened if folded, folded if that tab is already shown (H folds it whatever
+   * the tab).
+   */
+  showTab(tab, toggle = false) {
+    if (this.infoOpen && toggle && panelTab() === tab) { this.toggleInfo(); return; }
+    setPanelTab(tab);
+    if (!this.infoOpen) this.toggleInfo();
+    else this.#renderInfo();
+  }
 
   /** Crop and straighten a photo: the viewer opens on it with the crop editor. */
   async openCrop(it) {
@@ -1214,7 +1281,7 @@ export class PhotosView extends ViewPane {
 
   /** The info panel can be hidden (and shown again with ⓘ in the header, or the I key). */
   #infoClose() {
-    return h('button.icon-button.info-close', { title: t('photos.toggleInfo', { key: 'I' }), 'aria-label': t('photos.toggleInfo', { key: 'I' }), html: icon('close', 14), onclick: () => this.toggleInfo() });
+    return h('button.icon-button.info-close', { title: t('photos.toggleInfo', { key: 'H' }), 'aria-label': t('photos.toggleInfo', { key: 'H' }), html: icon('close', 14), onclick: () => this.toggleInfo() });
   }
 
   #renderEmpty() {
@@ -1230,6 +1297,7 @@ export class PhotosView extends ViewPane {
     const reason = (ic, text, patch) => why.push({ ic, text, patch, n: lib.countWith(patch, scope) });
     if (f.query) reason('search', t('photos.why.query', { q: f.query }), { query: '' });
     if (f.year && !this.limbo) reason('calendar', t('photos.why.year', { year: String(f.year) }), { year: 0 });
+    if (f.day && !this.limbo) reason('calendar', t('photos.why.day', { day: formatDate(new Date(`${f.day}T12:00:00`).getTime()) }), { day: '' });
     if (f.kind !== 'all') reason(f.kind === 'video' ? 'film' : 'image', t(f.kind === 'video' ? 'photos.why.videos' : 'photos.why.images'), { kind: 'all' });
     if (f.mark && !this.limbo) reason('star', t('photos.why.mark', { mark: t(`marks.${f.mark}`) }), { mark: '' });
     if (f.category && !this.limbo) reason('sphere', t('photos.why.category', { name: t(`category.${f.category}`) }), { category: '' });
@@ -1244,7 +1312,7 @@ export class PhotosView extends ViewPane {
         h('p.muted', lib.state === 'scanning' ? t('photos.empty.scanning') : t('photos.empty.hint')));
       return;
     }
-    const all = { query: '', year: 0, kind: 'all', mark: '', category: '', sphere: '', noAlbum: false, recursive: true };
+    const all = { query: '', year: 0, day: '', kind: 'all', mark: '', category: '', sphere: '', noAlbum: false, recursive: true };
     const total = lib.countWith(all, scope);
     const take = (patch) => lib.setFilter(patch);
     setChildren(this.empty,

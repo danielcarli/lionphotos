@@ -11,6 +11,7 @@
 //   - one person's page: every face given to them, the suggestions first — confirm, "not them", or
 //     "someone else".
 // Faces are found on this computer only; only the LionPhotos catalog changes.
+import { pageIntro } from '../../browser/pageIntro.js';
 import { sphereScope } from '../labels/sphereIcons.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
@@ -142,11 +143,11 @@ export class PeopleView extends ViewPane {
     name.addEventListener('keydown', (e) => { if (e.key === 'Enter') create(); });
     const toCheck = [...faces.values()].reduce((n, p) => n + p.suggested.length, 0);
 
+    const intro = pageIntro(this.type, t(`${this.k}.peopleLead`));
     setChildren(this.body,
       h('div.view-header',
-        h('div.eyebrow', h('span', { html: icon(this.icon, 14) }), t('labels.eyebrow')),
-        h('div.view-title-row', h('h1.view-title', t(`labels.type.${this.type}.plural`)), sphereScope(this.library)),
-        h('p.muted', t(`${this.k}.peopleLead`))),
+        h('div.view-title-row', h('h1.view-title', t(`labels.type.${this.type}.plural`)), sphereScope(this.library), intro.help),
+        intro.body),
       this.status,
       h('div.lbl-create', name, h('button.btn.btn-primary', { onclick: create }, h('span', { html: icon('plus', 14) }), t(`labels.type.${this.type}.new`)),
         h('span.toolbar-spacer'), modeToggle(modeOf(this.type, ['showcase']), (m) => { setMode(this.type, m); this.render(); }, [showcaseMode()])),
@@ -158,7 +159,13 @@ export class PeopleView extends ViewPane {
           mode: modeOf(this.type), groups: byYear(people, (l) => stats.get(l.id)), 
           card: (l) => this.#personCard(l, stats.get(l.id), faces.get(l.id)), row: (l) => this.#personRow(l, stats.get(l.id), faces.get(l.id)),
         })
-        : h('div.empty-state', h('span', { html: icon(this.icon, 28) }), h('h3', t(`labels.type.${this.type}.empty`)), h('p.muted', this.svc.state.faces ? t(`${this.k}.howToNamed`) : t('labels.howTo'))),
+        // nothing yet: the natural way in is to let the app look ("Index now"); creating one by hand comes second
+        : h('div.empty-state', h('span', { html: icon(this.icon, 28) }), h('h3', t(`labels.type.${this.type}.empty`)),
+          this.svc.state.faces ? h('p.muted', t(`${this.k}.howToNamed`))
+            : [h('p.muted', t(`labels.emptyFind.${this.type}`)),
+              this.svc.state.support?.supported === false || this.svc.state.running ? null
+                : h('button.btn.btn-primary.empty-index', { onclick: () => this.svc.start() }, h('span', { html: icon('face', 14) }), t(`${this.k}.indexNow`)),
+              h('p.muted.small', t('labels.emptyOr'))]),
       this.svc.state.faces || this.svc.state.running ? this.#groupsSection(groups, people) : null,
       this.svc.overview?.ignored ? h('button.btn.btn-ghost.btn-sm.faces-ignored-link', { onclick: () => { this.page = { ignored: true }; this.render(); } },
         tn(`${this.k}.ignoredLink`, this.svc.overview.ignored)) : null);

@@ -17,6 +17,9 @@ const { t } = require('../../nls/common/nls');
 
 const inside = (root, p) => p === root || p.startsWith(root.endsWith(path.sep) ? root : root + path.sep);
 
+const CATALOG_DIR = '.lionphotos';
+const CATALOG_FILES = ['catalog.json', 'faces.json', 'collection.json', 'README.txt'];
+
 class BackupMainService {
   constructor(library) {
     this.library = library;
@@ -29,6 +32,7 @@ class BackupMainService {
   registerChannels(ipc) {
     ipc.handle('backup:compare', (e, opts) => this.compare(e.sender, opts || {}));
     ipc.handle('backup:cancel', () => { this.token++; return true; });
+    ipc.handle('backup:copyCatalog', (_e, sessionId) => this.copyCatalog(sessionId));
   }
 
   async #folder(p) {
@@ -72,7 +76,45 @@ class BackupMainService {
     const onlyBackup = res.onlyBackup.map(add);
     this.session = { id: crypto.randomUUID(), master: m, backup: b, files, both, onlyMaster, onlyBackup };
     const view = (f) => ({ side: f.side, rel: f.rel, folder: f.folder, name: f.name, ext: f.ext, kind: f.kind, size: f.size, mtime: f.mtime, id: f.id, thumb: f.thumb, taken: f.taken, mark: f.mark });
-    return { session: this.session.id, master: m, backup: b, files: files.map(view), both, onlyMaster, onlyBackup, stats: res.stats };
+    return { session: this.session.id, master: m, backup: b, files: files.map(view), both, onlyMaster, onlyBackup, stats: res.stats, catalog: await this.catalogState(m, b) };
+  }
+
+  // ------------------------------------------------------------------ the catalog goes to the backup too
+  // Albums, people, marks, descriptions, adjustments and crops are not in the photos' files: they are in the
+  // collection's .lionphotos folder. A backup without it brings the photos back, not the work done on them.
+  async #catalogOf(root) {
+    try {
+      const c = JSON.parse(await fs.promises.readFile(path.join(root, CATALOG_DIR, 'catalog.json'), 'utf8'));
+      return { rev: Number(c.rev) || 0, at: Number(c.updatedAt) || 0 };
+    } catch { return null; }
+  }
+
+  /** The master's catalog and the copy the backup has: { master, backup, current }. */
+  async catalogState(m, b) {
+    const [master, backup] = await Promise.all([this.#catalogOf(m), this.#catalogOf(b)]);
+    return { master, backup, current: !!master && !!backup && master.rev === backup.rev && master.at === backup.at };
+  }
+
+  /**
+   * Copies the master's .lionphotos (catalog, faces, collection, README) into the backup folder; what was there
+   * stays beside it as .bak. Only LionPhotos' own data: no photo is touched.
+   */
+  async copyCatalog(sessionId) {
+    const s = this.session;
+    if (!s || s.id !== sessionId) throw new Error(t('main.backup.errors.expired'));
+    const from = path.join(s.master, CATALOG_DIR), to = path.join(s.backup, CATALOG_DIR);
+    if (!(await this.#catalogOf(s.master))) return this.catalogState(s.master, s.backup);
+    await fs.promises.mkdir(to, { recursive: true });
+    for (const name of CATALOG_FILES) {
+      const src = path.join(from, name), dst = path.join(to, name);
+      let data;
+      try { data = await fs.promises.readFile(src); } catch { continue; }
+      const tmp = `${dst}.${process.pid}.tmp`;
+      await fs.promises.writeFile(tmp, data);
+      await fs.promises.copyFile(dst, `${dst}.bak`).catch(() => {});
+      await fs.promises.rename(tmp, dst);
+    }
+    return this.catalogState(s.master, s.backup);
   }
 
   /** The files a copy covers: those missing on the other side (all, or the indices given). */

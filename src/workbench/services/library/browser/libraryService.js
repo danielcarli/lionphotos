@@ -28,6 +28,8 @@ function loadSettings() {
 }
 
 export const dateOf = (it) => it.taken || it.mtime;
+/** The day of a photo, as the computer's clock has it: '2026-07-11' (the "all the photos of the day" filter). */
+export const dayOf = (it) => { const d = new Date(dateOf(it)); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
 /** The metadata written in LionPhotos over the file's (headline, place, keywords…): an object, never null. */
 export function editsOf(it) {
@@ -118,7 +120,7 @@ export class LibraryService {
     this.host = host;
     this.settings = loadSettings();
     // sphere: '' every photo · 'personal' · 'professional' · 'none' (not categorized) — chosen in the title bar, kept
-    this.filter = { folder: '', recursive: this.settings.recursive, kind: this.settings.kind, query: '', sort: this.settings.sort, year: 0, category: '', labelId: 0, mark: '', noAlbum: false, sphere: ['personal', 'professional', 'none'].includes(this.settings.sphere) ? this.settings.sphere : '' };
+    this.filter = { folder: '', recursive: this.settings.recursive, kind: this.settings.kind, query: '', sort: this.settings.sort, year: 0, day: '', category: '', labelId: 0, mark: '', noAlbum: false, sphere: ['personal', 'professional', 'none'].includes(this.settings.sphere) ? this.settings.sphere : '' };
     host.library.onProgress((p) => { this.progress = p; this.#onDidProgress.fire(p); });
     try { this.lastRoot = localStorage.getItem(ROOT_KEY) || null; } catch { this.lastRoot = null; }
   }
@@ -434,7 +436,7 @@ export class LibraryService {
     // put aside while the label is open, and come back with the folder when it is closed
     const f = this.filter;
     this.labelReturn = { view: fromView, folder: f.folder, recursive: f.recursive, query: f.query, year: f.year, ...(mark !== undefined ? { mark: f.mark } : {}) };
-    this.setFilter({ labelId, folder: '', recursive: true, noAlbum: false, query: '', year: 0, ...(mark !== undefined ? { mark } : {}) });
+    this.setFilter({ labelId, folder: '', recursive: true, noAlbum: false, query: '', year: 0, day: '', ...(mark !== undefined ? { mark } : {}) });
   }
 
   /** Leaves a label's photos: the folder shown before comes back. @returns {string} the view to go back to */
@@ -458,7 +460,7 @@ export class LibraryService {
       const f = this.filter;
       const inFolder = !f.folder || it.folder === f.folder || (f.recursive && it.folder.startsWith(f.folder + this.sep));
       this.labelReturn = null;
-      this.setFilter({ year: 0, labelId: 0, mark: '', query: '', category: '', kind: 'all', ...(inFolder ? {} : { folder: it.folder }) }, { keepSelection: true });
+      this.setFilter({ year: 0, day: '', labelId: 0, mark: '', query: '', category: '', kind: 'all', ...(inFolder ? {} : { folder: it.folder }) }, { keepSelection: true });
     }
     return scope === 'limbo' ? 'limbo' : 'photos';
   }
@@ -466,13 +468,26 @@ export class LibraryService {
   /** No filter at all: every photo and video of the collection, from the top folder (the start page). */
   get isHome() {
     const f = this.filter;
-    return !f.folder && !f.year && !f.labelId && !f.mark && !f.query && !f.category && f.kind === 'all';
+    return !f.folder && !f.year && !f.day && !f.labelId && !f.mark && !f.query && !f.category && f.kind === 'all';
   }
 
   /** Back to the start: the whole collection, every year, no label, no search, no mark filter. */
   goHome() {
     this.labelReturn = null;
-    this.setFilter({ folder: '', recursive: true, year: 0, labelId: 0, mark: '', query: '', category: '', kind: 'all' });
+    this.setFilter({ folder: '', recursive: true, year: 0, day: '', labelId: 0, mark: '', query: '', category: '', kind: 'all' });
+  }
+
+  /**
+   * Every photo and video of the day a photo was taken, in Photos: out of the album, person or search it was
+   * seen in, with no other filter (the photo stays selected). Returns the day ('2026-07-11').
+   */
+  showDay(id) {
+    const it = this.byId.get(id);
+    if (!it) return '';
+    this.labelReturn = null;
+    const day = dayOf(it);
+    this.setFilter({ folder: '', recursive: true, year: 0, day, labelId: 0, mark: '', query: '', category: '', kind: 'all', noAlbum: false }, { keepSelection: true });
+    return day;
   }
 
   /** Every delete candidate of the collection (what the Limbo shows), whatever the folder in focus or the filters. */
@@ -581,7 +596,7 @@ export class LibraryService {
   view(scope = 'main') {
     if (this.#views.has(scope)) return this.#views.get(scope);
     const limbo = scope === 'limbo';
-    const { folder, recursive, kind, query, sort, year, category, labelId, mark, noAlbum } = this.filter;
+    const { folder, recursive, kind, query, sort, year, day, category, labelId, mark, noAlbum } = this.filter;
     // "only photos in no album"
     const albums = noAlbum && !limbo ? this.albumIds?.() : null;
     const wantMark = limbo ? MARK.reject : mark && mark !== 'reject' && mark !== 'picks' ? MARK[mark] ?? -1 : -1;
@@ -598,6 +613,7 @@ export class LibraryService {
       (limbo || (folder ? it.folder === folder || (recursive && it.folder.startsWith(prefix)) : recursive || it.folder === ''))
       && (!want || it.kind === want)
       && (limbo || !year || new Date(dateOf(it)).getFullYear() === year)
+      && (limbo || !day || dayOf(it) === day)
       && (limbo || !category || categoryOf(it) === category)
       && (limbo || !labelId || asg(it)?.ids.has(labelId))
       && (!albums || !inAny(asg(it)?.ids, albums))

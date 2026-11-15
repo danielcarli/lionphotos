@@ -3,22 +3,28 @@
  *  Created and conceived by Daniel Michelon De Carli.
  *  Licensed under the MIT License. See LICENSE in the project root.
  *--------------------------------------------------------------------------------------------*/
-// Status bar: library state, totals, thumbnails and previews being made (with "Stop"), selection,
-// theme and language pickers, and the version.
+// Status bar: library state, totals, thumbnails and previews being made (with "Stop"), selection, theme and
+// language pickers, and the version in the bottom-right corner, as in LionOrganizer (a click opens the update
+// window, which checks for a new version).
+import { showShortcuts } from '../../contrib/help/shortcutsDialog.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { formatBytes, formatNumber } from '../../../base/common/format.js';
 import { t, tn, getLocales, getLocalePreference, setLocalePreference } from '../../../base/common/nls.js';
+import { showContextMenu } from '../contextMenu.js';
+import { showUpdateDialog } from '../../contrib/update/updateDialog.js';
 
 export class StatusbarPart {
   constructor(services) {
     Object.assign(this, services);
     this.left = h('div.status-left');
     this.right = h('div.status-right');
-    this.themeSwitch = h('div.theme-switch', { role: 'radiogroup', 'aria-label': t('statusbar.theme') });
-    this.version = h('span.status-version');
-    this.element = h('footer.part.statusbar', this.left, h('div.status-right-wrap', this.right, this.themeSwitch, this.#languagePicker(), this.version));
-    this.host.appInfo().then((i) => { this.version.textContent = i?.version ? `v${i.version}` : ''; }).catch(() => {});
+    this.themeSwitch = h('div.theme-switch');
+    this.version = h('button.status-version', { type: 'button', onclick: () => showUpdateDialog(services) });
+    this.element = h('footer.part.statusbar', this.left, h('div.status-right-wrap', this.right, this.themeSwitch, this.#languagePicker(),
+      h('button.status-keys', { type: 'button', title: t('keys.button'), 'aria-label': t('keys.button'), html: icon('keyboard', 13), onclick: () => showShortcuts() }), this.version));
+    this.update.onDidChange(() => this.#renderVersion());
+    this.#renderVersion();
     this.layout.onDidChangeTheme(() => this.#renderThemeSwitch());
     this.#renderThemeSwitch();
     const r = () => this.render();
@@ -66,13 +72,35 @@ export class StatusbarPart {
     setChildren(this.right, right);
   }
 
+  /** "v1.39.0", or "New version 1.40.0" once a check found one */
+  #renderVersion() {
+    const { status, info, version } = this.update;
+    const available = status === 'available' && info?.latest;
+    this.version.classList.toggle('update-available', !!available);
+    this.version.title = available ? t('update.status.availableTitle', { version: info.latest })
+      : status === 'checking' ? t('update.status.checking')
+      : status === 'current' ? t('update.status.currentTitle')
+      : status === 'error' ? t('update.status.errorTitle')
+      : t('update.status.title');
+    setChildren(this.version,
+      h(`span.status-icon${status === 'checking' ? '.spin' : ''}`, { html: icon(available ? 'download' : status === 'checking' ? 'refresh' : 'info', 12) }),
+      available ? t('update.status.available', { version: info.latest }) : version ? `v${version}` : '');
+  }
+
+  /** One button with the theme in use; a click opens the menu of themes, above it. */
   #renderThemeSwitch() {
     const current = this.layout.themePreference;
-    setChildren(this.themeSwitch, THEMES.map((th) => h('button.theme-option', {
-      role: 'radio', 'aria-checked': String(th.id === current), title: t(th.title),
-      class: `theme-option${th.id === current ? ' active' : ''}`,
-      onclick: () => this.layout.setTheme(th.id),
-    }, h('span.status-icon', { html: icon(th.icon, 12) }), t(th.label))));
+    const now = THEMES.find((th) => th.id === current) || THEMES[0];
+    const all = THEMES.map((th) => t(th.label)).join(' · ');
+    setChildren(this.themeSwitch, h('button.theme-option.active.theme-menu-btn', {
+      type: 'button', 'aria-haspopup': 'menu', title: `${t('statusbar.theme')}: ${all}`, 'aria-label': `${t('statusbar.theme')}: ${t(now.label)}`,
+      onclick: (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        showContextMenu(Math.max(8, r.left), Math.max(8, r.top - (THEMES.length * 30 + 16)), THEMES.map((th) => ({
+          label: t(th.label), icon: th.icon, title: t(th.title), checked: th.id === current, run: () => this.layout.setTheme(th.id),
+        })));
+      },
+    }, h('span.status-icon', { html: icon(now.icon, 12) }), t(now.label), h('span.status-icon.theme-chev', { html: icon('chevronDown', 10) })));
   }
 
   #languagePicker() {

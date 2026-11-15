@@ -11,7 +11,7 @@ Lavora sulle tue cartelle così come sono: miniature piccole create una volta so
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · **Italiano** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versione 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
+![Versione 1.41.0](https://img.shields.io/badge/version-1.41.0-161214)
 ![Stato: versione beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licenza: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Piattaforme: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -55,7 +55,7 @@ Le raccolte di foto crescono più in fretta di quanto si riesca a ordinarle: ann
 ## Punti di forza
 
 - **Le tue cartelle, così come sono.** Nessuna importazione né libreria chiusa: le foto restano dove le hai messe, e gli altri programmi continuano a lavorarci.
-- **Locale e privato.** Nessun account, nessuna telemetria, nessuna rete; il riconoscimento di volti e animali gira sul tuo computer. Legge solo la cartella che scegli e le sue sottocartelle.
+- **Locale e privato.** Nessun account, nessuna telemetria; si collega a Internet solo quando gli chiedi di cercare una nuova versione. Il riconoscimento di volti e animali gira sul tuo computer. Legge solo la cartella che scegli e le sue sottocartelle.
 - **Veloce a qualsiasi scala.** La griglia disegna solo ciò che è sullo schermo; le miniature sono piccole, tenute in un unico file di cache e create una sola volta. Le grandi raccolte su dischi esterni restano fluide.
 - **Tutti i formati, con decodificatori propri.** JPEG, HEIC/HEIF, TIFF, PSD/PSB, RAW delle principali marche (CR3, CR2, NEF, ARW, RAF, DNG…) e video (MP4, MOV, MTS, AVI…).
 - **Sicuro per progetto.** Ogni modifica ai file mostra prima il piano, chiede un codice di 3 caratteri digitato e si può annullare; eliminare manda sempre nel Cestino.
@@ -102,7 +102,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | | |
 |---|---|
 | **Foto** | Griglia per mese o elenco con cartella, tipo, dimensioni, peso, data e dettagli; selezione con clic, Ctrl e Maiusc; zoom; filtri per tipo, anno, contrassegno, categoria e sottocartelle, mostrati come etichette che si tolgono con un clic. L’albero delle cartelle (o gli anni) a sinistra, il pannello informazioni a destra — entrambi nascondibili, o tutto con la modalità concentrazione (`\`). **La ricerca nella barra del titolo** (Ctrl+K o Ctrl+F) cerca in tutta la raccolta mentre scrivi — foto, album, progetti, persone, luoghi, fotografi, fotocamere, parole chiave, cartelle — e, quando i filtri nascondono tutto, la pagina dice quali, con un pulsante per toglierli uno a uno. Dentro un album, una persona, un animale, un luogo o un progetto: mosaico, griglia uniforme, elenco o in evidenza. |
-| **Visualizzatore** | Dimensione piena subito (prima la miniatura), file RAW a dimensione piena tramite il JPEG salvato dalla fotocamera, ← → per scorrere, `I` per le informazioni, zoom alle dimensioni reali; i video si riproducono con i controlli. Il cursore dello zoom va dalla dimensione dello schermo al 400 %; la rotellina ingrandisce dove si trova il puntatore, trascinare sposta la foto, `Z` alterna adattata ↔ dimensione reale. *Modifica* (o `I`) mostra o comprime lo stesso pannello di modifica del pannello informazioni — categoria, album, regolazioni, descrizione, autore e luogo; una foto spostata in una categoria esclusa dal filtro resta visibile, in grigio, con un avviso che dice dove si trova. Anche HEIC, HEIF e HIF si aprono a dimensione reale; le foto HDR (PQ, HLG) vengono convertite per uno schermo comune, nel visualizzatore e nelle miniature. Il doppio clic ingrandisce al 100 % nel punto e torna indietro. Canc manda la foto nel Limbo con una semplice conferma. |
+| **Visualizzatore** | Dimensione piena subito (prima la miniatura), file RAW a dimensione piena tramite il JPEG salvato dalla fotocamera, ← → per scorrere, `I` per le informazioni, zoom alle dimensioni reali; i video si riproducono con i controlli. Il cursore dello zoom va dalla dimensione dello schermo al 400 %; la rotellina ingrandisce dove si trova il puntatore, trascinare sposta la foto, `Z` alterna adattata ↔ dimensione reale. *Modifica* (o `H`) mostra o comprime lo stesso pannello di modifica del pannello informazioni — categoria, album, regolazioni, descrizione, autore e luogo; una foto spostata in una categoria esclusa dal filtro resta visibile, in grigio, con un avviso che dice dove si trova. Anche HEIC, HEIF e HIF si aprono a dimensione reale; le foto HDR (PQ, HLG) vengono convertite per uno schermo comune, nel visualizzatore e nelle miniature. Il doppio clic ingrandisce al 100 % nel punto e torna indietro. Canc manda la foto nel Limbo con una semplice conferma. Il pannello mostra un'attività alla volta — Regola, Descrivi, Info — e, in una finestra di 1680 px o più, Descrivi e Info a sinistra e Regola a destra; trascina il bordo di un pannello per allargarlo. |
 | **Regolazioni** | Esposizione, contrasto, ombre e saturazione nel pannello informazioni, per una foto o molte, con istogramma e anteprima immediata (sulla scheda grafica, o sul processore se manca); copiale e incollale su altre foto. Il file non cambia mai: le regolazioni sono nel catalogo (annullate con Ctrl+Z), miniature e visualizzatore le mostrano (tieni premuto `\` per l'originale) e *Salva copia modificata* scrive un nuovo JPEG accanto all'originale, con i suoi metadati. *Esporta foto* (Ctrl+E) crea nuovi file delle foto modificate in qualsiasi cartella — JPEG, PNG o TIFF, nella misura di un social network o di una stampa, con nitidezza in uscita, nomi come `2026-07-24-Laurea-Ana-Souza-001.jpg`, con tutti i metadati o senza il luogo e una firma facoltativa — con il profilo sRGB; gli originali non cambiano mai. |
 | **Modifica** | Luci, bianchi, neri, bilanciamento del bianco (temperatura, tinta e contagocce), vividezza, bianco e nero con miscela per colore, vignettatura e — sulla scheda grafica — nitidezza, texture e chiarezza; *Automatico*, predefiniti e prima/dopo nel visualizzatore (`Y`). **Ritaglia e raddrizza** (`C`): libero o in un formato — quelli comuni e quelli dei social network (Instagram 4:5 e 3:4, Stories/Reels/TikTok 9:16, YouTube 16:9, link 1,91:1, Pinterest, copertine di X e LinkedIn) —, rotazioni di 90° e raddrizzamento tracciando una linea sull’orizzonte. Tutto resta nel catalogo; il file non cambia mai. |
 | **Correzione dell’obiettivo** | Distorsione, angoli scuri e frange di colore dell’obiettivo annullati dal suo profilo — tutto il database [Lensfun](https://lensfun.github.io), circa 1.600 obiettivi, trovato dal nome scritto dalla fotocamera o scelto da un elenco con ricerca — e a mano: distorsione, prospettiva verticale e orizzontale (edifici che cadono all’indietro), scala, angoli e frange. Sulla scheda grafica; il file non cambia mai. |
@@ -181,7 +181,9 @@ Fai doppio clic su **`build-installer.bat`** (oppure esegui `npm run dist`). I p
 | `Alt+←` · `Alt+Home` | Torna da un album, progetto o persona · l'intera raccolta, senza filtri |
 | `Ctrl+B` · `\` | Mostra/nascondi la barra laterale · modalità concentrazione (solo le foto) |
 | `1` `2` `3` · `0` | Segna la selezione come ottima · OK · da eliminare · togli il segno |
-| `Ctrl+A` · `Invio` · `I` · `Canc` · `F2` · `Esc` | Seleziona tutto · apri · pannello informazioni · Cestino · rinomina · annulla la selezione |
+| `Ctrl+A` · `Invio` · `H` · `Canc` · `F2` · `Esc` | Seleziona tutto · apri · pannello informazioni · Cestino · rinomina · annulla la selezione |
+| `E` · `D` · `I` | Pannello laterale su Regola · Descrivi · Info (lo stesso tasto di nuovo lo chiude) |
+| `V` · `?` | Confronta fianco a fianco · Scorciatoie da tastiera |
 | `Ctrl+E` | Esporta foto (la selezione, o le foto mostrate) |
 | `←` `→` · `Spazio` · `Esc` | Visualizzatore: precedente/successiva · riproduci/pausa · chiudi |
 | `P` · `F` · `A` | Visualizzatore: presentazione · schermo intero · aggiungi all'album |
@@ -200,7 +202,7 @@ La lingua segue quella del sistema e si può cambiare nella barra di stato. Nume
 
 ## Privacy
 
-LionPhotos non si collega mai alla rete: nessun account, nessuna telemetria, nessun controllo degli aggiornamenti. Il riconoscimento di volti e animali gira su questo computer, con modelli inclusi nell'app.
+LionPhotos si collega alla rete solo quando lo chiedi: un clic sulla versione, nell'angolo in basso a destra, cerca una nuova versione su GitHub, e l'aggiornamento scarica il programma di installazione per il tuo sistema, verificato (SHA-256) prima di usarlo. Nessun account, nessuna telemetria, non viene inviato nulla su di te o sulle tue foto. Il riconoscimento di volti e animali gira su questo computer, con modelli inclusi nell'app.
 
 Il catalogo e le miniature stanno in un unico file sul tuo computer:
 
@@ -262,7 +264,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-foto"; npm run test:e2e
 
 ## Registro delle modifiche
 
-Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.38.1**.
+Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.41.0**.
 
 ## Riconoscimenti
 

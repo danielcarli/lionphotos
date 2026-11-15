@@ -94,6 +94,12 @@ const paths = {
   stop: '<rect x="7" y="7" width="10" height="10" rx="1.5"/>',
   layers: '<path d="M12 4l8.5 4.5L12 13 3.5 8.5z"/><path d="M3.5 12.5L12 17l8.5-4.5M3.5 16.5L12 21l8.5-4.5"/>',
   sidebar: '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><path d="M9.5 4.5v15"/>',
+  export: '<path d="M12 15V4M8 8l4-4 4 4"/><path d="M4.5 13.5v5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5v-5"/>',
+  help: '<circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.9"/><path d="M12 16.6v.1"/>',
+  keyboard: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.1M9.5 10h.1M13 10h.1M16.5 10h.1M6 13.5h.1M18 13.5h.1M9 13.5h6"/>',
+  // one panel on the right, and a panel on each side (the viewer's two panels)
+  panel: '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><path d="M14.5 4.5v15"/>',
+  columns: '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><path d="M8.5 4.5v15M15.5 4.5v15"/>',
   arrowUpRight: '<path d="M7 17L17 7M9 7h8v8"/>',
   link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/>',
   copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>',

@@ -25,6 +25,8 @@ const PART_RE = /^(raws?|imgs?|jpe?gs?|hif|heic|heif|cr2|cr3|nef|arw|raf|orf|rw2
 // a folder named after a camera, inside an event: the files of that camera, not another event
 const CAMERA_RE = /^(r\d{1,2}\s*(v|c|mark\s*i*|m\d*)?|eos\b|canon|sony|nikon|fuji\w*|gopro\w*|dji\w*|mavic\w*|iphone\w*|android|celular|a7\w*|z\d\w*|x-?[ts]\d+\w*|osmo\w*|insta360\w*|drone)(?=$|[\s\-_.])/i;
 const INBOX_RE = /\b(organizar|triagem|triar|inbox|entrada|importad[oa]s?|importar|descarregar|cart[aã]o|sd ?card|sem ?nome|unsorted|to ?sort)\b/i;
+// a folder named as a copy of other folders: it is not a subject, and "Repeated files" is where it is dealt with
+const BACKUP_RE = /\b(backups?|bkp|bak|c[oó]pias?( de seguran[cç]a)?|copy|copies|copia de seguridad|sauvegardes?|sicherung(en)?|duplicad[oa]s?|duplicates?|repetid[oa]s?)\b/i;
 const GEAR_RE = /\b(testes?|tete|tests?|lentes?|lens(es)?|objetivas?|calibra[cç][aã]o)\b|\b(r\d{1,3}v?|eos ?\w+|a7\w*|z\d{1,2}\w*|x-?t\d+|x-?s\d+|gopro\w*|mavic\w*|dji\w*|osmo\w*|insta360\w*)\b/i;
 const STOPWORDS = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'em', 'no', 'na', 'of', 'the', 'and', 'del', 'la', 'le', 'des', 'y']);
 const DEFAULTS = { themes: 'folder', spheres: false, loose: 'events', eventDays: 31, gapHours: 36 };
@@ -88,6 +90,20 @@ function sphereOf(items) {
  * @returns {{ groups: object[], stats: object }}
  */
 function proposeReorganization({ items, folders = {}, dirs = [] }, options = {}) {
+  // how many of a folder's items have a twin in another folder (same file name and same second)
+  const twinKey = (it) => `${lower(base(it.rel))}|${Math.floor((it.taken || it.mtime || 0) / 1000)}`;
+  const twinDirs = new Map();
+  for (const it of items) { const k = twinKey(it); let set = twinDirs.get(k); if (!set) twinDirs.set(k, (set = new Set())); set.add(parent(it.rel)); }
+  const twinsOf = (list) => list.filter((it) => twinDirs.get(twinKey(it)).size > 1).length;
+  const mostlyTwins = (list) => list.length >= 2 && twinsOf(list) >= list.length * 0.8;
+  // a folder of copies: most of its photos are elsewhere. Of two folders that are copies of each other, one is
+  // the original: the first by name stays a subject, the other is the copy
+  const isCopy = (dir, list) => {
+    if (!mostlyTwins(list)) return false;
+    const partners = new Set(list.flatMap((it) => [...twinDirs.get(twinKey(it))]).filter((d) => d !== dir));
+    const copies = [...partners].filter((d) => mostlyTwins(byDir.get(d) || []));
+    return !copies.length || copies.some((d) => lower(d) < lower(dir));
+  };
   const o = { ...DEFAULTS, ...options };
   const N = { themes: 'Temas', inbox: '_Entrada', gear: '_Equipamento', personal: 'Pessoal', professional: 'Profissional', loose: 'Soltas', ...(options.names || {}) };
   const reserved = new Set([N.themes, N.inbox, N.gear].map(lower));
@@ -193,6 +209,10 @@ function proposeReorganization({ items, folders = {}, dirs = [] }, options = {})
     if (ctx.reserved) { g.kind = 'keep'; g.reason = 'chosen'; } // already in Temas/, _Entrada/…: the person's choice stays
     else if (!list.length) { g.kind = 'keep'; g.reason = 'noPhotos'; }
     else if (other > list.length * 2 && list.length < 20) { g.kind = 'keep'; g.reason = 'documents'; }
+    // a copy of photos that are elsewhere in the collection (its name says so, or most of its photos have a twin
+    // — same file name, taken at the same second — in another folder): it stays where it is
+    else if (BACKUP_RE.test(name)) { g.kind = 'keep'; g.reason = 'backup'; g.twins = twinsOf(list); }
+    else if (isCopy(dir, list)) { g.kind = 'keep'; g.reason = 'copies'; g.twins = twinsOf(list); }
     else if (INBOX_RE.test(name)) { g.kind = 'inbox'; g.reason = 'inbox'; }
     else if (GEAR_RE.test(name)) { g.kind = 'gear'; g.reason = 'gear'; }
     else if (span.days <= o.eventDays) { g.kind = 'event'; g.reason = span.days ? 'eventDays' : 'eventDay'; }

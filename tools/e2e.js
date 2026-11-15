@@ -29,7 +29,28 @@ if (process.platform === 'linux') {
   process.env.XDG_DATA_DIRS = path.join(OW, 'none');
 }
 
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, shell } = require('electron');
+// new versions (1.39.0): a local "GitHub release" — manifest, checksums and a package — counted, so the test
+// also proves the app never goes there by itself; the system installer and the browser are stand-ins
+const http = require('http');
+const crypto = require('crypto');
+const UPD = { latest: '9.9.9', requests: [], opened: [], external: [] };
+const updDeb = crypto.randomBytes(300 * 1024);
+const updSum = crypto.createHash('sha256').update(updDeb).digest('hex');
+const updServer = http.createServer((req, res) => {
+  UPD.requests.push(req.url);
+  const send = (body) => { res.writeHead(200, { 'Content-Length': body.length }); res.end(body); };
+  if (req.url === '/latest/download/manifest.txt') return send(Buffer.from(`name=LionPhotos\nversion=${UPD.latest}\n`));
+  if (req.url === '/download/v9.9.9/SHA256SUMS') return send(Buffer.from(`${updSum}  lionphotos_amd64.deb\n`));
+  if (req.url === '/download/v9.9.8/SHA256SUMS') return send(Buffer.from(`${'0'.repeat(64)}  lionphotos_amd64.deb\n`));
+  if (/^\/download\/v9\.9\.[89]\/lionphotos_amd64\.deb$/.test(req.url)) return send(updDeb);
+  res.writeHead(404); res.end();
+}).listen(0, '127.0.0.1');
+process.env.LIONPHOTOS_ALLOW_INSECURE_FOR_TESTS = '1';
+process.env.LIONPHOTOS_UPDATE_METHOD = 'deb';
+const UPD_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'lionphotos-e2e-downloads-'));
+shell.openPath = async (p) => { UPD.opened.push(p); return ''; };
+shell.openExternal = async (url) => { UPD.external.push(url); };
 require('../src/code/electron-main/main.js');
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -42,6 +63,8 @@ app.whenReady().then(async () => {
   const js = (code) => win.webContents.executeJavaScript(code);
   while (!(await js('!!window.__lionphotos').catch(() => false))) await wait(100);
   const S = 'window.__lionphotos.services';
+  // the side panel shows every section at once here (its tabs are checked on their own, below)
+  await js(`localStorage.setItem('lionphotos.panel.tab', 'all'), true`);
   const idle = async () => {
     for (let i = 0; i < 600; i++) {
       if (await js(`${S}.library.state === 'idle' && ${S}.thumbs.status.thumbPending === 0`)) return;
@@ -404,13 +427,224 @@ app.whenReady().then(async () => {
       const melon = { theme: root.getAttribute('data-theme'), palette: root.getAttribute('data-palette'), bar: bg(), status: sb() };
       L.setTheme('city'); await wait(100);
       const city = { theme: root.getAttribute('data-theme'), palette: root.getAttribute('data-palette'), bar: bg(), status: sb(), content: getComputedStyle(document.querySelector('.part.editor, .editor, main') || document.body).backgroundColor,
-        labels: [...document.querySelectorAll('.theme-option')].map((b) => b.textContent.trim()).join('|') };
+        labels: document.querySelector('.theme-menu-btn')?.title || '', button: document.querySelector('.theme-menu-btn')?.textContent.trim(), buttons: document.querySelectorAll('.theme-option').length };
       L.setTheme(before); await wait(100);
       return { melon, city, back: root.getAttribute('data-palette') };
     })()`);
     check(th.melon.theme === 'teal' && !th.melon.palette && th.melon.bar === 'rgb(1, 135, 163)' && th.city.theme === 'teal' && th.city.palette === 'city'
-      && th.city.bar === 'rgb(27, 63, 148)' && th.city.status === 'rgb(243, 246, 252)' && /Watermelon/.test(th.city.labels) && /City blue/.test(th.city.labels),
-      'themes: Watermelon (teal frame, the default) and City blue (cobalt frame, coral status bar, the same white content), in the status bar', JSON.stringify(th));
+      && th.city.bar === 'rgb(27, 63, 148)' && th.city.status === 'rgb(243, 246, 252)' && /Watermelon/.test(th.city.labels) && /City blue/.test(th.city.labels) && th.city.button === 'City blue' && th.city.buttons === 1,
+      'themes: Watermelon (teal frame, the default) and City blue (cobalt frame, coral status bar, the same white content), behind one theme button in the status bar', JSON.stringify(th));
+    // new versions (1.39.0): the version in the bottom-right corner (as in LionOrganizer) opens the window that checks GitHub — only then;
+    // updating downloads the package of this kind of install, checks it against the release's SHA256SUMS and opens it
+    process.env.LIONPHOTOS_UPDATE_URL = `http://127.0.0.1:${updServer.address().port}`;
+    app.setPath('downloads', UPD_DIR);
+    const appVersion = require('../package.json').version;
+    const corner = await js(`(() => { const b = document.querySelector('.part.statusbar .status-right-wrap > .status-version'); const r = b?.getBoundingClientRect(); return b ? { text: b.textContent.trim(), gap: Math.round(document.querySelector('.part.statusbar').getBoundingClientRect().right - r.right), last: b === b.parentElement.lastElementChild } : null; })()`);
+    check(!!corner && corner.text === 'v' + appVersion && corner.last && corner.gap < 24 && UPD.requests.length === 0,
+      'the version sits in the bottom-right corner, as in LionOrganizer, and the app has not gone to the network by itself', JSON.stringify({ corner, requests: UPD.requests.length }));
+    const updWait = async (code, ms = 8000) => { for (let i = 0; i < ms / 100; i++) { if (await js(code)) return true; await wait(100); } return false; };
+    await js(`document.querySelector('.status-right-wrap > .status-version').click(), true`);
+    const found = await updWait(`(document.querySelector('.update-dialog')?.textContent || '').includes('9.9.9')`);
+    const dlg = await js(`(() => { const d = document.querySelector('.update-dialog'); return { text: d?.textContent || '', go: d?.querySelector('.cm-actions .btn-primary')?.textContent.trim() || '', corner: document.querySelector('.status-version')?.classList.contains('update-available') }; })()`);
+    check(found && UPD.requests.includes('/latest/download/manifest.txt') && dlg.text.includes(appVersion) && /\.deb/.test(dlg.text) && /password/.test(dlg.text) && dlg.go === 'Update now' && dlg.corner && /only when you open this window/.test(dlg.text),
+      'clicking it opens the window, which checks GitHub: both versions, how this copy updates (.deb), what is sent, "Update now"', JSON.stringify({ ...dlg, text: dlg.text.slice(0, 160) }));
+    await js(`document.querySelector('.update-dialog .cm-actions .btn-primary').click(), true`);
+    const done = await updWait(`!document.querySelector('.update-dialog') && [...document.querySelectorAll('.toast')].some((x) => /installer/.test(x.textContent))`, 15000);
+    const got = UPD.opened.find((p) => p.startsWith(UPD_DIR)) || '';
+    check(done && path.basename(got) === 'lionphotos_amd64.deb' && fs.existsSync(got) && crypto.createHash('sha256').update(fs.readFileSync(got)).digest('hex') === updSum,
+      '"Update now": the package is downloaded to Downloads, checked against the release\'s SHA-256 and opened in the system\'s installer', JSON.stringify({ done, got, opened: UPD.opened }));
+    const badUpd = await (async () => { try { await globalThis.__lionphotosMain.update.download('deb', path.join(UPD_DIR, 'bad'), '9.9.8'); return 'kept'; } catch (e) { return e.message; } })();
+    check(badUpd === 'checksum' && !fs.existsSync(path.join(UPD_DIR, 'bad', 'lionphotos_amd64.deb')), 'a download that does not match the published SHA-256 is thrown away', badUpd);
+    UPD.latest = appVersion;
+    await js(`document.querySelector('.status-right-wrap > .status-version').click(), true`);
+    const current = await updWait(`/up to date/.test(document.querySelector('.update-dialog')?.textContent || '') && !document.querySelector('.status-version').classList.contains('update-available')`);
+    check(current, 'with no newer version, the window says LionPhotos is up to date (and the corner shows the version again)');
+    await js(`document.querySelector('.update-dialog .cm-actions .btn-primary')?.click(), true`);
+    await wait(150);
+    // the view modes at the end of the row, as on every page; nothing that leads back to all the photos inside a label
+    const row = await js(`(() => { const tb = document.querySelector('.view-photos .photos-toolbar') || document.querySelector('.photos-toolbar'); const kids = [...(tb?.children || [])].filter((x) => !x.hidden); return { last: kids.slice(-2).map((x) => x.className), first: kids[0]?.className || '' }; })()`);
+    check(/view-mode/.test(row.last[0] || '') && /info-toggle/.test(row.last[1] || '') && /photos-crumbs/.test(row.first),
+      'Photos: where you are first in the row; the view modes at its end, before the info panel switch (as on the other pages)', JSON.stringify(row));
+    // the panel by task (1.40.0): Adjust · Describe · Info as tabs in the photos' panel and the viewer (E, D, I; H
+    // folds it), the adjustment groups as an accordion, the lens by hand folded, the width dragged, and two panels
+    // in a wide viewer (Describe and Info on the left, Adjust on the right)
+    const pt = await js(`(async () => {
+      const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      s.layout.openView('photos'); lib.setFilter({ query: '', labelId: 0, mark: '' }); await wait(300);
+      const jpg = lib.items.find((x) => x.kind === 1 && x.ext === 'jpg');
+      lib.setSelection([jpg.id]); await wait(400);
+      const pv = window.__lionphotos.views.photos;
+      if (!pv.infoOpen) pv.toggleInfo();
+      const secs = () => [...document.querySelectorAll('.info-panel .ip-secs > .ip-sec')].map((x) => x.dataset.sec).join();
+      const out = {};
+      localStorage.setItem('lionphotos.panel.tab', 'describe'); pv.rerenderInfo(); await wait(600);
+      out.tabs = [...document.querySelectorAll('.info-panel .ip-tab')].map((b) => b.dataset.tab + (b.getAttribute('aria-selected') === 'true' ? '*' : '')).join();
+      out.describe = secs();
+      document.querySelector('.info-panel .ip-tab[data-tab="adjust"]').click(); await wait(600);
+      out.adjust = secs(); out.one = !!document.querySelector('.info-panel .ip-secs.is-one') && document.querySelector('.info-panel .ip-sec[data-sec="adjust"]')?.dataset.open === '1';
+      out.remembered = localStorage.getItem('lionphotos.panel.tab');
+      // one group open at a time
+      const open = () => [...document.querySelectorAll('.info-panel .ip-adj-group.is-open')].map((g) => g.dataset.group).join();
+      document.querySelector('.info-panel .ip-adj-group[data-group="color"] .ip-adj-gh').click(); await wait(100);
+      out.accordion1 = open();
+      document.querySelector('.info-panel .ip-adj-group[data-group="lens"] .ip-adj-gh').click(); await wait(100);
+      out.accordion2 = open();
+      out.manualFolded = !!document.querySelector('.info-panel .ip-lens-mbody[hidden]') && document.querySelectorAll('.info-panel .ip-lens-mbody input[type=range]').length === 8;
+      document.querySelector('.info-panel .ip-adj-group[data-group="light"] .ip-adj-gh').click(); await wait(100);
+      // the footer: one line, the whole explanation one click away
+      const safe = document.querySelector('.info-panel .ip-safe');
+      out.safeLine = safe?.tagName === 'DETAILS' && !safe.open && /Saved in the catalog/.test(safe.querySelector('summary')?.textContent || '');
+      // keys
+      const key = (k) => pv.scroller.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+      key('i'); await wait(600); out.keyI = secs() + (pv.infoOpen ? '' : ' closed');
+      key('i'); await wait(300); out.keyIAgain = pv.infoOpen ? 'open' : 'closed';
+      key('d'); await wait(600); out.keyD = (pv.infoOpen ? '' : 'closed ') + secs();
+      key('h'); await wait(300); out.keyH = pv.infoOpen ? 'open' : 'closed';
+      key('h'); await wait(500);
+      // the width: the edge on the left of the panel (the arrows, as a keyboard does)
+      const grip = document.querySelector('.photos-body > .ip-resizer');
+      const w0 = Math.round(document.querySelector('.info-panel').getBoundingClientRect().width);
+      grip.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true })); await wait(100);
+      out.width = [w0, Math.round(document.querySelector('.info-panel').getBoundingClientRect().width), JSON.parse(localStorage.getItem('lionphotos.panel.width') || '{}').grid];
+      grip.dispatchEvent(new MouseEvent('dblclick', { bubbles: true })); await wait(100);
+      out.widthBack = Math.round(document.querySelector('.info-panel').getBoundingClientRect().width) === w0;
+      // the viewer: one panel with tabs here (the window is narrower than 1680 px)
+      const list = lib.items.filter((x) => x.kind === 1 && x.ext === 'jpg');
+      s.viewer.open(list, 0); await wait(500);
+      if (document.querySelector('.vw-info')?.hidden) document.querySelector('.vw-edit').click();
+      for (let i = 0; i < 30 && !document.querySelector('.vw-info .ip-tabs'); i++) await wait(100);
+      out.vwTabs = [...document.querySelectorAll('.vw-info:not(.vw-info-left) .ip-tab')].map((b) => b.dataset.tab + (b.getAttribute('aria-selected') === 'true' ? '*' : '')).join();
+      out.vwLeft = document.querySelector('.vw-info-left')?.hidden;
+      out.vwSplitBtn = !!document.querySelector('.vw-info .ip-split');
+      return out;
+    })()`);
+    check(pt.tabs === 'adjust,describe*,info' && pt.describe === 'describe,organize,place' && pt.adjust === 'adjust' && pt.one && pt.remembered === 'adjust'
+      && pt.accordion1 === 'color' && pt.accordion2 === 'lens' && pt.manualFolded && pt.safeLine,
+      'the panel by task: Adjust · Describe · Info tabs (Describe: the words, the organization, author and place), the last one remembered; one adjustment group open at a time; the lens by hand folded; the footer in one line', JSON.stringify(pt));
+    check(pt.keyI === 'file' && pt.keyIAgain === 'closed' && pt.keyD === 'describe,organize,place' && pt.keyH === 'closed'
+      && pt.width[1] === pt.width[0] + 20 && pt.width[2] === pt.width[1] && pt.widthBack,
+      'E, D, I open the panel on their tab (that tab\'s key again folds it), H folds it; its edge makes it wider, remembered (double-click: back)', JSON.stringify({ keyI: pt.keyI, keyIAgain: pt.keyIAgain, keyD: pt.keyD, keyH: pt.keyH, width: pt.width, back: pt.widthBack }));
+    check(pt.vwTabs === 'adjust,describe*,info' && pt.vwLeft === true && !pt.vwSplitBtn, 'the viewer, narrower than 1680 px: one panel with the same tabs', JSON.stringify({ tabs: pt.vwTabs, left: pt.vwLeft, split: pt.vwSplitBtn }));
+    // wider than 1680 px: Describe and Info on the left, Adjust on the right; the switch keeps one panel
+    const [ww, wh] = win.getSize();
+    win.setSize(1840, 920); await wait(900);
+    const wide = await js(`(async () => {
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      for (let i = 0; i < 30 && document.querySelector('.vw-info-left')?.hidden; i++) await wait(100);
+      await wait(400);
+      const L = document.querySelector('.vw-info-left'), R = document.querySelector('.vw-info:not(.vw-info-left)');
+      const secs = (p) => [...p.querySelectorAll('.ip-secs > .ip-sec')].map((x) => x.dataset.sec).join();
+      const out = { inner: window.innerWidth, left: !L.hidden && L.getBoundingClientRect().right < R.getBoundingClientRect().left, leftSecs: secs(L), rightSecs: secs(R),
+        rightTabs: R.querySelectorAll('.ip-tab[role=tab]').length, footLeft: !!L.querySelector('.ip-foot'),
+        arrows: Math.round(document.querySelector('.vw-prev').getBoundingClientRect().left - L.getBoundingClientRect().right) };
+      R.querySelector('.ip-split').click(); await wait(500);
+      out.one = document.querySelector('.vw-info-left').hidden && [...document.querySelectorAll('.vw-info:not(.vw-info-left) .ip-tab[role=tab]')].length === 3 && localStorage.getItem('lionphotos.panel.split') === 'off';
+      document.querySelector('.vw-info .ip-split').click(); await wait(500);
+      out.two = !document.querySelector('.vw-info-left').hidden;
+      ${S}.viewer.close(); await wait(200);
+      return out;
+    })()`);
+    win.setSize(ww, wh); await wait(400);
+    check(wide.inner >= 1680 && wide.left && wide.leftSecs === 'describe,organize,place,file' && wide.rightSecs === 'adjust' && wide.rightTabs === 0 && wide.footLeft && wide.arrows >= 0 && wide.one && wide.two,
+      'the viewer from 1680 px: Describe and Info on the left, Adjust on the right (the arrows clear of both); the switch keeps one panel with tabs, and back', JSON.stringify(wide));
+    await js(`localStorage.setItem('lionphotos.panel.tab', 'all'), window.__lionphotos.views.photos.rerenderInfo(), true`);
+    // "Photos of the day" (1.40.1): discreet, at the foot of Organization; it leaves the filters
+    // (album, year, search) the photo was seen through and shows that day's photos in Photos, as a filter with its ×
+    const dayRes = await js(`(async () => {
+      const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      // seen through other filters (a year, a search): they are left behind
+      const res = { album: true };
+      s.layout.openView('photos'); lib.goHome(); await wait(300);
+      const it = lib.view('main')[0];
+      lib.setFilter({ year: new Date(it.taken || it.mtime).getFullYear(), query: it.name.slice(0, 6) }); await wait(300);
+      lib.setSelection([it.id]); await wait(500);
+      const pv = window.__lionphotos.views.photos; if (!pv.infoOpen) pv.toggleInfo(); pv.rerenderInfo(); await wait(500);
+      const link = document.querySelector('.info-panel .ip-sec[data-sec="organize"] .ip-day');
+      res.link = (link?.textContent || '').trim();
+      link?.click(); await wait(600);
+      const d = new Date(it.taken || it.mtime), day = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      const same = (x) => { const k = new Date(x.taken || x.mtime); return k.getFullYear() === d.getFullYear() && k.getMonth() === d.getMonth() && k.getDate() === d.getDate(); };
+      res.filter = lib.filter.day === day && !lib.filter.labelId && !lib.filter.year && !lib.filter.query && s.layout.activeView === 'photos';
+      res.shown = lib.view('main').length; res.expected = lib.allItems.filter((x) => (x.mark || 0) !== 3 && same(x)).length;
+      res.only = lib.view('main').every(same) && lib.view('main').some((x) => x.id === it.id);
+      res.selected = lib.selection.has(it.id);
+      res.chip = [...document.querySelectorAll('.filter-chips .filter-chip')].length;
+      res.linkGone = !document.querySelector('.info-panel .ip-day');
+      document.querySelector('.filter-chips .filter-chip .chip-x')?.click(); await wait(300);
+      res.cleared = !lib.filter.day;
+      lib.goHome(); lib.clearSelection(); await wait(200);
+      return res;
+    })()`);
+    check(dayRes.album && /^Photos of the day/.test(dayRes.link) && dayRes.filter && dayRes.shown === dayRes.expected && dayRes.only && dayRes.selected && dayRes.chip === 1 && dayRes.linkGone && dayRes.cleared,
+      '"Photos of the day" in Organization: out of the year and the search it was seen through, Photos shows that day only (the photo still selected), as a filter with its ×', JSON.stringify(dayRes));
+    // 1.41.0: name pieces in the app's language, the list without sideways scroll, Albums › name inside an album and
+    // months only in a small one, a page's explanation folded after "Got it", the shortcuts (?), two photos side by side
+    const v141 = await js(`(async () => {
+      const s = ${S}, lib = s.library, L = s.labels, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const out = {};
+      const tok = await import(new URL('../contrib/export/nameTokens.js', location.href));
+      out.pattern = tok.defaultPattern(); out.fromPt = tok.localizePattern('{data}-{álbum}-{fotógrafo}-{nº}-x'); out.pieces = tok.namePieces().map((x) => x[0]).join();
+      // the list
+      s.layout.openView('photos'); lib.goHome(); lib.clearSelection(); await wait(300);
+      const pv = window.__lionphotos.views.photos;
+      document.querySelector('.photos-toolbar .view-mode-btn[data-mode="list"]').click(); await wait(500);
+      const sc = pv.scroller, row = document.querySelector('.list-row');
+      out.list = { fits: sc.scrollWidth <= sc.clientWidth + 1, name: Math.round(row.querySelector('.row-name').getBoundingClientRect().width), category: row.querySelector('.row-sphere').textContent.trim(), date: (() => { const d = row.querySelector('.row-date'); return d.scrollWidth <= d.clientWidth + 1; })() };
+      document.querySelector('.photos-toolbar .view-mode-btn[data-mode="grid"]').click(); await wait(300);
+      // an album of three photos
+      const three = lib.items.filter((x) => x.kind === 1).slice(0, 3);
+      const id = await L.save({ type: 'album', name: 'E2E small album' });
+      await L.link({ ids: three.map((x) => x.id), add: [id] }); await wait(300);
+      lib.openLabel(id, 'album'); s.layout.openView('photos'); await wait(600);
+      out.crumbs = [...document.querySelectorAll('.photos-crumbs .crumb')].map((x) => x.textContent.trim()).join(' > ');
+      out.years = pv.rows.filter((r) => r.type === 'year').length; out.heads = pv.rows.filter((r) => r.type === 'header').map((r) => r.label);
+      document.querySelector('.photos-crumbs .crumb')?.click(); await wait(400);
+      out.backTo = s.layout.activeView + (lib.filter.labelId ? ' in label' : '');
+      // the page's explanation
+      const intro = () => { const b = document.querySelector('.view-albums .page-intro, .page-intro'); return b ? !b.hidden : null; };
+      localStorage.removeItem('lionphotos.intro.seen'); s.layout.openView('photos'); await wait(100); s.layout.openView('album'); await wait(500);
+      window.__lionphotos.views.album?.render?.(); await wait(300);
+      out.introFirst = intro();
+      document.querySelector('.page-intro .intro-ok')?.click(); await wait(100);
+      out.introAfter = intro();
+      window.__lionphotos.views.album?.render?.(); await wait(300);
+      out.introStays = intro();
+      document.querySelector('.intro-help')?.click(); await wait(100);
+      out.introHelp = intro(); out.eyebrow = !!document.querySelector('.view-albums .view-header .eyebrow');
+      await L.remove(id);
+      // the shortcuts
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: '?', bubbles: true })); await wait(200);
+      out.keys = document.querySelectorAll('.keys-dialog kbd').length; out.keysButton = !!document.querySelector('.status-keys');
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(150);
+      out.keysClosed = !document.querySelector('.keys-dialog');
+      // side by side
+      s.layout.openView('photos'); lib.goHome(); await wait(300);
+      const two = lib.view('main').filter((x) => x.kind === 1 && x.ext === 'jpg').slice(0, 2);
+      lib.setSelection([two[0].id]); await wait(200);
+      pv.scroller.dispatchEvent(new KeyboardEvent('keydown', { key: 'v', bubbles: true })); await wait(500);
+      const names = () => [...document.querySelectorAll('.cmp .cmp-name')].map((x) => x.textContent);
+      out.cmp = { open: !!document.querySelector('.cmp'), imgs: document.querySelectorAll('.cmp .cmp-img').length, first: names() };
+      const key = (k) => document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+      key('ArrowRight'); await wait(200); out.cmp.next = names();
+      const rightName = out.cmp.next[1], rightId = lib.items.find((x) => x.name === rightName)?.id;
+      key('1'); await wait(400); out.cmp.marked = lib.byId.get(rightId)?.mark;
+      key('0'); await wait(300); out.cmp.cleared = lib.byId.get(rightId)?.mark || 0;
+      key('+'); await wait(100); out.cmp.zoom = [...document.querySelectorAll('.cmp .cmp-img')].map((x) => x.style.transform).join('|');
+      key('Escape'); await wait(200); out.cmp.closed = !document.querySelector('.cmp');
+      lib.clearSelection();
+      return out;
+    })()`);
+    check(v141.pattern === '{date}-{album}-{photographer}-{n}' && v141.fromPt === '{date}-{album}-{photographer}-{n}-x' && v141.pieces === 'date,album,photographer,n,name',
+      'file-name pieces are written in the app\'s language (a pattern kept in Portuguese is read and shown in English)', JSON.stringify({ pattern: v141.pattern, fromPt: v141.fromPt, pieces: v141.pieces }));
+    check(v141.list.fits && v141.list.name >= 120 && v141.list.category === '' && v141.list.date, 'the list fits its space (no sideways scroll, the date whole), the name first; "Not categorized" is not repeated down the rows', JSON.stringify(v141.list));
+    check(v141.crumbs === 'Albums > E2E small album' && v141.years === 0 && v141.heads.length >= 1 && v141.heads.every((x) => /\d{4}/.test(x)) && v141.backTo === 'album',
+      'inside an album: Albums › its name (a click goes back to Albums); a small album has months with their year, no large year heading', JSON.stringify({ crumbs: v141.crumbs, years: v141.years, heads: v141.heads, backTo: v141.backTo }));
+    check(v141.introFirst === true && v141.introAfter === false && v141.introStays === false && v141.introHelp === true && !v141.eyebrow,
+      'a page\'s explanation: shown the first time, folded after "Got it" (it stays folded), back with the "?" beside the title', JSON.stringify({ first: v141.introFirst, after: v141.introAfter, stays: v141.introStays, help: v141.introHelp, eyebrow: v141.eyebrow }));
+    check(v141.keys >= 30 && v141.keysButton && v141.keysClosed, 'the ? key opens the keyboard shortcuts (a button in the status bar too); Esc closes', JSON.stringify({ keys: v141.keys, button: v141.keysButton, closed: v141.keysClosed }));
+    check(v141.cmp.open && v141.cmp.imgs === 2 && v141.cmp.first[0] !== v141.cmp.first[1] && v141.cmp.next[1] !== v141.cmp.first[1] && v141.cmp.next[0] === v141.cmp.first[0]
+      && v141.cmp.marked === 1 && v141.cmp.cleared === 0 && /scale\(1\.25\)\|.*scale\(1\.25\)/.test(v141.cmp.zoom) && v141.cmp.closed,
+      'V: two photos side by side — → changes the active side\'s photo, 1 and 0 mark it, both zoom together, Esc closes', JSON.stringify(v141.cmp));
     // the lens: the group in Adjustments (the profile's switch, the corrections by hand), the values checked by the
     // main process, the profile chosen among all of Lensfun's (searched), what the photo's key says
     const ln = await js(`(async () => {
@@ -649,6 +883,20 @@ app.whenReady().then(async () => {
       })()`);
       check(made.enabled && made.state === 'saved' && label && relative && extras && info?.updatedBy && back.renamed && back.same && /OUTRO-PC/.test(back.toast),
         'catalog with the collection: written in its hidden folder with relative paths; written on another computer, it is read here (the same album, renamed)', JSON.stringify({ made, label: !!label, relative, extras, info: info && { updatedBy: info.updatedBy, format: info.format }, back }));
+      // open on another computer (1.41.0): its lock in the folder makes this one stand back, until it is used here anyway
+      fs.writeFileSync(path.join(PC, 'lock'), JSON.stringify({ host: 'OUTRO-PC', pid: 1, at: Date.now() }));
+      const lk = await js(`(async () => {
+        const s = ${S}, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        await s.library.scan();
+        for (let i = 0; i < 60 && s.portable.status.state !== 'locked'; i++) await wait(150);
+        const locked = { state: s.portable.status.state, by: s.portable.status.by, toast: [...document.querySelectorAll('.toast')].some((x) => /another computer/.test(x.textContent)) };
+        await s.portable.takeOver();
+        for (let i = 0; i < 60 && s.portable.status.state === 'locked'; i++) await wait(150);
+        return { locked, after: s.portable.status.state };
+      })()`);
+      const lockNow = (() => { try { return JSON.parse(fs.readFileSync(path.join(PC, 'lock'), 'utf8')); } catch { return null; } })();
+      check(lk.locked.state === 'locked' && lk.locked.by === 'OUTRO-PC' && lk.locked.toast && lk.after !== 'locked' && lockNow?.host === os.hostname(),
+        'a collection open on another computer (its lock in the folder): this one stands back and says so; "Use here anyway" takes it', JSON.stringify({ lk, lockHost: lockNow?.host }));
     }
 
     // export photos (1.23.0): Ctrl+E opens the dialog; the names carry the photographer; the typed code; each photo
@@ -670,7 +918,10 @@ app.whenReady().then(async () => {
         let dlg = null;
         for (let i = 0; i < 30 && !(dlg = document.querySelector('.xp-dialog')); i++) await wait(100);
         if (!dlg) return { dialog: false };
-        const work = [...dlg.querySelectorAll('input.text-input')].find((x) => /álbum/.test(x.placeholder));
+        // compact at first: "More options" opens the file, the names, the metadata
+        const compact = !dlg.querySelector('.xp-pattern') && !!dlg.querySelector('.xp-brief');
+        if (compact) { dlg.querySelector('.xp-more').click(); await wait(250); }
+        const work = [...dlg.querySelectorAll('input.text-input')].find((x) => /álbum|album/i.test(x.placeholder));
         work.value = 'Formatura'; work.dispatchEvent(new Event('input')); await wait(600);
         const preview = [...dlg.querySelectorAll('.xp-names li')].map((li) => li.textContent);
         const title = dlg.querySelector('#xp-title').textContent;
@@ -957,6 +1208,13 @@ app.whenReady().then(async () => {
     fs.writeFileSync(path.join(bkDir, 'extra.png'), Buffer.from('89504e470d0a1a0a0000000d4948445200000001000000010806000000', 'hex'));
     const cmp = await js(`${S}.host.backup.compare({ master: ${JSON.stringify(FOLDER)}, backup: ${JSON.stringify(bkDir)}, exact: true })`);
     check(cmp.stats.onlyMasterCount === 1 && cmp.files[cmp.onlyMaster[0]].name === firstJpg && cmp.stats.onlyBackupCount === 1, 'backup compare finds what is missing on each side', `only master ${cmp.stats.onlyMasterCount}, only backup ${cmp.stats.onlyBackupCount}`);
+    // the catalog goes to the backup too (1.41.0): missing there at first, then copied (only LionPhotos' own folder)
+    fs.rmSync(path.join(bkDir, '.lionphotos'), { recursive: true, force: true });
+    const cmp2 = await js(`${S}.host.backup.compare({ master: ${JSON.stringify(FOLDER)}, backup: ${JSON.stringify(bkDir)}, exact: false })`);
+    const bcat = await js(`${S}.host.backup.copyCatalog(${JSON.stringify(cmp2.session)})`);
+    check(!!cmp2.catalog?.master && !cmp2.catalog.backup && !cmp2.catalog.current && bcat.current && fs.existsSync(path.join(bkDir, '.lionphotos', 'catalog.json')),
+      'backup: the collection\'s catalog is missing from the backup, then copied into it', JSON.stringify({ before: cmp2.catalog, after: bcat }));
+    Object.assign(cmp, await js(`${S}.host.backup.compare({ master: ${JSON.stringify(FOLDER)}, backup: ${JSON.stringify(bkDir)}, exact: true })`));
     const bv = await js(`${S}.host.ops.prepare('backupCopy', { session: ${JSON.stringify(cmp.session)}, direction: 'toBackup', layout: 'mirror' })`);
     await js(`window.__bk = null; ${S}.host.ops.onBackupCopy((p) => { if (p.finished) window.__bk = p; }); true`);
     await js(`${S}.host.ops.commit(${JSON.stringify(bv.id)}, ${JSON.stringify(bv.code)})`);
@@ -1647,8 +1905,8 @@ app.whenReady().then(async () => {
       await L.remove(id);
       return out;
     })()`);
-    check(ms.tiles > 3 && ms.sizes >= 2 && /^\d{4}$/.test(ms.year) && ms.month.length > 2 && ms.days.length > 0 && ms.grid && ms.back && ms.modes === 'mosaic* grid list spot' && ms.person === 'mosaic grid* list spot' && ms.personMosaic && ms.photos === 'grid list',
-      'inside an album: the photos as a mosaic of different sizes, the even grid at a click and back, as the Albums page (mosaic, even grid, list, highlights); a person opens as the even grid, with the mosaic a click away; Photos keeps grid and list; the year above its months, with their days', JSON.stringify(ms));
+    check(ms.tiles > 3 && ms.sizes >= 2 && ms.year === '' && /\d{4}/.test(ms.month) && ms.days.length > 0 && ms.grid && ms.back && ms.modes === 'mosaic* grid list spot' && ms.person === 'mosaic grid* list spot' && ms.personMosaic && ms.photos === 'grid list',
+      'inside an album: the photos as a mosaic of different sizes, the even grid at a click and back, as the Albums page (mosaic, even grid, list, highlights); a person opens as the even grid, with the mosaic a click away; Photos keeps grid and list; a small album has its months (with the year) and their days, no large year heading', JSON.stringify(ms));
     // another album, folder or tab: the selection is cleared (Organize keeps it)
     const sc = await js(`(async () => {
       const s = ${S}, L = s.labels, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));

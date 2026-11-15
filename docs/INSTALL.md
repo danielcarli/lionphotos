@@ -129,6 +129,25 @@ Chromium's sandbox needs. On those systems the installer defaults to a system in
 includes the root-owned `chrome-sandbox` helper, the same way the official `.deb` packages of Electron apps
 work. The app never runs with the sandbox turned off.
 
+## Updating from inside the app
+
+Click the version in the **bottom-right corner** of the window. LionPhotos checks the latest release on GitHub
+(it reads `manifest.txt`, a few bytes) and, when there is a newer version, says how this copy is updated and asks
+before doing anything. This is the only time the app goes to the network, and only when you click; nothing about
+you or your photos is sent.
+
+| Installed with | What "Update now" does |
+|---|---|
+| Windows setup wizard | LionPhotos closes and the wizard kept for updates runs in update mode (the newest wizard is fetched first and checked). |
+| `install.ps1` for the current user | LionPhotos closes and the script kept next to the app runs again. |
+| macOS `.dmg` | The new `.dmg` is downloaded to Downloads, checked and opened; LionPhotos closes so you can drag it to Applications and choose **Replace**. |
+| `install.sh` (macOS, or Linux for the current user) | LionPhotos closes, the release's `install.sh` runs again and then reopens the app. |
+| Linux AppImage | The new AppImage is downloaded next to this one, checked, put in its place and opened. |
+| Linux `.deb` / `.rpm` | The new package is downloaded to Downloads, checked and opened in the system's software installer (it asks for your password). |
+| Anything else (an install for all users with `install.sh` on Linux, or running from the source) | The release page opens in the browser. |
+
+Every file is kept only if its SHA-256 matches the release's `SHA256SUMS`; anything else is thrown away.
+
 ## How it stays safe
 
 This applies to the Windows wizard (which runs `install.ps1` behind the scenes) and to the command-line installers.

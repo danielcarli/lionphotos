@@ -114,10 +114,12 @@ export function infoFooter(s, items, { pending = 0, onNext = null } = {}) {
   // what is typed is kept at once — in the catalog, and a recovery copy in the collection's .lionphotos folder,
   // written by itself as it changes; the photos' files change only with Write to the files (decided 14/11/2026)
   const st = s.services?.portable?.status;
-  const copy = st && st.enabled !== false && !['readOnly', 'newer', 'error', 'full'].includes(st.state);
-  const safe = operations && photos ? h('p.ip-safe', { title: copy && st.at ? t('describe.safeWhen', { when: formatDate(st.at) }) : '' },
-    h('span.ip-safe-icon', { html: icon('shield', 13) }),
-    h('span', copy ? t('describe.safeCollection') : t('describe.safeLocal'), ' ',
-      pending ? h('strong.ip-safe-pending', tn('describe.notInFile', pending)) : h('span', t('describe.inFile')))) : null;
+  const copy = st && st.enabled !== false && !['readOnly', 'newer', 'error', 'full', 'locked'].includes(st.state);
+  // one line ("Saved in the catalog · 7 fields not in the file yet"); the whole explanation one click away
+  const safe = operations && photos ? h('details.ip-safe', { title: copy && st.at ? t('describe.safeWhen', { when: formatDate(st.at) }) : '' },
+    h('summary', h('span.ip-safe-icon', { html: icon('shield', 13) }),
+      h('span.ip-safe-line', t('describe.safeShort'), ' · ',
+        pending ? h('strong.ip-safe-pending', tn('describe.notInFile', pending)) : h('span', t('describe.inFile')))),
+    h('p', copy ? t('describe.safeCollection') : t('describe.safeLocal'))) : null;
   return h('div.ip-foot', safe, history, h('span.ip-foot-sp'), next, write);
 }

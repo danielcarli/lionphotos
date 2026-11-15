@@ -34,9 +34,13 @@ export class PortableService {
       this.notifications.info(s.keptAside ? t('portable.importedKept', { when, by: s.by || '?' }) : t('portable.imported', { when, by: s.by || '?' }), 9000);
     }
     if (s?.state === 'newer') this.notifications.warn(t('portable.newer'), 12000);
+    // open on another computer: said once, when found
+    if (s?.locked) this.notifications.warn(t('portable.lockedToast', { by: s.by || '?' }), 14000);
   }
 
   saveNow() { return this.host.portable.saveNow().then((s) => this.#apply(s)); }
   reveal() { return this.host.portable.reveal(); }
+  /** Open on another computer: use it here anyway. */
+  takeOver() { return this.host.portable.takeOver().then((s) => this.#apply(s)); }
   setEnabled(on) { return this.host.portable.setEnabled(on).then((s) => this.#apply(s)); }
 }

@@ -11,7 +11,7 @@ Works on your folders as they are: small thumbnails made once, the metadata that
 
 **English** · [Português (Brasil)](docs/README.pt-BR.md) · [Português (Portugal)](docs/README.pt-PT.md) · [Español](docs/README.es.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Italiano](docs/README.it.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md)
 
-![Version 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
+![Version 1.41.0](https://img.shields.io/badge/version-1.41.0-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -55,7 +55,7 @@ Photo collections grow faster than anyone can sort them: years of shoots spread 
 ## Strengths
 
 - **Your folders, as they are.** No import and no closed library: the photos stay where you put them, and your other programs keep working with them.
-- **Local and private.** No account, no telemetry, no network; face and pet recognition run on your computer. It reads only the folder you choose and its subfolders.
+- **Local and private.** No account, no telemetry; it goes to the internet only when you ask it to look for a new version. Face and pet recognition run on your computer. It reads only the folder you choose and its subfolders.
 - **Fast at any size.** The grid draws only what is on screen; thumbnails are small, kept in one cache file and made only once. Large collections on external drives stay fluid.
 - **Every format, its own decoders.** JPEG, HEIC/HEIF, TIFF, PSD/PSB, camera raw from every major brand (CR3, CR2, NEF, ARW, RAF, DNG…) and videos (MP4, MOV, MTS, AVI…).
 - **Safe by design.** Every change to files shows its plan first, asks for a typed 3-character code and can be undone; deleting always goes to the Recycle Bin.
@@ -102,7 +102,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | | |
 |---|---|
 | **Photos** | Grid by month or list with folder, type, dimensions, size, date and details; selection with click, Ctrl and Shift; zoom; filters by type, year, mark, category and subfolders, shown as chips you take off with one click. The folder tree (or the years) on the left, the info panel on the right — both can be hidden, or everything with focus mode (`\`). **Search in the title bar** (Ctrl+K or Ctrl+F) looks through the whole collection as you type — photos, albums, projects, people, places, photographers, cameras, keywords, folders — and, when filters hide everything, the page says which ones, with a button to take each off. Inside an album, a person, a pet, a place or a project: a mosaic, an even grid, a list or its highlights. |
-| **Viewer** | Full size at once (the thumbnail first), raw files at full size through the JPEG the camera stored in them, ← → to move, `I` for info, zoom to actual size; videos play with controls. The zoom slider goes from the screen size to 400 %; the wheel zooms where the mouse is, dragging moves the picture, `Z` switches fit ↔ actual size. *Edit* (or `I`) shows or folds the same editing panel as the info panel — category, albums, adjustments, description, author and place; a photo moved to a category the filter hides stays in view, greyed, with a note naming where it now is. HEIC, HEIF and HIF open at full size too; HDR photos (PQ, HLG) are made ordinary for the screen, in the viewer and the thumbnails. A double click zooms to 100 % where it is clicked, and back. Delete sends a photo to the Limbo with a plain confirmation. |
+| **Viewer** | Full size at once (the thumbnail first), raw files at full size through the JPEG the camera stored in them, ← → to move, `I` for info, zoom to actual size; videos play with controls. The zoom slider goes from the screen size to 400 %; the wheel zooms where the mouse is, dragging moves the picture, `Z` switches fit ↔ actual size. *Edit* (or `H`) shows or folds the same editing panel as the info panel — category, albums, adjustments, description, author and place; a photo moved to a category the filter hides stays in view, greyed, with a note naming where it now is. HEIC, HEIF and HIF open at full size too; HDR photos (PQ, HLG) are made ordinary for the screen, in the viewer and the thumbnails. A double click zooms to 100 % where it is clicked, and back. Delete sends a photo to the Limbo with a plain confirmation. The panel shows one task at a time — Adjust, Describe, Info — and, in a window 1680 px or wider, Describe and Info on the left and Adjust on the right; drag a panel's edge to make it wider. |
 | **Adjustments** | Exposure, contrast, shadows and saturation in the info panel, for one photo or many, with a histogram and a live preview (on the graphics card, or the processor when there is none); copy and paste them on other photos. The file never changes: the adjustments are in the catalog (undone with Ctrl+Z), the thumbnails and the viewer show them (hold `\` for the original), and *Save edited copy* writes a new JPEG next to the original with its metadata. *Export photos* (Ctrl+E) makes new files of the edited photos in any folder — JPEG, PNG or TIFF, the size of a social network or a print, output sharpening, names like `2026-07-24-Graduation-Ana-Souza-001.jpg`, all the metadata or without the place, an optional signature — with the sRGB profile; the originals never change. |
 | **Editing** | Highlights, whites, blacks, white balance (temperature, tint and an eyedropper), vibrance, black & white with a mix per colour, vignette, and — on the graphics card — sharpness, texture and clarity; *Auto*, presets, and before/after in the viewer (`Y`). **Crop and straighten** (`C`): free or locked to a shape — the common ones and the social networks' (Instagram 4:5 and 3:4, Stories/Reels/TikTok 9:16, YouTube 16:9, link 1.91:1, Pinterest, X and LinkedIn headers) — 90° turns and straightening by a line along the horizon. Everything stays in the catalog; the file never changes. |
 | **Lens correction** | The distortion, darker corners and colour fringes of the lens undone from its profile — the whole [Lensfun](https://lensfun.github.io) database, about 1,600 lenses, found from the name the camera wrote or chosen from a searchable list — and by hand: distortion, vertical and horizontal perspective (buildings that lean back), scale, corners and fringes. On the graphics card; the file never changes. |
@@ -181,7 +181,9 @@ Double-click **`build-installer.bat`** (or run `npm run dist`). The installers a
 | `Alt+←` · `Alt+Home` | Back from an album, project or person · the whole collection, without filters |
 | `Ctrl+B` · `\` | Show/hide the side bar · focus mode (only the photos) |
 | `1` `2` `3` · `0` | Mark the selection great · OK · candidate to delete · clear |
-| `Ctrl+A` · `Enter` · `I` · `Delete` · `F2` · `Esc` | Select all · open · info panel · Recycle Bin · rename · clear the selection |
+| `Ctrl+A` · `Enter` · `H` · `Delete` · `F2` · `Esc` | Select all · open · info panel · Recycle Bin · rename · clear the selection |
+| `E` · `D` · `I` | Side panel on Adjust · Describe · Info (the same key again folds it) |
+| `V` · `?` | Compare side by side · Keyboard shortcuts |
 | `Ctrl+E` | Export photos (the selection, or the photos shown) |
 | `←` `→` · `Space` · `Esc` | Viewer: previous/next · play/pause · close |
 | `P` · `F` · `A` | Viewer: slideshow · full screen · add to album |
@@ -200,7 +202,7 @@ The language follows the system by default and can be changed in the status bar.
 
 ## Privacy
 
-LionPhotos never connects to the network: no account, no telemetry, no update check. Face and pet recognition run on this computer with models bundled in the app.
+LionPhotos goes to the network only when you ask: clicking the version in the bottom-right corner checks for a new version on GitHub, and updating downloads the installer for your system, checked (SHA-256) before it is used. No account, no telemetry, nothing about you or your photos is sent. Face and pet recognition run on this computer with models bundled in the app.
 
 The catalog and the thumbnails are a single file on your computer:
 
@@ -262,7 +264,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.38.1**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.41.0**.
 
 ## Credits
 

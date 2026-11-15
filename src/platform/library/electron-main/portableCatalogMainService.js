@@ -29,6 +29,10 @@ const QUIET_MS = 3000;          // written this long after the last change
 const FACES_EVERY_MS = 60000;   // faces (larger) at most this often
 const RETRY_MS = 60000;         // after a failed write
 
+const LOCK_STALE_MS = 10 * 60 * 1000; // a lock not renewed for this long was left behind
+const LOCK_RENEW_MS = 2 * 60 * 1000;
+const LOCK_CHECK_MS = 30 * 1000;
+
 class PortableCatalogMainService {
   constructor(library, uiContents, appVersion = '') {
     this.library = library;
@@ -44,9 +48,15 @@ class PortableCatalogMainService {
     this.status = { state: 'idle' };
     this.lastFaces = 0;
     this.retryAt = 0;
+    this.lockedBy = null;  // another computer has this collection open: nothing is written to its folder
+    this.takeover = false; // the person chose to use it here anyway
+    this.lockAt = 0;       // when this computer's lock was last written
+    this.lockCheck = 0;
     library.onDidOpen(({ root, rootId }) => {
       // the collection left behind: what was not written yet, now
       if (this.ready && this.root && this.root !== root && this.enabled && !this.db.closed) { try { this.#writeSync(); } catch { /* the next session writes it */ } }
+      if (this.root && this.root !== root) this.#releaseLock();
+      this.lockedBy = null; this.takeover = false; this.lockAt = 0;
       this.gen++;
       this.root = root;
       this.rootId = rootId;
@@ -70,6 +80,8 @@ class PortableCatalogMainService {
   registerChannels(ipc) {
     ipc.handle('portable:status', () => this.#status());
     ipc.handle('portable:saveNow', () => this.#writeNow({ force: true }).then(() => this.#status()));
+    // the collection is open on another computer: use it here anyway (this computer's lock replaces the other)
+    ipc.handle('portable:takeOver', () => { this.takeover = true; this.lockedBy = null; this.#holdLock(true); return this.#sync().catch((err) => this.#fail(err)).then(() => this.#status()); });
     ipc.handle('portable:reveal', () => { const f = this.root && path.join(this.root, DIR); if (f && fs.existsSync(f)) shell.openPath(f); return true; });
     ipc.handle('portable:setEnabled', (_e, on) => { this.db.setSetting('portable.enabled', on ? '1' : '0'); if (on) this.#sync().catch((err) => this.#fail(err)); return this.#status(); });
   }
@@ -78,6 +90,57 @@ class PortableCatalogMainService {
     clearInterval(this.timer);
     // closing: what was not written yet
     if (this.ready && this.enabled && !this.db.closed) { try { this.#writeSync(); } catch { /* the next session writes it */ } }
+    this.#releaseLock();
+  }
+
+  // ------------------------------------------------------------------ one computer at a time
+  // .lionphotos/lock says which computer has the collection open ({ host, pid, at }), renewed every two minutes.
+  // A second computer that finds a fresh lock of another writes nothing to the folder (its own catalog goes on
+  // working) until the lock is gone, goes stale (10 minutes with no renewal: the other was closed badly) or the
+  // person chooses to use it here anyway.
+  #lockFile() { return path.join(this.root, DIR, 'lock'); }
+
+  /** The lock of another computer still in use, or null. */
+  #otherLock() {
+    if (!this.root || this.takeover) return null;
+    try {
+      const file = this.#lockFile();
+      const lock = JSON.parse(fs.readFileSync(file, 'utf8'));
+      if (!lock || lock.host === os.hostname()) return null;
+      // fresh by what it says or by the file's own date (computers' clocks differ)
+      const age = Math.min(Date.now() - (Number(lock.at) || 0), Date.now() - fs.statSync(file).mtimeMs);
+      return age < LOCK_STALE_MS ? { host: String(lock.host || '?').slice(0, 80), at: Number(lock.at) || 0 } : null;
+    } catch { return null; }
+  }
+
+  /** This computer's lock, written (or renewed) — only where the collection already has its folder. */
+  #holdLock(force = false) {
+    if (!this.root || (!force && this.lockedBy)) return;
+    try {
+      if (!fs.existsSync(path.join(this.root, DIR))) return;
+      fs.writeFileSync(this.#lockFile(), JSON.stringify({ host: os.hostname(), pid: process.pid, at: Date.now(), app: this.appVersion }));
+      this.lockAt = Date.now();
+    } catch { /* a folder that cannot be written: said by the writes themselves */ }
+  }
+
+  /** Leaving the collection: this computer's lock goes (never another's). */
+  #releaseLock() {
+    if (!this.root || !this.lockAt) return;
+    try {
+      const file = this.#lockFile();
+      const lock = JSON.parse(fs.readFileSync(file, 'utf8'));
+      if (lock?.host === os.hostname() && lock.pid === process.pid) fs.rmSync(file, { force: true });
+    } catch { /* none */ }
+    this.lockAt = 0;
+  }
+
+  /** Another computer has it: nothing read or written here until it leaves. */
+  #standBack(other) {
+    const first = this.lockedBy?.host !== other.host; // said once
+    this.lockedBy = other;
+    this.ready = false;
+    this.status = { state: 'locked', folder: path.join(this.root, DIR), by: other.host, at: other.at };
+    this.#tell(first ? { locked: true } : {});
   }
 
   // ------------------------------------------------------------------ reading the folder
@@ -119,6 +182,10 @@ class PortableCatalogMainService {
   async #syncNow(gen) {
     if (!this.root || !this.rootId || !this.enabled) return;
     {
+      const other = this.#otherLock();
+      if (other) return this.#standBack(other);
+      this.lockedBy = null;
+      this.#holdLock();
       const f = this.#files();
       const catalog = await this.#readJson(f.catalog);
       if (gen !== this.gen) return;
@@ -156,8 +223,15 @@ class PortableCatalogMainService {
 
   // ------------------------------------------------------------------ writing it
   #tick() {
-    if (!this.ready || this.pending || !this.enabled || !this.root || this.db.closed) return;
     const now = Date.now();
+    // standing back for another computer: when its lock goes (or goes stale), the folder is read and written again
+    if (this.lockedBy && !this.pending && this.enabled && this.root && !this.db.closed && now - this.lockCheck >= LOCK_CHECK_MS) {
+      this.lockCheck = now;
+      if (!this.#otherLock()) { this.lockedBy = null; this.#sync().catch((err) => this.#fail(err)); }
+      return;
+    }
+    if (!this.ready || this.pending || !this.enabled || !this.root || this.db.closed) return;
+    if (now - this.lockAt >= LOCK_RENEW_MS) this.#holdLock();
     if (now < this.retryAt) return;
     const d = this.#dirtyAt(), fd = this.#dirtyAt('portable.facesDirty');
     const quiet = (t) => t && now - t >= QUIET_MS;
@@ -181,6 +255,9 @@ class PortableCatalogMainService {
 
   async #write({ faces, gen }) {
     const f = this.#files();
+    // another computer took the collection meanwhile: it writes, this one stands back
+    const other = this.#otherLock();
+    if (other) return this.#standBack(other);
     // written elsewhere since this computer last saw it: that version is read first (ours is kept aside)
     const there = await this.#readJson(f.catalog);
     if (gen !== this.gen) return;
@@ -194,6 +271,7 @@ class PortableCatalogMainService {
     out.catalog.rev = Math.max(there?.rev || 0, this.#synced()) + 1;
     await this.#ensureDir(f);
     if (gen !== this.gen) return;
+    if (!this.lockAt) this.#holdLock();
     await this.#atomic(f.catalog, JSON.stringify(out.catalog));
     if (faces || !fs.existsSync(f.faces)) { await this.#atomic(f.faces, JSON.stringify(out.faces)); this.lastFaces = Date.now(); }
     await this.#atomic(f.collection, JSON.stringify(await this.#collectionInfo(f, out.catalog.updatedAt), null, 2));
@@ -210,6 +288,7 @@ class PortableCatalogMainService {
   /** The same, without waiting (closing the app). */
   #writeSync() {
     if (!this.#dirtyAt() && !this.#dirtyAt('portable.facesDirty')) return;
+    if (this.lockedBy || this.#otherLock()) return; // another computer has it: written when it leaves
     const f = this.#files();
     let there = null;
     try { there = JSON.parse(fs.readFileSync(f.catalog, 'utf8')); } catch { /* none */ }

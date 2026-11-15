@@ -11,7 +11,7 @@ Trabalha com as suas pastas tal como estão: miniaturas pequenas feitas uma vez,
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · **Português (Portugal)** · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versão 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
+![Versão 1.41.0](https://img.shields.io/badge/version-1.41.0-161214)
 ![Estado: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -55,7 +55,7 @@ As coleções de fotografias crescem mais depressa do que se consegue arrumá-la
 ## Pontos fortes
 
 - **As suas pastas, tal como estão.** Sem importação e sem biblioteca fechada: as fotografias ficam onde as pôs, e os seus outros programas continuam a trabalhar com elas.
-- **Local e privado.** Sem conta, sem telemetria, sem rede; o reconhecimento de rostos e animais corre no seu computador. Lê apenas a pasta que escolher e as respetivas subpastas.
+- **Local e privado.** Sem conta, sem telemetria; só acede à Internet quando lhe pede para procurar uma nova versão. O reconhecimento de rostos e animais corre no seu computador. Lê apenas a pasta que escolher e as respetivas subpastas.
 - **Rápido em qualquer dimensão.** A grelha desenha só o que está no ecrã; as miniaturas são pequenas, ficam num único ficheiro de cache e são feitas uma só vez. Coleções grandes em discos externos continuam fluidas.
 - **Todos os formatos, com descodificadores próprios.** JPEG, HEIC/HEIF, TIFF, PSD/PSB, RAW das principais marcas (CR3, CR2, NEF, ARW, RAF, DNG…) e vídeos (MP4, MOV, MTS, AVI…).
 - **Seguro por princípio.** Cada alteração a ficheiros mostra primeiro o plano, pede um código de 3 caracteres escrito e pode ser anulada; eliminar envia sempre para a Reciclagem.
@@ -102,7 +102,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | | |
 |---|---|
 | **Fotografias** | Grelha por mês ou lista com pasta, tipo, dimensões, tamanho, data e detalhes; seleção com clique, Ctrl e Shift; zoom; filtros por tipo, ano, marcação, categoria e subpastas, mostrados como etiquetas que saem com um clique. A árvore de pastas (ou os anos) à esquerda e o painel de informações à direita — ambos podem ser ocultados, ou tudo com o modo foco (`\`). **A pesquisa na barra do título** (Ctrl+K ou Ctrl+F) procura em toda a coleção enquanto escreve — fotografias, álbuns, projetos, pessoas, lugares, fotógrafos, câmaras, palavras-chave, pastas — e, quando os filtros escondem tudo, a página diz quais são, com um botão para retirar cada um. Dentro de um álbum, pessoa, animal, lugar ou projeto: mosaico, grelha uniforme, lista ou destaques. |
-| **Visualizador** | Tamanho real de imediato (a miniatura primeiro), ficheiros RAW em tamanho real através do JPEG que a câmara guardou neles, ← → para navegar, `I` para informações, zoom ao tamanho real; os vídeos reproduzem com controlos. O controlo de zoom vai do tamanho do ecrã a 400 %; a roda do rato aproxima onde está o ponteiro, arrastar move a fotografia, `Z` alterna entre ajustar e tamanho real. *Editar* (ou `I`) mostra ou recolhe o mesmo painel de edição do painel de informações — categoria, álbuns, ajustes, descrição, autor e local; uma fotografia levada para uma categoria fora do filtro continua visível, a cinzento, com um aviso a dizer onde está agora. HEIC, HEIF e HIF também abrem em tamanho real; fotografias HDR (PQ, HLG) são convertidas para o ecrã comum, no visualizador e nas miniaturas. Duplo clique faz zoom a 100 % no ponto clicado, e volta. Delete envia a fotografia para o Limbo com uma confirmação simples. |
+| **Visualizador** | Tamanho real de imediato (a miniatura primeiro), ficheiros RAW em tamanho real através do JPEG que a câmara guardou neles, ← → para navegar, `I` para informações, zoom ao tamanho real; os vídeos reproduzem com controlos. O controlo de zoom vai do tamanho do ecrã a 400 %; a roda do rato aproxima onde está o ponteiro, arrastar move a fotografia, `Z` alterna entre ajustar e tamanho real. *Editar* (ou `H`) mostra ou recolhe o mesmo painel de edição do painel de informações — categoria, álbuns, ajustes, descrição, autor e local; uma fotografia levada para uma categoria fora do filtro continua visível, a cinzento, com um aviso a dizer onde está agora. HEIC, HEIF e HIF também abrem em tamanho real; fotografias HDR (PQ, HLG) são convertidas para o ecrã comum, no visualizador e nas miniaturas. Duplo clique faz zoom a 100 % no ponto clicado, e volta. Delete envia a fotografia para o Limbo com uma confirmação simples. O painel mostra uma tarefa de cada vez — Ajustar, Descrever, Info — e, numa janela com 1680 px ou mais, Descrever e Info à esquerda e Ajustar à direita; arraste a margem de um painel para o alargar. |
 | **Ajustes** | Exposição, contraste, sombras e saturação no painel de informações, para uma fotografia ou várias, com histograma e pré-visualização imediata (na placa gráfica, ou no processador quando não há); copie e cole noutras fotografias. O ficheiro nunca muda: os ajustes ficam no catálogo (anulados com Ctrl+Z), as miniaturas e o visualizador mostram-nos (mantenha `\` para ver o original), e *Guardar cópia editada* grava um novo JPEG ao lado do original, com os metadados. *Exportar fotografias* (Ctrl+E) cria ficheiros novos das fotografias editadas em qualquer pasta — JPEG, PNG ou TIFF, no tamanho de uma rede social ou de uma impressão, com nitidez de saída, nomes como `2026-07-24-Formatura-Ana-Souza-001.jpg`, com todos os metadados ou sem a localização e uma assinatura opcional — com o perfil sRGB; os originais nunca mudam. |
 | **Edição** | Realces, brancos, pretos, equilíbrio de brancos (temperatura, matiz e conta-gotas), vibração, preto e branco com mistura por cor, vinheta e — na placa gráfica — nitidez, textura e clareza; *Automático*, predefinições e antes e depois no visualizador (`Y`). **Recortar e endireitar** (`C`): livre ou numa proporção — as comuns e as das redes sociais (Instagram 4:5 e 3:4, Stories/Reels/TikTok 9:16, YouTube 16:9, ligação 1,91:1, Pinterest, capas do X e do LinkedIn) —, rotações de 90° e endireitar traçando uma linha sobre o horizonte. Tudo fica no catálogo; o ficheiro nunca muda. |
 | **Correção da objetiva** | Distorção, cantos escuros e franjas de cor da objetiva desfeitos pelo perfil dela — toda a base do [Lensfun](https://lensfun.github.io), cerca de 1600 objetivas, encontrada pelo nome que a câmara gravou ou escolhida numa lista com pesquisa — e à mão: distorção, perspetiva vertical e horizontal (edifícios que tombam para trás), escala, cantos e franjas. Na placa gráfica; o ficheiro nunca muda. |
@@ -181,7 +181,9 @@ Faça duplo clique em **`build-installer.bat`** (ou execute `npm run dist`). Os 
 | `Alt+←` · `Alt+Home` | Voltar de um álbum, projeto ou pessoa · a coleção inteira, sem filtros |
 | `Ctrl+B` · `\` | Mostrar/ocultar a barra lateral · modo foco (só as fotografias) |
 | `1` `2` `3` · `0` | Marcar a seleção como ótima · OK · candidata a eliminar · limpar |
-| `Ctrl+A` · `Enter` · `I` · `Delete` · `F2` · `Esc` | Selecionar tudo · abrir · painel de informações · Reciclagem · mudar o nome · limpar a seleção |
+| `Ctrl+A` · `Enter` · `H` · `Delete` · `F2` · `Esc` | Selecionar tudo · abrir · painel de informações · Reciclagem · mudar o nome · limpar a seleção |
+| `E` · `D` · `I` | Painel lateral em Ajustar · Descrever · Info (a mesma tecla novamente recolhe-o) |
+| `V` · `?` | Comparar lado a lado · Atalhos de teclado |
 | `Ctrl+E` | Exportar fotografias (a seleção, ou as fotografias mostradas) |
 | `←` `→` · `Espaço` · `Esc` | Visualizador: anterior/seguinte · reproduzir/pausa · fechar |
 | `P` · `F` · `A` | Visualizador: apresentação · ecrã inteiro · adicionar a álbum |
@@ -200,7 +202,7 @@ O idioma segue o do sistema e pode ser alterado na barra de estado. Números e d
 
 ## Privacidade
 
-O LionPhotos nunca se liga à rede: sem conta, sem telemetria, sem verificação de atualizações. O reconhecimento de rostos e de animais corre neste computador, com modelos incluídos na aplicação.
+O LionPhotos só se liga à rede quando o pede: clicar na versão, no canto inferior direito, procura uma nova versão no GitHub, e atualizar transfere o instalador do seu sistema, verificado (SHA-256) antes de ser usado. Sem conta, sem telemetria, nada sobre si ou as suas fotografias é enviado. O reconhecimento de rostos e de animais corre neste computador, com modelos incluídos na aplicação.
 
 O catálogo e as miniaturas ficam num único ficheiro no seu computador:
 
@@ -262,7 +264,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotografias"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.38.1**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.41.0**.
 
 ## Créditos
 

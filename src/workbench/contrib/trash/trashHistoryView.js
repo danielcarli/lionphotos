@@ -7,6 +7,7 @@
 // when, which file, from which folder, how big and from where (the Limbo, Duplicates, a selection) — and how
 // much space the Limbo freed: in all, this month, month by month. Read from the operations log; nothing here
 // changes a file. The disk gets the space back when the Recycle Bin is emptied.
+import { pageIntro } from '../../browser/pageIntro.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
@@ -47,7 +48,8 @@ export class TrashHistoryView extends ViewPane {
   }
 
   #header() {
-    return h('div.view-header', h('div.eyebrow', t('trashlog.eyebrow')), h('h1.view-title', t('trashlog.title')), h('p.muted', t('trashlog.lead')));
+    const intro = pageIntro('trash', t('trashlog.lead'));
+    return h('div.view-header', h('div.view-title-row', h('h1.view-title', t('trashlog.title')), intro.help), intro.body);
   }
 
   #empty() {

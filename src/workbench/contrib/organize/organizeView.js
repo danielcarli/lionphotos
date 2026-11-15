@@ -9,6 +9,7 @@
 // subfolders; undo recent operations.
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
+import { namePieces, defaultPattern, localizePattern, pieceOf } from '../export/nameTokens.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { formatNumber, formatDateTime } from '../../../base/common/format.js';
 import { ViewPane } from '../../browser/viewPane.js';
@@ -17,8 +18,7 @@ import { showMoveDialog } from './moveDialog.js';
 import { reorganizePanel, readOptions } from './reorganizePanel.js';
 
 const PATTERNS = ['yearSlashMonth', 'yearMonth', 'year', 'yearSlashDay', 'dayTheme', 'same'];
-const DEFAULT_NAME = '{data}-{álbum}-{fotógrafo}-{nº}';
-const NAME_PIECES = { data: 'date', 'álbum': 'work', 'fotógrafo': 'author', 'nº': 'number', nome: 'name' };
+const PIECE_TITLE = { date: 'date', work: 'work', author: 'author', n: 'number', name: 'name' };
 const RENAME_KEY = 'lionphotos.organize.rename';
 
 /** The new name of a photo, as the main process will make it (for the example shown; the plan has the real ones). */
@@ -30,9 +30,8 @@ function exampleName(it, pattern, work, ascii, n = 1) {
   };
   const d = new Date(dateOf(it));
   const base = it.name.replace(/\.[^.]+$/, '');
-  const value = { data: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, date: null, 'álbum': part(work), album: null, projeto: null, 'fotógrafo': part(it.by || it.author), autor: null, 'nº': String(n).padStart(3, '0'), nome: part(base) };
-  for (const [a, b] of [['date', 'data'], ['album', 'álbum'], ['projeto', 'álbum'], ['autor', 'fotógrafo'], ['author', 'fotógrafo'], ['photographer', 'fotógrafo'], ['fotografo', 'fotógrafo'], ['n', 'nº'], ['name', 'nome']]) value[a] = value[b];
-  const stem = part(String(pattern || DEFAULT_NAME).replace(/\{([^}]+)\}/g, (_, k) => value[k.toLowerCase()] ?? ''));
+  const value = { date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, work: part(work), author: part(it.by || it.author), n: String(n).padStart(3, '0'), name: part(base) };
+  const stem = part(String(pattern || defaultPattern()).replace(/\{([^}]+)\}/g, (_, k) => value[pieceOf(k)] ?? ''));
   return `${stem || base}${it.name.slice(base.length)}`;
 }
 const pad = (n) => String(n).padStart(2, '0');
@@ -58,7 +57,7 @@ export class OrganizeView extends ViewPane {
   albumsChosen = new Set();
   // renaming the files (1.23.0): off unless turned on; the pattern is remembered
   rename = false;
-  namePattern = DEFAULT_NAME;
+  namePattern = defaultPattern();
   nameAscii = false;
   work = '';
   // reorganizing the whole collection (1.24.0): the proposal under review, what is kept of it, and the options
@@ -74,7 +73,7 @@ export class OrganizeView extends ViewPane {
     this.library.onDidChangeFilter(() => this.invalidate());
     this.operations.onDidRun(() => this.invalidate());
     this.labels.onDidChange(() => this.invalidate());
-    try { const r = JSON.parse(localStorage.getItem(RENAME_KEY)) || {}; this.namePattern = r.pattern || DEFAULT_NAME; this.nameAscii = !!r.ascii; } catch { /* storage unavailable */ }
+    try { const r = JSON.parse(localStorage.getItem(RENAME_KEY)) || {}; this.namePattern = localizePattern(r.pattern) || defaultPattern(); this.nameAscii = !!r.ascii; } catch { /* storage unavailable */ }
   }
 
   #saveRename() { try { localStorage.setItem(RENAME_KEY, JSON.stringify({ pattern: this.namePattern, ascii: this.nameAscii })); } catch { /* storage unavailable */ } }
@@ -92,12 +91,12 @@ export class OrganizeView extends ViewPane {
     // (native append writes "null" for an absent part: only the parts there)
     box.append(...[
       h('div.org-name-row', input),
-      h('div.xp-pieces', Object.entries(NAME_PIECES).map(([p, key]) => h('button.chip-token', { title: t(`export.pieces.${key}`), onclick: () => {
+      h('div.xp-pieces', namePieces().map(([p, key]) => h('button.chip-token', { title: t(`export.pieces.${PIECE_TITLE[key]}`), onclick: () => {
         const at = input.selectionStart ?? input.value.length;
         const sep = at && !/[-_ ]$/.test(input.value.slice(0, at)) ? '-' : '';
         this.namePattern = input.value.slice(0, at) + `${sep}{${p}}` + input.value.slice(at); this.#saveRename(); this.render();
       } }, `{${p}}`)),
-      h('button.chip-token.xp-reset', { disabled: this.namePattern === DEFAULT_NAME, onclick: () => { this.namePattern = DEFAULT_NAME; this.#saveRename(); this.render(); } }, t('export.patternReset'))),
+      h('button.chip-token.xp-reset', { disabled: this.namePattern === defaultPattern(), onclick: () => { this.namePattern = defaultPattern(); this.#saveRename(); this.render(); } }, t('export.patternReset'))),
       workField ? h('label.form-field', h('span.field-label', t('organize.work')), h('input.text-input', { value: this.work, placeholder: t('organize.workPlaceholder'), maxlength: 80,
         oninput: (e) => { this.work = e.target.value; example.textContent = sample ? exampleName(sample, this.namePattern, work(), this.nameAscii) : ''; } })) : null,
       h('label.xp-check', h('input', { type: 'checkbox', checked: this.nameAscii, onchange: (e) => { this.nameAscii = e.target.checked; this.#saveRename(); this.render(); } }), h('span', t('export.ascii'))),
@@ -143,6 +142,7 @@ export class OrganizeView extends ViewPane {
       setChildren(this.element,
         h('div.view-header', h('div.eyebrow', t('organize.eyebrow')), h('h1.view-title', t('organize.title'))),
         reorganizePanel({
+          onDuplicates: () => this.layout.openView('duplicates'),
           result: this.reorg, state: this.reorgState, options: this.reorgOptions, busy: this.reorgBusy,
           onOptions: (o) => this.#analyze(o), onApply: () => this.#applyReorg(), onClose: () => { this.reorg = null; this.render(); },
           onChange: (redraw) => { if (redraw) this.render(); },

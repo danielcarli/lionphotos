@@ -28,7 +28,8 @@ export const WEB_IMAGES = new Set(['jpg', 'jpeg', 'jpe', 'jfif', 'png', 'gif', '
 const MAX_SAVE = 30;
 
 const GROUPS_KEY = 'lionphotos.adjustGroups';
-const GROUPS_OPEN = { light: true, color: true, detail: false, lens: false, effects: false };
+// one group open at a time (an accordion): Light at first
+const GROUPS_OPEN = { light: true, color: false, detail: false, lens: false, effects: false, lensManual: false };
 function groupState() { try { return JSON.parse(localStorage.getItem(GROUPS_KEY) || '{}') || {}; } catch { return {}; } }
 const isGroupOpen = (id) => { const st = groupState(); return id in st ? !!st[id] : !!GROUPS_OPEN[id]; };
 function rememberGroup(id, open) { try { localStorage.setItem(GROUPS_KEY, JSON.stringify({ ...groupState(), [id]: open })); } catch { /* storage unavailable */ } }
@@ -237,18 +238,34 @@ export function adjustSection(s, items, { live = null, preview: draw = null } = 
   const bwSwitch = h('label.ip-adj-switch', { title: t('adjust.bwTitle') },
     h('input', { type: 'checkbox', checked: bwOn, onchange: (e) => commit({ bw: e.target.checked ? 1 : 0 }) }), h('span', t('adjust.bw')));
 
+  // the groups fold like an accordion: opening one folds the others; a folded group says what was changed in it
+  const setGroup = (g, open) => {
+    const body = g.querySelector(':scope > .ip-adj-body'), btn = g.querySelector(':scope > .ip-adj-ghrow > .ip-adj-gh');
+    body.hidden = !open; btn.setAttribute('aria-expanded', String(open));
+    btn.querySelector('.ip-adj-chev').innerHTML = icon(open ? 'chevronDown' : 'chevronRight', 12);
+    g.classList.toggle('is-open', open);
+    rememberGroup(g.dataset.group, open);
+  };
   const group = (id, title, keys, extra = null, note = null, head = null, watch = keys) => {
     const open = isGroupOpen(id);
     const changed = items.some((it) => watch.some((k) => adjustOf(it)?.[k]));
     const body = h('div.ip-adj-body', { hidden: !open }, note, ...keys.map(slider), extra);
     const btn = h('button.ip-adj-gh', { type: 'button', 'aria-expanded': String(open), onclick: () => {
-      const o = body.hidden;
-      body.hidden = !o; btn.setAttribute('aria-expanded', String(o)); chev.innerHTML = icon(o ? 'chevronDown' : 'chevronRight', 12); rememberGroup(id, o);
+      const g = btn.closest('.ip-adj-group');
+      const opening = body.hidden;
+      if (opening) for (const other of g.parentElement.querySelectorAll(':scope > .ip-adj-group.is-open')) if (other !== g) setGroup(other, false);
+      setGroup(g, opening);
     } });
     const chev = h('span.ip-adj-chev', { html: icon(open ? 'chevronDown' : 'chevronRight', 12) });
     btn.append(chev, h('span', title));
-    if (changed) btn.append(h('span.ip-adj-dot', { title: t('adjust.groupChanged') }));
-    return h('div.ip-adj-group', { 'data-group': id }, h('div.ip-adj-ghrow', btn, head), body);
+    if (changed) {
+      // one photo: the values changed ("Exposure +0.3 · Contrast +12"); several: a dot
+      const a = one ? adjustOf(items[0]) || {} : null;
+      const words = a ? keys.filter((k) => a[k]).map((k) => `${t(`adjust.${k}`)} ${adjustText(k, a[k])}`) : [];
+      btn.append(words.length ? h('span.ip-adj-gsum', { title: words.join(' · ') }, words.slice(0, 2).join(' · ') + (words.length > 2 ? ` +${words.length - 2}` : ''))
+        : h('span.ip-adj-dot', { title: t('adjust.groupChanged') }));
+    }
+    return h(`div.ip-adj-group${open ? '.is-open' : ''}`, { 'data-group': id }, h('div.ip-adj-ghrow', btn, head), body);
   };
   // ---- the lens: its distortion, vignetting and colour fringes undone, from its Lensfun profile (found from the
   // name the camera wrote, or chosen among all of them); the sliders say how much (or correct by hand)
@@ -318,13 +335,22 @@ export function adjustSection(s, items, { live = null, preview: draw = null } = 
     // by hand, with or without a profile: the distortion, the perspective, the size, the corners, the fringes
     const anyManual = items.some((it) => hasManual(adjustOf(it)) || adjustOf(it)?.manScale || adjustOf(it)?.manMid);
     const sub = (key) => h('p.ip-lens-sub', t(key));
-    const manual = h('div.ip-lens-manual',
-      h('div.ip-lens-mhead', h('p.ip-lens-mtitle', t('lens.manual')),
-        anyManual ? h('button.btn.btn-ghost.btn-sm.ip-lens-mreset', { type: 'button', disabled: !gpu, onclick: () => commit(Object.fromEntries(MANUAL_KEYS.map((k) => [k, 0]))) }, t('lens.manualReset')) : null),
+    // folded until asked for (or while something in it is in use)
+    const manOpen = anyManual || isGroupOpen('lensManual');
+    const manBody = h('div.ip-lens-mbody', { hidden: !manOpen },
       h('p.small.muted.ip-lens-mhint', gpu ? t('lens.manualHint') : t('lens.noGpu')),
       sub('lens.geometry'), ...['manDist', 'manVert', 'manHorz', 'manScale'].map(slider),
       sub('lens.corners'), ...['manVig', 'manMid'].map(slider),
       sub('lens.fringesTitle'), ...['manCaR', 'manCaB'].map(slider));
+    const manChev = h('span.ip-adj-chev', { html: icon(manOpen ? 'chevronDown' : 'chevronRight', 12) });
+    const manBtn = h('button.ip-lens-mtoggle', { type: 'button', 'aria-expanded': String(manOpen), onclick: () => {
+      const o = manBody.hidden;
+      manBody.hidden = !o; manBtn.setAttribute('aria-expanded', String(o)); manChev.innerHTML = icon(o ? 'chevronDown' : 'chevronRight', 12); rememberGroup('lensManual', o);
+    } }, manChev, h('span.ip-lens-mtitle', t('lens.manual')), anyManual ? h('span.ip-adj-dot', { title: t('adjust.groupChanged') }) : null);
+    const manual = h('div.ip-lens-manual',
+      h('div.ip-lens-mhead', manBtn,
+        anyManual ? h('button.btn.btn-ghost.btn-sm.ip-lens-mreset', { type: 'button', disabled: !gpu, onclick: () => commit(Object.fromEntries(MANUAL_KEYS.map((k) => [k, 0]))) }, t('lens.manualReset')) : null),
+      manBody);
     // the profile's amounts only where a profile is used
     const profiled = all && photos.some((it) => adjustOf(it)?.lensId);
     return group('lens', t('adjust.group.lens'), profiled ? ['lensDist', 'lensVig', 'lensCa'] : [], manual, box, null, LENS_KEYS);

@@ -54,7 +54,7 @@ function treeOf(groups, state) {
  * @param {{ result:object, state:Map<string,{on:boolean,dest:string}>, options:object, busy:boolean,
  *           onOptions:(o:object)=>void, onApply:()=>void, onClose:()=>void, onChange:()=>void }} p
  */
-export function reorganizePanel({ result, state, options, busy, onOptions, onApply, onClose, onChange }) {
+export function reorganizePanel({ result, state, options, busy, onOptions, onApply, onClose, onChange, onDuplicates }) {
   const groups = result.groups;
   const moving = groups.filter((g) => g.kind !== 'keep' && state.get(g.key).on);
   const items = moving.reduce((n, g) => n + g.count, 0);
@@ -72,13 +72,15 @@ export function reorganizePanel({ result, state, options, busy, onOptions, onApp
       oninput: (e) => { s.dest = e.target.value.replace(/\\/g, '/').replace(/^\/+|\/+$/g, ''); s.edited = true; onChange(false); },
     });
     const meta = [tn('reorganize.photos', g.photos), g.videos ? tn('reorganize.videos', g.videos) : '', when(g)].filter(Boolean).join(' · ');
-    const reason = t(`reorganize.reasons.${g.reason}`, { days: formatNumber((g.days || 0) + 1) });
+    const reason = t(`reorganize.reasons.${g.reason}`, { days: formatNumber((g.days || 0) + 1), twins: formatNumber(g.twins || 0), count: formatNumber(g.count) });
     return h('li.reorg-row', { class: `reorg-row${!keep && !s.on ? ' is-off' : ''}` },
       keep ? h('span.reorg-check', { html: icon('check', 14) }) : h('input', { type: 'checkbox', checked: s.on, disabled: busy, 'aria-label': t('reorganize.include', { folder: g.src || g.from || rootName }),
         onchange: (e) => { s.on = e.target.checked; onChange(true); } }),
       h('div.reorg-main',
         h('div.reorg-paths', h('span.reorg-from', { title: g.src || g.from }, from), keep ? null : h('span.reorg-arrow', { html: icon('arrowRight', 14) }), dest),
         h('div.reorg-meta.small', h('span.muted', meta), h('span.reorg-reason', reason),
+          // a copy of photos that are elsewhere: dealt with in "Repeated files", not moved here
+          (g.reason === 'backup' || g.reason === 'copies') && onDuplicates ? h('button.link-button.reorg-dupes', { type: 'button', onclick: onDuplicates }, t('reorganize.seeDuplicates')) : null,
           g.sphere ? h('span.reorg-sphere', { class: `reorg-sphere is-${g.sphere.main}` }, t(`sphere.${g.sphere.main}`)) : null)));
   };
 

@@ -5,11 +5,14 @@
  *--------------------------------------------------------------------------------------------*/
 // The viewer: one photo or video at full size over the window, with the thumbnail shown first (so it
 // opens at once) and the original loaded on top. ← → to move, Delete to send it to the Recycle Bin (typed
-// code), Esc to close. "Edit" (or I) shows or folds the same panel as the photos' info panel — organization
-// and category, adjustments, description, author and place, file and camera. A photo moved to a category the
+// code), Esc to close. "Edit" (or H) shows or folds the same panel as the photos' info panel, by task: Adjust ·
+// Describe · Info (E, D, I); in a wide window (1680 px or more) two panels — Describe and Info on the left, Adjust
+// on the right — unless the person keeps one. A photo moved to a category the
 // title bar's filter does not show stays in view, its name greyed, with a note saying where it now is. The next and previous photos are loaded ahead.
 // P starts a slideshow (an album's, or of whatever is shown): the photos advance by themselves, videos
 // play to the end, Space pauses, F fills the screen.
+import { showCompare, comparable } from '../compare/compareView.js';
+import { exportPhotos } from '../export/exportPhotos.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
@@ -20,6 +23,7 @@ import { organizeSection } from '../photos/selectionSummary.js';
 import { metadataSections } from '../photos/descriptionSection.js';
 import { adjustSection } from '../photos/adjustSection.js';
 import { fileSection, infoFooter } from '../photos/infoSections.js';
+import { panelTab, setPanelTab, sectionsFor, asOnly, usableTab, tabBar, panelTitle, splitSwitch, splitOn, setSplit, isWide, TAB_KEYS, attachResizer } from '../photos/panelTabs.js';
 import { applyMark } from '../limbo/sendToLimbo.js';
 import { addToAlbum } from '../albums/albumDialogs.js';
 import { RAW_PREVIEW } from '../../services/library/common/mediaCategories.js';
@@ -82,8 +86,15 @@ export class Viewer {
       this.outNote = h('div.vw-out-note', { role: 'status', hidden: true });
       this.busyNote = h('div.vw-busy', { role: 'status', hidden: true });
       this.side = h('aside.vw-info');
+      // in a wide window, Describe and Info on the left (Adjust stays on the right)
+      this.sideLeft = h('aside.vw-info.vw-info-left', { hidden: true });
+      // each panel's inner edge is dragged to make it wider (300–480 px, remembered)
+      this.gripLeft = attachResizer(this.sideLeft, 'viewerLeft', 'left');
+      this.gripRight = attachResizer(this.side, 'viewer', 'right');
       this.el = h('div.viewer', { role: 'dialog', 'aria-modal': 'true', 'aria-label': t('viewer.label') },
-        this.bar, h('div.vw-body', h('div.vw-stage-wrap', this.stage, this.outNote, this.busyNote), this.side),
+        this.bar, // the left panel comes after the right one in the page (CSS order puts it on the left): the right panel stays
+        // the first .vw-info, the one every part of the app (and the tests) means by "the panel"
+        h('div.vw-body', h('div.vw-stage-wrap', this.stage, this.outNote, this.busyNote), this.gripRight, this.side, this.sideLeft, this.gripLeft),
         h('button.vw-nav.vw-prev', { 'aria-label': t('viewer.previous'), html: icon('chevronLeft', 28), onclick: () => this.move(-1) }),
         h('button.vw-nav.vw-next', { 'aria-label': t('viewer.next'), html: icon('chevronRight', 28), onclick: () => this.move(1) }));
       this.onKey = (e) => this.#key(e);
@@ -99,7 +110,15 @@ export class Viewer {
       // while a slideshow plays, the bar and the arrows fade out when the mouse rests
       this.el.addEventListener('mousemove', () => this.#wake());
       this.#zoomGestures();
-      this.onResize = () => { this.#paintZoom(); this.#placeAdjusted(); };
+      // the arrows keep clear of the panels, whatever their width
+      new ResizeObserver(() => this.#placeArrows()).observe(this.side);
+      new ResizeObserver(() => this.#placeArrows()).observe(this.sideLeft);
+      this.wasWide = isWide();
+      this.onResize = () => {
+        this.#paintZoom(); this.#placeAdjusted();
+        // crossing 1680 px: one panel becomes two, or two become one
+        if (isWide() !== this.wasWide) { this.wasWide = isWide(); if (this.current) this.#renderInfo(this.current); }
+      };
       window.addEventListener('resize', this.onResize);
       document.body.append(this.el);
     }
@@ -263,6 +282,8 @@ export class Viewer {
         h('button.vw-btn', { title: t('common.showIn', { explorer: this.actions.explorerName }), onclick: () => this.actions.reveal(it) }, h('span', { html: icon('reveal', 16) })),
         h('button.vw-btn', { title: t('info.openDefault'), onclick: () => this.actions.openExternal(it) }, h('span', { html: icon('external', 16) })),
         it.kind === KIND.image && adjustOf(it) ? h(this.comparing ? 'button.vw-btn.vw-compare.active' : 'button.vw-btn.vw-compare', { title: `${t('adjust.compareTitle')} (Y)`, 'aria-pressed': String(!!this.comparing), onclick: () => this.toggleCompare() }, h('span', { html: icon('compare', 16) })) : null,
+        it.kind === KIND.image && this.list.length > 1 ? h('button.vw-btn.vw-side', { title: `${t('compare.viewerTitle')} (V)`, 'aria-label': t('compare.viewerTitle'), onclick: () => this.#sideBySide() }, h('span', { html: icon('columns', 16) })) : null,
+        h('button.vw-btn.vw-export', { title: `${t('export.menu')} (Ctrl+E)`, 'aria-label': t('export.menu'), onclick: () => exportPhotos(this.services, [it]) }, h('span', { html: icon('export', 16) })),
         this.#canCrop(it) ? h('button.vw-btn.vw-crop', { title: `${t('crop.title')} (C)`, onclick: () => this.openCrop() }, h('span', { html: icon('crop', 16) })) : null,
         h('button.vw-btn.vw-edit', { class: `vw-btn vw-edit${this.infoOpen ? ' active' : ''}`, title: t('viewer.editTitle'), 'aria-pressed': String(!!this.infoOpen), onclick: () => this.#toggleInfo() }, h('span', { html: icon('rename', 16) }), t('viewer.edit')),
         h('button.vw-btn.danger', { title: `${t((it.mark || 0) === 3 ? 'photos.trash' : 'limbo.send')} (Delete)`, onclick: () => this.#discard() }, h('span', { html: icon((it.mark || 0) === 3 ? 'trash' : 'binQuestion', 16) })),
@@ -488,7 +509,14 @@ export class Viewer {
       v.render(kind === 'shown' ? withoutLens(values) : values, { quick, shape: kind === 'full' });
       this.#placeAdjusted();
       if (adjustOf(it) && !this.#chips().querySelector('.vw-adj-note')) {
-        this.#chips().append(h('span.vw-chip.vw-adj-note', { title: t('adjust.viewerNote') }, h('span.vw-chip-icon', { html: icon('sliders', 11) }), t('adjust.viewerChip'), h('kbd', '\\')));
+        // "Adjusted · hold to see the original": pressed (or the \\ key held), the photo as it was
+        const orig = (on) => { if (this.showingOriginal !== on) { this.showingOriginal = on; this.#placeAdjusted(); } };
+        this.#chips().append(h('button.vw-chip.vw-adj-note', {
+          type: 'button', title: t('adjust.viewerNote'),
+          onpointerdown: (e) => { e.preventDefault(); orig(true); }, onpointerup: () => orig(false), onpointerleave: () => orig(false), onpointercancel: () => orig(false),
+          onkeydown: (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); orig(true); } },
+          onkeyup: (e) => { if (e.key === ' ' || e.key === 'Enter') { e.stopPropagation(); orig(false); } },
+        }, h('span.vw-chip-icon', { html: icon('sliders', 11) }), t('adjust.viewerChip'), h('span.vw-adj-hold', t('adjust.holdOriginal'))));
       }
     } catch (err) {
       console.warn('[viewer] adjust', err);
@@ -719,41 +747,80 @@ export class Viewer {
       h('button.btn.btn-secondary.btn-sm', { onclick: () => this.actions.openExternal(it) }, t('info.openDefault')));
   }
 
-  /** The editing panel: the same sections as the photos' info panel, for the photo shown. */
+  /** Two panels: a wide window, and the person did not keep one. */
+  #split() { return isWide() && splitOn(); }
+
+  #placeArrows() {
+    if (!this.el) return;
+    const w = (el) => (el.hidden ? 0 : Math.round(el.getBoundingClientRect().width));
+    this.el.style.setProperty('--vw-left', `${w(this.sideLeft)}px`);
+    this.el.style.setProperty('--vw-right', `${w(this.side)}px`);
+  }
+
+  /**
+   * The editing panel, for the photo shown: the same sections as the photos' info panel, by tab (Adjust ·
+   * Describe · Info); in a wide window, Describe and Info on the left and Adjust on the right.
+   */
   async #renderInfo(it) {
+    const split = this.#split();
     this.side.hidden = !this.infoOpen;
-    if (!this.infoOpen) return;
+    this.sideLeft.hidden = !this.infoOpen || !split;
+    if (!this.infoOpen) { this.#placeArrows(); return; }
     const token = (this.infoToken = (this.infoToken || 0) + 1);
     const d = await this.host.library.details(it.id);
     if (!d || token !== this.infoToken || this.current?.id !== it.id) return;
     // what is being typed stays: the panel is not drawn again under the cursor
-    if (this.side.dataset.id === String(it.id) && this.side.contains(document.activeElement) && document.activeElement.matches('textarea, input:not([type=range])')) return;
+    const typing = [this.side, this.sideLeft].some((p) => p.dataset.id === String(it.id) && p.contains(document.activeElement) && document.activeElement.matches('textarea, input:not([type=range])'));
+    if (typing && this.side.dataset.split === String(split)) return;
     const raw = RAW_PREVIEW.has(it.ext);
-    const original = raw ? this.thumbs.rawUrl(it) : this.thumbs.mediaUrl(it);
     const dims = d.width && d.height ? `${formatNumber(d.width)} × ${formatNumber(d.height)}` : null;
     const md = metadataSections(this, [it], { fileMeta: d.meta || null, rerender: () => this.#renderInfo(this.current) });
-    const scrollTop = this.side.dataset.id === String(it.id) ? this.side.scrollTop : 0;
-    this.side.dataset.id = String(it.id);
-    setChildren(this.side,
-      h('div.ip-head.vw-ip-head',
-        h('div.ip-name', { title: d.path }, d.name, adjustOf(it) ? h('span.ip-edited', t('adjust.edited')) : null),
-        h('div.ip-meta', [detailsLine(d), dims].filter(Boolean).join(' · ')),
-        h('div.ip-tools',
-          h('span.ip-sp'),
-          h('button.icon-button', { title: t('common.showIn', { explorer: this.actions.explorerName }), 'aria-label': t('info.reveal'), html: icon('reveal', 15), onclick: () => this.actions.reveal(it) }),
-          h('button.icon-button', { title: t('info.openDefault'), 'aria-label': t('info.openDefault'), html: icon('external', 15), onclick: () => this.actions.openExternal(it) }),
-          h('button.icon-button', { title: t('info.copyPath'), 'aria-label': t('info.copyPath'), html: icon('copy', 15), onclick: () => this.actions.copyPath(it) }))),
-      h('div.ip-secs',
-        organizeSection(this, [it], { title: it.name }),
-        it.kind === KIND.image && (WEB_IMAGES.has(it.ext) || raw || HEIF_IMAGES.has(String(it.ext).toLowerCase()))
-          ? adjustSection(this, [it], { preview: (v) => this.#previewAdjust(v) }) : null,
-        md.describe, md.place,
-        fileSection(d)),
-      infoFooter(this, [it], { pending: md.pending, onNext: this.index < this.list.length - 1 ? () => this.move(1) : null }));
-    this.side.scrollTop = scrollTop;
+    const keep = (p) => (p.dataset.id === String(it.id) && p.dataset.split === String(split) ? p.scrollTop : 0);
+    const tops = [keep(this.side), keep(this.sideLeft)];
+    for (const p of [this.side, this.sideLeft]) { p.dataset.id = String(it.id); p.dataset.split = String(split); }
+    const canAdjust = it.kind === KIND.image && (WEB_IMAGES.has(it.ext) || raw || HEIF_IMAGES.has(String(it.ext).toLowerCase()));
+    const head = () => h('div.ip-head.vw-ip-head',
+      h('div.ip-name', { title: d.path }, d.name, adjustOf(it) ? h('span.ip-edited', t('adjust.edited')) : null),
+      h('div.ip-meta', [detailsLine(d), dims].filter(Boolean).join(' · ')),
+      h('div.ip-tools',
+        h('span.ip-sp'),
+        h('button.icon-button', { title: t('common.showIn', { explorer: this.actions.explorerName }), 'aria-label': t('info.reveal'), html: icon('reveal', 15), onclick: () => this.actions.reveal(it) }),
+        h('button.icon-button', { title: t('info.openDefault'), 'aria-label': t('info.openDefault'), html: icon('external', 15), onclick: () => this.actions.openExternal(it) }),
+        h('button.icon-button', { title: t('info.copyPath'), 'aria-label': t('info.copyPath'), html: icon('copy', 15), onclick: () => this.actions.copyPath(it) })));
+    const sections = {
+      organize: () => organizeSection(this, [it], { title: it.name, onLeave: () => this.close() }),
+      adjust: () => (canAdjust ? adjustSection(this, [it], { preview: (v) => this.#previewAdjust(v) }) : null),
+      describe: md.describe, place: md.place,
+      file: () => fileSection(d),
+    };
+    const footer = () => infoFooter(this, [it], { pending: md.pending, onNext: this.index < this.list.length - 1 ? () => this.move(1) : null });
+    const toggleSplit = () => { setSplit(!splitOn()); this.#renderInfo(this.current); };
+    if (split) {
+      // left: what the photo is and says; right: its adjustments (a video: only the left)
+      this.side.hidden = !canAdjust;
+      setChildren(this.sideLeft,
+        panelTitle(t('panel.describeInfo'), 'rename', canAdjust ? null : splitSwitch(true, toggleSplit)),
+        head(),
+        h('div.ip-secs', sectionsFor('describe', sections), sections.file()),
+        footer());
+      if (canAdjust) setChildren(this.side, panelTitle(t('panel.tab.adjust'), 'sliders', splitSwitch(true, toggleSplit)), asOnly(sectionsFor('adjust', sections)));
+    } else {
+      const tab = usableTab(panelTab(), { adjust: canAdjust });
+      setChildren(this.side,
+        tabBar(tab, (x) => {
+          setPanelTab(x);
+          this.#renderInfo(this.current).then(() => this.side.querySelector(`.ip-tab[data-tab="${x}"]`)?.focus());
+        }, { adjust: canAdjust, extra: isWide() ? splitSwitch(false, toggleSplit) : null }),
+        head(),
+        asOnly(sectionsFor(tab, sections)),
+        footer());
+    }
+    this.side.scrollTop = tops[0];
+    this.sideLeft.scrollTop = tops[1];
+    this.#placeArrows();
     // after Alt+↓ (the next photo): the same field keeps the focus
     if (this.refocus) {
-      const el = this.side.querySelector(`[data-desc="${this.refocus}"]`);
+      const el = this.el.querySelector(`.vw-info [data-desc="${this.refocus}"]`);
       this.refocus = null;
       if (el && !el.closest('[hidden]')) { el.focus(); el.select?.(); }
     }
@@ -840,6 +907,22 @@ export class Viewer {
     this.#renderInfo(it);
   }
 
+  /** This photo and the next of the list, side by side (the photos the viewer is going through). */
+  #sideBySide() {
+    const all = comparable(this.services, this.list);
+    const at = all.findIndex((x) => x.id === this.current?.id);
+    if (at < 0 || all.length < 2) return;
+    showCompare(this.services, all, at, at + 1 < all.length ? at + 1 : at - 1);
+  }
+
+  /** E, D, I: the panel opened on that tab, or folded when that tab is shown already (two panels: folded). */
+  #keyTab(tab) {
+    if (this.infoOpen && (this.#split() || panelTab() === tab)) { this.#toggleInfo(); return; }
+    setPanelTab(tab);
+    if (!this.infoOpen) { this.#toggleInfo(); return; }
+    this.#renderInfo(this.current);
+  }
+
   #toggleInfo() {
     this.infoOpen = !this.infoOpen;
     try { localStorage.setItem(INFO_KEY, this.infoOpen ? '1' : '0'); } catch { /* storage unavailable */ }
@@ -869,7 +952,7 @@ export class Viewer {
   }
 
   #key(e) {
-    if (document.querySelector('.cm-overlay')) return; // a confirmation dialog is open
+    if (document.querySelector('.cm-overlay, .cmp')) return; // a dialog, or the two photos side by side, has the keys
     if (this.cropEditor) return; // the crop editor has its own keys
     // typing in the editing panel: the keys are the field's (Alt+↓ / Alt+↑ still move, keeping the field)
     const field = e.target?.closest?.('.vw-info') && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) && e.target.type !== 'range';
@@ -887,10 +970,15 @@ export class Viewer {
     if (e.key === 'Escape' && this.picking) { e.preventDefault(); e.stopPropagation(); this.#endPick(); }
     else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); this.close(); }
     else if ((e.key === 'y' || e.key === 'Y') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); this.toggleCompare(); }
+    // Ctrl+E: export this photo; V: this photo and the next, side by side
+    else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'e') { e.preventDefault(); exportPhotos(this.services, [this.current]); }
+    else if ((e.key === 'v' || e.key === 'V') && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); this.#sideBySide(); }
     else if (e.key === 'ArrowRight') { e.preventDefault(); this.move(1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); this.move(-1); }
     else if (e.key === 'Delete') { e.preventDefault(); this.#discard(); }
-    else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); this.#toggleInfo(); }
+    // E · D · I: the panel's tabs (Adjust, Describe, Info); H shows or folds the panels
+    else if (!e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey && TAB_KEYS[e.key.toLowerCase()]) { e.preventDefault(); this.#keyTab(TAB_KEYS[e.key.toLowerCase()]); }
+    else if ((e.key === 'h' || e.key === 'H') && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); this.#toggleInfo(); }
     else if (/^[0-3]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); this.#mark(e.key === '0' ? 0 : MARK_NAMES[Number(e.key)]); }
     else if ((e.key === 'a' || e.key === 'A') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); addToAlbum(this, [this.current.id]); }
     else if ((e.key === 'c' || e.key === 'C') && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); this.openCrop(); }

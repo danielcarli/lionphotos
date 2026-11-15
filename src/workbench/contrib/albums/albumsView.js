@@ -7,6 +7,7 @@
 // they were taken. Opening one shows its photos in Photos; "Slideshow" plays it full screen. Photos are
 // added from Photos ("Add to album…" on the selection) and an album is only an entry in the catalog:
 // the files stay where they are.
+import { pageIntro } from '../../browser/pageIntro.js';
 import { sphereScope } from '../labels/sphereIcons.js';
 import { sphereIcons } from '../labels/sphereIcons.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
@@ -107,11 +108,11 @@ export class AlbumsView extends ViewPane {
       this.faceUrls = this.#faces();
       this.whoKinds = new Map(labels.labels.filter((l) => l.type === 'person' || l.type === 'pet').map((l) => [l.id, l]));
     }
+    const intro = pageIntro('album', t('albums.lead'));
     setChildren(this.element,
       h('div.view-header',
-        h('div.eyebrow', h('span', { html: icon('album', 14) }), t('albums.eyebrow')),
-        h('div.view-title-row', h('h1.view-title', t('views.album')), sphereScope(this.library)),
-        h('p.muted', t('albums.lead'))),
+        h('div.view-title-row', h('h1.view-title', t('views.album')), sphereScope(this.library), intro.help),
+        intro.body),
       h('div.lbl-create', name, h('button.btn.btn-primary', { onclick: create }, h('span', { html: icon('plus', 14) }), t('albums.new')),
         // albums proposed from the events and what the photos show
         h('button.btn.btn-secondary', { title: t('albumSuggest.buttonTitle'), disabled: !this.library.items.length, onclick: () => this.suggest.show() },

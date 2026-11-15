@@ -1,6 +1,6 @@
 {
   "name": "lionphotos",
-  "version": "1.38.1",
+  "version": "1.41.0",
   "description": "LionPhotos — fast photo & video browser and organizer. Browse folders of pictures and videos as small cached thumbnails, regenerated only when a file changes, and organize them safely.",
   "main": "src/code/electron-main/main.js",
   "desktopName": "lionphotos.desktop",

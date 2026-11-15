@@ -35,6 +35,8 @@ const TOKENS = {
   'fotógrafo': 'author', fotografo: 'author', autor: 'author', author: 'author', photographer: 'author',
   'nº': 'n', 'n': 'n', 'no': 'n', 'num': 'n', '#': 'n',
   nome: 'name', name: 'name',
+  // the words of the other languages of the app (src/workbench/contrib/export/nameTokens.js)
+  fecha: 'date', datum: 'date', photographe: 'author', fotograf: 'author', 'n°': 'n', nr: 'n', nombre: 'name', nom: 'name',
 };
 const DEFAULT_PATTERN = '{data}-{álbum}-{fotógrafo}-{nº}';
 
@@ -55,7 +57,7 @@ function exportNames(items, { pattern = DEFAULT_PATTERN, work = '', ascii = fals
     let stem;
     if (keepName) stem = cleanPart(base, ascii);
     else {
-      if (/\{(fotógrafo|fotografo|autor|author|photographer)\}/i.test(pattern) && !it.author) noAuthor++;
+      if (/\{(fotógrafo|fotografo|autor|author|photographer|photographe|fotograf)\}/i.test(pattern) && !it.author) noAuthor++;
       const value = (key) => {
         switch (TOKENS[key.toLowerCase()]) {
           case 'date': return dayOf(it.taken);

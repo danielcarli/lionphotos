@@ -45,7 +45,9 @@ export class BackupService {
         toast = null;
         const msg = tn('backup.copied', p.done, { size: formatBytes(p.bytesTotal || 0) });
         if (p.failed) this.notifications.warn(`${msg} ${tn('ops.failed', p.failed)}`); else this.notifications.success(msg);
-        this.compare(); // the lists change: compare again (what was just copied is now in both)
+        // the catalog goes along (albums, people, adjustments… are not in the photos' files), then compare again
+        const session = this.result?.session;
+        (session && this.result.catalog?.master ? this.host.backup.copyCatalog(session).catch(() => {}) : Promise.resolve()).then(() => this.compare());
       }
       this.#onDidChange.fire();
     });
@@ -65,6 +67,16 @@ export class BackupService {
   async pick(which) {
     const folder = await this.host.pickFolder();
     if (folder) this.set({ [which]: folder });
+  }
+
+  /** The collection's catalog (.lionphotos) copied into the backup folder. */
+  async copyCatalog() {
+    if (!this.result?.session) return;
+    try {
+      this.result.catalog = await this.host.backup.copyCatalog(this.result.session);
+      this.notifications.success(t('backup.catalog.copied'));
+    } catch (err) { this.notifications.warn(String(err?.message || err)); }
+    this.#onDidChange.fire();
   }
 
   swap() { this.set({ master: this.backup, backup: this.master }); }

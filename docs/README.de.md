@@ -11,7 +11,7 @@ Arbeitet direkt mit Ihren Ordnern: kleine, einmal erstellte Vorschaubilder, die 
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · **Deutsch** · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Version 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
+![Version 1.41.0](https://img.shields.io/badge/version-1.41.0-161214)
 ![Status: Betatest](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Lizenz: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plattformen: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -55,7 +55,7 @@ Fotosammlungen wachsen schneller, als man sie sortieren kann: Jahre an Aufnahmen
 ## Stärken
 
 - **Ihre Ordner, so wie sie sind.** Kein Import, keine geschlossene Bibliothek: Die Fotos bleiben, wo Sie sie abgelegt haben, und Ihre anderen Programme arbeiten weiter damit.
-- **Lokal und privat.** Kein Konto, keine Telemetrie, kein Netzwerk; Gesichts- und Tiererkennung laufen auf Ihrem Computer. Gelesen wird nur der gewählte Ordner mit seinen Unterordnern.
+- **Lokal und privat.** Kein Konto, keine Telemetrie; ins Internet geht die App nur, wenn Sie nach einer neuen Version suchen lassen. Gesichts- und Tiererkennung laufen auf Ihrem Computer. Gelesen wird nur der gewählte Ordner mit seinen Unterordnern.
 - **Schnell in jeder Größe.** Das Raster zeichnet nur, was sichtbar ist; Miniaturen sind klein, liegen in einer einzigen Cache-Datei und werden nur einmal erstellt. Große Sammlungen auf externen Laufwerken bleiben flüssig.
 - **Alle Formate, mit eigenen Decodern.** JPEG, HEIC/HEIF, TIFF, PSD/PSB, RAW aller großen Hersteller (CR3, CR2, NEF, ARW, RAF, DNG…) und Videos (MP4, MOV, MTS, AVI…).
 - **Sicher von Grund auf.** Jede Änderung an Dateien zeigt zuerst ihren Plan, verlangt einen eingetippten 3-stelligen Code und lässt sich rückgängig machen; Löschen geht immer in den Papierkorb.
@@ -102,7 +102,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | | |
 |---|---|
 | **Fotos** | Raster nach Monat oder Liste mit Ordner, Typ, Abmessungen, Größe, Datum und Details; Auswahl per Klick, Strg und Umschalt; Zoom; Filter nach Typ, Jahr, Markierung, Kategorie und Unterordnern, als Chips angezeigt, die sich mit einem Klick entfernen lassen. Links der Ordnerbaum (oder die Jahre), rechts das Infofeld — beide ausblendbar, oder alles im Fokusmodus (`\`). **Die Suche in der Titelleiste** (Strg+K oder Strg+F) durchsucht beim Tippen die ganze Sammlung — Fotos, Alben, Projekte, Personen, Orte, Fotografen, Kameras, Stichwörter, Ordner — und wenn Filter alles verbergen, sagt die Seite welche, mit einer Schaltfläche, um jeden zu entfernen. In einem Album, einer Person, einem Haustier, einem Ort oder Projekt: Mosaik, gleichmäßiges Raster, Liste oder Highlights. |
-| **Betrachter** | Sofort in voller Größe (zuerst das Vorschaubild), RAW-Dateien in voller Größe über das JPEG, das die Kamera darin gespeichert hat, ← → zum Blättern, `I` für Infos, Zoom auf Originalgröße; Videos laufen mit Steuerelementen. Der Zoomregler reicht von Bildschirmgröße bis 400 %; das Mausrad zoomt an der Zeigerposition, Ziehen verschiebt das Bild, `Z` wechselt zwischen angepasst und Originalgröße. *Bearbeiten* (oder `I`) zeigt oder klappt denselben Bearbeitungsbereich wie der Infobereich ein — Kategorie, Alben, Anpassungen, Beschreibung, Urheber und Ort; ein Foto, das in eine vom Filter ausgeblendete Kategorie wechselt, bleibt sichtbar, ausgegraut, mit einem Hinweis, wo es jetzt ist. Auch HEIC, HEIF und HIF öffnen in voller Größe; HDR-Fotos (PQ, HLG) werden für normale Bildschirme umgerechnet, im Betrachter und in den Vorschaubildern. Doppelklick zoomt auf 100 % an der Stelle und zurück. Entf schickt ein Foto mit einer einfachen Bestätigung in den Limbus. |
+| **Betrachter** | Sofort in voller Größe (zuerst das Vorschaubild), RAW-Dateien in voller Größe über das JPEG, das die Kamera darin gespeichert hat, ← → zum Blättern, `I` für Infos, Zoom auf Originalgröße; Videos laufen mit Steuerelementen. Der Zoomregler reicht von Bildschirmgröße bis 400 %; das Mausrad zoomt an der Zeigerposition, Ziehen verschiebt das Bild, `Z` wechselt zwischen angepasst und Originalgröße. *Bearbeiten* (oder `H`) zeigt oder klappt denselben Bearbeitungsbereich wie der Infobereich ein — Kategorie, Alben, Anpassungen, Beschreibung, Urheber und Ort; ein Foto, das in eine vom Filter ausgeblendete Kategorie wechselt, bleibt sichtbar, ausgegraut, mit einem Hinweis, wo es jetzt ist. Auch HEIC, HEIF und HIF öffnen in voller Größe; HDR-Fotos (PQ, HLG) werden für normale Bildschirme umgerechnet, im Betrachter und in den Vorschaubildern. Doppelklick zoomt auf 100 % an der Stelle und zurück. Entf schickt ein Foto mit einer einfachen Bestätigung in den Limbus. Der Bereich zeigt jeweils eine Aufgabe – Anpassen, Beschreiben, Info – und in einem Fenster ab 1680 px Beschreiben und Info links und Anpassen rechts; ziehen Sie den Rand eines Bereichs, um ihn zu verbreitern. |
 | **Anpassungen** | Belichtung, Kontrast, Tiefen und Sättigung im Infobereich, für ein Foto oder mehrere, mit Histogramm und sofortiger Vorschau (auf der Grafikkarte, sonst auf dem Prozessor); kopieren und bei anderen Fotos einfügen. Die Datei ändert sich nie: Die Anpassungen stehen im Katalog (Strg+Z macht sie rückgängig), Vorschaubilder und Betrachter zeigen sie (`\` halten für das Original), und *Bearbeitete Kopie speichern* schreibt ein neues JPEG neben das Original, mit seinen Metadaten. *Fotos exportieren* (Strg+E) erstellt neue Dateien der bearbeiteten Fotos in einem beliebigen Ordner — JPEG, PNG oder TIFF, in der Größe eines sozialen Netzwerks oder eines Abzugs, mit Ausgabeschärfe, Namen wie `2026-07-24-Abschluss-Ana-Souza-001.jpg`, mit allen Metadaten oder ohne Ort und einer optionalen Signatur — mit sRGB-Profil; die Originale ändern sich nie. |
 | **Bearbeitung** | Lichter, Weiß, Schwarz, Weißabgleich (Temperatur, Tönung und Pipette), Dynamik, Schwarzweiß mit Farbmischung, Vignette und – auf der Grafikkarte – Schärfe, Struktur und Klarheit; *Automatisch*, Vorgaben und Vorher/Nachher im Betrachter (`Y`). **Zuschneiden und begradigen** (`C`): frei oder in einem Seitenverhältnis – den üblichen und denen sozialer Netzwerke (Instagram 4:5 und 3:4, Stories/Reels/TikTok 9:16, YouTube 16:9, Link 1,91:1, Pinterest, X- und LinkedIn-Banner) –, 90°-Drehungen und Begradigen per Linie am Horizont. Alles bleibt im Katalog; die Datei ändert sich nie. |
 | **Objektivkorrektur** | Verzeichnung, dunkle Ecken und Farbsäume des Objektivs anhand seines Profils aufgehoben — die ganze [Lensfun](https://lensfun.github.io)-Datenbank, rund 1.600 Objektive, gefunden über den Namen, den die Kamera schrieb, oder aus einer durchsuchbaren Liste gewählt — und von Hand: Verzeichnung, vertikale und horizontale Perspektive (stürzende Linien), Skalierung, Ecken und Farbsäume. Auf der Grafikkarte; die Datei ändert sich nie. |
@@ -181,7 +181,9 @@ Doppelklick auf **`build-installer.bat`** (oder `npm run dist`). Die Installatio
 | `Alt+←` · `Alt+Pos1` | Zurück aus einem Album, Projekt oder einer Person · die ganze Sammlung, ohne Filter |
 | `Strg+B` · `\` | Seitenleiste ein/aus · Fokusmodus (nur die Fotos) |
 | `1` `2` `3` · `0` | Auswahl als sehr gut · OK · zum Löschen vorgemerkt markieren · Markierung entfernen |
-| `Strg+A` · `Eingabe` · `I` · `Entf` · `F2` · `Esc` | Alles auswählen · öffnen · Infobereich · Papierkorb · umbenennen · Auswahl aufheben |
+| `Strg+A` · `Eingabe` · `H` · `Entf` · `F2` · `Esc` | Alles auswählen · öffnen · Infobereich · Papierkorb · umbenennen · Auswahl aufheben |
+| `E` · `D` · `I` | Seitenbereich auf Anpassen · Beschreiben · Info (dieselbe Taste noch einmal blendet ihn aus) |
+| `V` · `?` | Nebeneinander vergleichen · Tastenkürzel |
 | `Strg+E` | Fotos exportieren (die Auswahl oder die angezeigten Fotos) |
 | `←` `→` · `Leertaste` · `Esc` | Betrachter: vorheriges/nächstes · abspielen/anhalten · schließen |
 | `P` · `F` · `A` | Betrachter: Diashow · Vollbild · zu Album hinzufügen |
@@ -200,7 +202,7 @@ Die Sprache folgt dem System und lässt sich in der Statusleiste ändern. Zahlen
 
 ## Datenschutz
 
-LionPhotos verbindet sich nie mit dem Netzwerk: kein Konto, keine Telemetrie, keine Update-Prüfung. Gesichts- und Tiererkennung laufen auf diesem Computer, mit Modellen, die in der App enthalten sind.
+LionPhotos geht nur ins Netz, wenn Sie es verlangen: Ein Klick auf die Version unten rechts sucht auf GitHub nach einer neuen Version, und beim Aktualisieren wird das Installationsprogramm für Ihr System heruntergeladen und vor der Verwendung geprüft (SHA-256). Kein Konto, keine Telemetrie, es wird nichts über Sie oder Ihre Fotos gesendet. Gesichts- und Tiererkennung laufen auf diesem Computer, mit Modellen, die in der App enthalten sind.
 
 Katalog und Vorschaubilder liegen in einer einzigen Datei auf Ihrem Computer:
 
@@ -262,7 +264,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\fotos-kopie"; npm run test:e2e
 
 ## Änderungsprotokoll
 
-Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.38.1**.
+Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.41.0**.
 
 ## Mitwirkende
 

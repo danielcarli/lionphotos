@@ -104,7 +104,12 @@ export class AlbumsView extends ViewPane {
     const range = (a) => { const l = items.get(a.id) || []; return l.length ? { from: dateOf(l[0]), to: dateOf(l[l.length - 1]) } : null; };
     // the mosaic (grid), the even grid (every cover the same size), the list, the highlights
     const mode = modeOf('album', ['showcase', 'even']);
-    if (mode === 'grid' || mode === 'even') {
+    let fallback = false; // the highlights with nothing picked yet: drawn as the mosaic
+    const mosaic = (m) => renderGroups({
+      mode: m, groups: byYear(albums, range, (a) => a.name), grid: 'alb-grid',
+      card: (a) => this.#card(a, items.get(a.id) || []), row: (a) => this.#row(a, items.get(a.id) || [], range(a)),
+    });
+    if (mode !== 'list') {
       this.faceUrls = this.#faces();
       this.whoKinds = new Map(labels.labels.filter((l) => l.type === 'person' || l.type === 'pet').map((l) => [l.id, l]));
     }
@@ -124,15 +129,16 @@ export class AlbumsView extends ViewPane {
           h('span', { html: icon('external', 14) }), t('plugins.export.button')),
         h('span.toolbar-spacer'), modeToggle(mode, (m) => { setMode('album', m); this.render(); }, [showcaseMode()], { grid: ['mosaic', t('albums.modeMosaic')], beside: [['even', 'grid', t('albums.modeEven')]] })),
       mode === 'showcase' && albums.length
-        ? renderShowcase(this.services, { type: 'album', labels: albums, picks: labels.picks('album'), counts: new Map([...items].map(([id, l]) => [id, { count: l.length }])), eyebrow: albumEyebrow(labels), emptyIcon: 'album' })
-        : albums.length
-        ? renderGroups({
-          mode, groups: byYear(albums, range, (a) => a.name), grid: 'alb-grid',
-          card: (a) => this.#card(a, items.get(a.id) || []), row: (a) => this.#row(a, items.get(a.id) || [], range(a)),
+        ? renderShowcase(this.services, {
+          type: 'album', labels: albums, picks: labels.picks('album'), counts: new Map([...items].map(([id, l]) => [id, { count: l.length }])), eyebrow: albumEyebrow(labels), emptyIcon: 'album', onAll: () => { setMode('album', 'grid'); this.render(); },
+          // no photo with a star or OK yet: the albums are there all the same (they looked missing), as the mosaic
+          empty: () => { fallback = true; return h('div.alb-nopicks', h('p.muted.small.alb-nopicks-note', h('span', { html: icon('star', 13) }), t('showcase.albumsNoPicks')), mosaic('grid')); },
         })
+        : albums.length
+        ? mosaic(mode)
         : h('div.empty-state', h('span', { html: icon('album', 30) }), h('h3', t('albums.empty')), h('p.muted', t('albums.howTo'))));
     this.element.classList.toggle('is-even', mode === 'even');
-    if (mode === 'grid' || mode === 'even') requestAnimationFrame(() => this.#fit());
+    if (mode === 'grid' || mode === 'even' || fallback) requestAnimationFrame(() => this.#fit());
   }
 
   /**

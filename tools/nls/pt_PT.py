@@ -494,3 +494,7 @@ _merge(MESSAGES, {'plugins': {'which': {'label': 'Fotos a exportar', 'all': 'Tod
 _merge(MESSAGES, {'plugins': {'same': {'title': {'one': 'Uma foto com o mesmo nome de outra', 'other': '{count} fotos com o mesmo nome de outra'}, 'text': 'Na página seriam duas fotos com um só nome. Escolha qual vai de cada uma; a outra fica fora desta exportação.', 'raw': 'RAW: vai convertida para JPG', 'continue': 'Continuar'}}})
 
 _merge(MESSAGES, {'places': {'sphereEmpty': '“{sphere}” não tem ficheiros com lugares registados.', 'sphereTable': 'Lugares em cada categoria', 'sphereFiles': {'one': '{count} ficheiro com lugar', 'other': '{count} ficheiros com lugar'}, 'spherePlaces': {'one': '{count} lugar', 'other': '{count} lugares'}, 'sphereShow': 'Ver', 'sphereHere': 'aberta agora'}})
+
+_merge(MESSAGES, {'sidebar': {'otherFolders': 'Outras pastas abertas antes'}, 'showcase': {'albumsNoPicks': 'Ainda não há fotos com estrela ou OK nestes álbuns, por isso não há destaques: os álbuns aparecem como no mosaico. Marque as melhores fotos (1 ou 2) para as ver aqui.'}})
+
+_merge(MESSAGES, {'showcase': {'modeTitle': 'Destaques: só os que têm fotos com estrela ou OK', 'only': 'Destaques mostra só os que têm fotos marcadas com estrela ou OK: {shown} de {total}, os mais recentes primeiro.', 'all': 'Ver todos', 'albumsNoPicks': 'Ainda não há fotos com estrela ou OK nestes álbuns. Destaques mostra só os álbuns com fotos marcadas com estrela ou OK; por agora aparecem como no mosaico. Marque as melhores fotos (1 ou 2) para as ver aqui.'}})

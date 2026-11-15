@@ -21,14 +21,16 @@ import { focusImage } from '../../services/thumbs/browser/thumbFocus.js';
 import { sharpenCover } from '../albums/albumCovers.js';
 
 /** The mode for modeToggle: [mode, icon, label]. */
-export const showcaseMode = () => ['showcase', 'showcase', t('showcase.mode')];
+// its name on the button says what it leaves out: only what has photos with a star or OK is shown
+export const showcaseMode = () => ['showcase', 'showcase', t('showcase.modeTitle')];
 
 /**
  * @param {object} services
  * @param {{ type: string, labels: object[], picks: Map<number, object[]>, counts: Map<number, {count:number}>,
- *           eyebrow?: (l) => string, emptyIcon: string }} o
+ *           eyebrow?: (l) => string, emptyIcon: string, empty?: () => Node, onAll?: () => void }} o
+ *           empty: what to show when nothing was picked yet · onAll: show every one (the mosaic), not only the highlights
  */
-export function renderShowcase(services, { type, labels, picks, counts, eyebrow = () => '', emptyIcon }) {
+export function renderShowcase(services, { type, labels, picks, counts, eyebrow = () => '', emptyIcon, empty = null, onAll = null }) {
   const { library, layout, thumbs } = services;
   const rows = labels
     .filter((l) => picks.get(l.id)?.length)
@@ -52,6 +54,7 @@ export function renderShowcase(services, { type, labels, picks, counts, eyebrow 
   }
   groups.sort((a, b) => b.last - a.last || a[0].l.name.localeCompare(b[0].l.name));
   if (!rows.length) {
+    if (empty) return empty();
     return h('div.empty-state.sc-empty', h('span', { html: icon(emptyIcon, 28) }), h('h3', t('showcase.empty')), h('p.muted', t('showcase.howTo')));
   }
 
@@ -124,7 +127,10 @@ export function renderShowcase(services, { type, labels, picks, counts, eyebrow 
   };
 
   return h('div.sc', { 'data-count': String(rows.length) },
-    h('p.small.muted.sc-lead', tn('showcase.lead', rows.length)),
+    // said plainly: this view leaves out what has no photo with a star or OK — how many of how many are here
+    h('p.sc-lead', h('span.sc-lead-icon', { html: icon('star', 14) }),
+      h('span', t('showcase.only', { shown: formatNumber(rows.length), total: formatNumber(labels.length) })),
+      onAll && rows.length < labels.length ? h('button.link-button.sc-all', { type: 'button', onclick: onAll }, t('showcase.all')) : null),
     groups.map(row));
 }
 

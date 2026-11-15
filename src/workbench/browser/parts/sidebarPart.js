@@ -124,9 +124,11 @@ export class SidebarPart {
       }))) : null, this.hideBtn);
   }
 
-  #collectionMenu(button) {
+  async #collectionMenu(button) {
     const { library } = this;
     const r = button.getBoundingClientRect();
+    // the other folders opened before on this computer: each one a collection of its own, a click away
+    const others = (await this.host.library.roots().catch(() => [])).filter((x) => x.path !== library.root).slice(0, 8);
     const { depth, unlimited } = library.settings;
     const busy = library.busy;
     const levels = [{ label: t('sidebar.unlimited'), checked: unlimited, run: () => library.setSetting('unlimited', true) }, '-',
@@ -140,6 +142,8 @@ export class SidebarPart {
       { label: library.filter.folder ? t('sidebar.refreshFolder') : t('sidebar.refresh'), icon: 'refresh', hint: 'F5', disabled: busy, run: () => library.refresh() },
       { label: t('sidebar.changeFolder'), icon: 'folderOpen', hint: 'Ctrl+O', disabled: busy, run: () => this.actions.openFolder() },
       { label: t('sidebar.depthLabel'), icon: 'layers', disabled: busy, submenu: levels },
+      ...(others.length ? ['-', { label: t('sidebar.otherFolders'), disabled: true },
+        ...others.map((x) => ({ label: x.path, icon: 'folder', hint: formatNumber(x.count), disabled: busy, run: () => library.open(x.path) }))] : []),
       '-',
       { label: t('common.showIn', { explorer: this.actions.explorerName }), icon: 'reveal', run: () => this.actions.revealFolder('') },
     ]);

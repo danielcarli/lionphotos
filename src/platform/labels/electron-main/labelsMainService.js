@@ -36,6 +36,49 @@ function projectInfo(info, labels) {
   return JSON.stringify(out);
 }
 
+/**
+ * The labels of the collection that is open, with their links in it. A computer's catalog holds every
+ * collection opened on it (each folder, each drive); a collection shows only what is its own:
+ *   - the labels linked to its files or folders, or with a face in its photos;
+ *   - the labels with no link anywhere yet (an album just made), made in it — or before this was recorded;
+ *   - a project, when one of its albums is in it;
+ *   - the categories (personal, professional), and what those kept point to: an album's project, the place
+ *     and the team of a project.
+ * The albums, people and places of another folder stay in the catalog and come back with that folder.
+ * @param {object[]} labels every label @param {{labelId:number, kind:string, path:string}[]} allLinks @param {string|null} root
+ */
+function labelsOfCollection(labels, allLinks, root) {
+  if (!root) return { labels, links: allLinks };
+  const sep = path.sep;
+  const links = allLinks.filter((a) => a.path === root || a.path.startsWith(root + sep) || (a.kind === 'folder' && (root + sep).startsWith(a.path + sep)));
+  const here = new Set(links.map((a) => a.labelId));
+  const anywhere = new Set(allLinks.map((a) => a.labelId));
+  const byId = new Map(labels.map((l) => [l.id, l]));
+  const keep = new Set();
+  // a project has no links of its own: it is where its albums are; a place or a person only named in a
+  // project's sheet goes where that project goes
+  const kids = new Map();
+  const named = new Set();
+  for (const l of labels) {
+    if (l.parentId) { if (!kids.has(l.parentId)) kids.set(l.parentId, []); kids.get(l.parentId).push(l.id); }
+    if (l.info) { try { const sheet = JSON.parse(l.info) || {}; if (sheet.placeId) named.add(Number(sheet.placeId)); for (const id of sheet.team || []) named.add(Number(id)); } catch { /* not a sheet */ } }
+  }
+  const used = (set, l) => set.has(l.id) || (kids.get(l.id) || []).some((id) => set.has(id));
+  for (const l of labels) {
+    if (l.type === 'sphere' || used(here, l)) keep.add(l.id);
+    // nothing linked anywhere yet (an album just made): in the collection it was made in
+    else if (!used(anywhere, l) && !named.has(l.id) && (!l.root || l.root === root)) keep.add(l.id);
+  }
+  const pending = [...keep];
+  const add = (id) => { const n = Number(id); if (n && byId.has(n) && !keep.has(n)) { keep.add(n); pending.push(n); } };
+  while (pending.length) {
+    const l = byId.get(pending.pop());
+    if (l.parentId) add(l.parentId);
+    if (l.info) { try { const sheet = JSON.parse(l.info) || {}; add(sheet.placeId); for (const id of sheet.team || []) add(id); } catch { /* not a sheet */ } }
+  }
+  return { labels: labels.filter((l) => keep.has(l.id)), links };
+}
+
 class LabelsMainService {
   constructor(library) {
     this.library = library;
@@ -80,7 +123,7 @@ class LabelsMainService {
 
   state() {
     this.#ensureSpheres();
-    return { labels: this.db.labels(), links: this.db.labelLinks(this.library.currentRoot) };
+    return labelsOfCollection(this.db.labels(), this.db.labelLinks(null), this.library.currentRoot);
   }
 
   #ensureSpheres() {
@@ -102,7 +145,7 @@ class LabelsMainService {
     // an album can belong to a project (a project groups albums); nothing else has a parent any more
     const parent = parentId ? all.find((l) => l.id === Number(parentId)) : null;
     const parentOk = kind === 'album' && parent?.type === 'project' ? parent.id : null;
-    const newId = this.db.saveLabel({ id: id ? Number(id) : null, type, name: n, parentId: parentOk, notes: cleanText(notes, 2000) || null,
+    const newId = this.db.saveLabel({ id: id ? Number(id) : null, type, name: n, parentId: parentOk, notes: cleanText(notes, 2000) || null, root: this.library.currentRoot || null,
       info: kind === 'project' && info !== undefined ? projectInfo(info, all) : undefined });
     return { ...this.state(), id: newId };
   }
@@ -140,4 +183,4 @@ class LabelsMainService {
   }
 }
 
-module.exports = { LabelsMainService, TYPES };
+module.exports = { labelsOfCollection, LabelsMainService, TYPES };

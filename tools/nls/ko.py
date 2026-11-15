@@ -491,3 +491,7 @@ _merge(MESSAGES, {'plugins': {'which': {'label': '내보낼 사진', 'all': '전
 _merge(MESSAGES, {'plugins': {'same': {'title': {'one': '이름이 같은 사진 {count}쌍', 'other': '이름이 같은 사진 {count}쌍'}, 'text': '페이지에서는 한 이름에 사진이 두 장이 됩니다. 각각 어느 것을 내보낼지 선택하세요. 다른 하나는 이번 내보내기에서 빠집니다.', 'raw': 'RAW: JPG로 변환하여 내보냄', 'continue': '계속'}}})
 
 _merge(MESSAGES, {'places': {'sphereEmpty': '“{sphere}”에는 장소가 있는 파일이 없습니다.', 'sphereTable': '각 범주의 장소', 'sphereFiles': {'one': '장소가 있는 파일 {count}개', 'other': '장소가 있는 파일 {count}개'}, 'spherePlaces': {'one': '장소 {count}개', 'other': '장소 {count}개'}, 'sphereShow': '보기', 'sphereHere': '현재 열림'}})
+
+_merge(MESSAGES, {'sidebar': {'otherFolders': '이전에 연 다른 폴더'}, 'showcase': {'albumsNoPicks': '이 앨범들에는 아직 별표나 OK가 붙은 사진이 없어 하이라이트가 없습니다. 앨범은 모자이크처럼 표시됩니다. 좋은 사진에 표시(1 또는 2)를 하면 여기에 나타납니다.'}})
+
+_merge(MESSAGES, {'showcase': {'modeTitle': '하이라이트: 별표나 OK가 붙은 사진이 있는 것만', 'only': '하이라이트에는 별표나 OK가 붙은 사진이 있는 것만 표시됩니다: {total}개 중 {shown}개, 최근 순.', 'all': '모두 보기', 'albumsNoPicks': '이 앨범들에는 아직 별표나 OK가 붙은 사진이 없습니다. 하이라이트에는 별표나 OK가 붙은 사진이 있는 앨범만 표시되므로, 지금은 모자이크처럼 표시합니다. 좋은 사진에 표시(1 또는 2)를 하면 여기에 나타납니다.'}})

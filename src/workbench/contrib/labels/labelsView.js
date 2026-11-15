@@ -65,7 +65,7 @@ export class LabelsView extends ViewPane {
       type === 'place' && modeOf(type, EXTRA.place) === 'map' ? this.#mapView(stats) : null,
       // places: their highlights, the places from the photos and the ones made by hand together
       type === 'place' && modeOf(type, EXTRA.place) === 'showcase'
-        ? renderShowcase(this.services, { type, labels: [...labels.autoPlaces(), ...shown], picks: labels.picks('place'), counts: stats, eyebrow: (l) => (l.auto ? [l.auto === 'city' ? l.state : '', l.country].filter(Boolean).join(', ') : ''), emptyIcon: this.spec.icon })
+        ? renderShowcase(this.services, { type, labels: [...labels.autoPlaces(), ...shown], picks: labels.picks('place'), counts: stats, eyebrow: (l) => (l.auto ? [l.auto === 'city' ? l.state : '', l.country].filter(Boolean).join(', ') : ''), emptyIcon: this.spec.icon, onAll: () => { setMode(type, 'grid'); this.render(); } })
         : null,
       // projects: by where they stand
       type === 'project' && list.length ? h('div.segmented.pp-filter', { role: 'radiogroup', 'aria-label': t('projects.status') },
@@ -79,7 +79,7 @@ export class LabelsView extends ViewPane {
       type === 'place' && ['grid', 'list'].includes(modeOf(type, EXTRA.place)) ? this.#autoPlaces(stats) : null,
       type === 'place' && !['grid', 'list'].includes(modeOf(type, EXTRA.place)) ? null : type === 'place' && shown.length && labels.autoPlaces().length ? h('h2.place-section', t('places.yours')) : null,
       type === 'project' && modeOf(type, SHOW) === 'showcase' && shown.length
-        ? renderShowcase(this.services, { type, labels: shown, picks: labels.picks('project'), counts: stats, eyebrow: projectEyebrow(labels), emptyIcon: this.spec.icon })
+        ? renderShowcase(this.services, { type, labels: shown, picks: labels.picks('project'), counts: stats, eyebrow: projectEyebrow(labels), emptyIcon: this.spec.icon, onAll: () => { setMode(type, 'grid'); this.render(); } })
         : type === 'place' && !['grid', 'list'].includes(modeOf(type, EXTRA.place)) ? null : shown.length
         ? renderGroups({
           mode: modeOf(type), groups: byYear(shown, (l) => stats.get(l.id), type === 'project' ? (l) => l.name : null),

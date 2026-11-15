@@ -2,6 +2,18 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.46.1] — 2026-11-15
+
+### Changed
+- **Highlights says what it leaves out.** In Albums, People, Pets, Places and Projects, the *Highlights* view shows only what has photos marked with a star or OK: its button says so, and a line at its top says how many of how many are shown, with *Show all* to go to the full view.
+
+## [1.46.0] — 2026-11-15
+
+### Changed
+- **Each folder is a collection of its own.** With another folder open (another drive, an external disk), the albums, projects, people, pets and places of the folders opened before are no longer listed — they were shown as "No photos yet". They stay in this computer's catalog and come back when that folder is opened again. A collection shows the labels linked to its files, the people with a face in its photos, the albums just made in it, and the project of its albums.
+- **The other folders, a click away:** the collection's menu (the folder's name, at the top of the side bar) lists the other folders opened before, with how many files each has; a click opens that one.
+- **Albums, highlights with nothing picked yet:** the albums are shown as in the mosaic, under a line saying no photo has a star or OK yet. The page said "Nothing picked yet" and the albums looked missing.
+
 ## [1.45.3] — 2026-11-15
 
 ### Changed

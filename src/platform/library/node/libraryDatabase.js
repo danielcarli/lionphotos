@@ -252,6 +252,8 @@ class LibraryDatabase {
     if (!this.db.prepare('PRAGMA table_info(labels)').all().some((c) => c.name === 'uid')) {
       this.db.exec("ALTER TABLE labels ADD COLUMN uid TEXT; UPDATE labels SET uid = CASE WHEN type = 'sphere' THEN 'sphere:' || name ELSE lower(hex(randomblob(8))) END;");
     }
+    // the collection a label was made in (its folder): an empty album belongs to it, not to every collection
+    if (!this.db.prepare('PRAGMA table_info(labels)').all().some((c) => c.name === 'root')) this.db.exec('ALTER TABLE labels ADD COLUMN root TEXT');
     const dirty = (key) => `INSERT INTO meta(key, value) VALUES ('${key}', CAST(strftime('%s', 'now') AS INTEGER) * 1000) ON CONFLICT(key) DO UPDATE SET value = excluded.value;`;
     this.db.exec(`
       CREATE UNIQUE INDEX IF NOT EXISTS labels_uid ON labels(uid);
@@ -872,21 +874,21 @@ class LibraryDatabase {
 
   // ------------------------------------------------------------------ labels (clients, projects, people, pets, places, albums)
   labels() {
-    return this.db.prepare('SELECT id, type, name, parent_id AS parentId, notes, created_at AS createdAt, cover, info FROM labels ORDER BY name COLLATE NOCASE').all();
+    return this.db.prepare('SELECT id, type, name, parent_id AS parentId, notes, created_at AS createdAt, cover, info, root FROM labels ORDER BY name COLLATE NOCASE').all();
   }
 
   /** An album's cover: a file's absolute path, or null for "the first photo". */
   setLabelCover(id, file) { this.db.prepare('UPDATE labels SET cover = ? WHERE id = ?').run(file ?? null, id); }
 
   /** info: a project's sheet (JSON: status, for whom, place, team), undefined to leave it as it is. */
-  saveLabel({ id, type, name, parentId, notes, info }) {
+  saveLabel({ id, type, name, parentId, notes, info, root = null }) {
     if (id) {
       this.db.prepare('UPDATE labels SET name = ?, parent_id = ?, notes = ? WHERE id = ?').run(name, parentId ?? null, notes ?? null, id);
       if (info !== undefined) this.db.prepare('UPDATE labels SET info = ? WHERE id = ?').run(info, id);
       return id;
     }
-    return this.db.prepare('INSERT INTO labels(type, name, parent_id, notes, created_at, info) VALUES (?, ?, ?, ?, ?, ?) RETURNING id')
-      .get(type, name, parentId ?? null, notes ?? null, Date.now(), info ?? null).id;
+    return this.db.prepare('INSERT INTO labels(type, name, parent_id, notes, created_at, info, root) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id')
+      .get(type, name, parentId ?? null, notes ?? null, Date.now(), info ?? null, root ?? null).id;
   }
 
   deleteLabel(id) {

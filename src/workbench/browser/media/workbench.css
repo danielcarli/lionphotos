@@ -2299,6 +2299,8 @@ input.desc-input { min-height: 32px; resize: none; }
 .plg-card-acts .link-button { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
 .plg-card-acts .link-button:hover { color: var(--accent); }
 .plg-which { display: inline-flex; align-items: center; gap: 8px; }
+/* the highlights of the albums with nothing picked yet: a line saying so, then the albums as the mosaic */
+.alb-nopicks-note { display: flex; align-items: center; gap: 6px; margin: 0 0 14px; }
 /* two photos with the same name: which one goes */
 .sn-dialog { width: min(760px, 94vw); max-height: 88vh; display: flex; flex-direction: column; }
 .sn-groups { overflow: auto; min-height: 0; display: grid; gap: 14px; margin: 6px 0 14px; }
@@ -2995,7 +2997,9 @@ code.reorg-dest { overflow: hidden; text-overflow: ellipsis; white-space: nowrap
 /* Highlights (Albums, People, Pets, Projects): only the photos marked great or OK, one row each — what it is
    on the left, one chosen photo large on the right, as a portfolio page */
 .sc { margin-top: 6px; border-bottom: 1px solid var(--border); }
-.sc-lead { margin: 0 0 14px; }
+.sc-lead { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 0 14px; padding: 8px 12px; border: 1px solid var(--border); background: var(--bg-elevated); font-size: 13px; }
+.sc-lead-icon { display: grid; color: var(--accent); }
+.sc-all { margin-left: auto; }
 .sc-row { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(0, 2.1fr); gap: 28px; padding: 22px 0; border-top: 1px solid var(--border); }
 .sc-text { display: flex; flex-direction: column; min-width: 0; }
 .sc-text > .sc-open { margin-top: auto; }

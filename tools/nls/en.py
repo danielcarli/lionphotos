@@ -494,3 +494,7 @@ _merge(MESSAGES, {'plugins': {'which': {'label': 'Photos to export', 'all': 'All
 _merge(MESSAGES, {'plugins': {'same': {'title': {'one': 'A photo with the same name as another', 'other': '{count} photos with the same name as another'}, 'text': 'On the page they would be two photos under one name. Choose which one goes of each; the other stays out of this export.', 'raw': 'RAW: goes as a JPEG', 'continue': 'Continue'}}})
 
 _merge(MESSAGES, {'places': {'sphereEmpty': '“{sphere}” has no files with places.', 'sphereTable': 'Places in each category', 'sphereFiles': {'one': '{count} file with a place', 'other': '{count} files with a place'}, 'spherePlaces': {'one': '{count} place', 'other': '{count} places'}, 'sphereShow': 'Show', 'sphereHere': 'open now'}})
+
+_merge(MESSAGES, {'sidebar': {'otherFolders': 'Other folders opened before'}, 'showcase': {'albumsNoPicks': 'No photo with a star or OK in these albums yet, so there are no highlights: the albums are shown as in the mosaic. Mark the best photos (1 or 2) to see them here.'}})
+
+_merge(MESSAGES, {'showcase': {'modeTitle': 'Highlights: only those with photos marked with a star or OK', 'only': 'Highlights shows only those with photos marked with a star or OK: {shown} of {total}, the most recent first.', 'all': 'Show all', 'albumsNoPicks': 'No photo with a star or OK in these albums yet. Highlights shows only albums with photos marked with a star or OK, so for now they are shown as in the mosaic. Mark the best photos (1 or 2) to see them here.'}})

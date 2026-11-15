@@ -491,3 +491,7 @@ _merge(MESSAGES, {'plugins': {'which': {'label': '要导出的照片', 'all': '�
 _merge(MESSAGES, {'plugins': {'same': {'title': {'one': '{count} 组同名照片', 'other': '{count} 组同名照片'}, 'text': '在页面上它们会是同一个名称下的两张照片。请为每组选择要导出的那一张；另一张不参与本次导出。', 'raw': 'RAW：转换为 JPG 导出', 'continue': '继续'}}})
 
 _merge(MESSAGES, {'places': {'sphereEmpty': '“{sphere}”中没有带地点的文件。', 'sphereTable': '各类别中的地点', 'sphereFiles': {'one': '{count} 个带地点的文件', 'other': '{count} 个带地点的文件'}, 'spherePlaces': {'one': '{count} 个地点', 'other': '{count} 个地点'}, 'sphereShow': '查看', 'sphereHere': '当前打开'}})
+
+_merge(MESSAGES, {'sidebar': {'otherFolders': '之前打开过的其他文件夹'}, 'showcase': {'albumsNoPicks': '这些相册中还没有带星标或 OK 的照片，所以没有精选：相册按马赛克方式显示。给最好的照片做标记（1 或 2），即可在这里看到。'}})
+
+_merge(MESSAGES, {'showcase': {'modeTitle': '精选：只显示有星标或 OK 照片的项目', 'only': '精选只显示有星标或 OK 照片的项目：{total} 个中的 {shown} 个，最新的在前。', 'all': '显示全部', 'albumsNoPicks': '这些相册中还没有带星标或 OK 的照片。精选只显示有星标或 OK 照片的相册，所以目前按马赛克方式显示。给最好的照片做标记（1 或 2），即可在这里看到。'}})

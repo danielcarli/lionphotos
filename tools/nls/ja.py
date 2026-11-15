@@ -491,3 +491,7 @@ _merge(MESSAGES, {'plugins': {'which': {'label': '書き出す写真', 'all': '�
 _merge(MESSAGES, {'plugins': {'same': {'title': {'one': '同じ名前の写真が {count} 組あります', 'other': '同じ名前の写真が {count} 組あります'}, 'text': 'ページでは 1 つの名前で 2 枚の写真になります。それぞれどちらを書き出すか選んでください。もう一方は今回の書き出しから外れます。', 'raw': 'RAW: JPG に変換して書き出し', 'continue': '続ける'}}})
 
 _merge(MESSAGES, {'places': {'sphereEmpty': '「{sphere}」には場所のあるファイルがありません。', 'sphereTable': '各カテゴリの場所', 'sphereFiles': {'one': '場所のあるファイル {count} 件', 'other': '場所のあるファイル {count} 件'}, 'spherePlaces': {'one': '場所 {count} 件', 'other': '場所 {count} 件'}, 'sphereShow': '表示', 'sphereHere': '表示中'}})
+
+_merge(MESSAGES, {'sidebar': {'otherFolders': '以前に開いた他のフォルダー'}, 'showcase': {'albumsNoPicks': 'これらのアルバムには、まだスターや OK の付いた写真がないため、ハイライトはありません。アルバムはモザイクと同じように表示されます。良い写真に印（1 または 2）を付けると、ここに表示されます。'}})
+
+_merge(MESSAGES, {'showcase': {'modeTitle': 'ハイライト: スターまたは OK の付いた写真があるものだけ', 'only': 'ハイライトには、スターまたは OK の付いた写真があるものだけが表示されます: {total} 件中 {shown} 件、新しい順。', 'all': 'すべて表示', 'albumsNoPicks': 'これらのアルバムには、まだスターや OK の付いた写真がありません。ハイライトには、スターまたは OK の付いた写真があるアルバムだけが表示されるため、今はモザイクと同じように表示しています。良い写真に印（1 または 2）を付けると、ここに表示されます。'}})

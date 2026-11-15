@@ -153,7 +153,7 @@ export class PeopleView extends ViewPane {
         h('span.toolbar-spacer'), modeToggle(modeOf(this.type, ['showcase']), (m) => { setMode(this.type, m); this.render(); }, [showcaseMode()])),
       toCheck ? h('p.faces-tocheck', h('span', { html: icon('face', 14) }), tn(`${this.k}.toCheck`, toCheck)) : null,
       people.length && modeOf(this.type, ['showcase']) === 'showcase'
-        ? renderShowcase(this.services, { type: this.type, labels: people, picks: labels.picks(this.type), counts: stats, emptyIcon: this.icon })
+        ? renderShowcase(this.services, { type: this.type, labels: people, picks: labels.picks(this.type), counts: stats, emptyIcon: this.icon, onAll: () => { setMode(this.type, 'grid'); this.render(); } })
         : people.length
         ? renderGroups({
           mode: modeOf(this.type), groups: byYear(people, (l) => stats.get(l.id)), 

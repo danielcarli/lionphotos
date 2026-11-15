@@ -178,6 +178,7 @@
   "albums.searchNone": "No album by that name — a new one can be made below.",
   "albums.modeMosaic": "Mosaic",
   "albums.modeEven": "Even grid",
+  "albums.setAsCover": "Set as album cover",
   "slideshow.button": "Slideshow",
   "slideshow.start": "Start the slideshow ({key})",
   "slideshow.startTitle": "Show the photos one after another, full screen (P in the viewer)",

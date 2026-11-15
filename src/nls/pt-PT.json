@@ -178,6 +178,7 @@
   "albums.searchNone": "Nenhum álbum com esse nome — pode criar um novo logo abaixo.",
   "albums.modeMosaic": "Mosaico",
   "albums.modeEven": "Grelha uniforme",
+  "albums.setAsCover": "Definir como capa do álbum",
   "slideshow.button": "Apresentação",
   "slideshow.start": "Iniciar a apresentação ({key})",
   "slideshow.startTitle": "Mostra as fotos umas a seguir às outras, em ecrã inteiro (P no visualizador)",

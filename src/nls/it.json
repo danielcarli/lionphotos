@@ -178,6 +178,7 @@
   "albums.searchNone": "Nessun album con questo nome: puoi crearne uno nuovo qui sotto.",
   "albums.modeMosaic": "Mosaico",
   "albums.modeEven": "Griglia uniforme",
+  "albums.setAsCover": "Imposta come copertina dell’album",
   "slideshow.button": "Presentazione",
   "slideshow.start": "Avvia la presentazione ({key})",
   "slideshow.startTitle": "Mostra le foto una dopo l’altra, a schermo intero (P nel visualizzatore)",

@@ -178,6 +178,7 @@
   "albums.searchNone": "没有这个名称的相册，可以在下方新建。",
   "albums.modeMosaic": "拼贴",
   "albums.modeEven": "均匀网格",
+  "albums.setAsCover": "设为相册封面",
   "slideshow.button": "幻灯片",
   "slideshow.start": "开始幻灯片（{key}）",
   "slideshow.startTitle": "全屏逐张显示照片（在查看器中按 P）",

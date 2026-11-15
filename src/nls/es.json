@@ -178,6 +178,7 @@
   "albums.searchNone": "Ningún álbum con ese nombre: se puede crear uno nuevo abajo.",
   "albums.modeMosaic": "Mosaico",
   "albums.modeEven": "Cuadrícula uniforme",
+  "albums.setAsCover": "Usar como portada del álbum",
   "slideshow.button": "Presentación",
   "slideshow.start": "Iniciar la presentación ({key})",
   "slideshow.startTitle": "Muestra las fotos una tras otra, a pantalla completa (P en el visor)",

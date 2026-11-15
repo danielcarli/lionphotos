@@ -178,6 +178,7 @@
   "albums.searchNone": "Kein Album mit diesem Namen – unten lässt sich ein neues anlegen.",
   "albums.modeMosaic": "Mosaik",
   "albums.modeEven": "Gleichmäßiges Raster",
+  "albums.setAsCover": "Als Albumcover festlegen",
   "slideshow.button": "Diashow",
   "slideshow.start": "Diashow starten ({key})",
   "slideshow.startTitle": "Zeigt die Fotos nacheinander im Vollbild (P im Betrachter)",

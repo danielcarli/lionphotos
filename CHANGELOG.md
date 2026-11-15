@@ -2,6 +2,11 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.42.0] — 2026-11-15
+
+### Added
+- **Set as album cover, from inside the album:** a right click on a photo of the album has *Set as album cover* (the same in the *More* menu); the photo that is the cover says *Album cover*. Only the catalog changes.
+
 ## [1.41.3] — 2026-11-15
 
 ### Fixed

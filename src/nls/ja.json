@@ -178,6 +178,7 @@
   "albums.searchNone": "その名前のアルバムはありません。下で新しく作成できます。",
   "albums.modeMosaic": "モザイク",
   "albums.modeEven": "均等グリッド",
+  "albums.setAsCover": "アルバムの表紙にする",
   "slideshow.button": "スライドショー",
   "slideshow.start": "スライドショーを開始（{key}）",
   "slideshow.startTitle": "写真を 1 枚ずつ全画面で表示します（ビューアーでは P）",

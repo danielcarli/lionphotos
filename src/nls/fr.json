@@ -178,6 +178,7 @@
   "albums.searchNone": "Aucun album de ce nom — vous pouvez en créer un ci-dessous.",
   "albums.modeMosaic": "Mosaïque",
   "albums.modeEven": "Grille régulière",
+  "albums.setAsCover": "Définir comme couverture de l’album",
   "slideshow.button": "Diaporama",
   "slideshow.start": "Lancer le diaporama ({key})",
   "slideshow.startTitle": "Affiche les photos l’une après l’autre, en plein écran (P dans la visionneuse)",

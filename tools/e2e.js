@@ -1425,6 +1425,22 @@ app.whenReady().then(async () => {
     await js(`${S}.labels.setCover(${albumId}, ${pics[0]}).then(() => true)`);
     const alb = await js(`(() => { try { const its = ${S}.labels.albumItems().get(${albumId}) || []; return { n: its.length, cover: ${S}.labels.coverOf(${S}.labels.get(${albumId}), its)?.id, cards: (${S}.layout.openView('album'), document.querySelectorAll('.view-albums .alb-card').length) }; } catch (e) { return { err: String(e.stack) }; } })()`);
     check(alb.n === 2 && alb.cover === pics[0] && alb.cards === 1, 'an album holds photos from different folders, with the chosen cover', JSON.stringify(alb));
+    // inside the album, a right click on a photo: "Set as album cover" (the one that is the cover says so)
+    const ctxCover = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      lib.openLabel(${albumId}, 'album'); s.layout.openView('photos'); await wait(700);
+      const menu = async (id) => { document.querySelectorAll('.ctx-menu').forEach((m) => m.remove()); lib.clearSelection();
+        document.querySelector('.photos-main .tile[data-id="' + id + '"]')?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 300, clientY: 300 })); await wait(500);
+        return [...document.querySelectorAll('.ctx-item')]; };
+      const label = (b) => b.querySelector('.ctx-label')?.textContent;
+      const res = {};
+      const isCover = (await menu(${pics[0]})).find((b) => label(b) === 'Album cover'); res.marked = !!isCover && isCover.disabled;
+      const set = (await menu(${pics[1]})).find((b) => label(b) === 'Set as album cover'); res.offered = !!set;
+      set?.click(); await wait(600);
+      const its = s.labels.albumItems().get(${albumId}) || []; res.cover = s.labels.coverOf(s.labels.get(${albumId}), its)?.id === ${pics[1]};
+      document.querySelectorAll('.ctx-menu').forEach((m) => m.remove());
+      await s.labels.setCover(${albumId}, ${pics[0]}); lib.goHome(); lib.clearSelection(); await wait(200);
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(ctxCover.marked && ctxCover.offered && ctxCover.cover, 'inside an album, the right click sets a photo as the album cover', JSON.stringify(ctxCover));
     const rn2 = await op('renameFolder', { folder: top, name: 'Viagens 2' });
     const coverAfter = await js(`${S}.host.labels.state().then((s) => s.labels.find((l) => l.id === ${albumId}).cover)`);
     await op('undo', { opId: rn2.res.opId });

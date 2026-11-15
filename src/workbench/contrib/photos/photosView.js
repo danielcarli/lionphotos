@@ -502,7 +502,7 @@ export class PhotosView extends ViewPane {
             { label: t('labels.removeFrom', { name: label.name }), icon: 'close', title: t('labels.removeFromTitle', { name: label.name }), run: () => removeFromLabel(this, label.id, sel) }] : []),
           ...(album ? ['-',
             { label: t('albums.remove'), icon: 'close', title: t('albums.removeTitle', { name: album.name }), run: () => removeFromAlbum(this, album.id, sel) },
-            ...(sel.length === 1 ? [{ label: album.cover === sel[0].path ? t('albums.isCover') : t('albums.setCover'), icon: 'star', checked: album.cover === sel[0].path, disabled: album.cover === sel[0].path, run: () => this.labels.setCover(album.id, sel[0].id) }] : [])] : []),
+            ...this.#coverItem(album, sel)] : []),
           '-',
           // outside the Limbo a photo goes to the Limbo first (a confirmation); from the Limbo, to the Recycle Bin (typed code)
           this.limbo
@@ -868,6 +868,16 @@ export class PhotosView extends ViewPane {
    * Right mouse button on a photo: it joins the selection (or becomes it, when it was not selected) and the
    * menu acts on the selected items — rename (one file), category, Limbo.
    */
+  /** Inside an album, with one photo: "Set as album cover" (checked, and nothing to do, on the one that is). */
+  #coverItem(album, sel) {
+    if (!album || album.type !== 'album' || sel.length !== 1) return [];
+    const is = album.cover === sel[0].path;
+    return [{ label: is ? t('albums.isCover') : t('albums.setAsCover'), icon: 'star', checked: is, disabled: is, run: async () => {
+      try { await this.labels.setCover(album.id, sel[0].id); this.services.notifications.success(t('albums.cover.done', { name: album.name }), 4000); }
+      catch (err) { this.services.notifications.warn(String(err?.message || err)); }
+    } }];
+  }
+
   async #contextMenu(e, it) {
     e.preventDefault();
     const { library, labels } = this;
@@ -898,6 +908,8 @@ export class PhotosView extends ViewPane {
       albumMenuItem(this.services, ids),
       ...(label ? [{ label: label.type === 'album' ? t('albums.remove') : t('labels.removeFrom', { name: label.name }), icon: 'close',
         title: label.type === 'album' ? t('albums.removeTitle', { name: label.name }) : t('labels.removeFromTitle', { name: label.name }), run: () => removeFromLabel(this, label.id, sel) }] : []),
+      // inside an album: this photo as its cover
+      ...this.#coverItem(label, sel),
       '-',
       inLimbo
         ? { label: t('contextMenu.restore'), icon: 'undo', run: () => library.setMark(ids, 0) }

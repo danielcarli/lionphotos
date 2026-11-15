@@ -178,6 +178,7 @@
   "albums.searchNone": "그 이름의 앨범이 없습니다. 아래에서 새로 만들 수 있습니다.",
   "albums.modeMosaic": "모자이크",
   "albums.modeEven": "균일한 격자",
+  "albums.setAsCover": "앨범 표지로 설정",
   "slideshow.button": "슬라이드 쇼",
   "slideshow.start": "슬라이드 쇼 시작({key})",
   "slideshow.startTitle": "사진을 한 장씩 전체 화면으로 보여 줍니다(뷰어에서 P)",

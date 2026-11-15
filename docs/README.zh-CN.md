@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · **简体中文** · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![版本 1.37.2](https://img.shields.io/badge/version-1.37.2-161214)
+![版本 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -122,7 +122,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **转换** | HEIC/HEIF → 全分辨率 JPG 或 PNG，保留 EXIF 和色彩配置文件，保存在原文件旁边。 |
 | **格式** | 照片：JPEG、PNG、GIF、WebP、AVIF、BMP、HEIC/HEIF、TIFF、PSD/PSB、相机 RAW（CR3、CR2、NEF、NRW、ARW、SR2、ORF、RW2、RAF、SRW、PEF、DNG、3FR、IIQ、ERF、RWL）。视频：MP4、MOV、M4V、3GP、WebM、MKV、MTS/M2TS、AVI。 |
 | **10 种语言** | English、Português (Brasil)、Português (Portugal)、Español、Français、Deutsch、Italiano、简体中文、日本語、한국어 — 跟随系统，可在状态栏切换。 |
-| **主题** | 蓝色（标志的青色）、浅色、深色和自动。 |
+| **主题** | 西瓜（标志的青色、粉色和白色）、城市蓝（如城市规划图般的钴蓝、珊瑚色和白色——默认）、浅色、深色和自动。 |
 
 ## 安全第一
 
@@ -262,7 +262,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.37.2**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.38.1**。
 
 ## 致谢
 

@@ -11,7 +11,7 @@ Works on your folders as they are: small thumbnails made once, the metadata that
 
 **English** · [Português (Brasil)](docs/README.pt-BR.md) · [Português (Portugal)](docs/README.pt-PT.md) · [Español](docs/README.es.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Italiano](docs/README.it.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md)
 
-![Version 1.37.2](https://img.shields.io/badge/version-1.37.2-161214)
+![Version 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -122,7 +122,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Convert** | HEIC/HEIF → JPG or PNG at full resolution, EXIF and colour profile kept, next to the original. |
 | **Formats** | Photos: JPEG, PNG, GIF, WebP, AVIF, BMP, HEIC/HEIF, TIFF, PSD/PSB, camera raw (CR3, CR2, NEF, NRW, ARW, SR2, ORF, RW2, RAF, SRW, PEF, DNG, 3FR, IIQ, ERF, RWL). Videos: MP4, MOV, M4V, 3GP, WebM, MKV, MTS/M2TS, AVI. |
 | **10 languages** | English, Português (Brasil), Português (Portugal), Español, Français, Deutsch, Italiano, 简体中文, 日本語, 한국어 — detected from the system, switchable in the status bar. |
-| **Themes** | Blue (the teal of the logo), light, dark and automatic. |
+| **Themes** | Watermelon (the teal of the logo, pink and white ), City blue (cobalt, coral and white, like an urban plan — the default), light, dark and automatic. |
 
 ## Safety first
 
@@ -262,7 +262,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.37.2**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.38.1**.
 
 ## Credits
 

@@ -451,3 +451,5 @@ _merge(MESSAGES, {'adjust': {'manVig': '양'}})
 _merge(MESSAGES, {'main': {'meta': {'write': {'both': '이미지 안과 옆의 {name}', 'noteInside': 'JPEG: 메타데이터를 파일 안에 기록해 사진을 보낼 때 함께 전달되게 합니다(이미지 자체는 바뀌지 않으며 이전 버전은 휴지통으로). 옆의 .xmp 파일에도 기록합니다.'}}}})
 # recovery copy (1.37.1)
 _merge(MESSAGES, {'describe': {'safeCollection': '입력하는 즉시 저장: 카탈로그에 저장하고, 컬렉션 폴더(.lionphotos)에 복구용 사본을 자동으로 기록합니다. 사진 파일은 기록을 요청할 때만 바뀝니다.', 'safeLocal': '입력하는 즉시 이 컴퓨터의 카탈로그에 저장합니다. 사진 파일은 기록을 요청할 때만 바뀝니다.', 'safeWhen': '복구용 사본 기록: {when}', 'notInFile': '아직 파일에 없는 항목: {count}개', 'inFile': '파일에 이미 이 데이터가 있습니다.', 'writeHint': '이 메타데이터와 표시(별점으로)를 파일에 기록합니다(다른 프로그램과 전송용). JPEG는 안과 옆의 .xmp에, 다른 형식은 옆의 .xmp에'}, 'main': {'meta': {'write': {'message': '지금까지 이 변경은 카탈로그(와 복구용 사본)에만 있었습니다. 이제 메타데이터(작가, 캡션, 음성 설명, 장소, 키워드 등)와 표시(별점)를 파일 자체에 기록합니다. 다른 프로그램과 전송용입니다.'}}}})
+# 1.38.0: Watermelon and City blue
+_merge(MESSAGES, {'statusbar': {'themeTeal': '수박', 'themeTealTitle': '수박 테마 — 로고의 청록색, 분홍, 흰색', 'themeCity': '시티 블루', 'themeCityTitle': '시티 블루 테마 — 도시 계획도처럼 코발트, 코랄, 흰색'}})

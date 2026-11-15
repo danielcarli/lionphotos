@@ -35,9 +35,10 @@ const PANEL_KEY = 'lionphotos.sidebarPanel';
 
 const THEME_KEY = 'lionphotos.theme';
 const DETAILS_KEY = 'lionphotos.tileDetails';
-// auto (follows the system), light, dark, and teal: the blue of the logo and of the cover it came from
-const THEMES = ['auto', 'light', 'dark', 'teal'];
-export const DEFAULT_THEME = 'teal'; // the blue theme, unless the person chose another
+// auto (follows the system), light, dark; teal — Watermelon: the teal of the logo with the pink of the cover it
+// came from; city — City blue: the same frame in the cobalt and coral of an urban plan (theme-city.css)
+const THEMES = ['auto', 'light', 'dark', 'teal', 'city'];
+export const DEFAULT_THEME = 'city'; // City blue, unless the person chose another (1.38.0)
 
 export class LayoutService {
   #onDidChangeView = new Emitter();
@@ -113,7 +114,7 @@ export class LayoutService {
     return this.themePreference === 'dark' || (this.themePreference === 'auto' && this.media.matches);
   }
 
-  /** @param {'auto'|'light'|'dark'|'teal'} pref */
+  /** @param {'auto'|'light'|'dark'|'teal'|'city'} pref */
   setTheme(pref) {
     if (!THEMES.includes(pref) || pref === this.themePreference) return;
     this.themePreference = pref;
@@ -123,9 +124,12 @@ export class LayoutService {
 
   #applyTheme() {
     const root = document.documentElement;
-    if (this.themePreference === 'auto') root.removeAttribute('data-theme');
-    else root.setAttribute('data-theme', this.themePreference);
-    this.host.setTheme(this.themePreference === 'teal' ? 'teal' : this.isDark);
+    const pref = this.themePreference;
+    if (pref === 'auto') root.removeAttribute('data-theme');
+    // City blue is Watermelon's frame with its own colours
+    else root.setAttribute('data-theme', pref === 'city' ? 'teal' : pref);
+    if (pref === 'city') root.setAttribute('data-palette', 'city'); else root.removeAttribute('data-palette');
+    this.host.setTheme(pref === 'teal' || pref === 'city' ? pref : this.isDark);
     this.#onDidChangeTheme.fire(this.isDark);
   }
 }

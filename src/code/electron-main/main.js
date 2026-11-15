@@ -112,17 +112,18 @@ function registerAppProtocol() {
 
 const TITLEBAR_HEIGHT = 36;
 // the theme the window used last time (kept by the main process), so it opens with the right colours;
-// the blue theme by default
+// City blue by default (1.38.0)
 function themeFile() { return path.join(app.getPath('userData'), 'window-theme.json'); }
 let cachedTheme = null;
 function lastTheme() {
   if (cachedTheme) return cachedTheme;
-  try { cachedTheme = JSON.parse(fs.readFileSync(themeFile(), 'utf8')).theme; } catch { cachedTheme = 'teal'; }
-  if (!['auto', 'light', 'dark', 'teal'].includes(cachedTheme)) cachedTheme = 'teal';
+  try { cachedTheme = JSON.parse(fs.readFileSync(themeFile(), 'utf8')).theme; } catch { cachedTheme = 'city'; }
+  if (!['auto', 'light', 'dark', 'teal', 'city'].includes(cachedTheme)) cachedTheme = 'city';
   return cachedTheme;
 }
 function overlayColors(dark) {
   if (dark === 'teal') return { color: '#0187a3', symbolColor: '#ffffff', height: TITLEBAR_HEIGHT };
+  if (dark === 'city') return { color: '#1b3f94', symbolColor: '#ffffff', height: TITLEBAR_HEIGHT };
   return dark
     ? { color: '#141113', symbolColor: '#c9bfb4', height: TITLEBAR_HEIGHT }
     : { color: '#f4f0e9', symbolColor: '#5a524c', height: TITLEBAR_HEIGHT };
@@ -141,7 +142,7 @@ function createWindow() {
     icon: path.join(APP_ROOT, 'src', 'workbench', 'browser', 'media', 'icon.png'),
     backgroundColor: lastTheme() === 'dark' || (lastTheme() === 'auto' && nativeTheme.shouldUseDarkColors) ? '#1a1619' : '#fbf8f3',
     titleBarStyle: 'hidden',
-    ...(isMac ? { trafficLightPosition: { x: 12, y: 11 } } : { titleBarOverlay: overlayColors(lastTheme() === 'teal' ? 'teal' : lastTheme() === 'dark' || (lastTheme() === 'auto' && nativeTheme.shouldUseDarkColors)) }),
+    ...(isMac ? { trafficLightPosition: { x: 12, y: 11 } } : { titleBarOverlay: overlayColors(lastTheme() === 'teal' || lastTheme() === 'city' ? lastTheme() : lastTheme() === 'dark' || (lastTheme() === 'auto' && nativeTheme.shouldUseDarkColors)) }),
     show: false,
     webPreferences: {
       preload: path.join(__dirname, '..', 'electron-sandbox', 'preload.js'),
@@ -267,8 +268,9 @@ if (gotTheLock) app.whenReady().then(() => {
   ipcMain.on('window:setTheme', (event, dark) => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win && process.platform !== 'darwin') {
-      try { win.setTitleBarOverlay(overlayColors(dark === 'teal' ? 'teal' : !!dark)); } catch { /* platform without overlay */ }
-      const pref = dark === 'teal' ? 'teal' : dark ? 'dark' : 'light';
+      const named = dark === 'teal' || dark === 'city';
+      try { win.setTitleBarOverlay(overlayColors(named ? dark : !!dark)); } catch { /* platform without overlay */ }
+      const pref = named ? dark : dark ? 'dark' : 'light';
       if (pref !== cachedTheme) { cachedTheme = pref; fs.promises.writeFile(themeFile(), JSON.stringify({ theme: pref })).catch(() => {}); }
     }
   });

@@ -394,6 +394,23 @@ app.whenReady().then(async () => {
     })()`);
     check(rw.box && /JPEG the camera stored/.test(rw.note) && /not on the raw data/.test(rw.note) && /16 bits \(develop mode\)/.test(rw.label) && (rw.can || (rw.disabled && /WebGL 2/.test(rw.hint))) && !rw.jpg,
       'a raw photo\'s adjustments say they are made on the camera\'s JPEG, not the raw data, with the switch to develop the raw data in 16 bits (not on a JPEG)', JSON.stringify(rw));
+    // themes (1.38.0): Watermelon (the default) and City blue — the same frame, its own colours
+    const th = await js(`(async () => {
+      const L = ${S}.layout, wait = (ms) => new Promise((r) => setTimeout(r, ms)), root = document.documentElement;
+      const bg = () => getComputedStyle(document.querySelector('.part.titlebar')).backgroundColor;
+      const sb = () => getComputedStyle(document.querySelector('.part.statusbar')).backgroundColor;
+      const before = L.themePreference;
+      L.setTheme('teal'); await wait(100);
+      const melon = { theme: root.getAttribute('data-theme'), palette: root.getAttribute('data-palette'), bar: bg(), status: sb() };
+      L.setTheme('city'); await wait(100);
+      const city = { theme: root.getAttribute('data-theme'), palette: root.getAttribute('data-palette'), bar: bg(), status: sb(), content: getComputedStyle(document.querySelector('.part.editor, .editor, main') || document.body).backgroundColor,
+        labels: [...document.querySelectorAll('.theme-option')].map((b) => b.textContent.trim()).join('|') };
+      L.setTheme(before); await wait(100);
+      return { melon, city, back: root.getAttribute('data-palette') };
+    })()`);
+    check(th.melon.theme === 'teal' && !th.melon.palette && th.melon.bar === 'rgb(1, 135, 163)' && th.city.theme === 'teal' && th.city.palette === 'city'
+      && th.city.bar === 'rgb(27, 63, 148)' && th.city.status === 'rgb(243, 246, 252)' && /Watermelon/.test(th.city.labels) && /City blue/.test(th.city.labels),
+      'themes: Watermelon (teal frame, the default) and City blue (cobalt frame, coral status bar, the same white content), in the status bar', JSON.stringify(th));
     // the lens: the group in Adjustments (the profile's switch, the corrections by hand), the values checked by the
     // main process, the profile chosen among all of Lensfun's (searched), what the photo's key says
     const ln = await js(`(async () => {

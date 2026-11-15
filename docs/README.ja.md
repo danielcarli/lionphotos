@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · **日本語** · [한국어](README.ko.md)
 
-![バージョン 1.37.2](https://img.shields.io/badge/version-1.37.2-161214)
+![バージョン 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
 ![ステータス：ベータテスト](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![ライセンス: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![対応: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -122,7 +122,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **変換** | HEIC/HEIF → フル解像度の JPG または PNG。EXIF とカラープロファイルを保持し、元のファイルの横に保存。 |
 | **形式** | 写真：JPEG、PNG、GIF、WebP、AVIF、BMP、HEIC/HEIF、TIFF、PSD/PSB、カメラ RAW（CR3、CR2、NEF、NRW、ARW、SR2、ORF、RW2、RAF、SRW、PEF、DNG、3FR、IIQ、ERF、RWL）。動画：MP4、MOV、M4V、3GP、WebM、MKV、MTS/M2TS、AVI。 |
 | **10 言語** | English、Português (Brasil)、Português (Portugal)、Español、Français、Deutsch、Italiano、简体中文、日本語、한국어 — システムから検出し、ステータスバーで切り替え可能。 |
-| **テーマ** | ブルー（ロゴのティール）、ライト、ダーク、自動。 |
+| **テーマ** | スイカ（ロゴのティール、ピンク、白）、シティブルー（都市計画図のようなコバルト、コーラル、白・既定）、ライト、ダーク、自動。 |
 
 ## 安全を第一に
 
@@ -262,7 +262,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 変更履歴
 
-[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.37.2**。
+[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.38.1**。
 
 ## クレジット
 

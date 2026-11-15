@@ -11,7 +11,7 @@ Trabaja con sus carpetas tal como están: miniaturas pequeñas hechas una sola v
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · **Español** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versión 1.37.2](https://img.shields.io/badge/version-1.37.2-161214)
+![Versión 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
 ![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -122,7 +122,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Convertir** | HEIC/HEIF → JPG o PNG a resolución completa, conservando el EXIF y el perfil de color, junto al original. |
 | **Formatos** | Fotos: JPEG, PNG, GIF, WebP, AVIF, BMP, HEIC/HEIF, TIFF, PSD/PSB, RAW de cámara (CR3, CR2, NEF, NRW, ARW, SR2, ORF, RW2, RAF, SRW, PEF, DNG, 3FR, IIQ, ERF, RWL). Vídeos: MP4, MOV, M4V, 3GP, WebM, MKV, MTS/M2TS, AVI. |
 | **10 idiomas** | English, Português (Brasil), Português (Portugal), Español, Français, Deutsch, Italiano, 简体中文, 日本語, 한국어: detectado del sistema y cambiable en la barra de estado. |
-| **Temas** | Azul (el turquesa del logotipo), claro, oscuro y automático. |
+| **Temas** | Sandía (el turquesa del logotipo, rosa y blanco ), Azul ciudad (cobalto, coral y blanco, como un plano urbano — el predeterminado), claro, oscuro y automático. |
 
 ## La seguridad primero
 
@@ -262,7 +262,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Historial de cambios
 
-Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.37.2**.
+Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.38.1**.
 
 ## Créditos
 

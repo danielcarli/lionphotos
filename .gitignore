@@ -6,3 +6,4 @@ dist-installer/
 shots/
 __pycache__/
 models/
+commit.txt

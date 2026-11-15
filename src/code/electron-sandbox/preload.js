@@ -27,7 +27,7 @@ function recognizer(ch) {
 
 contextBridge.exposeInMainWorld('host', {
   platform: process.platform,
-  setTheme: (theme) => ipcRenderer.send('window:setTheme', theme === 'teal' ? 'teal' : !!theme),
+  setTheme: (theme) => ipcRenderer.send('window:setTheme', theme === 'teal' || theme === 'city' ? theme : !!theme),
   setLocale: (locale) => ipcRenderer.send('nls:setLocale', locale),
   reloadWindow: () => ipcRenderer.send('window:reload'),
   appInfo: () => ipcRenderer.invoke('app:info'),

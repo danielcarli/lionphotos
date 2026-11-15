@@ -11,7 +11,7 @@ Trabalha com as suas pastas como elas são: miniaturas pequenas feitas uma vez, 
 
 [English](../README.md) · **Português (Brasil)** · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versão 1.37.2](https://img.shields.io/badge/version-1.37.2-161214)
+![Versão 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
 ![Status: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -122,7 +122,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Converter** | HEIC/HEIF → JPG ou PNG em resolução total, mantendo o EXIF e o perfil de cor, ao lado do original. |
 | **Formatos** | Fotos: JPEG, PNG, GIF, WebP, AVIF, BMP, HEIC/HEIF, TIFF, PSD/PSB, RAW de câmera (CR3, CR2, NEF, NRW, ARW, SR2, ORF, RW2, RAF, SRW, PEF, DNG, 3FR, IIQ, ERF, RWL). Vídeos: MP4, MOV, M4V, 3GP, WebM, MKV, MTS/M2TS, AVI. |
 | **10 idiomas** | English, Português (Brasil), Português (Portugal), Español, Français, Deutsch, Italiano, 简体中文, 日本語, 한국어 — detectado do sistema, trocável na barra de status. |
-| **Temas** | Azul (o azul-petróleo do logo), claro, escuro e automático. |
+| **Temas** | Melancia (o azul-petróleo do logo, rosa e branco ), Azul cidade (azul cobalto, coral e branco, como uma planta urbana — o padrão), claro, escuro e automático. |
 
 ## Segurança em primeiro lugar
 
@@ -262,7 +262,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.37.2**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.38.1**.
 
 ## Créditos
 

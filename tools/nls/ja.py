@@ -451,3 +451,5 @@ _merge(MESSAGES, {'adjust': {'manVig': '適用量'}})
 _merge(MESSAGES, {'main': {'meta': {'write': {'both': '画像の中と、隣の {name}', 'noteInside': 'JPEG: メタデータをファイル内に書き込み、写真を送るときに一緒に届くようにします（画像そのものは変わらず、以前の版はごみ箱へ）。隣の .xmp ファイルにも書き込みます。'}}}})
 # recovery copy (1.37.1)
 _merge(MESSAGES, {'describe': {'safeCollection': '入力と同時に保存: カタログに保存し、コレクションのフォルダー (.lionphotos) にも復元用コピーを自動で書き込みます。写真のファイルは、書き込みを指示したときだけ変わります。', 'safeLocal': '入力と同時に、このコンピューターのカタログに保存します。写真のファイルは、書き込みを指示したときだけ変わります。', 'safeWhen': '復元用コピーの書き込み: {when}', 'notInFile': 'まだファイルにない項目: {count}', 'inFile': 'ファイルにはすでにこのデータがあります。', 'writeHint': 'このメタデータと印（レーティングとして）をファイルに書き込みます（他のソフトや送信用）。JPEG には内部と隣の .xmp に、その他の形式は隣の .xmp に'}, 'main': {'meta': {'write': {'message': 'これまでこの変更はカタログ（と復元用コピー）にだけありました。これからメタデータ（作者、キャプション、音声説明、場所、キーワードなど）と印（レーティング）をファイル自体に書き込みます。他のソフトや送信用です。'}}}})
+# 1.38.0: Watermelon and City blue
+_merge(MESSAGES, {'statusbar': {'themeTeal': 'スイカ', 'themeTealTitle': 'スイカ テーマ — ロゴのティール、ピンク、白', 'themeCity': 'シティブルー', 'themeCityTitle': 'シティブルー テーマ — 都市計画図のようなコバルト、コーラル、白'}})

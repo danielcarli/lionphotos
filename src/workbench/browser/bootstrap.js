@@ -10,8 +10,9 @@ import { bootStatus, bootDone } from './boot.js';
 
 // the theme chosen in the app, before anything else is painted (the loading screen too)
 try {
-  const theme = localStorage.getItem('lionphotos.theme') || 'teal'; // blue by default
+  const theme = localStorage.getItem('lionphotos.theme') || 'city'; // City blue by default
   if (theme === 'light' || theme === 'dark' || theme === 'teal') document.documentElement.setAttribute('data-theme', theme);
+  if (theme === 'city') { document.documentElement.setAttribute('data-theme', 'teal'); document.documentElement.setAttribute('data-palette', 'city'); }
 } catch { /* storage unavailable */ }
 
 try {

@@ -2,6 +2,19 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.38.1] — 2026-11-14
+
+### Changed
+- **City blue's status bar is a pale blue-grey** (`#f3f6fc`, set apart from the white of the photos), its words and icons in cobalt and the chosen theme in coral; it still turns coral while something is being done. The colour stays at the top (the selection) and on the sides — Watermelon keeps its pink bar.
+
+## [1.38.0] — 2026-11-14
+
+### Added
+- **City blue**, a new theme and **the new default**: the frame of the app in the cobalt of a blueprint, the status bar, the selection and the Limbo in the coral of the paths of an urban plan, the content on white — the same proportions of white and colour as the blue theme. In the status bar beside the others. Its colours are made from the other theme's rules by `tools/themes/make-city.py` (`theme-city.css`), so both stay alike.
+
+### Changed
+- **The blue theme is now called Watermelon** (its teal, pink and white); whoever chose it keeps it.
+
 ## [1.37.2] — 2026-11-14
 
 ### Documentation

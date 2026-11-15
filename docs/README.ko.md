@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · **한국어**
 
-![버전 1.37.2](https://img.shields.io/badge/version-1.37.2-161214)
+![버전 1.38.1](https://img.shields.io/badge/version-1.38.1-161214)
 ![상태: 베타 테스트](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![라이선스: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![플랫폼: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -122,7 +122,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **변환** | HEIC/HEIF → 원본 해상도 JPG 또는 PNG, EXIF와 색상 프로필 유지, 원본 옆에 저장. |
 | **형식** | 사진: JPEG, PNG, GIF, WebP, AVIF, BMP, HEIC/HEIF, TIFF, PSD/PSB, 카메라 RAW(CR3, CR2, NEF, NRW, ARW, SR2, ORF, RW2, RAF, SRW, PEF, DNG, 3FR, IIQ, ERF, RWL). 동영상: MP4, MOV, M4V, 3GP, WebM, MKV, MTS/M2TS, AVI. |
 | **10개 언어** | English, Português (Brasil), Português (Portugal), Español, Français, Deutsch, Italiano, 简体中文, 日本語, 한국어 — 시스템에서 감지하며 상태 표시줄에서 바꿀 수 있습니다. |
-| **테마** | 파랑(로고의 청록색), 밝게, 어둡게, 자동. |
+| **테마** | 수박(로고의 청록색, 분홍, 흰색), 시티 블루(도시 계획도 같은 코발트, 코랄, 흰색 — 기본값), 밝게, 어둡게, 자동. |
 
 ## 안전이 먼저
 
@@ -262,7 +262,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 변경 내역
 
-[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.37.2**.
+[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.38.1**.
 
 ## 만든 사람들
 

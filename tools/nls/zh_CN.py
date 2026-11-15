@@ -451,3 +451,5 @@ _merge(MESSAGES, {'adjust': {'manVig': '数量'}})
 _merge(MESSAGES, {'main': {'meta': {'write': {'both': '图像内部，以及旁边的 {name}', 'noteInside': 'JPEG：元数据写入文件内部，照片发送时随之携带（图像本身不变，旧版本移至回收站），同时也写入旁边的 .xmp 文件。'}}}})
 # recovery copy (1.37.1)
 _merge(MESSAGES, {'describe': {'safeCollection': '输入即保存：保存在目录中，并在收藏文件夹 (.lionphotos) 中自动写入恢复副本。只有在你要求写入时，照片文件才会改变。', 'safeLocal': '输入即保存，保存在本机目录中。只有在你要求写入时，照片文件才会改变。', 'safeWhen': '恢复副本写入于 {when}', 'notInFile': '尚未写入文件的字段：{count} 个', 'inFile': '文件中已有这些数据。', 'writeHint': '将这些元数据和标记（作为评级）写入文件，供其他程序和发送使用：JPEG 写入内部和旁边的 .xmp；其他格式写入旁边的 .xmp'}, 'main': {'meta': {'write': {'message': '到目前为止，这些更改只在目录（及其恢复副本）中。现在元数据（作者、说明、音频描述、地点、关键词……）和标记（作为评级）将写入文件本身，供其他程序和发送使用。'}}}})
+# 1.38.0: Watermelon and City blue
+_merge(MESSAGES, {'statusbar': {'themeTeal': '西瓜', 'themeTealTitle': '西瓜主题——标志的青色、粉色和白色', 'themeCity': '城市蓝', 'themeCityTitle': '城市蓝主题——钴蓝、珊瑚色和白色，如同城市规划图'}})

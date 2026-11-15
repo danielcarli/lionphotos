@@ -89,6 +89,7 @@ const THEMES = [
   { id: 'light', label: 'statusbar.themeLight', icon: 'sun', title: 'statusbar.themeLightTitle' },
   { id: 'dark', label: 'statusbar.themeDark', icon: 'moon', title: 'statusbar.themeDarkTitle' },
   { id: 'teal', label: 'statusbar.themeTeal', icon: 'drop', title: 'statusbar.themeTealTitle' },
+  { id: 'city', label: 'statusbar.themeCity', icon: 'map', title: 'statusbar.themeCityTitle' },
 ];
 
 function item(iconName, text, { spin = false, title, cls } = {}) {

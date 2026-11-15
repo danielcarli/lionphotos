@@ -49,6 +49,7 @@ class PluginsMainService {
     ipc.handle('plugins:setEnabled', (_e, id, on) => this.setEnabled(String(id), !!on));
     ipc.handle('plugins:openLast', (_e, what) => this.openLast(what));
     ipc.handle('plugins:cancelExport', () => { if (this.exporting) this.exporting.canceled = true; return true; });
+    ipc.handle('plugins:rendered', (_e, req, res) => { const done = this.renders.get(Number(req)); if (done) { this.renders.delete(Number(req)); done(res); } return true; });
     this.ops.register('installPlugin', { plan: (p) => this.#planInstall(p), run: (plan) => this.#runInstall(plan) });
     this.ops.register('removePlugin', { plan: (p) => this.#planRemove(p), run: (plan) => this.#runRemove(plan) });
     this.ops.register('export', { plan: (p) => this.#planExport(p), run: (plan) => this.#runExport(plan) });
@@ -249,16 +250,42 @@ class PluginsMainService {
     };
   }
 
+  renders = new Map();
+  renderSeq = 0;
+
+  /**
+   * A photo with adjustments (exposure, colour, crop, lens…) as the window draws it — the same picture as on
+   * the screen: asked of the window, which hands the JPEG back. { ok:false, plain:true } = it has none after all.
+   */
+  #windowRender(id, max) {
+    const ui = this.ui();
+    if (!ui || ui.isDestroyed()) return Promise.resolve({ ok: false });
+    const req = ++this.renderSeq;
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => { this.renders.delete(req); resolve({ ok: false }); }, 180000);
+      this.renders.set(req, (res) => { clearTimeout(timer); resolve(res && typeof res === 'object' ? res : { ok: false }); });
+      ui.send('plugins:render', { req, id, max });
+    });
+  }
+
   /** In the background, one photo at a time; the window is told the progress and the end. */
   #runExport(plan) {
     const tell = (msg) => { const ui = this.ui(); if (ui && !ui.isDestroyed()) ui.send('plugins:export', msg); };
     const job = (this.exporting = { canceled: false });
     const total = plan.collections.reduce((s, c) => s + c.rows.length, 0);
+    const adjusted = new Set(plan.collections.flatMap((c) => c.rows).filter((r) => r.kind !== 2 && r.adjust && r.adjust !== '{}').map((r) => r.id));
     (async () => {
       try {
         const res = await runExport({
           plugin: plan.plugin, dest: plan.dest, collections: plan.collections, options: plan.options,
-          render: (id, max) => this.thumbs.renderJpeg(id, max),
+          // what was adjusted in LionPhotos goes adjusted: those photos are drawn by the window; the others
+          // (and the videos' frames) by the thumbnail maker. An adjusted photo that cannot be drawn is not
+          // exported as the file is — it is reported with the ones that failed.
+          render: async (id, max) => {
+            if (!adjusted.has(id)) return this.thumbs.renderJpeg(id, max);
+            const res = await this.#windowRender(id, max);
+            return res.plain ? this.thumbs.renderJpeg(id, max) : res;
+          },
           onProgress: (done) => tell({ done, total }),
           isCanceled: () => job.canceled,
           generator: `LionPhotos ${app.getVersion()}`, locale: getLocale(),

@@ -136,6 +136,9 @@ contextBridge.exposeInMainWorld('host', {
     openLast: (what) => ipcRenderer.invoke('plugins:openLast', what),
     cancelExport: () => ipcRenderer.invoke('plugins:cancelExport'),
     onExport: on('plugins:export'),
+    // an adjusted photo is drawn by the window (the same shader as the screen) and handed back
+    onRender: on('plugins:render'),
+    rendered: (req, res) => ipcRenderer.invoke('plugins:rendered', req, res),
   },
   // "Open with": the programs of this computer for the selected files (by id; programs by key)
   openWith: {

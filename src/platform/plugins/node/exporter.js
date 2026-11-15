@@ -17,6 +17,12 @@ const pad = (n) => String(n).padStart(2, '0');
 const isoDay = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
 /** A file or folder name from any text: accents kept, the rest that systems refuse replaced. */
+// a camera's raw file is never exported: the page gets a JPEG made from it, and so does "the original"
+const { thumbDecoder } = require('../../library/node/mediaTypes');
+const isRaw = (name) => thumbDecoder(path.extname(name).slice(1).toLowerCase()) === 'raw';
+/** The largest JPEG asked of a raw file standing in for its original (never enlarged). */
+const FULL = 16000;
+
 function safeSegment(s, fallback = 'item') {
   const out = String(s || '').normalize('NFC').replace(/[\u0000-\u001f<>:"/\\|?*]/g, '-').replace(/\s+/g, ' ').replace(/^[ .]+|[ .]+$/g, '').slice(0, 80);
   return /^(con|prn|aux|nul|com\d|lpt\d)$/i.test(out) || !out ? fallback : out;
@@ -193,8 +199,10 @@ async function runExport({ plugin, dest, collections, options, render, onProgres
         try { ed = r.meta_edit ? JSON.parse(r.meta_edit) || {} : {}; } catch { ed = {}; }
         const pick = (k) => ed[k] || meta[k] || null;
         const base = unique(safeSegment(path.parse(r.name).name, 'foto'), taken);
+        const raw = isRaw(r.name);
         const item = {
-          file: r.name, name: path.parse(r.name).name, ext: path.extname(r.name).slice(1).toUpperCase(),
+          // a raw file goes as the JPEG made from it: its name and format on the page are the JPEG's
+          file: raw ? `${path.parse(r.name).name}.jpg` : r.name, name: path.parse(r.name).name, ext: raw ? 'JPG' : path.extname(r.name).slice(1).toUpperCase(),
           kind: r.kind === 2 ? 'video' : 'photo', folder: r.folder || '',
           takenAt: r.taken_at ? new Date(r.taken_at).toISOString() : null,
           width: r.width || null, height: r.height || null,
@@ -244,13 +252,21 @@ async function runExport({ plugin, dest, collections, options, render, onProgres
           try {
             const odir = path.join(out, 'originais', slug);
             await fs.promises.mkdir(odir, { recursive: true });
-            const oname = unique(safeSegment(path.parse(r.name).name, 'foto'), new Set(), path.extname(r.name));
-            await fs.promises.copyFile(r.path, path.join(odir, oname), fs.constants.COPYFILE_EXCL).catch(async () => {
-              const alt = unique(safeSegment(path.parse(r.name).name, 'foto'), new Set([oname.toLowerCase()]), path.extname(r.name));
-              await fs.promises.copyFile(r.path, path.join(odir, alt));
-              item.original = `originais/${slug}/${alt}`;
-            });
-            item.original ||= `originais/${slug}/${oname}`;
+            if (raw) {
+              // never the raw file itself: a full-size JPEG made from it, named as the JPEG of the page
+              const full = await render(r.id, FULL);
+              if (!full?.ok || !full.data?.length) throw new Error('raw: no JPEG could be made');
+              await fs.promises.writeFile(path.join(odir, `${base}.jpg`), Buffer.from(full.data));
+              item.original = `originais/${slug}/${base}.jpg`;
+            } else {
+              const oname = unique(safeSegment(path.parse(r.name).name, 'foto'), new Set(), path.extname(r.name));
+              await fs.promises.copyFile(r.path, path.join(odir, oname), fs.constants.COPYFILE_EXCL).catch(async () => {
+                const alt = unique(safeSegment(path.parse(r.name).name, 'foto'), new Set([oname.toLowerCase()]), path.extname(r.name));
+                await fs.promises.copyFile(r.path, path.join(odir, alt));
+                item.original = `originais/${slug}/${alt}`;
+              });
+              item.original ||= `originais/${slug}/${oname}`;
+            }
           } catch (err) {
             item.original = null;
             console.warn('[export] original', r.path, err?.message || err);

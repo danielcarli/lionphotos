@@ -485,3 +485,7 @@ _merge(MESSAGES, {'albums': {'setAsCover': '앨범 표지로 설정'}})
 _merge(MESSAGES, {'about': {'short': '정보'}})
 
 _merge(MESSAGES, {'sidebar': {'hide': '탐색 숨기기 ({key})', 'show': '탐색 표시 ({key})'}})
+
+_merge(MESSAGES, {'plugins': {'which': {'label': '내보낼 사진', 'all': '전체', 'good': '우수와 OK', 'great': '우수만'}, 'view': {'ofTotal': '{total} 중 {n}', 'noneWhich': '이 표시가 있는 사진이 없습니다', 'preview': '미리 보기', 'previewTitle': '내보낼 사진 보기', 'open': '열기', 'openTitle': '“{name}”을(를) 사진에서 열어 확인하고 변경합니다. 뒤로를 누르면 이 페이지로 돌아옵니다.'}, 'preview': {'count': '내보내기: {total} 중 {n}', 'more': '외 {n}', 'cover': '표지'}}})
+
+_merge(MESSAGES, {'plugins': {'same': {'title': {'one': '이름이 같은 사진 {count}쌍', 'other': '이름이 같은 사진 {count}쌍'}, 'text': '페이지에서는 한 이름에 사진이 두 장이 됩니다. 각각 어느 것을 내보낼지 선택하세요. 다른 하나는 이번 내보내기에서 빠집니다.', 'raw': 'RAW: JPG로 변환하여 내보냄', 'continue': '계속'}}})

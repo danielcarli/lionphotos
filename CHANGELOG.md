@@ -2,6 +2,25 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.44.0] — 2026-11-15
+
+### Added
+- **Two photos with the same name: which one goes.** Before a plugin exports, the photos of an album that share a name (a raw file beside its JPEG, the same name from two folders) are shown side by side, and the person chooses which one goes; the other stays out of that export. Suggested: the adjusted one, else the one that is not raw, else the largest.
+
+### Changed
+- **A plugin export sends the photos as they are seen in LionPhotos:** what was adjusted — exposure, colour, black and white, crop, straightening, lens — goes adjusted, in every size of the page. An adjusted photo that cannot be drawn is reported with the ones that failed, never sent as the file is.
+- **Raw files are never exported.** A raw photo goes as a JPEG made from it: its name and format on the page are the JPEG's, and with *Include the original files* its "original" is a full-size JPEG, not the raw file.
+
+## [1.43.0] — 2026-11-15
+
+### Added
+- **Which photos a plugin exports:** *All*, *Great and OK* or *Only great*, chosen in the plugin's page and in the export window (remembered). Each album or project says how many of its photos go ("9 of 25 items"); one with none under the choice is shown faded and cannot be checked.
+- **A preview of what goes:** *Preview*, on each card of a plugin's page, shows the cover large and the photos the export will take, each with its mark.
+- **Open the album from the plugin's page and come back:** *Open* (on the card and in the preview) shows the album or project in Photos, to change what is needed; *Back* returns to the plugin's page as it was left — what was checked and where it was scrolled.
+
+### Changed
+- In a plugin's page, each card leads with the cover, large, and two more photos beside it.
+
 ## [1.42.4] — 2026-11-15
 
 ### Changed

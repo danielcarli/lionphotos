@@ -30,6 +30,7 @@ import { collapsible, fileSection, infoFooter } from './infoSections.js';
 import { panelTab, setPanelTab, sectionsFor, asOnly, usableTab, tabBar, TAB_KEYS, attachResizer } from './panelTabs.js';
 import { showExportDialog } from '../plugins/exportDialog.js';
 import { renderProjectPanel } from '../labels/projectPanel.js';
+import { textOf } from '../../services/plugins/browser/pluginsService.js';
 import { showContextMenu } from '../../browser/contextMenu.js';
 import { openWithItem } from './openWithMenu.js';
 import { exportPhotos, exportMenuItem } from '../export/exportPhotos.js';
@@ -316,7 +317,8 @@ export class PhotosView extends ViewPane {
     if (label?.type === 'project') setChildren(this.projectPanel, renderProjectPanel(this.services, label));
     if (!label) return;
     const back = this.library.labelReturn?.view || label.type;
-    const backName = back === 'photos' ? t('views.photos') : t(`views.${back}`);
+    const plg = back === 'plugin' ? this.services.plugins?.tabs.find((x) => x.id === this.services.plugins.opened) : null;
+    const backName = back === 'plugin' ? (plg ? textOf(plg.shortName) || textOf(plg.name) : t('plugins.title')) : back === 'photos' ? t('views.photos') : t(`views.${back}`);
     const typeIcon = LABEL_ICON[label.type] || 'tag';
     const shown = this.library.view(this.scope), count = shown.length;
     const album = label.type === 'album';

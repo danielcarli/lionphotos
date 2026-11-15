@@ -1035,7 +1035,25 @@ app.whenReady().then(async () => {
       const listed = await js(`${S}.plugins.refresh().then((l) => l.map((p) => p.id + '@' + p.version))`);
       const aid = await js(`(async () => { const L = ${S}.labels, lib = ${S}.library; const id = await L.save({ type: 'album', name: 'Export Test' });
         const its = lib.items.filter((x) => x.kind === 1).slice(0, 4); await L.link({ ids: its.map((x) => x.id), add: [id] });
-        await lib.describe([its[0].id], { caption: 'Legenda exportada', alt: 'Audiodescrição exportada' }); return id; })()`);
+        await lib.describe([its[0].id], { caption: 'Legenda exportada', alt: 'Audiodescrição exportada' });
+        // adjusted in LionPhotos (the left half kept, no colour): it must be exported as it is seen here
+        const jpg = its.find((x) => x.ext === 'jpg' && x.thumb === 1);
+        await lib.describe([jpg.id], { adjust: { saturation: -100, crop: [0, 0, 5000, 10000] } }, { history: false });
+        window.__expAdjusted = { id: jpg.id, name: jpg.name, w: jpg.w, h: jpg.h };
+        // two photos with the same name in one album (a raw beside its JPEG, or two folders): asked which goes
+        const twin = { ...jpg, id: -777, ext: 'cr3', name: jpg.name.replace(/\.[^.]+$/, '.CR3') };
+        const P = ${S}.plugins, real = P.itemsOf.bind(P);
+        P.itemsOf = (lid, w) => (lid === id ? [...real(lid, w), twin] : real(lid, w));
+        const groups = P.sameNames([id]).sort((x, y) => Number(y.items.includes(twin)) - Number(x.items.includes(twin)));
+        const { askSameNames, suggested } = await import(new URL('../contrib/plugins/sameNameDialog.js', location.href));
+        const asked = askSameNames(${S}, groups); await new Promise((r) => setTimeout(r, 300));
+        const dlg = document.querySelector('.sn-dialog');
+        window.__sameNames = { groups: groups.length, two: groups[0]?.items.length, dialog: !!dlg, options: dlg?.querySelectorAll('.sn-option').length,
+          suggestedAdjusted: suggested(groups[0].items).id === jpg.id, rawTag: !!dlg?.querySelector('.sn-option[data-id="-777"] .sn-tag') };
+        dlg?.querySelector('.cm-actions .btn-primary').click();
+        const skip = await asked; window.__sameNames.skip = [...(skip || [])];
+        P.itemsOf = real;
+        return id; })()`);
       const ids = await js(`${S}.plugins.itemsOf(${aid}).map((x) => x.id)`);
       next = expDir;
       const dest = await js(`${S}.host.plugins.pickDestination()`);
@@ -1058,7 +1076,17 @@ app.whenReady().then(async () => {
         page.hasCaption = data.includes('Legenda exportada');
         // a photo that could not be rendered (a raw file without a preview) is listed without a picture
         page.withImage = JSON.parse(data.replace(/^window\.LIONPHOTOS_EXPORT = /, '').replace(/;\s*$/, '')).collections[0].items.filter((i) => i.image).length;
+        // the adjusted photo went as it is seen in LionPhotos: cropped to its left half
+        const adj = await js('window.__expAdjusted');
+        const exported = JSON.parse(data.replace(/^window\.LIONPHOTOS_EXPORT = /, '').replace(/;\s*$/, '')).collections[0].items.find((i) => i.file === adj.name);
+        page.adjusted = { was: adj.w / adj.h, is: exported ? exported.imageWidth / exported.imageHeight : 0 };
+        page.adjustedOk = !!exported && Math.abs(page.adjusted.is - page.adjusted.was / 2) < 0.02;
+        await js(`${S}.library.describe([${adj.id}], { adjust: null }, { history: false })`);
       }
+      check(page.adjustedOk, 'a plugin export draws an adjusted photo as it is seen in LionPhotos (its crop)', JSON.stringify(page.adjusted));
+      const sn = await js('window.__sameNames');
+      check(sn && sn.groups >= 1 && sn.dialog && sn.options >= 2 * sn.groups && sn.suggestedAdjusted && sn.rawTag && sn.skip.length === sn.groups && sn.skip.includes(-777),
+        'two photos with the same name in an album: the export asks which one goes (the raw one would go as a JPEG)', JSON.stringify(sn));
       // its tab in the activity bar, right after Projects: its page, the albums to pick; turned off, the tab goes
       const tab = await js(`(async () => { const wait = (ms) => new Promise((r) => setTimeout(r, ms));
         const bar = document.querySelector('.activitybar');
@@ -1066,18 +1094,37 @@ app.whenReady().then(async () => {
         const b = bar.querySelector('[data-view="plugin:simple-gallery"]'); b.click(); await wait(200);
         const v = document.querySelector('.view-plugin');
         const title = v.querySelector('.view-title')?.textContent, cards = v.querySelectorAll('.plg-card').length;
-        [...v.querySelectorAll('.plg-card')].find((c) => c.title === 'Export Test')?.click(); await wait(50);
+        [...v.querySelectorAll('.plg-card')].find((c) => c.title === 'Export Test')?.querySelector('.plg-pick').click(); await wait(50);
         const btn = v.querySelector('.plg-actions .btn-primary').textContent, active = b.classList.contains('active');
         // checking a collection keeps the page where it was (a small window, scrolled down), the card drawn once
         const one = [...v.querySelectorAll('.plg-card')].find((c) => c.title === 'Export Test');
         v.style.maxHeight = '160px'; v.scrollTop = 120; await wait(50);
-        const at = v.scrollTop; one.click(); await wait(80);
+        const pickOne = one.querySelector('.plg-pick'); const at = v.scrollTop; pickOne.click(); await wait(80);
         const stay = { at, after: v.scrollTop, same: [...v.querySelectorAll('.plg-card')].includes(one), off: !one.classList.contains('is-on') };
-        one.click(); await wait(50); stay.on = one.classList.contains('is-on') && one.getAttribute('aria-pressed') === 'true'; v.style.maxHeight = ''; v.scrollTop = 0;
+        pickOne.click(); await wait(50); stay.on = one.classList.contains('is-on') && pickOne.getAttribute('aria-pressed') === 'true'; v.style.maxHeight = ''; v.scrollTop = 0;
+        // which photos go (all, great and OK, only great): the count of the card and of the export follow; a
+        // preview with the cover; Open goes to the album in Photos and Back returns to the plugin's page
+        const P = ${S}.plugins, its = P.itemsOf(${aid}, 'all');
+        await ${S}.library.setMark([its[0].id], 1); await ${S}.library.setMark([its[1].id], 2); await wait(300);
+        const cardOf = () => document.querySelector('.view-plugin .plg-card[data-label="${aid}"]');
+        const sub = () => cardOf().querySelector('.lbl-card-body .small')?.textContent;
+        const pv = { total: its.length, all: P.itemsOf(${aid}).length };
+        document.querySelector('.view-plugin .plg-which [data-which="good"]').click(); await wait(200); pv.good = P.itemsOf(${aid}).length; pv.goodText = sub(); pv.goodIds = P.collectionOf(${aid}).ids.length;
+        document.querySelector('.view-plugin .plg-which [data-which="great"]').click(); await wait(200); pv.great = P.itemsOf(${aid}).length; pv.kept = cardOf().classList.contains('is-on');
+        cardOf().querySelector('.plg-card-acts .link-button').click(); await wait(300);
+        const dlg = document.querySelector('.plg-pv'); pv.dialog = !!dlg && !!dlg.querySelector('.plg-pv-cover img') && dlg.querySelectorAll('.plg-pv-tile').length === 1;
+        dlg?.querySelector('.cm-actions .btn-primary').click(); await wait(600);
+        pv.opened = ${S}.layout.activeView === 'photos' && ${S}.library.filter.labelId === ${aid} && !document.querySelector('.plg-pv');
+        pv.backText = document.querySelector('.label-back-btn')?.textContent || '';
+        document.querySelector('.label-back-btn').click(); await wait(500);
+        pv.back = ${S}.layout.activeView === 'plugin' && !${S}.library.filter.labelId && cardOf()?.classList.contains('is-on');
+        document.querySelector('.view-plugin .plg-which [data-which="all"]').click(); await wait(200); pv.allAgain = P.which === 'all';
+        await ${S}.library.setMark([its[0].id, its[1].id], 0); await wait(200);
+
         await ${S}.plugins.setEnabled('simple-gallery', false); await wait(100);
         const gone = !document.querySelector('[data-view="plugin:simple-gallery"]'), view = ${S}.layout.activeView;
         await ${S}.plugins.setEnabled('simple-gallery', true);
-        return { order, title, cards, btn, active, gone, view, stay }; })()`);
+        return { order, title, cards, btn, active, gone, view, stay, pv }; })()`);
       const rm = await op('removePlugin', { id: 'simple-gallery' });
       const after = await js(`${S}.plugins.refresh().then((l) => l.length)`);
       await js(`${S}.labels.remove(${aid})`);
@@ -1088,6 +1135,8 @@ app.whenReady().then(async () => {
       check(tab.order.indexOf('plugin:simple-gallery') === tab.order.indexOf('project') + 1 && !!tab.title && tab.cards >= 1 && /1/.test(tab.btn) && tab.active && tab.gone && tab.view === 'project',
         'an installed plugin has its tab after Projects, with its page; turned off, the tab goes', JSON.stringify(tab));
       check(tab.stay.at > 0 && tab.stay.after === tab.stay.at && tab.stay.same && tab.stay.off && tab.stay.on, 'in a plugin page, checking a collection keeps the page where it was scrolled', JSON.stringify(tab.stay));
+      check(tab.pv.all === tab.pv.total && tab.pv.good === 2 && tab.pv.goodIds === 2 && /2/.test(tab.pv.goodText) && tab.pv.great === 1 && tab.pv.kept && tab.pv.dialog && tab.pv.opened && tab.pv.back && tab.pv.allAgain,
+        'a plugin page: which photos go (all, great and OK, great), a preview with the cover, open the album and come back', JSON.stringify(tab.pv));
       // hiding the navigation is done in the navigation: a button at the end of its title folds it to a strip
       // with the button that brings it back; the activity bar has no such button
       const fold = await js(`(async () => { const s = ${S}, wait = (ms) => new Promise((r) => setTimeout(r, ms));

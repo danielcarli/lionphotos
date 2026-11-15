@@ -61,7 +61,13 @@ check((() => { try { readPackage(Buffer.from('not a zip at all, sorry')); return
   check(c.name === 'Formatura: turma/2026' && c.description === 'A descrição' && c.items.length === 2, 'collections in data.js', JSON.stringify({ name: c.name, n: c.items.length }));
   check(c.items[0].file === 'IMG 1.JPG' && c.items[0].caption === 'Uma legenda' && c.items[0].alt === 'Uma audiodescrição' && c.items[1].caption === 'from the file', 'file names, descriptions (or the file’s own) and audio descriptions');
   check(c.items[0].image !== c.items[1].image && c.items.every((i) => fs.existsSync(path.join(res.dir, i.image)) && fs.existsSync(path.join(res.dir, i.thumb))), 'two photos with the same name do not overwrite each other', c.items.map((i) => i.image).join(' · '));
-  check(c.items.every((i) => i.original && fs.readFileSync(path.join(res.dir, i.original), 'utf8') === 'original bytes'), 'originals copied when asked');
+  check(c.items[0].original && fs.readFileSync(path.join(res.dir, c.items[0].original), 'utf8') === 'original bytes', 'originals copied when asked');
+  // a raw file is never exported: its name, its format and its "original" are the JPEG made from it
+  const rawItem = c.items[1], rawOrig = fs.readFileSync(path.join(res.dir, rawItem.original));
+  const everyFile = (function walk(d) { return fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : [e.name])); })(res.dir);
+  check(rawItem.file === 'IMG 1.jpg' && rawItem.ext === 'JPG' && /\.jpg$/.test(rawItem.original) && rawOrig[0] === 0xff && rawOrig[1] === 0xd8 && rawOrig[2] === 2
+    && sizes.includes(16000) && !everyFile.some((n) => /\.cr3$/i.test(n)),
+  'a raw file goes as a JPEG, never as itself (name, format, original)', JSON.stringify({ file: rawItem.file, ext: rawItem.ext, original: rawItem.original }));
   check(!/[:/]/.test(path.basename(path.dirname(path.join(res.dir, c.items[0].image)))), 'folder names are safe on every system', path.dirname(c.items[0].image));
   check(sizes.includes(2048) && sizes.includes(480) && data.options.theme === 'dark', 'the size asked, the thumbnails, the plugin options');
   check(fs.readFileSync(src, 'utf8') === 'original bytes' && fs.readdirSync(dest).length === 1, 'the photos are untouched; one new folder only');

@@ -488,3 +488,7 @@ _merge(MESSAGES, {'albums': {'setAsCover': 'Usar como portada del álbum'}})
 _merge(MESSAGES, {'about': {'short': 'Acerca de'}})
 
 _merge(MESSAGES, {'sidebar': {'hide': 'Ocultar la navegación ({key})', 'show': 'Mostrar la navegación ({key})'}})
+
+_merge(MESSAGES, {'plugins': {'which': {'label': 'Fotos a exportar', 'all': 'Todas', 'good': 'Excelentes y OK', 'great': 'Solo las excelentes'}, 'view': {'ofTotal': '{n} de {total}', 'noneWhich': 'Ninguna foto con esta marca', 'preview': 'Vista previa', 'previewTitle': 'Ver las fotos que se exportarán', 'open': 'Abrir', 'openTitle': 'Abrir «{name}» en Fotos, para verlo y cambiarlo. Volver regresa a esta página.'}, 'preview': {'count': 'A exportar: {n} de {total}', 'more': 'y {n} más', 'cover': 'Portada'}}})
+
+_merge(MESSAGES, {'plugins': {'same': {'title': {'one': 'Una foto con el mismo nombre que otra', 'other': '{count} fotos con el mismo nombre que otra'}, 'text': 'En la página serían dos fotos con un solo nombre. Elija cuál va de cada una; la otra queda fuera de esta exportación.', 'raw': 'RAW: va convertida a JPG', 'continue': 'Continuar'}}})

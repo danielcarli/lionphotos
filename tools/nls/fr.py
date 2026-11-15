@@ -488,3 +488,7 @@ _merge(MESSAGES, {'albums': {'setAsCover': 'Définir comme couverture de l’alb
 _merge(MESSAGES, {'about': {'short': 'À propos'}})
 
 _merge(MESSAGES, {'sidebar': {'hide': 'Masquer la navigation ({key})', 'show': 'Afficher la navigation ({key})'}})
+
+_merge(MESSAGES, {'plugins': {'which': {'label': 'Photos à exporter', 'all': 'Toutes', 'good': 'Excellentes et OK', 'great': 'Seulement les excellentes'}, 'view': {'ofTotal': '{n} sur {total}', 'noneWhich': 'Aucune photo avec cette marque', 'preview': 'Aperçu', 'previewTitle': 'Voir les photos qui seront exportées', 'open': 'Ouvrir', 'openTitle': 'Ouvrir « {name} » dans Photos, pour le voir et le modifier. Retour ramène à cette page.'}, 'preview': {'count': 'À exporter : {n} sur {total}', 'more': 'et {n} de plus', 'cover': 'Couverture'}}})
+
+_merge(MESSAGES, {'plugins': {'same': {'title': {'one': 'Une photo portant le même nom qu’une autre', 'other': '{count} photos portant le même nom qu’une autre'}, 'text': 'Sur la page, ce seraient deux photos sous un seul nom. Choisissez laquelle part pour chacune ; l’autre reste hors de cet export.', 'raw': 'RAW : exportée en JPG', 'continue': 'Continuer'}}})

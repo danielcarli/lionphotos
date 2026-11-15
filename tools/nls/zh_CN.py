@@ -485,3 +485,7 @@ _merge(MESSAGES, {'albums': {'setAsCover': '设为相册封面'}})
 _merge(MESSAGES, {'about': {'short': '关于'}})
 
 _merge(MESSAGES, {'sidebar': {'hide': '隐藏导航 ({key})', 'show': '显示导航 ({key})'}})
+
+_merge(MESSAGES, {'plugins': {'which': {'label': '要导出的照片', 'all': '全部', 'good': '优秀和 OK', 'great': '仅优秀'}, 'view': {'ofTotal': '{total} 中的 {n}', 'noneWhich': '没有带此标记的照片', 'preview': '预览', 'previewTitle': '查看将要导出的照片', 'open': '打开', 'openTitle': '在“照片”中打开“{name}”，以查看和修改。返回会回到此页面。'}, 'preview': {'count': '导出：{total} 中的 {n}', 'more': '另有 {n}', 'cover': '封面'}}})
+
+_merge(MESSAGES, {'plugins': {'same': {'title': {'one': '{count} 组同名照片', 'other': '{count} 组同名照片'}, 'text': '在页面上它们会是同一个名称下的两张照片。请为每组选择要导出的那一张；另一张不参与本次导出。', 'raw': 'RAW：转换为 JPG 导出', 'continue': '继续'}}})

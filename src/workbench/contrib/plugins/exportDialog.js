@@ -6,11 +6,12 @@
 // Export albums and projects with a plugin: which plugin (its page model), which albums and projects, the
 // size of the photos, whether the original files go along, and the plugin's own options. Then the folder,
 // then the typed code; the export runs in the background.
+import { askSameNames } from './sameNameDialog.js';
 import { h } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { formatNumber } from '../../../base/common/format.js';
-import { textOf } from '../../services/plugins/browser/pluginsService.js';
+import { textOf, WHICH } from '../../services/plugins/browser/pluginsService.js';
 
 const TYPES = ['album', 'project', 'person', 'pet', 'place'];
 
@@ -79,6 +80,8 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
         pickers,
         groups.length ? h('div.exp-list', { role: 'group', 'aria-label': t('plugins.export.what') }, groups) : h('p.muted', t('plugins.export.empty')),
         h('div.exp-opts',
+          h('label.exp-opt.col', h('span.small', t('plugins.which.label')), h('select.text-input.exp-which', { onchange: (e) => { plugins.setWhich(e.target.value); draw(); } },
+            WHICH.map((w) => h('option', { value: w, selected: plugins.which === w }, t(`plugins.which.${w}`))))),
           h('label.exp-opt.col', h('span.small', t('plugins.export.size')), sizeSel),
           h('label.exp-opt', originals, h('span', t('plugins.export.originals'))),
           h('label.exp-opt', { title: t('plugins.export.zipHint') }, zip, h('span', t('plugins.export.zip'))),
@@ -97,7 +100,11 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
     const go = async () => {
       const ids = [...chosen].filter((id) => current.accepts.includes(labels.get(id)?.type));
       close(true);
-      await plugins.export({ pluginId: current.id, labelIds: ids, options: values });
+      // two photos with the same name in one of them: which one goes
+      const same = plugins.sameNames(ids);
+      const skip = same.length ? await askSameNames(s, same) : null;
+      if (same.length && !skip) return;
+      await plugins.export({ pluginId: current.id, labelIds: ids, options: values, skip });
     };
 
     const dialog = h('div.cm-dialog.choice-dialog.exp-dialog', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'exp-title' },

@@ -485,3 +485,7 @@ _merge(MESSAGES, {'albums': {'setAsCover': 'アルバムの表紙にする'}})
 _merge(MESSAGES, {'about': {'short': '情報'}})
 
 _merge(MESSAGES, {'sidebar': {'hide': 'ナビゲーションを隠す ({key})', 'show': 'ナビゲーションを表示 ({key})'}})
+
+_merge(MESSAGES, {'plugins': {'which': {'label': '書き出す写真', 'all': 'すべて', 'good': '優良と OK', 'great': '優良のみ'}, 'view': {'ofTotal': '{total}中 {n}', 'noneWhich': 'このマークの写真はありません', 'preview': 'プレビュー', 'previewTitle': '書き出される写真を見る', 'open': '開く', 'openTitle': '「{name}」を写真で開いて確認・変更します。戻るでこのページに戻ります。'}, 'preview': {'count': '書き出し: {total} 中 {n}', 'more': 'ほか {n}', 'cover': '表紙'}}})
+
+_merge(MESSAGES, {'plugins': {'same': {'title': {'one': '同じ名前の写真が {count} 組あります', 'other': '同じ名前の写真が {count} 組あります'}, 'text': 'ページでは 1 つの名前で 2 枚の写真になります。それぞれどちらを書き出すか選んでください。もう一方は今回の書き出しから外れます。', 'raw': 'RAW: JPG に変換して書き出し', 'continue': '続ける'}}})

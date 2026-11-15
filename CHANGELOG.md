@@ -2,6 +2,11 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.45.0] — 2026-11-15
+
+### Added
+- **Places: "this category has no places", instead of "no place yet".** With the personal, the professional or the uncategorized photos chosen in the title bar and no place among them, the page says so by name and shows, for each of the three, how many files have a place and how many places there are — with a button to go to the one that has them. The places of the other photos looked lost.
+
 ## [1.44.0] — 2026-11-15
 
 ### Added

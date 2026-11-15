@@ -1152,6 +1152,24 @@ app.whenReady().then(async () => {
         s.layout.openView('photos'); await wait(200);
         return res; })()`);
       check(fold.inBar === 1 && fold.open && fold.folded && fold.noneElsewhere && fold.back, 'the navigation is hidden and shown from itself (a strip when hidden), not from the activity bar', JSON.stringify(fold));
+      // Places with the photos of one category chosen in the title bar and no place among them: said by name,
+      // with the files and places of each of the three categories; a click goes to the one that has them
+      const noPlace = await js(`(async () => { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        const withPlace = lib.allItems.filter((it) => [...s.labels.of(it).ids].some((id) => s.labels.get(id)?.type === 'place'));
+        const spheres = new Set(withPlace.map((it) => s.labels.sphereOf(it) || 'none'));
+        const empty = ['personal', 'professional', 'none'].find((k) => !spheres.has(k));
+        if (!empty || !withPlace.length) return { skipped: true };
+        lib.setFilter({ sphere: empty }); s.layout.openView('place'); await wait(500);
+        const v = document.querySelector('.view-labels-place'), rows = [...v.querySelectorAll('.place-spheres tr')];
+        const res = { title: v.querySelector('.place-none h3')?.textContent || '', rows: rows.length, here: v.querySelector('.place-spheres tr.is-here')?.dataset.sphere === empty };
+        const full = rows.find((r) => r.querySelector('button'));
+        res.files = full ? parseInt(full.children[1].textContent, 10) : 0; res.expected = withPlace.filter((it) => (s.labels.sphereOf(it) || 'none') === full?.dataset.sphere).length;
+        full?.querySelector('button').click(); await wait(500);
+        res.went = lib.filter.sphere === full?.dataset.sphere && !document.querySelector('.view-labels-place .place-none');
+        lib.setFilter({ sphere: '' }); s.layout.openView('photos'); await wait(200);
+        return res; })()`);
+      check(noPlace.skipped || (/has no files with places/.test(noPlace.title) && noPlace.rows === 3 && noPlace.here && noPlace.files > 0 && noPlace.files === noPlace.expected && noPlace.went),
+        'Places: a category without places says so, with the files and places of each one, and goes to the one that has them', JSON.stringify(noPlace));
       // the credits by name in the activity bar: "About" opens who made it, the license and the version
       const about = await js(`(async () => { const wait = (ms) => new Promise((r) => setTimeout(r, ms));
         const b = document.querySelector('.activitybar .activity-about'); b?.click(); await wait(400);

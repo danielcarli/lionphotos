@@ -7,7 +7,8 @@
 // create, rename and delete them, see how many items each one has and when they were taken, as a grid of
 // cards or a list, by year, and open them in Photos.
 import { pageIntro } from '../../browser/pageIntro.js';
-import { sphereScope } from './sphereIcons.js';
+import { sphereScope, SPHERE_KEYS } from './sphereIcons.js';
+import { SPHERE_ICON } from '../../services/labels/browser/labelsService.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
@@ -86,7 +87,37 @@ export class LabelsView extends ViewPane {
         })
         : list.length ? h('p.muted', t('projects.noneInStatus'))
           : type === 'place' && labels.autoPlaces().length ? null
+            : type === 'place' && SPHERE_KEYS.includes(this.library.filter.sphere) ? this.#noPlacesHere()
             : h('div.empty-state', h('span', { html: icon(this.spec.icon, 28) }), h('h3', t(`labels.type.${type}.empty`)), h('p.muted', t(type === 'place' ? 'places.howTo' : 'labels.howTo'))));
+  }
+
+  /**
+   * No place in the photos chosen in the title bar (personal, professional, not categorized): said by name —
+   * the places are not lost, they are in the other photos — with how many files have a place, and how many
+   * places, in each of the three; a click goes there.
+   */
+  #noPlacesHere() {
+    const { labels, library } = this;
+    const here = library.filter.sphere;
+    const count = Object.fromEntries(SPHERE_KEYS.map((k) => [k, { files: 0, places: new Set() }]));
+    for (const it of library.allItems) {
+      const ids = [...labels.of(it).ids].filter((id) => labels.get(id)?.type === 'place');
+      if (!ids.length) continue;
+      const c = count[labels.sphereOf(it) || 'none'];
+      c.files++;
+      for (const id of ids) c.places.add(id);
+    }
+    return h('div.empty-state.place-none',
+      h('span', { html: icon(this.spec.icon, 28) }),
+      h('h3', t('places.sphereEmpty', { sphere: t(`sphere.option.${here}`) })),
+      h('table.place-spheres', { 'aria-label': t('places.sphereTable') },
+        h('tbody', SPHERE_KEYS.map((k) => h(`tr${k === here ? '.is-here' : ''}`, { 'data-sphere': k },
+          h('th', { scope: 'row' }, h('span', { html: icon(SPHERE_ICON[k], 14) }), t(`sphere.option.${k}`)),
+          h('td', tn('places.sphereFiles', count[k].files)),
+          h('td', tn('places.spherePlaces', count[k].places.size)),
+          h('td', k === here ? h('span.small.muted', t('places.sphereHere'))
+            : count[k].places.size ? h('button.btn.btn-secondary.btn-sm', { type: 'button', onclick: () => library.setFilter({ sphere: k }) }, t('places.sphereShow')) : null))))),
+      h('p.muted', t('places.howTo')));
   }
 
   /** The places of the photos on the world map (drawn here, no map service). */

@@ -571,6 +571,13 @@ tr:hover td.col-actions .icon-button { opacity: 1; }
 .empty-state { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 60px 20px; color: var(--accent); }
 .empty-state h3 { margin: 8px 0 0; color: var(--text-primary); font-weight: 600; }
 .empty-state p { margin: 0; }
+/* no place in the photos chosen in the title bar: how many there are in each of the three */
+.place-spheres { margin: 14px 0 12px; border-collapse: collapse; color: var(--text-primary); font-size: 14px; }
+.place-spheres th, .place-spheres td { padding: 8px 16px; border-bottom: 1px solid var(--border); text-align: left; font-weight: 400; white-space: nowrap; }
+.place-spheres th { font-weight: 600; }
+.place-spheres th span { display: inline-block; vertical-align: -2px; margin-right: 8px; color: var(--accent); }
+.place-spheres td { font-variant-numeric: tabular-nums; }
+.place-spheres tr.is-here th, .place-spheres tr.is-here td { color: var(--text-secondary); }
 
 /* ---------- status bar ---------- */
 .statusbar {

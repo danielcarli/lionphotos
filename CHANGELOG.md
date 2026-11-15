@@ -2,6 +2,11 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.41.3] — 2026-11-15
+
+### Fixed
+- **The date rail no longer strikes out a year.** The mark of where the page is was a line across the rail, which crossed the year it passed over; it is now a short bar at the rail's edge, beside the years.
+
 ## [1.41.2] — 2026-11-15
 
 ### Changed

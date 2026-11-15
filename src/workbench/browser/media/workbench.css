@@ -943,7 +943,8 @@ code.hash { font: 500 11px var(--font-mono); color: var(--text-secondary); paddi
 .date-rail-mark { position: absolute; right: 10px; transform: translateY(-50%); font-size: 11px; font-weight: 650; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .date-rail-mark.is-dot { width: 4px; height: 4px; right: 18px; border-radius: 50%; background: var(--text-muted); opacity: 0.6; }
 .date-rail:hover .date-rail-mark:not(.is-dot), .date-rail.is-dragging .date-rail-mark:not(.is-dot) { color: var(--text-primary); }
-.date-rail-now { position: absolute; right: 6px; width: 30px; height: 3px; margin-top: -1.5px; border-radius: 2px; background: var(--accent); pointer-events: none; }
+/* where the page is: a short bar at the rail's edge, beside the years — never across one (it looked struck out) */
+.date-rail-now { position: absolute; right: 2px; width: 3px; height: 20px; margin-top: -10px; border-radius: 2px; background: var(--accent); pointer-events: none; }
 .date-rail-tip { position: absolute; right: 44px; transform: translateY(-50%); padding: 5px 10px; border-radius: 8px; white-space: nowrap; pointer-events: none;
   font-size: 12.5px; font-weight: 650; color: var(--btn-primary-fg); background: var(--btn-primary-bg); box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22); }
 .date-rail-tip::first-letter { text-transform: uppercase; }

@@ -2,6 +2,14 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.45.1] — 2026-11-15
+
+### Changed
+- **`LICENSE` is the MIT License text alone**, so GitHub (and other tools) name the license as MIT. The notices of the bundled third-party components moved, unchanged, to `THIRD-PARTY-NOTICES.md`, which goes in the application as well.
+
+### Removed
+- A folder of test pictures (`--help/`) that had been committed by mistake.
+
 ## [1.45.0] — 2026-11-15
 
 ### Added

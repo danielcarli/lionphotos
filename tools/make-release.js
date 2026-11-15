@@ -31,7 +31,7 @@ if (tag !== `v${version}`) fail(`Tag ${tag} does not match package.json version 
 if (!/^\d+\.\d+\.\d+$/.test(electron || '')) fail('Exact Electron version not found in package-lock.json.');
 
 // ------------------------------------------------------------------ files in the app bundle
-const INCLUDE = ['package.json', 'LICENSE', 'README.md', 'CHANGELOG.md', 'src', 'build/icon.ico', 'build/icons'];
+const INCLUDE = ['package.json', 'LICENSE', 'THIRD-PARTY-NOTICES.md', 'README.md', 'CHANGELOG.md', 'src', 'build/icon.ico', 'build/icons'];
 function collect(rel, out = []) {
   const abs = path.join(ROOT, rel);
   const st = fs.statSync(abs);

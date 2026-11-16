@@ -11,7 +11,7 @@ Travaille sur vos dossiers tels qu'ils sont : de petites miniatures créées une
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · **Français** · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Version 1.47.1](https://img.shields.io/badge/version-1.47.1-161214)
+![Version 1.50.0](https://img.shields.io/badge/version-1.50.0-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -76,6 +76,7 @@ Il **n’a pas pour but de remplacer Lightroom, Photoshop ni d’autres éditeur
 LionPhotos est en **bêta**. Cela signifie :
 
 - Il est utilisé tous les jours sur une vraie collection, et chaque version passe plus de 100 vérifications automatiques de bout en bout, mais il n’a pas encore servi sur beaucoup d’ordinateurs et de collections différents.
+- **Testé sur une grande collection, sur un disque ordinaire :** plus de 70 000 fichiers sur un disque dur externe USB 3.1 — un disque dur classique, pas un SSD. Dans ce test, les performances se sont montrées satisfaisantes.
 - Avant d’organiser, de renommer ou de réorganiser une collection pour la première fois, **gardez-en une sauvegarde** (l’onglet Sauvegarde peut la faire). Toute opération peut être annulée et rien n’est supprimé définitivement, mais une sauvegarde reste le filet le plus sûr.
 - Les installateurs ne sont pas encore signés avec un certificat payant (voir [Télécharger](#télécharger)).
 - Les photos RAW sont retouchées, par défaut, sur le JPEG que l’appareil range dedans (8 bits) ; le **mode développement** (un interrupteur dans Réglages) retouche les données du capteur, développées sur cet ordinateur en 16 bits avec LibRaw — nouveau et encore en réglage (ses couleurs ne sont ni celles de l’appareil ni celles de Lightroom). Il faut une carte graphique avec WebGL 2.
@@ -272,7 +273,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.47.1**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.50.0**.
 
 ## Crédits
 

@@ -11,6 +11,8 @@ import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { formatBytes, bytesParts, formatNumber, formatDate } from '../../../base/common/format.js';
 import { ViewPane } from '../../browser/viewPane.js';
+import { Eta } from '../../../base/common/eta.js';
+import { etaText } from '../../browser/parts/statusbarPart.js';
 import { dateOf } from '../../services/library/browser/libraryService.js';
 
 const PAGE = 60;
@@ -29,6 +31,18 @@ export class DuplicatesView extends ViewPane {
     const b = bytesParts(wasted);
     const p = d.progress;
     const pct = p && p.bytesTotal ? Math.min(100, Math.round((p.bytesDone / p.bytesTotal) * 100)) : 0;
+    // the time still needed, step by step: comparing the starts and ends goes by files (each one a seek on
+    // the disk), the full SHA-256 by bytes; how much the second step reads is known only when the first ends
+    let eta = '';
+    clearTimeout(this.etaTimer);
+    if (d.status === 'running' && p) {
+      if (this.etaStage !== p.stage) { this.etaStage = p.stage; this.eta = new Eta(); }
+      const [done, total] = p.stage === 'full' ? [p.bytesDone, p.bytesTotal] : [p.filesDone, p.filesTotal];
+      this.eta.update(done, total);
+      const left = this.eta.remaining();
+      eta = left == null ? etaText(null) : p.stage === 'full' ? etaText(left) : t('dupes.etaStep', { eta: etaText(left) });
+      this.etaTimer = setTimeout(() => { if (this.visible) this.render(); }, 15000);
+    } else { this.etaStage = null; }
 
     const dupIntro = pageIntro('duplicates', t('dupes.lead'));
     const intro = h('div.card.dup-intro',
@@ -39,7 +53,7 @@ export class DuplicatesView extends ViewPane {
         d.status === 'running'
           ? h('div.dup-progress',
               h('div.progress-bar', h('span', { style: { width: `${pct}%` } })),
-              h('div.small.muted', p ? t(`dupes.stage.${p.stage}`, { done: formatNumber(p.filesDone), total: formatNumber(p.filesTotal), pct }) : t('dupes.starting')),
+              h('div.small.muted', p ? [t(`dupes.stage.${p.stage}`, { done: formatNumber(p.filesDone), total: formatNumber(p.filesTotal), pct }), eta].filter(Boolean).join(' · ') : t('dupes.starting')),
               h('button.btn.btn-secondary.btn-sm', { onclick: () => d.cancel() }, t('common.cancel')))
           : h('div.btn-row.dup-actions',
               h('button.btn.btn-primary', { onclick: () => d.find() }, h('span', { html: icon('search', 14) }), d.status === 'done' ? t('dupes.again') : t('dupes.find')),

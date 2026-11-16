@@ -499,3 +499,9 @@ _merge(MESSAGES, {'showcase': {'modeTitle': 'ハイライト: スターまたは
 _merge(MESSAGES, {'statusbar': {'eta': {'estimating': '残り時間を計算中…', 'lessMinute': '残り 1 分未満', 'minutes': {'one': '残り約 1 分', 'other': '残り約 {count} 分'}, 'hours': {'one': '残り約 1 時間', 'other': '残り約 {count} 時間'}, 'hoursMinutes': '残り約 {hours} 時間 {minutes} 分'}}})
 
 _merge(MESSAGES, {'statusbar': {'thumbsKept': 'サムネイルはカタログに保存され、作り直されません: {kept} 件は作成済みで、足りない {missing} 件だけを作成中です。'}})
+
+_merge(MESSAGES, {'dupes': {'etaStep': 'このステップは{eta}'}})
+
+_merge(MESSAGES, {'trashlog': {'byRoot': 'ルートフォルダー別', 'byRootHint': 'ドライブやフォルダーごとに送った量と、その合計。クリックすると、下にそのフォルダーだけを表示します。', 'rootAll': 'すべてのルートフォルダー', 'rootUnknown': '記録されていないルートフォルダー', 'col': {'root': 'ルートフォルダー', 'sent': 'ごみ箱に送った量', 'limbo': 'リンボで空いた容量', 'dups': '重複ファイル'}}})
+
+_merge(MESSAGES, {'overview': {'cache': 'LionPhotos が使っている容量', 'cacheHint': 'サムネイルとプレビューは一度だけ作られ、カタログに保存されます。ファイルが変わったときだけ作り直します。写真そのものは含みません。', 'space': {'thumbsTotal': 'サムネイルとプレビュー', 'fileTotal': 'このコンピューター上のカタログファイル', 'photoThumbs': '写真のサムネイル', 'videoThumbs': '動画のサムネイル', 'adjusted': '補正した写真のサムネイル', 'byRoot': 'ルートフォルダー別', 'rootTotal': '合計', 'portable': '.lionphotos', 'portableTitle': '写真と一緒に保存されたカタログ。各ルートフォルダーの隠しフォルダー .lionphotos にあります（ドライブが接続されていないときは —）'}}, 'settings': {'space': '使用容量', 'spaceLoading': '計測中…', 'spaceLine': 'サムネイルとプレビュー: {thumbs} · カタログファイル: {file}', 'spaceDetails': '詳細'}})

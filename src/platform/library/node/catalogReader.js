@@ -21,9 +21,6 @@ if (!isMainThread && workerData?.catalogReader) {
       ORDER BY coalesce(taken_at, mtime) DESC`),
     roots: db.prepare(`SELECT r.path, r.last_scan_at AS lastScanAt, count(m.id) AS count, coalesce(sum(m.kind = 2), 0) AS videos,
       coalesce(sum(m.size), 0) AS bytes FROM roots r LEFT JOIN media m ON m.root_id = r.id GROUP BY r.id ORDER BY r.last_scan_at DESC`),
-    // the sizes of the cache: summing the thumbnails' bytes reads every page of them (seconds on a big catalog)
-    cache: ['thumbs', 'previews', 'adjusted_thumbs'].map((tb) => db.prepare(`SELECT count(*) AS count, coalesce(sum(length(data)), 0) AS bytes FROM ${tb}`)),
-    cacheItems: db.prepare('SELECT count(*) AS count, coalesce(sum(kind = 2), 0) AS videos FROM media'),
     faceCandidates: Object.fromEntries(['face', 'pet', 'scene'].map((k) => [k, db.prepare(`SELECT m.id FROM media m LEFT JOIN ${scanTable(k)} s ON s.media_id = m.id
       WHERE m.root_id = ? AND ${candidateWhere(k)} AND (s.media_id IS NULL OR s.size != m.size OR s.mtime != m.mtime)
       ORDER BY coalesce(m.taken_at, m.mtime) DESC`)])),
@@ -45,11 +42,7 @@ if (!isMainThread && workerData?.catalogReader) {
     listBuffer: (rootId) => new TextEncoder().encode(q.list.get(rootId).j).buffer,
     pendingThumbs: (rootId) => q.pendingThumbs.all(rootId).map((r) => r.id),
     roots: () => q.roots.all(),
-    cacheStats: () => {
-      const [th, pv, aj] = q.cache.map((x) => x.get());
-      const lib = q.cacheItems.get();
-      return { thumbs: th.count + aj.count, thumbBytes: th.bytes + aj.bytes, previews: pv.count, previewBytes: pv.bytes, items: lib.count, videos: lib.videos, file: workerData.file };
-    },
+    cacheStats: () => require('./cacheStats').cacheStats(db, workerData.file),
     faceCandidates: (rootId, kind = 'face') => q.faceCandidates[q.faceCandidates[kind] ? kind : 'face'].all(rootId).map((r) => r.id),
     // what each photo shows (scenes), still valid: one string "id data" per line, made by SQLite
     scenes: (rootId) => q.scenes.get(rootId).j || '',

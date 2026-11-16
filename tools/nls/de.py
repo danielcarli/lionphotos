@@ -502,3 +502,9 @@ _merge(MESSAGES, {'showcase': {'modeTitle': 'Highlights: nur was Fotos mit Stern
 _merge(MESSAGES, {'statusbar': {'eta': {'estimating': 'Zeit wird geschätzt…', 'lessMinute': 'noch weniger als 1 Minute', 'minutes': {'one': 'noch etwa 1 Minute', 'other': 'noch etwa {count} Minuten'}, 'hours': {'one': 'noch etwa 1 Stunde', 'other': 'noch etwa {count} Stunden'}, 'hoursMinutes': 'noch etwa {hours} Std. {minutes} Min.'}}})
 
 _merge(MESSAGES, {'statusbar': {'thumbsKept': 'Miniaturen bleiben im Katalog und werden nie neu erstellt: {kept} waren fertig, nur die {missing} fehlenden werden erstellt.'}})
+
+_merge(MESSAGES, {'dupes': {'etaStep': '{eta} in diesem Schritt'}})
+
+_merge(MESSAGES, {'trashlog': {'byRoot': 'Nach Stammordner', 'byRootHint': 'Wie viel jedes Laufwerk oder jeder Ordner abgegeben hat, und alle zusammen. Klicken Sie auf einen, um unten nur ihn zu sehen.', 'rootAll': 'Alle Stammordner', 'rootUnknown': 'Stammordner nicht erfasst', 'col': {'root': 'Stammordner', 'sent': 'In den Papierkorb', 'limbo': 'Vom Limbo freigegeben', 'dups': 'Doppelte Dateien'}}})
+
+_merge(MESSAGES, {'overview': {'cache': 'Von LionPhotos belegter Speicher', 'cacheHint': 'Miniaturen und Vorschauen, einmal erstellt und im Katalog gespeichert; neu erstellt nur, wenn sich eine Datei ändert. Ihre Fotos zählen nicht mit.', 'space': {'thumbsTotal': 'für Miniaturen und Vorschauen', 'fileTotal': 'Katalogdatei auf diesem Computer', 'photoThumbs': 'Foto-Miniaturen', 'videoThumbs': 'Video-Miniaturen', 'adjusted': 'Miniaturen bearbeiteter Fotos', 'byRoot': 'Nach Stammordner', 'rootTotal': 'Gesamt', 'portable': '.lionphotos', 'portableTitle': 'Der Katalog bei den Fotos, im versteckten Ordner .lionphotos jedes Stammordners (— wenn das Laufwerk nicht angeschlossen ist)'}}, 'settings': {'space': 'Belegter Speicher', 'spaceLoading': 'Wird gemessen…', 'spaceLine': 'Miniaturen und Vorschauen: {thumbs} · Katalogdatei: {file}', 'spaceDetails': 'Details'}})

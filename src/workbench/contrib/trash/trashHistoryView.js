@@ -7,6 +7,8 @@
 // when, which file, from which folder, how big and from where (the Limbo, Duplicates, a selection) — and how
 // much space the Limbo freed: in all, this month, month by month. Read from the operations log; nothing here
 // changes a file. The disk gets the space back when the Recycle Bin is emptied.
+// Split by root folder (each drive, each collection opened): how much left each one, and all of them
+// together; a click on one shows the page for that one alone.
 import { pageIntro } from '../../browser/pageIntro.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
@@ -20,6 +22,7 @@ const FROM = ['limbo', 'duplicates', 'other'];
 export class TrashHistoryView extends ViewPane {
   rows = null; // null while loading
   from = '';   // '' all · 'limbo' · 'duplicates' · 'other'
+  root = null; // null every root folder · a root's path · '' the files whose root was not recorded
   query = '';
   shown = PAGE;
 
@@ -32,7 +35,14 @@ export class TrashHistoryView extends ViewPane {
   async #load() {
     if (this.loading) return;
     this.loading = true;
-    try { this.rows = await this.operations.trashHistory(); } catch { this.rows = []; }
+    let rows = [];
+    try { rows = await this.operations.trashHistory(); } catch { rows = []; }
+    // the root folder of each file: as logged, or — for the oldest entries — the known root it lies in
+    let roots = [];
+    try { roots = (await this.host.library.roots()).map((r) => r.path).sort((a, b) => b.length - a.length); } catch { /* none known */ }
+    const inside = (p, root) => p === root || p.startsWith(root.endsWith('\\') || root.endsWith('/') ? root : `${root}${p.includes('\\') ? '\\' : '/'}`);
+    for (const r of rows) r.rootOf = r.root || roots.find((root) => inside(r.path, root)) || '';
+    this.rows = rows; // only now: a render meanwhile still shows "loading"
     this.loading = false;
     this.invalidate();
   }
@@ -43,8 +53,10 @@ export class TrashHistoryView extends ViewPane {
       setChildren(this.element, this.#header(), h('p.muted', t('trashlog.loading')));
       return;
     }
-    const rows = this.rows;
-    setChildren(this.element, this.#header(), rows.length ? [this.#report(rows), this.#list(rows)] : this.#empty());
+    const all = this.rows;
+    if (this.root !== null && !all.some((r) => r.rootOf === this.root)) this.root = null;
+    const rows = this.root === null ? all : all.filter((r) => r.rootOf === this.root);
+    setChildren(this.element, this.#header(), all.length ? [this.#byRoot(all), this.#report(rows), this.#list(rows)] : this.#empty());
   }
 
   #header() {
@@ -54,6 +66,37 @@ export class TrashHistoryView extends ViewPane {
 
   #empty() {
     return h('div.empty-state.th-empty', h('span', { html: icon('trash', 28) }), h('h3', t('trashlog.emptyTitle')), h('p.muted', t('trashlog.emptyLead')));
+  }
+
+  // ------------------------------------------------------------------ by root folder
+  /** Each root folder (a drive, a collection): what was sent from it, what the Limbo freed, the repeated files — and all together. */
+  #byRoot(all) {
+    const by = new Map();
+    for (const r of all) {
+      let g = by.get(r.rootOf);
+      if (!g) by.set(r.rootOf, (g = { sent: 0, files: 0, limbo: 0, limboFiles: 0, dups: 0, dupFiles: 0 }));
+      g.sent += r.size || 0; g.files++;
+      if (r.from === 'limbo') { g.limbo += r.size || 0; g.limboFiles++; }
+      if (r.from === 'duplicates') { g.dups += r.size || 0; g.dupFiles++; }
+    }
+    const total = { sent: 0, files: 0, limbo: 0, limboFiles: 0, dups: 0, dupFiles: 0 };
+    for (const g of by.values()) for (const k of Object.keys(total)) total[k] += g[k];
+    const groups = [...by].sort((a, b) => b[1].sent - a[1].sent);
+    const cell = (bytes, files) => h('td.num', h('span.th-root-bytes', formatBytes(bytes)), h('span.th-root-files', tn('trashlog.files', files)));
+    const pick = (root) => { this.root = this.root === root ? null : root; this.shown = PAGE; this.invalidate(); };
+    const row = (root, g, label, cls = '') => {
+      const on = root === null ? this.root === null : this.root === root;
+      return h(`tr.th-root${cls}${on ? '.is-on' : ''}`, { 'data-root': root ?? '*' },
+        h('td', h('button.th-root-name', { type: 'button', 'aria-pressed': String(on), title: root || label, onclick: () => pick(root) },
+          h('span', { html: icon(root === null ? 'layers' : 'folder', 14) }), h('span', label))),
+        cell(g.sent, g.files), cell(g.limbo, g.limboFiles), cell(g.dups, g.dupFiles));
+    };
+    return h('div.card.th-roots',
+      h('div.card-header', h('h2', h('span', { html: icon('folder', 16) }), t('trashlog.byRoot')), h('p', t('trashlog.byRootHint'))),
+      h('div.th-scroll', h('table.th-table.th-root-table',
+        h('thead', h('tr', h('th', t('trashlog.col.root')), h('th.num', t('trashlog.col.sent')), h('th.num', t('trashlog.col.limbo')), h('th.num', t('trashlog.col.dups')))),
+        h('tbody', groups.map(([root, g]) => row(root, g, root || t('trashlog.rootUnknown')))),
+        h('tfoot', row(null, total, t('trashlog.rootAll'), '.th-root-total')))));
   }
 
   // ------------------------------------------------------------------ the report
@@ -102,8 +145,11 @@ export class TrashHistoryView extends ViewPane {
     const nameOf = (p) => p.split(/[\\/]/).pop();
     const folderOf = (r) => {
       const dir = r.path.slice(0, Math.max(0, r.path.length - nameOf(r.path).length - 1));
-      if (r.root && dir === r.root) return t('common.rootFolder');
-      return r.root && dir.startsWith(r.root) ? dir.slice(r.root.length + 1) : dir;
+      const root = r.rootOf || r.root;
+      if (root && dir === root) return t('common.rootFolder');
+      // with every root folder shown, the root is said too (the same "2024" can be on two drives)
+      const rel = root && dir.startsWith(root) ? dir.slice(root.length + 1) : dir;
+      return this.root === null && root ? `${root.split(/[\\/]/).filter(Boolean).pop()} › ${rel}` : rel;
     };
     const list = rows.filter((r) => (!this.from || (r.from || 'other') === this.from) && (!q || r.path.toLocaleLowerCase().includes(q)));
     const chip = (key, label, n) => h(key === this.from ? 'button.chip.th-chip.active' : 'button.chip.th-chip', {

@@ -499,3 +499,9 @@ _merge(MESSAGES, {'showcase': {'modeTitle': '하이라이트: 별표나 OK가 �
 _merge(MESSAGES, {'statusbar': {'eta': {'estimating': '남은 시간 계산 중…', 'lessMinute': '1분 미만 남음', 'minutes': {'one': '약 1분 남음', 'other': '약 {count}분 남음'}, 'hours': {'one': '약 1시간 남음', 'other': '약 {count}시간 남음'}, 'hoursMinutes': '약 {hours}시간 {minutes}분 남음'}}})
 
 _merge(MESSAGES, {'statusbar': {'thumbsKept': '미리보기 이미지는 카탈로그에 보관되며 다시 만들지 않습니다: {kept}개는 이미 준비되었고, 없는 {missing}개만 만들고 있습니다.'}})
+
+_merge(MESSAGES, {'dupes': {'etaStep': '이 단계 {eta}'}})
+
+_merge(MESSAGES, {'trashlog': {'byRoot': '루트 폴더별', 'byRootHint': '드라이브나 폴더마다 보낸 양과 전체 합계입니다. 하나를 클릭하면 아래에 그것만 표시됩니다.', 'rootAll': '모든 루트 폴더', 'rootUnknown': '기록되지 않은 루트 폴더', 'col': {'root': '루트 폴더', 'sent': '휴지통으로 보냄', 'limbo': '림보로 확보한 공간', 'dups': '중복 파일'}}})
+
+_merge(MESSAGES, {'overview': {'cache': 'LionPhotos가 사용하는 공간', 'cacheHint': '미리보기 이미지와 미리보기는 한 번 만들어 카탈로그에 보관하며, 파일이 바뀔 때만 다시 만듭니다. 사진 자체는 포함하지 않습니다.', 'space': {'thumbsTotal': '미리보기 이미지와 미리보기', 'fileTotal': '이 컴퓨터의 카탈로그 파일', 'photoThumbs': '사진 미리보기 이미지', 'videoThumbs': '동영상 미리보기 이미지', 'adjusted': '보정한 사진의 미리보기 이미지', 'byRoot': '루트 폴더별', 'rootTotal': '합계', 'portable': '.lionphotos', 'portableTitle': '사진과 함께 보관된 카탈로그. 각 루트 폴더의 숨김 폴더 .lionphotos에 있습니다(드라이브가 연결되지 않으면 —)'}}, 'settings': {'space': '사용 공간', 'spaceLoading': '측정 중…', 'spaceLine': '미리보기 이미지와 미리보기: {thumbs} · 카탈로그 파일: {file}', 'spaceDetails': '자세히'}})

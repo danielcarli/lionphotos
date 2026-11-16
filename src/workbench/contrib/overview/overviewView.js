@@ -39,7 +39,7 @@ export class OverviewView extends ViewPane {
     super(services, 'overview');
     this.library.onDidChangeData(() => this.invalidate());
     this.thumbs.onDidChangeStatus(() => { if (this.visible && !this.thumbs.status.thumbPending) this.#renderCache(); });
-    this.cacheCard = h('div.card');
+    this.cacheCard = h('div.card.span-2.space-card', { id: 'lionphotos-space' });
   }
 
   render() {
@@ -117,13 +117,39 @@ export class OverviewView extends ViewPane {
   async #renderCache() {
     const s = await this.host.thumbs.cacheStats().catch(() => null);
     if (!s) return;
+    // the space LionPhotos uses: thumbnails of photos and of videos, of adjusted photos, previews — in all and
+    // for each root folder (a drive, a collection) — and the catalog file on the disk
+    const z = { count: 0, bytes: 0 };
+    const photo = s.photoThumbs || { count: s.thumbs, bytes: s.thumbBytes }, video = s.videoThumbs || z, adj = s.adjusted || z;
+    const prev = s.previewsTotal || { count: s.previews, bytes: s.previewBytes };
+    const sum = (...xs) => xs.reduce((a, x) => a + x.bytes, 0);
+    const cell = (x) => h('td.num', h('span.space-bytes', formatBytes(x.bytes)), h('span.space-n', formatNumber(x.count)));
+    const roots = (s.byRoot || []).filter((g) => g.items || sum(g.photoThumbs, g.videoThumbs, g.adjusted, g.previews));
+    const rootName = (p) => p.split(/[\\/]/).filter(Boolean).pop() || p;
     setChildren(this.cacheCard,
       h('div.card-header', h('h2', t('overview.cache')), h('p', t('overview.cacheHint'))),
+      h('div.space-total',
+        h('div.space-big', h('strong', formatBytes(sum(photo, video, adj, prev))), h('span', t('overview.space.thumbsTotal'))),
+        s.fileBytes ? h('div.space-big.is-file', h('strong', formatBytes(s.fileBytes)), h('span', t('overview.space.fileTotal'))) : null),
       h('dl.info-list.cache-list',
-        h('dt', t('overview.cacheThumbs')), h('dd', `${formatNumber(s.thumbs)} · ${formatBytes(s.thumbBytes)}`),
-        h('dt', t('overview.cachePreviews')), h('dd', `${formatNumber(s.previews)} · ${formatBytes(s.previewBytes)}`),
-        h('dt', t('overview.cacheAverage')), h('dd', s.thumbs ? formatBytes(s.thumbBytes / s.thumbs) : '—'),
+        h('dt', t('overview.space.photoThumbs')), h('dd', `${formatNumber(photo.count)} · ${formatBytes(photo.bytes)}`),
+        h('dt', t('overview.space.videoThumbs')), h('dd', `${formatNumber(video.count)} · ${formatBytes(video.bytes)}`),
+        adj.count ? [h('dt', t('overview.space.adjusted')), h('dd', `${formatNumber(adj.count)} · ${formatBytes(adj.bytes)}`)] : null,
+        h('dt', t('overview.cachePreviews')), h('dd', `${formatNumber(prev.count)} · ${formatBytes(prev.bytes)}`),
+        h('dt', t('overview.cacheAverage')), h('dd', photo.count + video.count ? formatBytes((photo.bytes + video.bytes) / (photo.count + video.count)) : '—'),
         h('dt', t('overview.cacheFile')), h('dd.mono', { title: s.file }, s.file)),
+      roots.length ? h('div.space-roots',
+        h('h3', t('overview.space.byRoot')),
+        h('div.th-scroll', h('table.th-table.space-table',
+          h('thead', h('tr', h('th', t('trashlog.col.root')), h('th.num', t('overview.space.photoThumbs')), h('th.num', t('overview.space.videoThumbs')),
+            h('th.num', t('overview.cachePreviews')), h('th.num', t('overview.space.rootTotal')), h('th.num', { title: t('overview.space.portableTitle') }, t('overview.space.portable')))),
+          h('tbody', roots.map((g) => h(`tr${g.root === this.library.root ? '.is-here' : ''}`,
+            h('td', { title: g.root }, h('span.space-root', rootName(g.root)), h('span.space-path', g.root)),
+            cell(g.photoThumbs), cell(g.videoThumbs), cell({ count: g.previews.count, bytes: g.previews.bytes + g.adjusted.bytes }),
+            h('td.num.space-sum', formatBytes(sum(g.photoThumbs, g.videoThumbs, g.adjusted, g.previews))),
+            h('td.num', g.portableBytes ? formatBytes(g.portableBytes) : '—')))),
+          roots.length > 1 ? h('tfoot', h('tr.space-all', h('td', t('trashlog.rootAll')), cell(photo), cell(video), cell({ count: prev.count, bytes: prev.bytes + adj.bytes }),
+            h('td.num.space-sum', formatBytes(sum(photo, video, adj, prev))), h('td.num', formatBytes(roots.reduce((a, g) => a + (g.portableBytes || 0), 0))))) : null))) : null,
       h('div.btn-row.cache-actions',
         h('button.btn.btn-danger-outline.btn-sm', { onclick: () => this.operations.run('clearCache', {}) }, h('span', { html: icon('trash', 13) }), t('overview.clearCache'))));
   }

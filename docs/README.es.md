@@ -11,7 +11,7 @@ Trabaja con sus carpetas tal como están: miniaturas pequeñas hechas una sola v
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · **Español** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versión 1.47.1](https://img.shields.io/badge/version-1.47.1-161214)
+![Versión 1.50.0](https://img.shields.io/badge/version-1.50.0-161214)
 ![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -76,6 +76,7 @@ También **edita y corrige**, para el trabajo rápido y ligero que necesita la m
 LionPhotos está en **beta**. Eso significa:
 
 - Se usa a diario con una colección real, y cada versión supera más de 100 comprobaciones automáticas de extremo a extremo, pero todavía no se ha usado en muchos ordenadores y colecciones distintos.
+- **Probado con una colección grande en un disco común:** más de 70 000 archivos en un disco duro externo USB 3.1 — un disco común, no un SSD. En esta prueba, el rendimiento ha resultado satisfactorio.
 - Antes de organizar, renombrar o reorganizar una colección por primera vez, **tenga una copia de seguridad** (la pestaña Copia de seguridad puede hacerla). Toda operación se puede deshacer y nada se borra para siempre, pero la copia de seguridad es la red más segura.
 - Los instaladores todavía no están firmados con un certificado de pago (vea [Descargar](#descargar)).
 - Las fotos RAW se editan, por defecto, sobre el JPEG que la cámara guarda dentro (8 bits); el **modo revelado** (un interruptor en Ajustes) edita los datos del sensor, revelados en este ordenador en 16 bits con LibRaw — nuevo y aún en ajuste (sus colores no son los de la cámara ni los de Lightroom). Necesita tarjeta gráfica con WebGL 2.
@@ -272,7 +273,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Historial de cambios
 
-Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.47.1**.
+Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.50.0**.
 
 ## Créditos
 

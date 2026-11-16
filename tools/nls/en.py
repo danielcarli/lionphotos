@@ -502,3 +502,9 @@ _merge(MESSAGES, {'showcase': {'modeTitle': 'Highlights: only those with photos 
 _merge(MESSAGES, {'statusbar': {'eta': {'estimating': 'estimating the time…', 'lessMinute': 'less than a minute left', 'minutes': {'one': 'about 1 minute left', 'other': 'about {count} minutes left'}, 'hours': {'one': 'about 1 hour left', 'other': 'about {count} hours left'}, 'hoursMinutes': 'about {hours} h {minutes} min left'}}})
 
 _merge(MESSAGES, {'statusbar': {'thumbsKept': 'Thumbnails are kept in the catalog and never made again: {kept} were ready, only the {missing} missing ones are being made.'}})
+
+_merge(MESSAGES, {'dupes': {'etaStep': '{eta} in this step'}})
+
+_merge(MESSAGES, {'trashlog': {'byRoot': 'By root folder', 'byRootHint': 'How much left each drive or folder, and all of them together. Click one to see only it below.', 'rootAll': 'All root folders', 'rootUnknown': 'Root folder not recorded', 'col': {'root': 'Root folder', 'sent': 'Sent to the Recycle Bin', 'limbo': 'Freed by the Limbo', 'dups': 'Repeated files'}}})
+
+_merge(MESSAGES, {'overview': {'cache': 'Space used by LionPhotos', 'cacheHint': 'Thumbnails and previews, made once and kept in the catalog; made again only when a file changes. Your photos are not counted.', 'space': {'thumbsTotal': 'thumbnails and previews', 'fileTotal': 'catalog file on this computer', 'photoThumbs': 'Photo thumbnails', 'videoThumbs': 'Video thumbnails', 'adjusted': 'Thumbnails of adjusted photos', 'byRoot': 'By root folder', 'rootTotal': 'Total', 'portable': '.lionphotos', 'portableTitle': 'The catalog kept with the photos, in the hidden .lionphotos folder of each root folder (— when the drive is not connected)'}}, 'settings': {'space': 'Space used', 'spaceLoading': 'Measuring…', 'spaceLine': 'Thumbnails and previews: {thumbs} · catalog file: {file}', 'spaceDetails': 'Details'}})

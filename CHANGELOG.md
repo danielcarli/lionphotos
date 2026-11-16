@@ -2,6 +2,32 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.50.0] — 2026-11-15
+
+### Added
+- **Space used by LionPhotos** (Tools › Overview, and a line in Settings with *Details*): how much the thumbnails and previews take — the photos' thumbnails, the videos', those of adjusted photos, the previews — and the catalog file on this computer. Split **by root folder** (each drive or collection), with each one's hidden `.lionphotos` folder, and all of them together. Your photos are not counted.
+
+### Fixed
+- Recycle Bin history: a render while the history was still loading could show the page without its root folders.
+
+## [1.49.0] — 2026-11-15
+
+### Added
+- **Recycle Bin history by root folder.** A table at the top shows, for each root folder (each drive or collection opened), how much was sent to the Recycle Bin, how much the Limbo freed and how much the repeated files — and all of them together. A click on one shows the whole page (totals, months, list) for that one alone; *All root folders* goes back. The oldest entries, logged without their root, are placed by the root folder their path lies in. In the list, with every root shown, a file's folder starts with its root's name.
+
+## [1.48.1] — 2026-11-15
+
+### Changed
+- README (10 languages), *Beta test*: LionPhotos is being tested on a collection of more than 70,000 files on an external USB 3.1 hard disk — a common disk, not an SSD — where its performance has been satisfactory.
+
+## [1.48.0] — 2026-11-15
+
+### Added
+- **Repeated files: the time still needed,** beside the progress — step by step: comparing the starts and ends goes by files ("about 20 minutes in this step"), the full SHA-256 by bytes. How much the second step reads is known only when the first one ends.
+
+### Fixed
+- **The thumbnails count stopped a few short of the end** (77,967 / 77,970) and stayed there. A photo shown on screen whose thumbnail was already made was added to the count but never counted as done. Besides the count, this held back what waits for the thumbnails to end: face recognition, reading the files' details, the previews. Now only tiles still without a thumbnail are counted, and the count ends whenever nothing is left to make.
+
 ## [1.47.1] — 2026-11-15
 
 ### Changed

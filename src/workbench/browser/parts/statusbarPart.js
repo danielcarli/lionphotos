@@ -16,7 +16,7 @@ import { showContextMenu } from '../contextMenu.js';
 import { showUpdateDialog } from '../../contrib/update/updateDialog.js';
 
 /** "about 38 minutes left", "about 3 h 20 min left", "calculating the time…" (pace not known yet). */
-function etaText(ms) {
+export function etaText(ms) {
   if (ms == null) return t('statusbar.eta.estimating');
   const r = roundEta(ms);
   if (r.unit === 'lessMinute') return t('statusbar.eta.lessMinute');

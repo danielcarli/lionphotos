@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · **한국어**
 
-![버전 1.47.1](https://img.shields.io/badge/version-1.47.1-161214)
+![버전 1.50.0](https://img.shields.io/badge/version-1.50.0-161214)
 ![상태: 베타 테스트](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![라이선스: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![플랫폼: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -76,6 +76,7 @@ LionPhotos는 **정리 도구이자 카탈로그**입니다. 주된 역할은 �
 LionPhotos는 **베타**입니다. 즉:
 
 - 실제 컬렉션에서 매일 사용되고 모든 버전이 100개가 넘는 자동 엔드투엔드 검사를 통과하지만, 아직 다양한 컴퓨터와 컬렉션에서 많이 사용되지는 않았습니다.
+- **일반 디스크의 큰 컬렉션으로 테스트 중:** USB 3.1 외장 하드디스크(SSD가 아닌 일반 HDD)에 있는 7만 개가 넘는 파일로 시험하고 있습니다. 이 테스트에서 성능은 만족스러운 수준입니다.
 - 컬렉션을 처음으로 정리하거나 이름을 바꾸거나 재구성하기 전에 **백업해 두세요**(백업 탭에서 할 수 있습니다). 모든 작업은 되돌릴 수 있고 영구 삭제되는 것은 없지만, 백업이 가장 확실한 안전망입니다.
 - 설치 프로그램은 아직 유료 인증서로 서명되지 않았습니다([다운로드](#다운로드) 참조).
 - RAW 사진은 기본적으로 카메라가 안에 저장한 JPEG(8비트)에서 편집합니다. **현상 모드**(보정의 스위치)는 센서 데이터를 이 컴퓨터에서 LibRaw로 16비트 현상해 편집합니다. 새 기능이며 아직 조정 중입니다(색은 카메라나 Lightroom과 다릅니다). WebGL 2를 지원하는 그래픽 카드가 필요합니다.
@@ -272,7 +273,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 변경 내역
 
-[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.47.1**.
+[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.50.0**.
 
 ## 만든 사람들
 

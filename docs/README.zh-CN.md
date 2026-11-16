@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · **简体中文** · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![版本 1.47.1](https://img.shields.io/badge/version-1.47.1-161214)
+![版本 1.50.0](https://img.shields.io/badge/version-1.50.0-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -76,6 +76,7 @@ LionPhotos 是一个**整理工具和目录**。它的主要功能是把工作�
 LionPhotos 处于 **Beta** 阶段。这意味着：
 
 - 它每天都在一个真实收藏上使用，每个版本都通过 100 多项自动化端到端检查，但还没有在许多不同的电脑和收藏上使用过。
+- **在普通硬盘上用大型照片集测试：** 在一块 USB 3.1 外置机械硬盘（普通硬盘，不是 SSD）上的 7 万多个文件。在这项测试中，性能表现令人满意。
 - 第一次整理、重命名或重新整理收藏之前，**请先备份**（“备份”标签页可以完成）。所有操作都可以撤销，也不会永久删除任何东西，但备份才是最稳妥的保障。
 - 安装程序尚未使用付费证书签名（见[下载](#下载)）。
 - RAW 照片默认基于相机存放在其中的 JPEG（8 位）编辑；**显影模式**（调整中的开关）则编辑传感器数据，在本机用 LibRaw 以 16 位显影——这是新功能，仍在调校（颜色既不同于相机，也不同于 Lightroom）。需要支持 WebGL 2 的显卡。
@@ -272,7 +273,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.47.1**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.50.0**。
 
 ## 致谢
 

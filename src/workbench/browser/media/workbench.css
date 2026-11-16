@@ -1115,6 +1115,8 @@ video.vw-media { background: #000; border-radius: 6px; }
 .cache-list { grid-template-columns: auto minmax(0, 1fr); font-size: 12.5px; }
 .cache-list dd.mono { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; }
 .cache-actions { margin-top: 14px; }
+.space-card .cache-actions { display: flex; justify-content: flex-end; }
+.space-card .cache-actions .btn { width: auto; flex: none; }
 .bar-row { grid-template-columns: minmax(80px, 160px) minmax(0, 1fr) 64px; }
 
 /* ---------- repeated files ---------- */
@@ -2587,6 +2589,34 @@ img.vw-media.vw-hold { opacity: 0 !important; }
 @media (max-width: 760px) { .crop-ed { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; } .crop-panel { max-height: 46vh; border-left: 0; border-top: 1px solid #2c2529; } }
 
 /* ---------- Recycle Bin history (Tools) ---------- */
+/* the space LionPhotos uses: thumbnails and previews, in all and by root folder */
+.space-total { display: flex; flex-wrap: wrap; gap: 12px 40px; margin: 4px 0 14px; }
+.space-big { display: grid; }
+.space-big strong { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; color: var(--accent); font-variant-numeric: tabular-nums; }
+.space-big.is-file strong { color: var(--text-primary); }
+.space-big span { font-size: 12.5px; color: var(--text-secondary); }
+.space-roots { margin-top: 16px; }
+.space-roots h3 { margin: 0 0 6px; font-size: 13px; }
+.space-table td { vertical-align: middle; }
+.space-root { display: block; font-weight: 600; }
+.space-path { display: block; font-size: 11.5px; color: var(--text-muted); overflow-wrap: anywhere; }
+.space-bytes { display: block; }
+.space-n { display: block; font-size: 11.5px; color: var(--text-muted); }
+.space-sum { font-weight: 700; }
+.space-table tr.is-here td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+.space-all td { border-top: 2px solid var(--border); border-bottom: 0; font-weight: 600; }
+/* by root folder: each drive or collection, and all together */
+.th-roots { margin-bottom: 16px; }
+.th-roots .card-header h2 { display: flex; align-items: center; gap: 8px; }
+.th-root-table td { vertical-align: middle; }
+.th-root-name { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 2px 0; border: 0; background: none; font: inherit; color: var(--text-primary); text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.th-root-name span:first-child { flex: none; color: var(--text-muted); display: grid; }
+.th-root-name:hover span:last-child { text-decoration: underline; }
+.th-root.is-on td { background: var(--selection-bg, var(--hover)); }
+.th-root.is-on .th-root-name { font-weight: 600; color: var(--accent); }
+.th-root-bytes { display: block; font-weight: 600; }
+.th-root-files { display: block; font-size: 11.5px; color: var(--text-muted); }
+.th-root-total td { border-top: 2px solid var(--border); border-bottom: 0; }
 .th-report { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-bottom: 16px; align-items: start; }
 .th-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .th-report .card-header h2, .th-list .card-header h2 { display: flex; align-items: center; gap: 8px; }

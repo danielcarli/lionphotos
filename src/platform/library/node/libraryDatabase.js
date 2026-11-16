@@ -665,14 +665,7 @@ class LibraryDatabase {
     this.db.prepare('UPDATE media SET preview_state = 2, preview_size = ?, preview_mtime = ? WHERE id = ?').run(size, mtime, id);
   }
 
-  cacheStats() {
-    const th = this.db.prepare('SELECT count(*) AS count, coalesce(sum(length(data)), 0) AS bytes FROM thumbs').get();
-    const pv = this.db.prepare('SELECT count(*) AS count, coalesce(sum(length(data)), 0) AS bytes FROM previews').get();
-    const aj = this.db.prepare('SELECT count(*) AS count, coalesce(sum(length(data)), 0) AS bytes FROM adjusted_thumbs').get();
-    th.count += aj.count; th.bytes += aj.bytes;
-    const lib = this.db.prepare('SELECT count(*) AS count, coalesce(sum(kind = 2), 0) AS videos FROM media').get();
-    return { thumbs: th.count, thumbBytes: th.bytes, previews: pv.count, previewBytes: pv.bytes, items: lib.count, videos: lib.videos, file: this.file };
-  }
+  cacheStats() { return require('./cacheStats').cacheStats(this.db, this.file); }
 
   /** Forgets every thumbnail and preview (thumbnails are made again when needed). Never touches the photos themselves. */
   clearCache() {

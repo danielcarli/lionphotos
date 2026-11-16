@@ -1170,6 +1170,15 @@ app.whenReady().then(async () => {
         return res; })()`);
       check(noPlace.skipped || (/has no files with places/.test(noPlace.title) && noPlace.rows === 3 && noPlace.here && noPlace.files > 0 && noPlace.files === noPlace.expected && noPlace.went),
         'Places: a category without places says so, with the files and places of each one, and goes to the one that has them', JSON.stringify(noPlace));
+      // the space LionPhotos uses: thumbnails of photos and videos, previews, the catalog file — in all and by root folder
+      const space = await js(`(async () => { const s = ${S}, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        const st = await window.host.thumbs.cacheStats();
+        s.layout.openView('overview'); for (let i = 0; i < 40 && !document.querySelector('#lionphotos-space .space-table'); i++) await wait(100);
+        const card = document.getElementById('lionphotos-space');
+        const res = { photos: st?.photoThumbs?.count, roots: st?.byRoot?.length, file: st?.fileBytes > 0, rows: card?.querySelectorAll('.space-table tbody tr').length, big: card?.querySelector('.space-big strong')?.textContent };
+        s.layout.openView('photos'); return res; })()`);
+      check(space.photos > 0 && space.roots >= 1 && space.file && space.rows >= 1 && /\d/.test(space.big || ''),
+        'Overview: the space used by thumbnails and previews, in all and by root folder, and the catalog file', JSON.stringify(space));
       // the credits by name in the activity bar: "About" opens who made it, the license and the version
       const about = await js(`(async () => { const wait = (ms) => new Promise((r) => setTimeout(r, ms));
         const b = document.querySelector('.activitybar .activity-about'); b?.click(); await wait(400);
@@ -1264,16 +1273,25 @@ app.whenReady().then(async () => {
         const wait = (ms) => new Promise((r) => setTimeout(r, ms));
         const rows = await ${S}.operations.trashHistory();
         ${S}.layout.openView('trash');
-        for (let i = 0; i < 30 && !document.querySelector('.th-table'); i++) await wait(100);
+        for (let i = 0; i < 50 && !document.querySelector('.th-stat.th-main'); i++) await wait(100);
         const main = document.querySelector('.th-stat.th-main .th-stat-value')?.textContent || '';
-        const tableRows = document.querySelectorAll('.th-table tbody tr').length;
+        const tableRows = document.querySelectorAll('.view-trash .th-table:not(.th-root-table) tbody tr').length;
         document.querySelector('.th-chip:nth-child(2)')?.click(); await wait(100);
-        const limboRows = document.querySelectorAll('.th-table tbody tr').length;
+        const limboRows = document.querySelectorAll('.view-trash .th-table:not(.th-root-table) tbody tr').length;
+        // by root folder: one row per root and the total; a click shows only that root
+        const rootRows = [...document.querySelectorAll('.th-root-table tbody tr')];
+        const root = { rows: rootRows.length, total: !!document.querySelector('.th-root-table tfoot .th-root-total'), first: rootRows[0]?.dataset.root };
+        rootRows[0]?.querySelector('.th-root-name').click(); await wait(150);
+        root.on = document.querySelector('.th-root.is-on')?.dataset.root === root.first;
+        document.querySelector('.th-root-total .th-root-name').click(); await wait(100);
+        root.back = !!document.querySelector('.th-root-total.is-on');
         ${S}.layout.openView('photos');
-        return { n: rows.length, first: rows[0], main, tableRows, limboRows };
+        return { n: rows.length, first: rows[0], main, tableRows, limboRows, root };
       })()`);
       check(th.n >= 2 && th.first.from === 'limbo' && th.first.size === dupe2.size && th.first.path === dupe2.path && /\d/.test(th.main) && th.tableRows >= 2 && th.limboRows === 1,
         'Recycle Bin history: each file with its size and origin; the space the Limbo freed; a filter by origin', JSON.stringify(th));
+      check(th.root.rows >= 1 && th.root.total && th.root.on && th.root.back,
+        'Recycle Bin history by root folder: a row per root and all together; a click shows only one', JSON.stringify(th.root));
     }
 
     // 10) marks: set without opening, toggled by the same key, kept by a new scan

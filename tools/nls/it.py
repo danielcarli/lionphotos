@@ -501,3 +501,9 @@ _merge(MESSAGES, {'showcase': {'modeTitle': 'In evidenza: solo ciò che ha foto 
 _merge(MESSAGES, {'statusbar': {'eta': {'estimating': 'stima del tempo…', 'lessMinute': 'manca meno di 1 minuto', 'minutes': {'one': 'manca circa 1 minuto', 'other': 'mancano circa {count} minuti'}, 'hours': {'one': 'manca circa 1 ora', 'other': 'mancano circa {count} ore'}, 'hoursMinutes': 'mancano circa {hours} h {minutes} min'}}})
 
 _merge(MESSAGES, {'statusbar': {'thumbsKept': 'Le miniature restano nel catalogo e non vengono rifatte: {kept} erano pronte, si creano solo le {missing} mancanti.'}})
+
+_merge(MESSAGES, {'dupes': {'etaStep': '{eta} in questa fase'}})
+
+_merge(MESSAGES, {'trashlog': {'byRoot': 'Per cartella principale', 'byRootHint': 'Quanto è uscito da ogni disco o cartella, e da tutte insieme. Fai clic su una per vedere solo quella qui sotto.', 'rootAll': 'Tutte le cartelle principali', 'rootUnknown': 'Cartella principale non registrata', 'col': {'root': 'Cartella principale', 'sent': 'Inviato al Cestino', 'limbo': 'Liberato dal Limbo', 'dups': 'File ripetuti'}}})
+
+_merge(MESSAGES, {'overview': {'cache': 'Spazio usato da LionPhotos', 'cacheHint': 'Miniature e anteprime, create una volta e tenute nel catalogo; rifatte solo se il file cambia. Le tue foto non sono contate.', 'space': {'thumbsTotal': 'in miniature e anteprime', 'fileTotal': 'file del catalogo su questo computer', 'photoThumbs': 'Miniature delle foto', 'videoThumbs': 'Miniature dei video', 'adjusted': 'Miniature delle foto modificate', 'byRoot': 'Per cartella principale', 'rootTotal': 'Totale', 'portable': '.lionphotos', 'portableTitle': 'Il catalogo tenuto con le foto, nella cartella nascosta .lionphotos di ogni cartella principale (— se il disco non è collegato)'}}, 'settings': {'space': 'Spazio usato', 'spaceLoading': 'Misurazione…', 'spaceLine': 'Miniature e anteprime: {thumbs} · file del catalogo: {file}', 'spaceDetails': 'Dettagli'}})

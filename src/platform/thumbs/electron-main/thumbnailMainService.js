@@ -178,13 +178,18 @@ class ThumbnailMainService {
 
   #setVisible(ids) {
     this.visible = (Array.isArray(ids) ? ids : []).map(Number).filter((id) => Number.isInteger(id) && id > 0).slice(0, 400);
+    // only a tile still without its thumbnail adds to the count: one already made was counted as never done,
+    // and the count stopped short of the end for good (77,967 / 77,970) — holding back what waits for the
+    // thumbnails to end (faces, the files' details, the previews)
     for (const id of this.visible) {
-      if (!this.lowSet.has(id)) { this.lowSet.add(id); this.counts.thumbTotal++; }
+      if (!this.lowSet.has(id) && this.db.needsThumb(id)) { this.lowSet.add(id); this.counts.thumbTotal++; }
     }
     this.#pump();
   }
 
   #thumbPending() {
+    // nothing left in the lanes and nothing being made: done, whatever the count says
+    if (this.lowAt >= this.low.length && !this.visible.length && this.running.size === 0) return 0;
     return Math.max(0, this.counts.thumbTotal - this.thumbDone.size);
   }
 
@@ -199,6 +204,7 @@ class ThumbnailMainService {
       const id = this.visible.shift();
       if (this.running.has(id)) continue;
       if (this.#needs(id)) return id;
+      if (this.lowSet.has(id)) this.thumbDone.add(id); // counted, and made meanwhile
       // on screen without a thumbnail, yet one is made: the window had an old picture of it — it is told again
       // (otherwise the tile waited for good)
       this.#ready(id);

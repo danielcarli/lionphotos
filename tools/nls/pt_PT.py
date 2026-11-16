@@ -502,3 +502,9 @@ _merge(MESSAGES, {'showcase': {'modeTitle': 'Destaques: só os que têm fotos co
 _merge(MESSAGES, {'statusbar': {'eta': {'estimating': 'a calcular o tempo…', 'lessMinute': 'falta menos de 1 minuto', 'minutes': {'one': 'falta cerca de 1 minuto', 'other': 'faltam cerca de {count} minutos'}, 'hours': {'one': 'falta cerca de 1 hora', 'other': 'faltam cerca de {count} horas'}, 'hoursMinutes': 'faltam cerca de {hours} h {minutes} min'}}})
 
 _merge(MESSAGES, {'statusbar': {'thumbsKept': 'As miniaturas ficam guardadas no catálogo e não são refeitas: {kept} já estavam prontas, só as {missing} que faltam estão a ser feitas.'}})
+
+_merge(MESSAGES, {'dupes': {'etaStep': '{eta} nesta etapa'}})
+
+_merge(MESSAGES, {'trashlog': {'byRoot': 'Por pasta raiz', 'byRootHint': 'Quanto saiu de cada disco ou pasta, e de todas juntas. Clique numa para ver só essa abaixo.', 'rootAll': 'Todas as pastas raiz', 'rootUnknown': 'Pasta raiz não registada', 'col': {'root': 'Pasta raiz', 'sent': 'Enviado para a Reciclagem', 'limbo': 'Libertado pelo Limbo', 'dups': 'Ficheiros repetidos'}}})
+
+_merge(MESSAGES, {'overview': {'cache': 'Espaço usado pelo LionPhotos', 'cacheHint': 'Miniaturas e pré-visualizações, feitas uma vez e guardadas no catálogo; refeitas só quando o ficheiro muda. As suas fotos não entram na conta.', 'space': {'thumbsTotal': 'em miniaturas e pré-visualizações', 'fileTotal': 'ficheiro do catálogo neste computador', 'photoThumbs': 'Miniaturas de fotos', 'videoThumbs': 'Miniaturas de vídeos', 'adjusted': 'Miniaturas de fotos ajustadas', 'byRoot': 'Por pasta raiz', 'rootTotal': 'Total', 'portable': '.lionphotos', 'portableTitle': 'O catálogo guardado junto com as fotos, na pasta oculta .lionphotos de cada pasta raiz (— quando o disco não está ligado)'}}, 'settings': {'space': 'Espaço usado', 'spaceLoading': 'A medir…', 'spaceLine': 'Miniaturas e pré-visualizações: {thumbs} · ficheiro do catálogo: {file}', 'spaceDetails': 'Detalhes'}})

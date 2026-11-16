@@ -498,3 +498,7 @@ _merge(MESSAGES, {'places': {'sphereEmpty': '„{sphere}“ hat keine Dateien mi
 _merge(MESSAGES, {'sidebar': {'otherFolders': 'Andere zuvor geöffnete Ordner'}, 'showcase': {'albumsNoPicks': 'In diesen Alben hat noch kein Foto einen Stern oder ein OK, daher gibt es keine Highlights: Die Alben werden wie im Mosaik gezeigt. Markieren Sie die besten Fotos (1 oder 2), um sie hier zu sehen.'}})
 
 _merge(MESSAGES, {'showcase': {'modeTitle': 'Highlights: nur was Fotos mit Stern oder OK hat', 'only': 'Highlights zeigt nur, was Fotos mit Stern oder OK hat: {shown} von {total}, die neuesten zuerst.', 'all': 'Alle anzeigen', 'albumsNoPicks': 'In diesen Alben hat noch kein Foto einen Stern oder ein OK. Highlights zeigt nur Alben mit Fotos, die einen Stern oder ein OK haben; vorerst werden sie wie im Mosaik gezeigt. Markieren Sie die besten Fotos (1 oder 2), um sie hier zu sehen.'}})
+
+_merge(MESSAGES, {'statusbar': {'eta': {'estimating': 'Zeit wird geschätzt…', 'lessMinute': 'noch weniger als 1 Minute', 'minutes': {'one': 'noch etwa 1 Minute', 'other': 'noch etwa {count} Minuten'}, 'hours': {'one': 'noch etwa 1 Stunde', 'other': 'noch etwa {count} Stunden'}, 'hoursMinutes': 'noch etwa {hours} Std. {minutes} Min.'}}})
+
+_merge(MESSAGES, {'statusbar': {'thumbsKept': 'Miniaturen bleiben im Katalog und werden nie neu erstellt: {kept} waren fertig, nur die {missing} fehlenden werden erstellt.'}})

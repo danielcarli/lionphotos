@@ -495,3 +495,7 @@ _merge(MESSAGES, {'places': {'sphereEmpty': '“{sphere}”中没有带地点的
 _merge(MESSAGES, {'sidebar': {'otherFolders': '之前打开过的其他文件夹'}, 'showcase': {'albumsNoPicks': '这些相册中还没有带星标或 OK 的照片，所以没有精选：相册按马赛克方式显示。给最好的照片做标记（1 或 2），即可在这里看到。'}})
 
 _merge(MESSAGES, {'showcase': {'modeTitle': '精选：只显示有星标或 OK 照片的项目', 'only': '精选只显示有星标或 OK 照片的项目：{total} 个中的 {shown} 个，最新的在前。', 'all': '显示全部', 'albumsNoPicks': '这些相册中还没有带星标或 OK 的照片。精选只显示有星标或 OK 照片的相册，所以目前按马赛克方式显示。给最好的照片做标记（1 或 2），即可在这里看到。'}})
+
+_merge(MESSAGES, {'statusbar': {'eta': {'estimating': '正在估算时间…', 'lessMinute': '剩余不到 1 分钟', 'minutes': {'one': '剩余约 1 分钟', 'other': '剩余约 {count} 分钟'}, 'hours': {'one': '剩余约 1 小时', 'other': '剩余约 {count} 小时'}, 'hoursMinutes': '剩余约 {hours} 小时 {minutes} 分钟'}}})
+
+_merge(MESSAGES, {'statusbar': {'thumbsKept': '缩略图保存在目录中，不会重新生成：{kept} 个已就绪，只生成缺少的 {missing} 个。'}})

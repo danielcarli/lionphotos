@@ -10,9 +10,19 @@ import { showShortcuts } from '../../contrib/help/shortcutsDialog.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { formatBytes, formatNumber } from '../../../base/common/format.js';
+import { Eta, roundEta } from '../../../base/common/eta.js';
 import { t, tn, getLocales, getLocalePreference, setLocalePreference } from '../../../base/common/nls.js';
 import { showContextMenu } from '../contextMenu.js';
 import { showUpdateDialog } from '../../contrib/update/updateDialog.js';
+
+/** "about 38 minutes left", "about 3 h 20 min left", "calculating the time…" (pace not known yet). */
+function etaText(ms) {
+  if (ms == null) return t('statusbar.eta.estimating');
+  const r = roundEta(ms);
+  if (r.unit === 'lessMinute') return t('statusbar.eta.lessMinute');
+  if (r.unit === 'minutes') return tn('statusbar.eta.minutes', r.minutes);
+  return r.minutes ? t('statusbar.eta.hoursMinutes', { hours: r.hours, minutes: r.minutes }) : tn('statusbar.eta.hours', r.hours);
+}
 
 export class StatusbarPart {
   constructor(services) {
@@ -36,8 +46,14 @@ export class StatusbarPart {
     this.render();
   }
 
+  thumbEta = new Eta();
+  previewEta = new Eta();
+
   render() {
     const { library, thumbs } = this;
+    // the estimate is said again every few seconds, also when nothing new arrives (a pause makes it longer)
+    clearTimeout(this.etaTimer);
+    if (thumbs.status.thumbPending > 0 || thumbs.status.previewPending > 0) this.etaTimer = setTimeout(() => this.render(), 15000);
     this.element.classList.toggle('busy', library.state === 'scanning');
     const left = [];
     if (library.state === 'scanning') {
@@ -50,13 +66,26 @@ export class StatusbarPart {
       left.push(item(null, t('statusbar.ready')));
     }
     const s = thumbs.status;
+    // how long is still needed, from the recent pace ("about 38 minutes left")
+    const left_ = (eta, done, total, pending) => {
+      if (pending <= 0) { eta.reset(); return ''; }
+      eta.update(done, total);
+      return etaText(eta.remaining());
+    };
+    const thumbEta = left_(this.thumbEta, s.thumbDone + s.thumbFailed, s.thumbTotal, s.thumbPending);
+    const previewEta = left_(this.previewEta, s.previewDone + s.previewFailed, s.previewTotal, s.previewPending);
     if (s.thumbPending > 0) {
-      left.push(item('image', t('statusbar.thumbs', { done: formatNumber(s.thumbDone + s.thumbFailed), total: formatNumber(s.thumbTotal) }), { spin: false, cls: 'status-work', title: t('statusbar.thumbsTitle') }));
+      // counted over the whole collection: the thumbnails made before are kept in the catalog and never made
+      // again — only the missing ones are made, so the count starts where it was left, not at zero
+      const all = Math.max(library.allItems.length, s.thumbTotal);
+      const kept = all - s.thumbTotal;
+      left.push(item('image', [t('statusbar.thumbs', { done: formatNumber(kept + s.thumbDone + s.thumbFailed), total: formatNumber(all) }), thumbEta].filter(Boolean).join(' · '),
+        { spin: false, cls: 'status-work', title: `${t('statusbar.thumbsTitle')}\n${t('statusbar.thumbsKept', { kept: formatNumber(kept), missing: formatNumber(s.thumbTotal) })}` }));
     }
     if (s.previewPending > 0) {
       left.push(h('span.status-item.status-work', { title: s.currentPreview?.name || '' },
         h('span.status-icon.spin', { html: icon('refresh', 13) }),
-        t('statusbar.previews', { done: formatNumber(s.previewDone + s.previewFailed), total: formatNumber(s.previewTotal) })),
+        [t('statusbar.previews', { done: formatNumber(s.previewDone + s.previewFailed), total: formatNumber(s.previewTotal) }), previewEta].filter(Boolean).join(' · ')),
       h('button.status-link', { onclick: () => thumbs.cancelPreviews() }, t('statusbar.stopPreviews')));
     }
     setChildren(this.left, left);

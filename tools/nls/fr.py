@@ -498,3 +498,7 @@ _merge(MESSAGES, {'places': {'sphereEmpty': '« {sphere} » n’a aucun fichier 
 _merge(MESSAGES, {'sidebar': {'otherFolders': 'Autres dossiers ouverts auparavant'}, 'showcase': {'albumsNoPicks': 'Aucune photo avec une étoile ou un OK dans ces albums pour l’instant, donc pas de sélection : les albums sont affichés comme dans la mosaïque. Marquez les meilleures photos (1 ou 2) pour les voir ici.'}})
 
 _merge(MESSAGES, {'showcase': {'modeTitle': 'Sélection : seulement ce qui a des photos avec une étoile ou un OK', 'only': 'La sélection ne montre que ce qui a des photos marquées d’une étoile ou d’un OK : {shown} sur {total}, les plus récents d’abord.', 'all': 'Tout afficher', 'albumsNoPicks': 'Aucune photo avec une étoile ou un OK dans ces albums pour l’instant. La sélection ne montre que les albums ayant des photos marquées d’une étoile ou d’un OK ; pour le moment ils sont affichés comme dans la mosaïque. Marquez les meilleures photos (1 ou 2) pour les voir ici.'}})
+
+_merge(MESSAGES, {'statusbar': {'eta': {'estimating': 'estimation du temps…', 'lessMinute': 'moins d’une minute restante', 'minutes': {'one': 'environ 1 minute restante', 'other': 'environ {count} minutes restantes'}, 'hours': {'one': 'environ 1 heure restante', 'other': 'environ {count} heures restantes'}, 'hoursMinutes': 'environ {hours} h {minutes} min restantes'}}})
+
+_merge(MESSAGES, {'statusbar': {'thumbsKept': 'Les vignettes restent dans le catalogue et ne sont jamais refaites : {kept} étaient prêtes, seules les {missing} manquantes sont créées.'}})

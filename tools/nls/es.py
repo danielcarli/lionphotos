@@ -498,3 +498,7 @@ _merge(MESSAGES, {'places': {'sphereEmpty': '«{sphere}» no tiene archivos con 
 _merge(MESSAGES, {'sidebar': {'otherFolders': 'Otras carpetas abiertas antes'}, 'showcase': {'albumsNoPicks': 'Todavía no hay fotos con estrella u OK en estos álbumes, así que no hay destacados: los álbumes se muestran como en el mosaico. Marque las mejores fotos (1 o 2) para verlas aquí.'}})
 
 _merge(MESSAGES, {'showcase': {'modeTitle': 'Destacados: solo los que tienen fotos con estrella u OK', 'only': 'Destacados muestra solo los que tienen fotos marcadas con estrella u OK: {shown} de {total}, los más recientes primero.', 'all': 'Ver todos', 'albumsNoPicks': 'Todavía no hay fotos con estrella u OK en estos álbumes. Destacados muestra solo los álbumes con fotos marcadas con estrella u OK; por ahora se muestran como en el mosaico. Marque las mejores fotos (1 o 2) para verlas aquí.'}})
+
+_merge(MESSAGES, {'statusbar': {'eta': {'estimating': 'calculando el tiempo…', 'lessMinute': 'falta menos de 1 minuto', 'minutes': {'one': 'falta alrededor de 1 minuto', 'other': 'faltan alrededor de {count} minutos'}, 'hours': {'one': 'falta alrededor de 1 hora', 'other': 'faltan alrededor de {count} horas'}, 'hoursMinutes': 'faltan alrededor de {hours} h {minutes} min'}}})
+
+_merge(MESSAGES, {'statusbar': {'thumbsKept': 'Las miniaturas se guardan en el catálogo y no se rehacen: {kept} ya estaban listas, solo se hacen las {missing} que faltan.'}})

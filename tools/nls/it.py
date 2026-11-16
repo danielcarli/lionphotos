@@ -497,3 +497,7 @@ _merge(MESSAGES, {'places': {'sphereEmpty': '“{sphere}” non ha file con luog
 _merge(MESSAGES, {'sidebar': {'otherFolders': 'Altre cartelle aperte in precedenza'}, 'showcase': {'albumsNoPicks': 'Nessuna foto con stella o OK in questi album per ora, quindi non ci sono foto in evidenza: gli album sono mostrati come nel mosaico. Segna le foto migliori (1 o 2) per vederle qui.'}})
 
 _merge(MESSAGES, {'showcase': {'modeTitle': 'In evidenza: solo ciò che ha foto con stella o OK', 'only': 'In evidenza mostra solo ciò che ha foto segnate con stella o OK: {shown} di {total}, i più recenti per primi.', 'all': 'Mostra tutti', 'albumsNoPicks': 'Nessuna foto con stella o OK in questi album per ora. In evidenza mostra solo gli album con foto segnate con stella o OK; per ora sono mostrati come nel mosaico. Segna le foto migliori (1 o 2) per vederle qui.'}})
+
+_merge(MESSAGES, {'statusbar': {'eta': {'estimating': 'stima del tempo…', 'lessMinute': 'manca meno di 1 minuto', 'minutes': {'one': 'manca circa 1 minuto', 'other': 'mancano circa {count} minuti'}, 'hours': {'one': 'manca circa 1 ora', 'other': 'mancano circa {count} ore'}, 'hoursMinutes': 'mancano circa {hours} h {minutes} min'}}})
+
+_merge(MESSAGES, {'statusbar': {'thumbsKept': 'Le miniature restano nel catalogo e non vengono rifatte: {kept} erano pronte, si creano solo le {missing} mancanti.'}})

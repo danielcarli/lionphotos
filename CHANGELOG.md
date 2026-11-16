@@ -2,6 +2,21 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.47.1] — 2026-11-15
+
+### Changed
+- **The thumbnails count starts where it was left.** Thumbnails were already kept in the catalog and only the missing ones made, but the status bar counted only those (from zero at every opening), which looked like starting over. It now counts over the whole collection — "Thumbnails 25,670 / 77,970" — and its tooltip says how many were ready and how many are being made.
+
+## [1.47.0] — 2026-11-15
+
+### Added
+- **How long the thumbnails and previews still need,** in the status bar beside their count: "about 38 minutes left", "about 3 h 20 min left". It comes from the pace of the last two minutes, so a slow start or the photos on screen made first do not throw it off for long; it is rounded more as it grows, and says "estimating the time…" for the first seconds.
+
+## [1.46.2] — 2026-11-15
+
+### Changed
+- **README screenshots in City blue**, the default theme (they were in Watermelon), taken again on the current version: the side panel by task, the viewer on its Adjust tab, the lens corrections folded under *Corrections*.
+
 ## [1.46.1] — 2026-11-15
 
 ### Changed

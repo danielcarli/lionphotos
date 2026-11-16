@@ -495,3 +495,7 @@ _merge(MESSAGES, {'places': {'sphereEmpty': '「{sphere}」には場所のある
 _merge(MESSAGES, {'sidebar': {'otherFolders': '以前に開いた他のフォルダー'}, 'showcase': {'albumsNoPicks': 'これらのアルバムには、まだスターや OK の付いた写真がないため、ハイライトはありません。アルバムはモザイクと同じように表示されます。良い写真に印（1 または 2）を付けると、ここに表示されます。'}})
 
 _merge(MESSAGES, {'showcase': {'modeTitle': 'ハイライト: スターまたは OK の付いた写真があるものだけ', 'only': 'ハイライトには、スターまたは OK の付いた写真があるものだけが表示されます: {total} 件中 {shown} 件、新しい順。', 'all': 'すべて表示', 'albumsNoPicks': 'これらのアルバムには、まだスターや OK の付いた写真がありません。ハイライトには、スターまたは OK の付いた写真があるアルバムだけが表示されるため、今はモザイクと同じように表示しています。良い写真に印（1 または 2）を付けると、ここに表示されます。'}})
+
+_merge(MESSAGES, {'statusbar': {'eta': {'estimating': '残り時間を計算中…', 'lessMinute': '残り 1 分未満', 'minutes': {'one': '残り約 1 分', 'other': '残り約 {count} 分'}, 'hours': {'one': '残り約 1 時間', 'other': '残り約 {count} 時間'}, 'hoursMinutes': '残り約 {hours} 時間 {minutes} 分'}}})
+
+_merge(MESSAGES, {'statusbar': {'thumbsKept': 'サムネイルはカタログに保存され、作り直されません: {kept} 件は作成済みで、足りない {missing} 件だけを作成中です。'}})

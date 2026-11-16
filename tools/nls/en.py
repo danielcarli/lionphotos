@@ -498,3 +498,7 @@ _merge(MESSAGES, {'places': {'sphereEmpty': '“{sphere}” has no files with pl
 _merge(MESSAGES, {'sidebar': {'otherFolders': 'Other folders opened before'}, 'showcase': {'albumsNoPicks': 'No photo with a star or OK in these albums yet, so there are no highlights: the albums are shown as in the mosaic. Mark the best photos (1 or 2) to see them here.'}})
 
 _merge(MESSAGES, {'showcase': {'modeTitle': 'Highlights: only those with photos marked with a star or OK', 'only': 'Highlights shows only those with photos marked with a star or OK: {shown} of {total}, the most recent first.', 'all': 'Show all', 'albumsNoPicks': 'No photo with a star or OK in these albums yet. Highlights shows only albums with photos marked with a star or OK, so for now they are shown as in the mosaic. Mark the best photos (1 or 2) to see them here.'}})
+
+_merge(MESSAGES, {'statusbar': {'eta': {'estimating': 'estimating the time…', 'lessMinute': 'less than a minute left', 'minutes': {'one': 'about 1 minute left', 'other': 'about {count} minutes left'}, 'hours': {'one': 'about 1 hour left', 'other': 'about {count} hours left'}, 'hoursMinutes': 'about {hours} h {minutes} min left'}}})
+
+_merge(MESSAGES, {'statusbar': {'thumbsKept': 'Thumbnails are kept in the catalog and never made again: {kept} were ready, only the {missing} missing ones are being made.'}})

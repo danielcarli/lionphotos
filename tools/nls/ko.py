@@ -495,3 +495,7 @@ _merge(MESSAGES, {'places': {'sphereEmpty': '“{sphere}”에는 장소가 있�
 _merge(MESSAGES, {'sidebar': {'otherFolders': '이전에 연 다른 폴더'}, 'showcase': {'albumsNoPicks': '이 앨범들에는 아직 별표나 OK가 붙은 사진이 없어 하이라이트가 없습니다. 앨범은 모자이크처럼 표시됩니다. 좋은 사진에 표시(1 또는 2)를 하면 여기에 나타납니다.'}})
 
 _merge(MESSAGES, {'showcase': {'modeTitle': '하이라이트: 별표나 OK가 붙은 사진이 있는 것만', 'only': '하이라이트에는 별표나 OK가 붙은 사진이 있는 것만 표시됩니다: {total}개 중 {shown}개, 최근 순.', 'all': '모두 보기', 'albumsNoPicks': '이 앨범들에는 아직 별표나 OK가 붙은 사진이 없습니다. 하이라이트에는 별표나 OK가 붙은 사진이 있는 앨범만 표시되므로, 지금은 모자이크처럼 표시합니다. 좋은 사진에 표시(1 또는 2)를 하면 여기에 나타납니다.'}})
+
+_merge(MESSAGES, {'statusbar': {'eta': {'estimating': '남은 시간 계산 중…', 'lessMinute': '1분 미만 남음', 'minutes': {'one': '약 1분 남음', 'other': '약 {count}분 남음'}, 'hours': {'one': '약 1시간 남음', 'other': '약 {count}시간 남음'}, 'hoursMinutes': '약 {hours}시간 {minutes}분 남음'}}})
+
+_merge(MESSAGES, {'statusbar': {'thumbsKept': '미리보기 이미지는 카탈로그에 보관되며 다시 만들지 않습니다: {kept}개는 이미 준비되었고, 없는 {missing}개만 만들고 있습니다.'}})

@@ -38,7 +38,13 @@ export class OverviewView extends ViewPane {
   constructor(services) {
     super(services, 'overview');
     this.library.onDidChangeData(() => this.invalidate());
-    this.thumbs.onDidChangeStatus(() => { if (this.visible && !this.thumbs.status.thumbPending) this.#renderCache(); });
+    // measured again when the thumbnails end — not at every progress of the previews or faces: summing the
+    // thumbnails' bytes reads the whole cache, and done at every event it kept the catalog busy for good
+    this.thumbs.onDidChangeStatus(() => {
+      const busy = this.thumbs.status.thumbPending > 0;
+      if (this.wasBusy && !busy && this.visible) this.#renderCache();
+      this.wasBusy = busy;
+    });
     this.cacheCard = h('div.card.span-2.space-card', { id: 'lionphotos-space' });
   }
 
@@ -115,7 +121,12 @@ export class OverviewView extends ViewPane {
   }
 
   async #renderCache() {
+    // one measure at a time, and not again within a minute (it reads the whole cache)
+    if (this.measuring || Date.now() - (this.measuredAt || 0) < 60000 && this.cacheCard.childElementCount) return;
+    this.measuring = true;
     const s = await this.host.thumbs.cacheStats().catch(() => null);
+    this.measuring = false;
+    this.measuredAt = Date.now();
     if (!s) return;
     // the space LionPhotos uses: thumbnails of photos and of videos, of adjusted photos, previews — in all and
     // for each root folder (a drive, a collection) — and the catalog file on the disk

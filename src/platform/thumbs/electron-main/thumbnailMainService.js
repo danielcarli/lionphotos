@@ -101,7 +101,8 @@ class ThumbnailMainService {
     ipc.handle('previews:estimate', (_e, scope) => this.estimatePreviews(scope || {}));
     ipc.handle('previews:start', (_e, scope) => this.startPreviews(scope || {}));
     ipc.handle('previews:cancel', () => { this.cancelPreviews(); return true; });
-    ipc.handle('cache:stats', () => this.library.reader.cacheStats().catch(() => this.db.cacheStats()));
+    // on the catalog thread only: on the main thread this measure (it reads the whole cache) froze the window
+    ipc.handle('cache:stats', () => this.library.reader.cacheStats().catch(() => null));
 
     ipcMain.on('thumbhost:ready', (e, info) => {
       if (this.host && e.sender === this.host.webContents) {

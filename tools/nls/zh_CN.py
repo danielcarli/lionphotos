@@ -505,3 +505,5 @@ _merge(MESSAGES, {'dupes': {'etaStep': '此步骤{eta}'}})
 _merge(MESSAGES, {'trashlog': {'byRoot': '按根文件夹', 'byRootHint': '每个硬盘或文件夹送出的量，以及全部合计。点击其中一个，下方只显示它。', 'rootAll': '所有根文件夹', 'rootUnknown': '未记录的根文件夹', 'col': {'root': '根文件夹', 'sent': '送入回收站', 'limbo': '待定区释放', 'dups': '重复文件'}}})
 
 _merge(MESSAGES, {'overview': {'cache': 'LionPhotos 占用的空间', 'cacheHint': '缩略图和预览只生成一次并保存在目录中；只有文件变化时才重新生成。不包括照片本身。', 'space': {'thumbsTotal': '缩略图和预览', 'fileTotal': '此电脑上的目录文件', 'photoThumbs': '照片缩略图', 'videoThumbs': '视频缩略图', 'adjusted': '已调整照片的缩略图', 'byRoot': '按根文件夹', 'rootTotal': '合计', 'portable': '.lionphotos', 'portableTitle': '与照片一起保存的目录，位于每个根文件夹的隐藏文件夹 .lionphotos 中（硬盘未连接时为 —）'}}, 'settings': {'space': '占用空间', 'spaceLoading': '正在计算…', 'spaceLine': '缩略图和预览：{thumbs} · 目录文件：{file}', 'spaceDetails': '详情'}})
+
+_merge(MESSAGES, {'places': {'noCity': {'one': '{count} 项没有城市', 'other': '{count} 项没有城市'}, 'noCityTitle': '只写明国家、没有城市的照片（GPS 离离线列表中的城市较远，或文件中只有国家）。按钮会显示该国家的所有照片。'}})

@@ -2,6 +2,12 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.50.1] — 2026-11-16
+
+### Fixed
+- **The window could stop answering after a while (tabs not opening)** with Tools › Overview open once the thumbnails had ended: the space used was measured again at every progress of the previews and faces — each measure reads the whole cache, seconds on a large catalog — piling up on the catalog thread, and falling back to the main process. It is now measured when the page opens and when the thumbnails end, one at a time, at most once a minute, and only on the catalog thread.
+- **Places: a country with photos and nothing under it** (e.g. "Germany · 284 items" and no card): photos that say the country but not the city — a GPS far from every town of the offline list, or only the country in the file — had no card. The country now has its own card, saying how many have no city.
+
 ## [1.50.0] — 2026-11-15
 
 ### Added

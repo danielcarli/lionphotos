@@ -505,3 +505,5 @@ _merge(MESSAGES, {'dupes': {'etaStep': 'このステップは{eta}'}})
 _merge(MESSAGES, {'trashlog': {'byRoot': 'ルートフォルダー別', 'byRootHint': 'ドライブやフォルダーごとに送った量と、その合計。クリックすると、下にそのフォルダーだけを表示します。', 'rootAll': 'すべてのルートフォルダー', 'rootUnknown': '記録されていないルートフォルダー', 'col': {'root': 'ルートフォルダー', 'sent': 'ごみ箱に送った量', 'limbo': 'リンボで空いた容量', 'dups': '重複ファイル'}}})
 
 _merge(MESSAGES, {'overview': {'cache': 'LionPhotos が使っている容量', 'cacheHint': 'サムネイルとプレビューは一度だけ作られ、カタログに保存されます。ファイルが変わったときだけ作り直します。写真そのものは含みません。', 'space': {'thumbsTotal': 'サムネイルとプレビュー', 'fileTotal': 'このコンピューター上のカタログファイル', 'photoThumbs': '写真のサムネイル', 'videoThumbs': '動画のサムネイル', 'adjusted': '補正した写真のサムネイル', 'byRoot': 'ルートフォルダー別', 'rootTotal': '合計', 'portable': '.lionphotos', 'portableTitle': '写真と一緒に保存されたカタログ。各ルートフォルダーの隠しフォルダー .lionphotos にあります（ドライブが接続されていないときは —）'}}, 'settings': {'space': '使用容量', 'spaceLoading': '計測中…', 'spaceLine': 'サムネイルとプレビュー: {thumbs} · カタログファイル: {file}', 'spaceDetails': '詳細'}})
+
+_merge(MESSAGES, {'places': {'noCity': {'one': '都市のない項目 {count} 件', 'other': '都市のない項目 {count} 件'}, 'noCityTitle': '国はわかるが都市がわからない写真です（オフラインの一覧にある町から遠い GPS、またはファイルに国だけ）。ボタンでその国のすべての写真を表示します。'}})

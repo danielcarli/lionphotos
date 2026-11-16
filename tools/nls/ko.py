@@ -505,3 +505,5 @@ _merge(MESSAGES, {'dupes': {'etaStep': '이 단계 {eta}'}})
 _merge(MESSAGES, {'trashlog': {'byRoot': '루트 폴더별', 'byRootHint': '드라이브나 폴더마다 보낸 양과 전체 합계입니다. 하나를 클릭하면 아래에 그것만 표시됩니다.', 'rootAll': '모든 루트 폴더', 'rootUnknown': '기록되지 않은 루트 폴더', 'col': {'root': '루트 폴더', 'sent': '휴지통으로 보냄', 'limbo': '림보로 확보한 공간', 'dups': '중복 파일'}}})
 
 _merge(MESSAGES, {'overview': {'cache': 'LionPhotos가 사용하는 공간', 'cacheHint': '미리보기 이미지와 미리보기는 한 번 만들어 카탈로그에 보관하며, 파일이 바뀔 때만 다시 만듭니다. 사진 자체는 포함하지 않습니다.', 'space': {'thumbsTotal': '미리보기 이미지와 미리보기', 'fileTotal': '이 컴퓨터의 카탈로그 파일', 'photoThumbs': '사진 미리보기 이미지', 'videoThumbs': '동영상 미리보기 이미지', 'adjusted': '보정한 사진의 미리보기 이미지', 'byRoot': '루트 폴더별', 'rootTotal': '합계', 'portable': '.lionphotos', 'portableTitle': '사진과 함께 보관된 카탈로그. 각 루트 폴더의 숨김 폴더 .lionphotos에 있습니다(드라이브가 연결되지 않으면 —)'}}, 'settings': {'space': '사용 공간', 'spaceLoading': '측정 중…', 'spaceLine': '미리보기 이미지와 미리보기: {thumbs} · 카탈로그 파일: {file}', 'spaceDetails': '자세히'}})
+
+_merge(MESSAGES, {'places': {'noCity': {'one': '도시 정보 없는 항목 {count}개', 'other': '도시 정보 없는 항목 {count}개'}, 'noCityTitle': '국가는 있지만 도시는 없는 사진입니다(오프라인 목록의 도시에서 먼 GPS 또는 파일에 국가만 있음). 버튼은 그 나라의 모든 사진을 보여 줍니다.'}})

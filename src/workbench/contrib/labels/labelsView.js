@@ -180,6 +180,13 @@ export class LabelsView extends ViewPane {
     const countries = auto.filter((l) => l.auto === 'country').sort((a, b) => n(b) - n(a) || a.name.localeCompare(b.name));
     const cities = auto.filter((l) => l.auto === 'city');
     const mode = modeOf('place');
+    // a country whose photos do not say the city (or not all of them): its own card shows them — the heading
+    // counted them and nothing was shown under it
+    const withCountry = (country, list) => {
+      if (!country) return list;
+      const inCities = list.reduce((s, l) => s + n(l), 0);
+      return inCities < n(country) ? [...list, { ...country, noCity: n(country) - (list.length ? inCities : 0) }] : list;
+    };
     const block = (country, list) => h('section.coll-group.place-country',
       h('div.coll-year',
         country
@@ -192,7 +199,7 @@ export class LabelsView extends ViewPane {
     const byCity = (a, b) => n(b) - n(a) || a.name.localeCompare(b.name);
     return h('div.place-auto',
       h('div.place-auto-head', h('h2.place-section', t('places.fromPhotos')), h('p.small.muted', t('places.fromPhotosHint'))),
-      countries.map((c) => block(c, cities.filter((l) => l.parentId === c.id).sort(byCity))),
+      countries.map((c) => block(c, withCountry(c, cities.filter((l) => l.parentId === c.id).sort(byCity)))),
       (() => { const rest = cities.filter((l) => !l.parentId).sort(byCity); return rest.length ? block(null, rest) : null; })());
   }
 
@@ -208,6 +215,7 @@ export class LabelsView extends ViewPane {
       h('div.lbl-card-body',
         h('div.lbl-name', l.name),
         l.auto === 'city' && (l.state || l.country) ? h('div.small.muted.lbl-where', [l.state, l.country].filter(Boolean).join(' · ')) : null,
+        l.noCity ? h('div.small.muted.lbl-where', { title: t('places.noCityTitle') }, tn('places.noCity', l.noCity)) : null,
         this.type === 'project' ? this.#projectLine(l) : null,
         l.notes ? h('p.lbl-notes', { title: l.notes }, l.notes) : null,
         h('div.lbl-stats', s?.count ? `${tn('common.items', s.count)} · ${formatBytes(s.bytes)}` : t('labels.noItems')),
@@ -235,7 +243,7 @@ export class LabelsView extends ViewPane {
     return listRow({
       onOpen: open, name: l.name,
       pic: s?.sample.length ? focusImage(this.thumbs.shown(h('img', { alt: '', draggable: false }), s.sample[0]), s.sample[0]) : h('span.coll-pic-empty', { html: icon(this.spec.icon, 18) }),
-      sub: l.auto ? [l.state, l.country].filter(Boolean).join(' · ') : this.type === 'project' ? [t(`projects.st.${this.labels.sheetOf(l).status}`), this.labels.sheetOf(l).client, l.notes].filter(Boolean).join(' · ') : l.notes || (folders.length ? folders.slice(0, 2).map((f) => f || t('common.rootFolder')).join(', ') + (folders.length > 2 ? '…' : '') : ''),
+      sub: l.noCity ? tn('places.noCity', l.noCity) : l.auto ? [l.state, l.country].filter(Boolean).join(' · ') : this.type === 'project' ? [t(`projects.st.${this.labels.sheetOf(l).status}`), this.labels.sheetOf(l).client, l.notes].filter(Boolean).join(' · ') : l.notes || (folders.length ? folders.slice(0, 2).map((f) => f || t('common.rootFolder')).join(', ') + (folders.length > 2 ? '…' : '') : ''),
       count: s?.count ? `${tn('common.items', s.count)} · ${formatBytes(s.bytes)}` : t('labels.noItems'),
       period: periodOf(s),
       actions: [

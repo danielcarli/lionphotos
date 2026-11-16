@@ -2,6 +2,12 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.51.0] — 2026-11-16
+
+### Added
+- **Slow files get a second chance** (a cloud drive such as Google Drive bringing them, a slow disk): a thumbnail that takes longer than 45 seconds is no longer marked as failed. It is tried again when the rest is done, one at a time: the file is first read whole (so the drive downloads it), then decoded with up to 4 minutes. Only if that fails too is it marked, and tried again at the next opening as before.
+- **Pictures are decoded by what they are, not by their name:** a phone's HEIC copied as ".JPG", a JPEG saved as ".tif", a PSD or a PNG with the wrong extension now get their thumbnail (and go out in exports) instead of "could not be decoded" or "not a TIFF file".
+
 ## [1.50.2] — 2026-11-16
 
 ### Fixed

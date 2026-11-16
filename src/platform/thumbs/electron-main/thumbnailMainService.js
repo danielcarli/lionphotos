@@ -24,18 +24,34 @@ const path = require('path');
 const { thumbDecoder } = require('../../library/node/mediaTypes');
 const { readRawPreview, TIFF_RAW } = require('../../library/node/rawPreview');
 const { readMetadata, searchTags, META_VERSION } = require('../../library/node/metadata');
+const { pictureDecoder } = require('../../library/node/sniff');
 
 const THUMB_MAX = 320;          // longest side in pixels (sharp up to ~200 px tiles on 1.5× screens)
 const THUMB_QUALITY = 0.8;
 const PREVIEW_MAX = 320;
 const PREVIEW_BITRATE = 280000;
-const JOB_TIMEOUT_MS = 45000;
+const JOB_TIMEOUT_MS = Number(process.env.LIONPHOTOS_THUMB_TIMEOUT_MS) || 45000; // (tests can make it short)
+// a file that took too long (a cloud drive downloading it, a slow disk): tried again at the end, first read
+// whole — so the drive brings it — and then given this long
+const SLOW_READ_MS = 15 * 60000;
+const SLOW_TIMEOUT_MS = 4 * 60000;
 const PREVIEW_TIMEOUT_MS = 120000;
 const MAX_VIDEO_THUMBS = 2;     // videos at the same time (they need the page's own thread)
 const MAX_HEIC_THUMBS = 1;      // HEIC files go to one worker of their own, one at a time
 const READY_FLUSH_MS = 120;
 const PROGRESS_MS = 250;
 const HOLD_MS = 220;            // no new job starts while the person scrolls (and this long after)
+
+/** Reads a file to its end and forgets it: a cloud drive (Google Drive, OneDrive) downloads it meanwhile. */
+function readWhole(file, maxMs, stop) {
+  return new Promise((resolve) => {
+    const stream = fs.createReadStream(file, { highWaterMark: 1 << 20 });
+    const timer = setTimeout(() => stream.destroy(), maxMs);
+    stream.on('data', () => { if (stop()) stream.destroy(); });
+    const done = () => { clearTimeout(timer); resolve(); };
+    stream.on('end', done); stream.on('error', done); stream.on('close', done);
+  });
+}
 
 class ThumbnailMainService {
   constructor(library, appScheme, uiContents) {
@@ -45,6 +61,8 @@ class ThumbnailMainService {
     this.uiContents = uiContents; // () => webContents of the main window
 
     this.retryFailed = new Set(); // failed thumbnails tried again in this session
+    this.slow = [];              // timed out once: tried again at the end, read whole first, given longer
+    this.slowTried = new Set();
     this.visible = [];
     this.low = [];
     this.lowAt = 0;
@@ -140,6 +158,7 @@ class ThumbnailMainService {
     this.low = [];
     this.lowAt = 0;
     this.lowSet = new Set();
+    this.slow = [];
     this.counts.thumbTotal = 0;
     this.thumbDone.clear();
     this.thumbFailed.clear();
@@ -190,7 +209,7 @@ class ThumbnailMainService {
 
   #thumbPending() {
     // nothing left in the lanes and nothing being made: done, whatever the count says
-    if (this.lowAt >= this.low.length && !this.visible.length && this.running.size === 0) return 0;
+    if (this.lowAt >= this.low.length && !this.visible.length && !this.slow.length && this.running.size === 0) return 0;
     return Math.max(0, this.counts.thumbTotal - this.thumbDone.size);
   }
 
@@ -214,6 +233,12 @@ class ThumbnailMainService {
       const id = this.low[this.lowAt++];
       if (!this.running.has(id) && this.#needs(id)) return id;
       if (!this.running.has(id)) this.thumbDone.add(id); // made meanwhile (e.g. it was on screen)
+    }
+    // the slow ones last, one at a time (each may wait minutes for a cloud drive to bring it)
+    while (this.slow.length && ![...this.running.keys()].some((id) => this.slowTried.has(id))) {
+      const id = this.slow.shift();
+      if (this.db.needsThumb(id)) return id;
+      this.thumbDone.add(id); // made meanwhile (it was on screen)
     }
     return null;
   }
@@ -336,17 +361,30 @@ class ThumbnailMainService {
     let res = null;
     // the main metadata (format, camera, author, codecs…) is read from the header at the same time
     const metaP = readMetadata(row.path, row.ext, row.kind, st.size).catch(() => ({}));
-    const how = thumbDecoder(row.ext);
+    // the decoder its bytes call for: a HEIC named ".JPG", a JPEG named ".tif"
+    const how = row.kind === 2 ? thumbDecoder(row.ext) : await pictureDecoder(row.path, thumbDecoder(row.ext));
     const job = { url: `lionmedia://f/${row.id}`, max: THUMB_MAX, quality: THUMB_QUALITY };
+    // the second try of a file that timed out: read it whole first (a cloud drive downloads it now, with no
+    // limit but a long one), then decode it with more time
+    const slow = this.slowTried.has(row.id);
+    const limit = slow ? SLOW_TIMEOUT_MS : JOB_TIMEOUT_MS;
+    if (slow) await readWhole(row.path, SLOW_READ_MS, () => this.disposed);
     const raw = how === 'raw';
     if (raw) {
       // a raw file: the JPEG preview the camera wrote inside it, decoded like any JPEG (off the main thread);
       // without one, the RGB copy many TIFF-based raws (DNG, NEF…) keep in their IFDs
       const preview = await readRawPreview(row.path, row.ext);
-      if (preview && !this.disposed) res = await this.#hostJob({ ...job, kind: 'image', url: undefined, bytes: preview.data, orientation: preview.orientation }, JOB_TIMEOUT_MS);
-      if (!res?.ok && !res?.aborted && TIFF_RAW.has(row.ext) && !this.disposed) res = await this.#hostJob({ ...job, kind: 'tiff' }, JOB_TIMEOUT_MS);
+      if (preview && !this.disposed) res = await this.#hostJob({ ...job, kind: 'image', url: undefined, bytes: preview.data, orientation: preview.orientation }, limit);
+      if (!res?.ok && !res?.aborted && TIFF_RAW.has(row.ext) && !this.disposed) res = await this.#hostJob({ ...job, kind: 'tiff' }, limit);
     } else if (how) {
-      res = await this.#hostJob({ ...job, kind: how }, JOB_TIMEOUT_MS);
+      res = await this.#hostJob({ ...job, kind: how }, limit);
+    }
+    // too long: not a failure yet — tried again when the rest is done (still counted as missing)
+    if (res && !res.ok && res.error === 'timeout' && !slow && !this.disposed) {
+      console.warn(`thumbnail (${how}) ${row.path}: slow, tried again at the end`);
+      this.slowTried.add(row.id);
+      this.slow.push(row.id);
+      return;
     }
     if (res && !res.ok && !res.aborted && res.error) console.warn(`thumbnail (${how}) ${row.path}: ${res.error}`);
     const meta = await metaP;
@@ -389,7 +427,7 @@ class ThumbnailMainService {
     const row = this.db.get(Number(id));
     if (!row) return { ok: false };
     await this.#ensureHost();
-    const how = thumbDecoder(row.ext);
+    const how = row.kind === 2 ? thumbDecoder(row.ext) : await pictureDecoder(row.path, thumbDecoder(row.ext));
     const job = { url: `lionmedia://f/${row.id}`, max, quality, format: 'jpeg' };
     if (how === 'raw') {
       const preview = await readRawPreview(row.path, row.ext, { largest: true });

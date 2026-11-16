@@ -2311,6 +2311,8 @@ app.whenReady().then(async () => {
       const hd = path.join(FOLDER, 'HEIF');
       fs.mkdirSync(hd, { recursive: true });
       for (const n of ['sdr.heic', 'pq.heic']) fs.copyFileSync(path.join(__dirname, 'fixtures', n), path.join(hd, n));
+      // a phone's HEIC copied with a .JPG name: its thumbnail is made from what it is, not what it is called
+      fs.copyFileSync(path.join(__dirname, 'fixtures', 'sdr.heic'), path.join(hd, 'IMG_HEIC.JPG'));
       await js(`${S}.library.scan().then(() => true)`);
       await idle();
       const hf = await js(`(async () => {
@@ -2337,6 +2339,8 @@ app.whenReady().then(async () => {
         return out;
       })()`);
       const sdr = hf['sdr.heic'] || {}, pq = hf['pq.heic'] || {};
+      const renamed = await js(`(async () => { const lib = ${S}.library; for (let i = 0; i < 100; i++) { const it = lib.items.find((x) => x.name === 'IMG_HEIC.JPG'); if (it?.thumb) return it.thumb; await new Promise((r) => setTimeout(r, 200)); } return lib.items.find((x) => x.name === 'IMG_HEIC.JPG')?.thumb ?? 'missing'; })()`);
+      check(renamed === 1, 'a HEIC named .JPG gets its thumbnail (decoded by what it is, not by its name)', String(renamed));
       await new Promise((r) => setTimeout(r, 500));
       const heifDisk = (() => { try { return fs.readdirSync(path.join(require('electron').app.getPath('userData'), 'cache', 'heif')).length; } catch { return 0; } })();
       // the PQ ramp goes from 0.2 to 0.75 of the code: shown as is its bottom (the diffuse white and above) would be

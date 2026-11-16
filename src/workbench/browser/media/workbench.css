@@ -2589,6 +2589,9 @@ img.vw-media.vw-hold { opacity: 0 !important; }
 @media (max-width: 760px) { .crop-ed { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; } .crop-panel { max-height: 46vh; border-left: 0; border-top: 1px solid #2c2529; } }
 
 /* ---------- Recycle Bin history (Tools) ---------- */
+/* a file copied dozens of times: the rest of its copies, a click away */
+.dup-rest { display: grid; place-content: center; gap: 4px; text-align: center; min-height: 120px; }
+.dup-rest-n { font-size: 22px; font-weight: 700; color: var(--accent); }
 /* the space LionPhotos uses: thumbnails and previews, in all and by root folder */
 .space-total { display: flex; flex-wrap: wrap; gap: 12px 40px; margin: 4px 0 14px; }
 .space-big { display: grid; }

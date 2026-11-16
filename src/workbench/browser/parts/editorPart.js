@@ -46,6 +46,12 @@ export class EditorPart {
     const on = this.library.hasData && TOOLS.includes(active);
     this.toolbar.hidden = !on;
     if (!on) return;
+    // drawn again only when something it shows changed: "Repeated files" reports its progress several times a
+    // second, and a tab redrawn between the press and the release of a click lost that click — the tab then
+    // seemed not to open while a long comparison ran
+    const key = `${active}|${this.duplicates.groups.length}|${document.documentElement.lang}`;
+    if (key === this.toolsKey && this.toolbar.childElementCount) return;
+    this.toolsKey = key;
     setChildren(this.toolbar, VIEWS.filter((v) => TOOLS.includes(v.id)).map((v) =>
       h('button', {
         class: `tool-tab${v.id === active ? ' active' : ''}`, role: 'tab', 'aria-selected': String(v.id === active),

@@ -16,13 +16,23 @@ import { etaText } from '../../browser/parts/statusbarPart.js';
 import { dateOf } from '../../services/library/browser/libraryService.js';
 
 const PAGE = 60;
+const COPIES = 8;
 
 export class DuplicatesView extends ViewPane {
   constructor(services) {
     super(services, 'duplicates');
     this.shown = PAGE;
     this.duplicates.onDidChange(() => this.invalidate());
-    this.library.onDidUpdateItems(() => { if (this.visible && this.duplicates.groups.length) this.invalidate(); });
+    // a thumbnail made (or a mark set) for a copy on screen: drawn again — only then, and at most once a second.
+    // Drawn again at every update while the thumbnails of a large collection were being made, the page asked
+    // the main process for all its pictures each time and kept it busy for seconds
+    this.library.onDidUpdateItems((ids) => {
+      if (!this.visible || !this.duplicates.groups.length) return;
+      const shown = new Set(this.duplicates.groups.slice(0, this.shown).flatMap((g) => g.ids));
+      if (!(ids || []).some((id) => shown.has(id))) return;
+      if (this.redrawTimer) return;
+      this.redrawTimer = setTimeout(() => { this.redrawTimer = null; this.invalidate(); }, 1000);
+    });
   }
 
   render() {
@@ -54,7 +64,7 @@ export class DuplicatesView extends ViewPane {
           ? h('div.dup-progress',
               h('div.progress-bar', h('span', { style: { width: `${pct}%` } })),
               h('div.small.muted', p ? [t(`dupes.stage.${p.stage}`, { done: formatNumber(p.filesDone), total: formatNumber(p.filesTotal), pct }), eta].filter(Boolean).join(' · ') : t('dupes.starting')),
-              h('button.btn.btn-secondary.btn-sm', { onclick: () => d.cancel() }, t('common.cancel')))
+              (this.cancelBtn ||= h('button.btn.btn-secondary.btn-sm', { onclick: () => this.duplicates.cancel() }, t('common.cancel'))))
           : h('div.btn-row.dup-actions',
               h('button.btn.btn-primary', { onclick: () => d.find() }, h('span', { html: icon('search', 14) }), d.status === 'done' ? t('dupes.again') : t('dupes.find')),
               d.groups.length ? h('button.btn.btn-danger-outline', { onclick: () => d.trashCopies() }, h('span', { html: icon('trash', 14) }), tn('dupes.trashAll', d.extraIds().length)) : null),
@@ -64,14 +74,16 @@ export class DuplicatesView extends ViewPane {
         h('div.big-number.hero-block-number', b.int, h('span.bn-dec', b.dec), h('span.bn-unit', b.unit)),
         h('div.hero-block-sub', d.status === 'done' || d.groups.length ? tn('dupes.groups', d.groups.length) : t('dupes.notRun'))));
 
-    const groups = d.groups.slice(0, this.shown);
+    // while a comparison runs, the page is drawn again at every progress (several times a second): the result
+    // of the last one is not drawn meanwhile — redrawn each time, its pictures were asked for again and again
+    const groups = d.status === 'running' ? [] : d.groups.slice(0, this.shown);
     setChildren(this.element,
       intro,
       d.status === 'done' && !d.groups.length
         ? h('div.empty-state', h('span', { html: icon('check', 28) }), h('h3', t('dupes.none')), h('p.muted', t('dupes.noneHint')))
         : null,
       h('div.dup-groups', groups.map((g) => this.#group(g))),
-      d.groups.length > this.shown ? h('button.btn.btn-secondary.dup-more', { onclick: () => { this.shown += PAGE; this.render(); } }, tn('dupes.more', d.groups.length - this.shown)) : null);
+      d.status !== 'running' && d.groups.length > this.shown ? h('button.btn.btn-secondary.dup-more', { onclick: () => { this.shown += PAGE; this.render(); } }, tn('dupes.more', d.groups.length - this.shown)) : null);
   }
 
   #group(g) {
@@ -83,7 +95,8 @@ export class DuplicatesView extends ViewPane {
         h('code.hash', { title: g.hash }, g.hash.slice(0, 12)),
         h('span.toolbar-spacer'),
         h('button.btn.btn-danger-outline.btn-sm', { onclick: () => this.duplicates.trashCopies([g]) }, h('span', { html: icon('trash', 13) }), tn('dupes.trashCopies', items.length - 1))),
-      h('div.dup-copies', items.map((it) => {
+      // the copy kept first, so it is among those shown
+      h('div.dup-copies', (g.open ? items : [...items].sort((a, b) => (b.id === g.keep) - (a.id === g.keep)).slice(0, COPIES)).map((it) => {
         const keep = it.id === g.keep;
         const url = this.thumbs.thumbUrl(it);
         return h('button.dup-copy', { class: `dup-copy${keep ? ' keep' : ''}`, onclick: () => this.duplicates.setKeep(g, it.id), title: it.path },
@@ -92,6 +105,9 @@ export class DuplicatesView extends ViewPane {
           h('span.dup-name', it.name),
           h('span.dup-folder', it.folder || t('common.rootFolder')),
           h('span.dup-date', formatDate(dateOf(it))));
-      })));
+      }), !g.open && items.length > COPIES
+        // a file copied dozens of times: the first copies, and the rest a click away (thousands of pictures at once held the page)
+        ? h('button.dup-copy.dup-rest', { onclick: () => { g.open = true; this.render(); } }, h('span.dup-rest-n', `+${formatNumber(items.length - COPIES)}`), h('span.dup-name', t('dupes.showAll')))
+        : null));
   }
 }

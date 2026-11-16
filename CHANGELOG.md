@@ -2,6 +2,16 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.50.2] — 2026-11-16
+
+### Fixed
+- **A tab of the tools not opening while a comparison ran.** The tools' tabs were drawn again at every progress of *Repeated files* (several times a second); a click whose press and release fell on two drawings of the tab was lost. They are now drawn again only when what they show changes. The same for the status bar's buttons (*Stop previews*, the selection) and *Cancel* in Repeated files. Reproduced and checked on a collection of 85,000 files.
+- **Repeated files on a large collection.** While a comparison ran, the result of the last one was drawn again at every progress, asking for all its pictures each time; after it, every thumbnail made redrew the page. Both kept the main process busy for seconds at a time. The last result is now hidden while a new comparison runs, the page is drawn again only for copies on screen (at most once a second), and a file copied dozens of times shows its first 8 copies with *Show all copies* (opening the page went from 4.9 s to 0.2 s in the test).
+- **Album suggestions with the same name** ("Raw 13-nov-2026" twice, from two photographers' folders) now say the folder above their own, so they can be told apart.
+
+### Added
+- Album suggestions while the folder is still being read say so: they come from the files read so far (and what the catalog already knew of them); suggest again when it ends.
+
 ## [1.50.1] — 2026-11-16
 
 ### Fixed

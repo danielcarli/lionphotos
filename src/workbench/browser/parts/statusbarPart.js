@@ -86,10 +86,16 @@ export class StatusbarPart {
       left.push(h('span.status-item.status-work', { title: s.currentPreview?.name || '' },
         h('span.status-icon.spin', { html: icon('refresh', 13) }),
         [t('statusbar.previews', { done: formatNumber(s.previewDone + s.previewFailed), total: formatNumber(s.previewTotal) }), previewEta].filter(Boolean).join(' · ')),
-      h('button.status-link', { onclick: () => thumbs.cancelPreviews() }, t('statusbar.stopPreviews')));
+      // the same button at every progress: one drawn anew could lose a click pressed just before the redraw
+      this.stopPreviewsBtn ||= h('button.status-link', { onclick: () => this.thumbs.cancelPreviews() }, t('statusbar.stopPreviews')));
     }
     setChildren(this.left, left);
 
+    // the right side changes with the selection only: not drawn again at every progress of the thumbnails
+    const sel = library.selection.size;
+    const rightKey = sel ? `${sel}|${library.selectedItems().reduce((a, it) => a + it.size, 0)}` : '';
+    if (rightKey === this.rightKey) return;
+    this.rightKey = rightKey;
     const right = [];
     if (library.selection.size) {
       const sel = library.selectedItems();

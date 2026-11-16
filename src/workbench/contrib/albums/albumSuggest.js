@@ -377,6 +377,26 @@ export function suggestAlbums(input, options = {}) {
     });
   }
   peopleOut.sort((a, b) => b.to - a.to || b.ids.length - a.ids.length);
+  // two suggestions with the same name ("Raw 13-nov-2026" from two photographers' folders): each one says
+  // the folder above its own, so the two can be told apart (and made as two albums)
+  const folderById = new Map(items.map((it) => [it.id, it.folder || '']));
+  const parentOf = (s) => {
+    const count = new Map();
+    for (const id of s.ids || []) { const f = folderById.get(id) || ''; count.set(f, (count.get(f) || 0) + 1); }
+    const main = [...count].sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+    const parts = main.split(sep).filter(Boolean);
+    return parts.length > 1 ? parts.at(-2) : '';
+  };
+  const all = [...eventOut, ...themeOut, ...peopleOut];
+  const sameName = new Map();
+  for (const s of all) { const k = fold(s.name).trim(); if (!sameName.has(k)) sameName.set(k, []); sameName.get(k).push(s); }
+  for (const same of sameName.values()) {
+    if (same.length < 2) continue;
+    for (const s of same) { const p = parentOf(s); if (p) s.name = `${s.name} (${p})`; }
+    // still the same (the same folder above): numbered
+    const again = new Map();
+    for (const s of same) { const k = fold(s.name).trim(); again.set(k, (again.get(k) || 0) + 1); const n = again.get(k); if (n > 1) s.name = `${s.name} ${n}`; }
+  }
   return { events: eventOut, themes: themeOut, people: peopleOut, analyzed, total: items.length };
 }
 

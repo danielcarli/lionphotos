@@ -31,6 +31,8 @@ export class AlbumSuggestions {
     this.services = view.services;
     this.scenes = view.services.host.scenes;
     this.sceneState = null;
+    // the reading of the folder ends: the note goes (suggest again to use every file)
+    view.services.library.onDidChangeState(() => { if (this.open) this.view.render(); });
     this.scenes?.onProgress((s) => {
       const ended = this.sceneState?.running && !s.running;
       this.sceneState = s;
@@ -140,6 +142,10 @@ export class AlbumSuggestions {
         h('div.reorg-head-actions',
           h('button.btn.btn-ghost.btn-sm', { disabled: this.busy, onclick: () => this.compute() }, h('span', { html: icon('refresh', 13) }), t('albumSuggest.again')),
           h('button.btn.btn-secondary.btn-sm', { disabled: this.busy, onclick: () => this.close() }, t('albumSuggest.close')))),
+      // the folder still being read: the suggestions come from the files read so far (and from what the
+      // catalog already knew of them — a folder opened before, inside this one)
+      this.services.library.state === 'scanning' ? h('p.choice-note.sug-scanning', h('span', { html: icon('refresh', 14) }),
+        h('span', tn('albumSuggest.scanning', this.services.library.items.length))) : null,
       this.contentEl,
       !r ? h('div.sug-wait', h('span.spin', { html: icon('refresh', 16) }), t('albumSuggest.working'))
         : !all.length ? h('div.empty-state', h('span', { html: icon('album', 30) }), h('h3', t('albumSuggest.empty')), h('p.muted', t('albumSuggest.emptyHint')))

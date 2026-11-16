@@ -623,6 +623,41 @@ begin
   if CurUninstallStep = usUninstall then StopRunningApp;
 end;
 
+{ The size of a folder and everything in it, in KB (whole files; up to 4 TB). }
+function FolderKB(const Dir: String): Cardinal;
+var
+  F: TFindRec;
+begin
+  Result := 0;
+  if FindFirst(AddBackslash(Dir) + '*', F) then
+  try
+    repeat
+      if (F.Name <> '.') and (F.Name <> '..') then
+      begin
+        if (F.Attributes and FILE_ATTRIBUTE_DIRECTORY) <> 0 then
+          Result := Result + FolderKB(AddBackslash(Dir) + F.Name)
+        else
+          Result := Result + F.SizeHigh * 4194304 + F.SizeLow div 1024;
+      end;
+    until not FindNext(F);
+  finally
+    FindClose(F);
+  end;
+end;
+
+{ Settings > Apps shows the size it reads in the app's entry ("EstimatedSize", in KB). The files come from
+  the copy assembled during the install, which Setup does not measure, so Windows guessed — 174 GB for
+  about 400 MB. The installed folder is measured and its real size written. }
+procedure WriteEstimatedSize;
+var
+  KB: Cardinal;
+begin
+  KB := FolderKB(ExpandConstant('{app}'));
+  Log(Format('Installed size: %d KB', [KB]));
+  if KB > 0 then
+    RegWriteDWordValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{10F3A9B6-64DA-4D56-BE79-9E2BE938402D}_is1', 'EstimatedSize', KB);
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   Location: String;
@@ -631,6 +666,7 @@ begin
   begin
     { the assembled copy is no longer needed }
     DelTree(Staging, True, True, True);
+    WriteEstimatedSize;
     KeepNewSetup;
     { an earlier install made with install.ps1 in the same folder: drop its entry in Settings > Apps,
       so only this installer's entry remains }

@@ -2,6 +2,11 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.51.1] — 2026-11-16
+
+### Fixed
+- **Windows Settings › Apps showed LionPhotos as taking 174 GB** (it takes about 400 MB). The files are installed from a copy assembled during the install, which Setup does not measure, so Windows guessed. Setup now measures the installed folder and writes its real size in the app's entry. Fixed at the next install or update.
+
 ## [1.51.0] — 2026-11-16
 
 ### Added

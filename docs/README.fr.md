@@ -26,7 +26,7 @@ Parcourez, recherchez et organisez d’immenses collections de photos et de vid�
 
 **Aucune importation** · **Rien ne quitte votre ordinateur** · **100 000 photos défilent comme 100** · **Gratuit et open source**
 
-![Version 1.57.2](https://img.shields.io/badge/version-1.57.2-161214)
+![Version 1.57.4](https://img.shields.io/badge/version-1.57.4-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -39,33 +39,81 @@ Parcourez, recherchez et organisez d’immenses collections de photos et de vid�
 
 ## Voyez-le à l’œuvre
 
-Du premier défilement à l’album livré : un tour de ce que LionPhotos fait d’une vraie collection.
-
-| | |
-|---|---|
-| ![Albums](screenshots/albums.webp) **Albums** — mosaïque par année, avec descriptions | ![Sélection](screenshots/highlights.webp) **Sélection** — seulement les photos marquées étoile ou OK, comme un portfolio |
-| ![Dans un album](screenshots/album.webp) **Dans un album** — mosaïque, grille uniforme, liste ou sélection | ![Recherche](screenshots/search.webp) **Recherche** — dans la barre de titre, sur toute la collection |
-| ![Lieux](screenshots/places-map.webp) **Lieux** — sur une carte du monde dessinée sur l’ordinateur | ![Visionneuse](screenshots/viewer.webp) **Visionneuse** — avec le panneau de retouche (noir et blanc) |
-| ![Correction d’objectif](screenshots/lens.webp) **Correction d’objectif** — perspective redressée à la main | ![Recadrage](screenshots/crop.webp) **Recadrage** — pour Instagram, Stories, YouTube… |
-| ![Description](screenshots/metadata.webp) **Description** — métadonnées IPTC, enregistrées pendant la saisie | ![Exporter les photos](screenshots/export.webp) **Exporter les photos** — noms cohérents, tailles de chaque réseau |
-| ![Liste](screenshots/photos-list.webp) **Liste** — dossier, type, dimensions, taille, date | ![Fichiers en double](screenshots/duplicates.webp) **Fichiers en double** — trouvés par leur contenu |
-
-<div align="center">
-<img src="screenshots/reorganize.webp" alt="Réorganiser la collection : la proposition, dossier par dossier, avant que rien ne bouge" width="820">
-</div>
-
-**Prêt à retrouver vos photos ?** [Téléchargez LionPhotos](#télécharger) pour Windows, macOS ou Linux — gratuit, sans compte, en 10 langues.
-
-## Ce qu’il résout
-
 Les collections de photos grandissent plus vite qu’on ne peut les trier : des années de prises de vue réparties dans des dossiers et des disques externes, la même photo à trois endroits, des fichiers RAW que la plupart des visionneuses n’ouvrent pas, et le travail de tri enfermé dans un seul logiciel, sur un seul ordinateur. LionPhotos est fait pour cette situation :
 
-- **« Je ne retrouve pas cette photo. »** Recherche par nom, dossier, appareil, auteur, description, album, projet, personne, animal ou lieu. Les visages et les animaux sont reconnus sur votre ordinateur, et les lieux se remplissent tout seuls grâce au GPS ou au lieu inscrit dans la photo. Ou tout simplement par ce que montre la photo : tapez *plage*, *chien* ou *anniversaire*.
-- **« Ouvrir la collection prend une éternité. »** Pas d’import, pas de copie de vos photos : LionPhotos parcourt les dossiers tels qu’ils sont, crée chaque vignette une fois et ne la refait que si le fichier change. 100 000 éléments défilent comme 100.
-- **« Mes dossiers sont en désordre. »** *Réorganiser la collection* lit les dossiers et propose une structure claire sur le disque (`2025/2025-12-24-Noël`, thèmes, une boîte d’entrée, essais d’appareil), à vérifier avant que rien ne bouge — et tout peut être annulé.
-- **« Le disque est plein de choses inutiles. »** Marquez les rebuts au fil de l’eau et envoyez-les dans les Limbes ; trouvez les fichiers en double par leur contenu. Tout part par la Corbeille, jamais supprimé définitivement.
-- **« Mon travail reste sur un seul ordinateur. »** Albums, personnes, marques, descriptions, réglages et recadrages sont aussi gardés dans un dossier caché au sein de la collection : le même disque externe s’ouvre avec tout cela sur un autre ordinateur, quelle que soit la lettre de lecteur.
-- **« Je dois livrer. »** Retouche rapide et recadrages pour chaque réseau social, légendes et audiodescription pour l’accessibilité, et export avec des noms de fichiers cohérents et les métadonnées de votre choix. Les originaux ne changent jamais.
+### Vos dossiers, tels qu’ils sont
+
+> *« Ouvrir la collection prend une éternité. »*
+
+Pas d’import, pas de copie de vos photos : LionPhotos parcourt les dossiers tels qu’ils sont, crée chaque vignette une fois et ne la refait que si le fichier change. 100 000 éléments défilent comme 100.
+
+Albums, personnes, marques, descriptions, réglages et recadrages sont aussi gardés dans un dossier caché au sein de la collection : le même disque externe s’ouvre avec tout cela sur un autre ordinateur, quelle que soit la lettre de lecteur.
+
+<p align="center"><img src="screenshots/photos-list.webp" alt="Liste" width="860"><br><sub><b>Liste</b> — dossier, type, dimensions, taille, date</sub></p>
+
+### N’importe quelle photo en quelques secondes
+
+> *« Je ne retrouve pas cette photo. »*
+
+Recherche par nom, dossier, appareil, auteur, description, album, projet, personne, animal ou lieu. Les visages et les animaux sont reconnus sur votre ordinateur, et les lieux se remplissent tout seuls grâce au GPS ou au lieu inscrit dans la photo. Ou tout simplement par ce que montre la photo : tapez *plage*, *chien* ou *anniversaire*.
+
+<p align="center"><img src="screenshots/search.webp" alt="Recherche" width="860"><br><sub><b>Recherche</b> — dans la barre de titre, sur toute la collection</sub></p>
+
+### Chaque voyage sur une carte du monde
+
+Les lieux se remplissent seuls à partir du GPS ou du lieu écrit dans chaque photo, et apparaissent sur une carte du monde dessinée sur votre ordinateur. Cliquez sur un point : les photos de ce lieu sont là.
+
+<p align="center"><img src="screenshots/places-map.webp" alt="Lieux" width="860"><br><sub><b>Lieux</b> — sur une carte du monde dessinée sur l’ordinateur</sub></p>
+
+### Des albums qui se font presque seuls
+
+*Suggérer des albums* regroupe les photos comme elles ont été prises et les nomme d’après ce qu’elles montrent — une plage, un mariage, un anniversaire — pour que vous les relisiez. Chaque album a une couverture, une description et une période, et s’ouvre en mosaïque, grille régulière, liste ou sélection ; le crayon l’ajoute à la liste de ce qui reste *à retoucher*.
+
+<p align="center"><img src="screenshots/albums.webp" alt="Albums" width="49%"> <img src="screenshots/album.webp" alt="Dans un album" width="49%"><br><sub><b>Albums</b> — mosaïque par année, avec descriptions · <b>Dans un album</b> — mosaïque, grille uniforme, liste ou sélection</sub></p>
+
+### Vos meilleures photos, comme un portfolio
+
+Marquez les excellentes photos et les bonnes avec `1` et `2` en parcourant. *Sélection* n’affiche qu’elles — albums, personnes, lieux et projets, une ligne chacun, la photo choisie en grand — une page de portfolio faite de vos propres marques.
+
+<p align="center"><img src="screenshots/highlights.webp" alt="Sélection" width="860"><br><sub><b>Sélection</b> — seulement les photos marquées étoile ou OK, comme un portfolio</sub></p>
+
+### Retouche rapide, original intact
+
+Exposition, couleur, noir et blanc, recadrage, redressement, corrections d’objectif et de perspective, développement RAW — en direct, sur la carte graphique. Tout reste dans le catalogue : le fichier ne change jamais, et `\` montre l’original à tout moment.
+
+<p align="center"><img src="screenshots/viewer.webp" alt="Visionneuse" width="49%"> <img src="screenshots/lens.webp" alt="Correction d’objectif" width="49%"><br><sub><b>Visionneuse</b> — avec le panneau de retouche (noir et blanc) · <b>Correction d’objectif</b> — perspective redressée à la main</sub></p>
+
+### Prêt pour chaque réseau
+
+> *« Je dois livrer. »*
+
+Retouche rapide et recadrages pour chaque réseau social, légendes et audiodescription pour l’accessibilité, et export avec des noms de fichiers cohérents et les métadonnées de votre choix. Les originaux ne changent jamais.
+
+<p align="center"><img src="screenshots/crop.webp" alt="Recadrage" width="49%"> <img src="screenshots/export.webp" alt="Exporter les photos" width="49%"><br><sub><b>Recadrage</b> — pour Instagram, Stories, YouTube… · <b>Exporter les photos</b> — noms cohérents, tailles de chaque réseau</sub></p>
+
+### Décrit pour tous
+
+Titre, légende, audiodescription, auteur et lieu pour une photo ou cent à la fois — enregistrés pendant la saisie, lisibles par d’autres logiciels (IPTC et XMP) et écrits dans les fichiers seulement quand vous le demandez.
+
+<p align="center"><img src="screenshots/metadata.webp" alt="Description" width="860"><br><sub><b>Description</b> — métadonnées IPTC, enregistrées pendant la saisie</sub></p>
+
+### Libérez de l’espace sans crainte
+
+> *« Le disque est plein de choses inutiles. »*
+
+Marquez les rebuts au fil de l’eau et envoyez-les dans les Limbes ; trouvez les fichiers en double par leur contenu. Tout part par la Corbeille, jamais supprimé définitivement.
+
+<p align="center"><img src="screenshots/duplicates.webp" alt="Fichiers en double" width="860"><br><sub><b>Fichiers en double</b> — trouvés par leur contenu</sub></p>
+
+### De l’ordre sur le disque — avec annulation
+
+> *« Mes dossiers sont en désordre. »*
+
+*Réorganiser la collection* lit les dossiers et propose une structure claire sur le disque (`2025/2025-12-24-Noël`, thèmes, une boîte d’entrée, essais d’appareil), à vérifier avant que rien ne bouge — et tout peut être annulé.
+
+<p align="center"><img src="screenshots/reorganize.webp" alt="Réorganiser la collection : la proposition, dossier par dossier, avant que rien ne bouge" width="860"></p>
+
+**Prêt à retrouver vos photos ?** [Téléchargez LionPhotos](#télécharger) pour Windows, macOS ou Linux — gratuit, sans compte, en 10 langues.
 
 ## Pourquoi LionPhotos
 
@@ -279,7 +327,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.57.2**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.57.4**.
 
 ## Crédits
 

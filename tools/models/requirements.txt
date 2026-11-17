@@ -1,0 +1,7 @@
+# What tools/models/build.py needs (CPU only): pip install -r tools/models/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.15.0
+transformers==5.23.0
+safetensors==0.8.0
+onnx==1.23.2
+onnxruntime==1.29.0
+numpy

@@ -2,6 +2,16 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.57.4] — 2026-11-17
+
+### Fixed
+- **The release still could not be built** (1.57.2): the script that builds the content model, `tools/models/build.py`, and its `requirements.txt` were never in the repository — the line `models/` in `.gitignore`, meant for the built model, also left out `tools/models/`. The CI job found neither and stopped. The line is now `/models/` (only the built model, at the root), and the two files are in the repository.
+
+## [1.57.3] — 2026-11-17
+
+### Changed
+- **The README tells the app as a story, illustrated as it goes** (in the ten languages). *See it in action* is now ten short chapters in the order one uses LionPhotos — your folders as they are, finding any photo, places on a world map, albums, highlights, quick edits, delivering, describing, freeing space, reorganizing the disk — each with a title, the problem in the user's words where there is one, two or three sentences, and its screenshot (or two side by side) with a caption right under the text it shows. The separate *What it solves* list became the chapters.
+
 ## [1.57.2] — 2026-11-17
 
 ### Fixed

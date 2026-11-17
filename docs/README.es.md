@@ -26,7 +26,7 @@ Explora, busca y organiza colecciones enormes de fotos y vídeos allí donde ya 
 
 **Sin importar nada** · **Nada sale de tu ordenador** · **100 000 fotos se desplazan como 100** · **Gratuito y de código abierto**
 
-![Versión 1.57.2](https://img.shields.io/badge/version-1.57.2-161214)
+![Versión 1.57.4](https://img.shields.io/badge/version-1.57.4-161214)
 ![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -39,33 +39,81 @@ Explora, busca y organiza colecciones enormes de fotos y vídeos allí donde ya 
 
 ## Míralo en acción
 
-Del primer desplazamiento al álbum entregado: un recorrido por lo que LionPhotos hace con una colección real.
-
-| | |
-|---|---|
-| ![Álbumes](screenshots/albums.webp) **Álbumes** — mosaico por año, con descripciones | ![Destacados](screenshots/highlights.webp) **Destacados** — solo las fotos marcadas con estrella u OK, como un portafolio |
-| ![Dentro de un álbum](screenshots/album.webp) **Dentro de un álbum** — mosaico, cuadrícula uniforme, lista o destacados | ![Búsqueda](screenshots/search.webp) **Búsqueda** — en la barra de título, en toda la colección |
-| ![Lugares](screenshots/places-map.webp) **Lugares** — en un mapamundi dibujado en el ordenador | ![Visor](screenshots/viewer.webp) **Visor** — con el panel de edición (blanco y negro) |
-| ![Corrección del objetivo](screenshots/lens.webp) **Corrección del objetivo** — perspectiva enderezada a mano | ![Recorte](screenshots/crop.webp) **Recorte** — para Instagram, Stories, YouTube… |
-| ![Descripción](screenshots/metadata.webp) **Descripción** — metadatos IPTC, guardados mientras escribe | ![Exportar fotos](screenshots/export.webp) **Exportar fotos** — nombres uniformes, tamaños de cada red |
-| ![Lista](screenshots/photos-list.webp) **Lista** — carpeta, tipo, dimensiones, tamaño, fecha | ![Archivos repetidos](screenshots/duplicates.webp) **Archivos repetidos** — encontrados por su contenido |
-
-<div align="center">
-<img src="screenshots/reorganize.webp" alt="Reorganizar la colección: la propuesta, carpeta por carpeta, antes de mover nada" width="820">
-</div>
-
-**¿Listo para reencontrar tus fotos?** [Descarga LionPhotos](#descargar) para Windows, macOS o Linux — gratuito, sin cuenta, en 10 idiomas.
-
-## Qué resuelve
-
 Las colecciones de fotos crecen más rápido de lo que nadie puede ordenarlas: años de trabajos repartidos en carpetas y discos externos, la misma foto en tres sitios, archivos RAW que la mayoría de los visores no abre, y el trabajo de ordenarlas encerrado en un solo programa, en un solo ordenador. LionPhotos está hecho para esa situación:
 
-- **«No encuentro esa foto.»** Busque por nombre, carpeta, cámara, autor, descripción, álbum, proyecto, persona, mascota o lugar. Las caras y las mascotas se reconocen en su ordenador, y los lugares se completan solos a partir del GPS o del lugar escrito en la foto. O simplemente por lo que muestra la foto: escribe *playa*, *perro* o *cumpleaños*.
-- **«Abrir la colección tarda una eternidad.»** Sin importar y sin copiar sus fotos: LionPhotos recorre las carpetas tal como están, hace cada miniatura una vez y solo la rehace cuando el archivo cambia. 100 000 elementos se desplazan como 100.
-- **«Mis carpetas son un desorden.»** *Reorganizar la colección* lee las carpetas y propone una estructura clara en el disco (`2025/2025-12-24-Navidad`, temas, una bandeja de entrada, pruebas de cámara), para revisarla antes de mover nada — y todo se puede deshacer.
-- **«El disco está lleno de cosas que no necesito.»** Marque los descartes mientras mira y envíelos al Limbo; encuentre archivos repetidos por su contenido. Todo sale por la Papelera, nunca se borra para siempre.
-- **«Mi trabajo se queda en un ordenador.»** Álbumes, personas, marcas, descripciones, ajustes y recortes también se guardan en una carpeta oculta dentro de la colección, así que el mismo disco externo se abre con todo ello en otro ordenador, con cualquier letra de unidad.
-- **«Tengo que entregar.»** Edición rápida y recortes para cada red social, pies de foto y audiodescripción para la accesibilidad, y exportación con nombres de archivo coherentes y los metadatos que elija. Los originales nunca cambian.
+### Tus carpetas, tal como están
+
+> *«Abrir la colección tarda una eternidad.»*
+
+Sin importar y sin copiar sus fotos: LionPhotos recorre las carpetas tal como están, hace cada miniatura una vez y solo la rehace cuando el archivo cambia. 100 000 elementos se desplazan como 100.
+
+Álbumes, personas, marcas, descripciones, ajustes y recortes también se guardan en una carpeta oculta dentro de la colección, así que el mismo disco externo se abre con todo ello en otro ordenador, con cualquier letra de unidad.
+
+<p align="center"><img src="screenshots/photos-list.webp" alt="Lista" width="860"><br><sub><b>Lista</b> — carpeta, tipo, dimensiones, tamaño, fecha</sub></p>
+
+### Cualquier foto en segundos
+
+> *«No encuentro esa foto.»*
+
+Busque por nombre, carpeta, cámara, autor, descripción, álbum, proyecto, persona, mascota o lugar. Las caras y las mascotas se reconocen en su ordenador, y los lugares se completan solos a partir del GPS o del lugar escrito en la foto. O simplemente por lo que muestra la foto: escribe *playa*, *perro* o *cumpleaños*.
+
+<p align="center"><img src="screenshots/search.webp" alt="Búsqueda" width="860"><br><sub><b>Búsqueda</b> — en la barra de título, en toda la colección</sub></p>
+
+### Cada viaje en un mapamundi
+
+Los lugares se completan solos con el GPS o el lugar escrito en cada foto y aparecen en un mapamundi dibujado en tu ordenador. Haz clic en un punto y ahí están las fotos de ese lugar.
+
+<p align="center"><img src="screenshots/places-map.webp" alt="Lugares" width="860"><br><sub><b>Lugares</b> — en un mapamundi dibujado en el ordenador</sub></p>
+
+### Álbumes que casi se hacen solos
+
+*Sugerir álbumes* agrupa las fotos tal como se tomaron y las nombra por lo que muestran — una playa, una boda, un cumpleaños — para que las revises. Cada álbum tiene portada, descripción y periodo, y se abre en mosaico, cuadrícula uniforme, lista o destacados; el lápiz lo pone en la lista de lo que aún está *por editar*.
+
+<p align="center"><img src="screenshots/albums.webp" alt="Álbumes" width="49%"> <img src="screenshots/album.webp" alt="Dentro de un álbum" width="49%"><br><sub><b>Álbumes</b> — mosaico por año, con descripciones · <b>Dentro de un álbum</b> — mosaico, cuadrícula uniforme, lista o destacados</sub></p>
+
+### Tus mejores fotos, como un portafolio
+
+Marca las fotos excelentes y las correctas con `1` y `2` mientras navegas. *Destacados* muestra solo esas — álbumes, personas, lugares y proyectos, una fila cada uno, la foto elegida en grande — una página de portafolio hecha con tus propias marcas.
+
+<p align="center"><img src="screenshots/highlights.webp" alt="Destacados" width="860"><br><sub><b>Destacados</b> — solo las fotos marcadas con estrella u OK, como un portafolio</sub></p>
+
+### Edición rápida, original intacto
+
+Exposición, color, blanco y negro, recorte, enderezado, corrección de objetivo y de perspectiva, revelado RAW — en vivo, en la tarjeta gráfica. Todo queda en el catálogo: el archivo nunca cambia y `\` muestra el original en cualquier momento.
+
+<p align="center"><img src="screenshots/viewer.webp" alt="Visor" width="49%"> <img src="screenshots/lens.webp" alt="Corrección del objetivo" width="49%"><br><sub><b>Visor</b> — con el panel de edición (blanco y negro) · <b>Corrección del objetivo</b> — perspectiva enderezada a mano</sub></p>
+
+### Listo para cada red
+
+> *«Tengo que entregar.»*
+
+Edición rápida y recortes para cada red social, pies de foto y audiodescripción para la accesibilidad, y exportación con nombres de archivo coherentes y los metadatos que elija. Los originales nunca cambian.
+
+<p align="center"><img src="screenshots/crop.webp" alt="Recorte" width="49%"> <img src="screenshots/export.webp" alt="Exportar fotos" width="49%"><br><sub><b>Recorte</b> — para Instagram, Stories, YouTube… · <b>Exportar fotos</b> — nombres uniformes, tamaños de cada red</sub></p>
+
+### Descrito para todos
+
+Titular, pie de foto, audiodescripción, autor y lugar para una foto o cien a la vez — guardados mientras escribes, legibles por otros programas (IPTC y XMP) y escritos en los archivos solo cuando lo pides.
+
+<p align="center"><img src="screenshots/metadata.webp" alt="Descripción" width="860"><br><sub><b>Descripción</b> — metadatos IPTC, guardados mientras escribe</sub></p>
+
+### Libera espacio sin miedo
+
+> *«El disco está lleno de cosas que no necesito.»*
+
+Marque los descartes mientras mira y envíelos al Limbo; encuentre archivos repetidos por su contenido. Todo sale por la Papelera, nunca se borra para siempre.
+
+<p align="center"><img src="screenshots/duplicates.webp" alt="Archivos repetidos" width="860"><br><sub><b>Archivos repetidos</b> — encontrados por su contenido</sub></p>
+
+### Orden en el disco — con deshacer
+
+> *«Mis carpetas son un desorden.»*
+
+*Reorganizar la colección* lee las carpetas y propone una estructura clara en el disco (`2025/2025-12-24-Navidad`, temas, una bandeja de entrada, pruebas de cámara), para revisarla antes de mover nada — y todo se puede deshacer.
+
+<p align="center"><img src="screenshots/reorganize.webp" alt="Reorganizar la colección: la propuesta, carpeta por carpeta, antes de mover nada" width="860"></p>
+
+**¿Listo para reencontrar tus fotos?** [Descarga LionPhotos](#descargar) para Windows, macOS o Linux — gratuito, sin cuenta, en 10 idiomas.
 
 ## Por qué LionPhotos
 
@@ -279,7 +327,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Historial de cambios
 
-Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.57.2**.
+Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.57.4**.
 
 ## Créditos
 

@@ -26,7 +26,7 @@
 
 **无需导入** · **数据不出本机** · **10 万张照片如 100 张般流畅** · **免费开源**
 
-![版本 1.57.2](https://img.shields.io/badge/version-1.57.2-161214)
+![版本 1.57.4](https://img.shields.io/badge/version-1.57.4-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -39,33 +39,81 @@
 
 ## 实际效果
 
-从第一次滚动到交付相册：看看 LionPhotos 如何处理一份真实的收藏。
-
-| | |
-|---|---|
-| ![相册](screenshots/albums.webp) **相册** — 按年份的马赛克，带描述 | ![精选](screenshots/highlights.webp) **精选** — 只显示星标和 OK 的照片，像作品集一样 |
-| ![相册内部](screenshots/album.webp) **相册内部** — 马赛克、均匀网格、列表或精选 | ![搜索](screenshots/search.webp) **搜索** — 在标题栏中搜索整个收藏 |
-| ![地点](screenshots/places-map.webp) **地点** — 在本机绘制的世界地图上 | ![查看器](screenshots/viewer.webp) **查看器** — 带编辑面板（黑白） |
-| ![镜头校正](screenshots/lens.webp) **镜头校正** — 手动校正透视 | ![裁剪](screenshots/crop.webp) **裁剪** — 适合 Instagram、快拍、YouTube 等 |
-| ![描述](screenshots/metadata.webp) **描述** — IPTC 元数据，输入即保存 | ![导出照片](screenshots/export.webp) **导出照片** — 统一命名，适配各平台尺寸 |
-| ![列表](screenshots/photos-list.webp) **列表** — 文件夹、类型、尺寸、大小、日期 | ![重复文件](screenshots/duplicates.webp) **重复文件** — 按内容查找 |
-
-<div align="center">
-<img src="screenshots/reorganize.webp" alt="重新整理收藏：在移动任何东西之前，逐个文件夹查看建议" width="820">
-</div>
-
-**准备好重新找到你的照片了吗？** [下载 LionPhotos](#下载)，支持 Windows、macOS 和 Linux——免费、无需账号、10 种语言。
-
-## 它解决什么问题
-
 照片收藏增长的速度总是快过整理的速度：多年的拍摄散落在各个文件夹和移动硬盘里，同一张照片存了三份，RAW 文件大多数看图软件打不开，而整理的成果又被锁在某一台电脑的某一个软件里。LionPhotos 正是为此而做：
 
-- **“找不到那张照片。”** 按名称、文件夹、相机、作者、描述、相册、项目、人物、宠物或地点搜索。人脸和宠物在你的电脑上识别，地点会根据 GPS 或照片里写的地点自动填好。 也可以直接按照片内容搜索：输入“海滩”“狗”或“生日派对”。
-- **“打开收藏要等很久。”** 不导入，也不复制你的照片：LionPhotos 直接浏览原有的文件夹，每张缩略图只生成一次，文件改变时才重做。10 万项滚动起来和 100 项一样流畅。
-- **“文件夹一团乱。”** *重新整理收藏* 会读取现有文件夹，在磁盘上提出一个清晰的结构（`2025/2025-12-24-圣诞节`、主题、待整理、相机测试），在移动任何东西之前供你审阅——而且一切都可以撤销。
-- **“磁盘里塞满了不需要的东西。”** 边看边标记废片并送进 Limbo；按内容找出重复文件。所有删除都经过回收站，绝不永久删除。
-- **“我的整理成果只在一台电脑上。”** 相册、人物、标记、描述、调整和裁剪也保存在收藏内的一个隐藏文件夹中，同一块移动硬盘在另一台电脑上、无论盘符是什么，打开后一切都在。
-- **“我要交付作品。”** 快速编辑和适配各个社交网络的裁剪，为无障碍准备的说明文字和音频描述，以及统一文件名、可选元数据的导出。原始文件永远不变。
+### 文件夹，保持原样
+
+> *“打开收藏要等很久。”*
+
+不导入，也不复制你的照片：LionPhotos 直接浏览原有的文件夹，每张缩略图只生成一次，文件改变时才重做。10 万项滚动起来和 100 项一样流畅。
+
+相册、人物、标记、描述、调整和裁剪也保存在收藏内的一个隐藏文件夹中，同一块移动硬盘在另一台电脑上、无论盘符是什么，打开后一切都在。
+
+<p align="center"><img src="screenshots/photos-list.webp" alt="列表" width="860"><br><sub><b>列表</b> — 文件夹、类型、尺寸、大小、日期</sub></p>
+
+### 任何照片，几秒找到
+
+> *“找不到那张照片。”*
+
+按名称、文件夹、相机、作者、描述、相册、项目、人物、宠物或地点搜索。人脸和宠物在你的电脑上识别，地点会根据 GPS 或照片里写的地点自动填好。 也可以直接按照片内容搜索：输入“海滩”“狗”或“生日派对”。
+
+<p align="center"><img src="screenshots/search.webp" alt="搜索" width="860"><br><sub><b>搜索</b> — 在标题栏中搜索整个收藏</sub></p>
+
+### 每一次旅行，都在世界地图上
+
+地点会根据 GPS 或照片里写的地名自动填写，并显示在本机绘制的世界地图上。点一下标记，那个地方的照片就都在那里。
+
+<p align="center"><img src="screenshots/places-map.webp" alt="地点" width="860"><br><sub><b>地点</b> — 在本机绘制的世界地图上</sub></p>
+
+### 几乎自动生成的相册
+
+“建议相册”按拍摄顺序把照片分组，并依照片内容——海滩、婚礼、生日——命名，供你审阅。每个相册都有封面、描述和时间段，可用马赛克、整齐网格、列表或精选查看；加上铅笔，它就进入“待编辑”清单。
+
+<p align="center"><img src="screenshots/albums.webp" alt="相册" width="49%"> <img src="screenshots/album.webp" alt="相册内部" width="49%"><br><sub><b>相册</b> — 按年份的马赛克，带描述 · <b>相册内部</b> — 马赛克、均匀网格、列表或精选</sub></p>
+
+### 最好的照片，像作品集一样
+
+浏览时用 `1` 和 `2` 标出最佳和可用的照片。“精选”只显示它们——相册、人物、地点和项目各占一行，选中的照片大幅展示——一页由你自己的标记组成的作品集。
+
+<p align="center"><img src="screenshots/highlights.webp" alt="精选" width="860"><br><sub><b>精选</b> — 只显示星标和 OK 的照片，像作品集一样</sub></p>
+
+### 快速编辑，原图不动
+
+曝光、色彩、黑白、裁剪、拉直、镜头与透视校正、RAW 显影——在显卡上实时完成。一切都保存在目录中：文件从不改变，按 `\` 随时查看原图。
+
+<p align="center"><img src="screenshots/viewer.webp" alt="查看器" width="49%"> <img src="screenshots/lens.webp" alt="镜头校正" width="49%"><br><sub><b>查看器</b> — 带编辑面板（黑白） · <b>镜头校正</b> — 手动校正透视</sub></p>
+
+### 一键适配各个平台
+
+> *“我要交付作品。”*
+
+快速编辑和适配各个社交网络的裁剪，为无障碍准备的说明文字和音频描述，以及统一文件名、可选元数据的导出。原始文件永远不变。
+
+<p align="center"><img src="screenshots/crop.webp" alt="裁剪" width="49%"> <img src="screenshots/export.webp" alt="导出照片" width="49%"><br><sub><b>裁剪</b> — 适合 Instagram、快拍、YouTube 等 · <b>导出照片</b> — 统一命名，适配各平台尺寸</sub></p>
+
+### 人人都能读懂的描述
+
+标题、说明、音频描述、作者和地点，一张或一百张一次完成——边输入边保存，其他软件也能读取（IPTC 和 XMP），只有在你要求时才写入文件。
+
+<p align="center"><img src="screenshots/metadata.webp" alt="描述" width="860"><br><sub><b>描述</b> — IPTC 元数据，输入即保存</sub></p>
+
+### 放心释放空间
+
+> *“磁盘里塞满了不需要的东西。”*
+
+边看边标记废片并送进 Limbo；按内容找出重复文件。所有删除都经过回收站，绝不永久删除。
+
+<p align="center"><img src="screenshots/duplicates.webp" alt="重复文件" width="860"><br><sub><b>重复文件</b> — 按内容查找</sub></p>
+
+### 整理磁盘——随时可撤销
+
+> *“文件夹一团乱。”*
+
+*重新整理收藏* 会读取现有文件夹，在磁盘上提出一个清晰的结构（`2025/2025-12-24-圣诞节`、主题、待整理、相机测试），在移动任何东西之前供你审阅——而且一切都可以撤销。
+
+<p align="center"><img src="screenshots/reorganize.webp" alt="重新整理收藏：在移动任何东西之前，逐个文件夹查看建议" width="860"></p>
+
+**准备好重新找到你的照片了吗？** [下载 LionPhotos](#下载)，支持 Windows、macOS 和 Linux——免费、无需账号、10 种语言。
 
 ## 为什么选择 LionPhotos
 
@@ -279,7 +327,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.57.2**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.57.4**。
 
 ## 致谢
 

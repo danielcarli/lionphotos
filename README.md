@@ -26,7 +26,7 @@ Browse, search and organize huge collections of photos and videos right where th
 
 **No import** · **Nothing leaves your computer** · **100,000 photos scroll like 100** · **Free and open source**
 
-![Version 1.57.2](https://img.shields.io/badge/version-1.57.2-161214)
+![Version 1.57.4](https://img.shields.io/badge/version-1.57.4-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -39,33 +39,81 @@ Browse, search and organize huge collections of photos and videos right where th
 
 ## See it in action
 
-From the first scroll to the delivered album: a look at what LionPhotos does with a real collection.
-
-| | |
-|---|---|
-| ![Albums](docs/screenshots/albums.webp) **Albums** — a mosaic by year, with descriptions | ![Highlights](docs/screenshots/highlights.webp) **Highlights** — only the photos marked great or OK, like a portfolio |
-| ![Inside an album](docs/screenshots/album.webp) **Inside an album** — mosaic, even grid, list or highlights | ![Search](docs/screenshots/search.webp) **Search** — in the title bar, across the whole collection |
-| ![Places](docs/screenshots/places-map.webp) **Places** — on a world map drawn on this computer | ![Viewer](docs/screenshots/viewer.webp) **Viewer** — with the editing panel (black & white) |
-| ![Lens correction](docs/screenshots/lens.webp) **Lens correction** — perspective straightened by hand | ![Crop](docs/screenshots/crop.webp) **Crop** — for Instagram, Stories, YouTube… |
-| ![Description](docs/screenshots/metadata.webp) **Description** — IPTC metadata, saved as you type | ![Export photos](docs/screenshots/export.webp) **Export photos** — consistent names, sizes for each network |
-| ![List](docs/screenshots/photos-list.webp) **List** — folder, type, dimensions, size, date | ![Repeated files](docs/screenshots/duplicates.webp) **Repeated files** — found by their content |
-
-<div align="center">
-<img src="docs/screenshots/reorganize.webp" alt="Reorganize the collection: the proposal, folder by folder, before anything moves" width="820">
-</div>
-
-**Ready to find your photos again?** [Download LionPhotos](#download) for Windows, macOS or Linux — free, no account, in 10 languages.
-
-## What it solves
-
 Photo collections grow faster than anyone can sort them: years of shoots spread over folders and external drives, the same picture in three places, raw files most viewers cannot open, and the work of sorting them locked inside one program on one computer. LionPhotos is made for that situation:
 
-- **"I can't find that photo."** Search by name, folder, camera, author, description, album, project, person, pet or place. Faces and pets are recognized on your computer, and places fill in by themselves from the GPS or the place written in the photo. Or simply by what the photo shows: type *beach*, *dog* or *birthday*.
-- **"Opening the collection takes forever."** No import, no copy of your photos: LionPhotos browses the folders as they are, makes each thumbnail once and remakes it only when the file changes. 100,000 items scroll like 100.
-- **"My folders are a mess."** *Reorganize the collection* reads the folders and proposes one clear structure on the disk (`2025/2025-12-24-Christmas`, themes, an inbox, camera tests), for review before anything moves — and all of it can be undone.
-- **"The disk is full of things I don't need."** Mark rejects as you go and send them to the Limbo; find repeated files by their content. Everything leaves through the Recycle Bin, never deleted for good.
-- **"My work stays on one computer."** Albums, people, marks, descriptions, adjustments and crops are also kept in a hidden folder inside the collection, so the same external drive opens with all of it on another computer, under any drive letter.
-- **"I need to deliver."** Quick edits and crops for each social network, captions and audio descriptions for accessibility, and exports with consistent file names and the metadata you choose. The originals never change.
+### Your folders, just as they are
+
+> *"Opening the collection takes forever."*
+
+No import, no copy of your photos: LionPhotos browses the folders as they are, makes each thumbnail once and remakes it only when the file changes. 100,000 items scroll like 100.
+
+Albums, people, marks, descriptions, adjustments and crops are also kept in a hidden folder inside the collection, so the same external drive opens with all of it on another computer, under any drive letter.
+
+<p align="center"><img src="docs/screenshots/photos-list.webp" alt="List" width="860"><br><sub><b>List</b> — folder, type, dimensions, size, date</sub></p>
+
+### Find any photo in seconds
+
+> *"I can't find that photo."*
+
+Search by name, folder, camera, author, description, album, project, person, pet or place. Faces and pets are recognized on your computer, and places fill in by themselves from the GPS or the place written in the photo. Or simply by what the photo shows: type *beach*, *dog* or *birthday*.
+
+<p align="center"><img src="docs/screenshots/search.webp" alt="Search" width="860"><br><sub><b>Search</b> — in the title bar, across the whole collection</sub></p>
+
+### Every trip on a world map
+
+Places fill in by themselves from the GPS or the place written in each photo, and appear on a world map drawn on your computer. Click a pin and the photos of that place are there.
+
+<p align="center"><img src="docs/screenshots/places-map.webp" alt="Places" width="860"><br><sub><b>Places</b> — on a world map drawn on this computer</sub></p>
+
+### Albums that almost make themselves
+
+*Suggest albums* groups the photos as they were taken and names them by what they show — a beach, a wedding, a birthday — for you to review. Each album has a cover, a description and a period, and opens as a mosaic, an even grid, a list or its highlights; the pencil puts it on the list of what is still *to edit*.
+
+<p align="center"><img src="docs/screenshots/albums.webp" alt="Albums" width="49%"> <img src="docs/screenshots/album.webp" alt="Inside an album" width="49%"><br><sub><b>Albums</b> — a mosaic by year, with descriptions · <b>Inside an album</b> — mosaic, even grid, list or highlights</sub></p>
+
+### Your best photos, like a portfolio
+
+Mark the great and the OK shots with `1` and `2` as you browse. *Highlights* shows only them — albums, people, places and projects, one row each, the chosen photo big — a portfolio page made from your own marks.
+
+<p align="center"><img src="docs/screenshots/highlights.webp" alt="Highlights" width="860"><br><sub><b>Highlights</b> — only the photos marked great or OK, like a portfolio</sub></p>
+
+### Quick edits, the original untouched
+
+Exposure, colour, black and white, crop, straightening, lens and perspective corrections, raw development — live, on the graphics card. Everything stays in the catalog: the file never changes, and `\` shows the original at any moment.
+
+<p align="center"><img src="docs/screenshots/viewer.webp" alt="Viewer" width="49%"> <img src="docs/screenshots/lens.webp" alt="Lens correction" width="49%"><br><sub><b>Viewer</b> — with the editing panel (black & white) · <b>Lens correction</b> — perspective straightened by hand</sub></p>
+
+### Ready for every network
+
+> *"I need to deliver."*
+
+Quick edits and crops for each social network, captions and audio descriptions for accessibility, and exports with consistent file names and the metadata you choose. The originals never change.
+
+<p align="center"><img src="docs/screenshots/crop.webp" alt="Crop" width="49%"> <img src="docs/screenshots/export.webp" alt="Export photos" width="49%"><br><sub><b>Crop</b> — for Instagram, Stories, YouTube… · <b>Export photos</b> — consistent names, sizes for each network</sub></p>
+
+### Described for everyone
+
+Headline, caption, audio description, author and place for one photo or a hundred at once — saved as you type, readable by other programs (IPTC and XMP), and written into the files only when you ask.
+
+<p align="center"><img src="docs/screenshots/metadata.webp" alt="Description" width="860"><br><sub><b>Description</b> — IPTC metadata, saved as you type</sub></p>
+
+### Free up space without fear
+
+> *"The disk is full of things I don't need."*
+
+Mark rejects as you go and send them to the Limbo; find repeated files by their content. Everything leaves through the Recycle Bin, never deleted for good.
+
+<p align="center"><img src="docs/screenshots/duplicates.webp" alt="Repeated files" width="860"><br><sub><b>Repeated files</b> — found by their content</sub></p>
+
+### Order on the disk — with undo
+
+> *"My folders are a mess."*
+
+*Reorganize the collection* reads the folders and proposes one clear structure on the disk (`2025/2025-12-24-Christmas`, themes, an inbox, camera tests), for review before anything moves — and all of it can be undone.
+
+<p align="center"><img src="docs/screenshots/reorganize.webp" alt="Reorganize the collection: the proposal, folder by folder, before anything moves" width="860"></p>
+
+**Ready to find your photos again?** [Download LionPhotos](#download) for Windows, macOS or Linux — free, no account, in 10 languages.
 
 ## Why LionPhotos
 
@@ -279,7 +327,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.57.2**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.57.4**.
 
 ## Credits
 

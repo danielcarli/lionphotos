@@ -26,7 +26,7 @@ Explore, pesquise e organize coleções enormes de fotografias e vídeos onde j�
 
 **Sem importar nada** · **Nada sai do seu computador** · **100 mil fotografias deslizam como 100** · **Gratuito e de código aberto**
 
-![Versão 1.57.2](https://img.shields.io/badge/version-1.57.2-161214)
+![Versão 1.57.4](https://img.shields.io/badge/version-1.57.4-161214)
 ![Estado: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -39,33 +39,81 @@ Explore, pesquise e organize coleções enormes de fotografias e vídeos onde j�
 
 ## Veja como é
 
-Do primeiro deslizar ao álbum entregue: uma volta pelo que o LionPhotos faz com uma coleção a sério.
-
-| | |
-|---|---|
-| ![Álbuns](screenshots/albums.webp) **Álbuns** — mosaico por ano, com descrições | ![Destaques](screenshots/highlights.webp) **Destaques** — só as fotografias com estrela ou OK, como um portefólio |
-| ![Dentro de um álbum](screenshots/album.webp) **Dentro de um álbum** — mosaico, grelha uniforme, lista ou destaques | ![Pesquisa](screenshots/search.webp) **Pesquisa** — na barra do título, em toda a coleção |
-| ![Lugares](screenshots/places-map.webp) **Lugares** — num mapa-múndi desenhado no computador | ![Visualizador](screenshots/viewer.webp) **Visualizador** — com o painel de edição (preto e branco) |
-| ![Correção da objetiva](screenshots/lens.webp) **Correção da objetiva** — perspetiva endireitada à mão | ![Recorte](screenshots/crop.webp) **Recorte** — para Instagram, Stories, YouTube… |
-| ![Descrição](screenshots/metadata.webp) **Descrição** — metadados IPTC, guardados enquanto escreve | ![Exportar fotografias](screenshots/export.webp) **Exportar fotografias** — nomes uniformes, tamanhos de cada rede |
-| ![Lista](screenshots/photos-list.webp) **Lista** — pasta, tipo, dimensões, tamanho, data | ![Ficheiros repetidos](screenshots/duplicates.webp) **Ficheiros repetidos** — encontrados pelo conteúdo |
-
-<div align="center">
-<img src="screenshots/reorganize.webp" alt="Reorganizar a coleção: a proposta, pasta a pasta, antes de algo mudar de lugar" width="820">
-</div>
-
-**Pronto para reencontrar as suas fotografias?** [Descarregue o LionPhotos](#transferir) para Windows, macOS ou Linux — gratuito, sem conta, em 10 idiomas.
-
-## O que resolve
-
 As coleções de fotografias crescem mais depressa do que se consegue arrumá-las: anos de trabalhos espalhados por pastas e discos externos, a mesma fotografia em três sítios, ficheiros RAW que a maioria dos visualizadores não abre, e o trabalho de organização preso num só programa, num só computador. O LionPhotos foi feito para essa situação:
 
-- **"Não encontro aquela fotografia."** Pesquisa por nome, pasta, câmara, autor, descrição, álbum, projeto, pessoa, animal ou lugar. Rostos e animais são reconhecidos no seu computador, e os lugares preenchem-se sozinhos a partir do GPS ou do lugar escrito na fotografia. Ou simplesmente pelo que a fotografia mostra: escreva *praia*, *cão* ou *aniversário*.
-- **"Abrir a coleção demora uma eternidade."** Sem importar e sem copiar as suas fotografias: o LionPhotos percorre as pastas tal como estão, faz cada miniatura uma vez e só a refaz quando o ficheiro muda. 100 mil itens deslizam como 100.
-- **"As minhas pastas estão uma confusão."** *Reorganizar a coleção* lê as pastas e propõe uma estrutura clara no disco (`2025/2025-12-24-Natal`, temas, uma entrada para triagem, testes de câmara), para rever antes de alguma coisa sair do sítio — e tudo pode ser anulado.
-- **"O disco está cheio de coisas de que não preciso."** Marque os descartes enquanto vê e envie-os para o Limbo; encontre ficheiros repetidos pelo conteúdo. Tudo sai pela Reciclagem, nunca eliminado de vez.
-- **"O meu trabalho fica preso num computador."** Álbuns, pessoas, marcações, descrições, ajustes e recortes ficam também numa pasta oculta dentro da coleção, e o mesmo disco externo abre com tudo isso noutro computador, com qualquer letra de unidade.
-- **"Preciso de entregar."** Edição rápida e recortes para cada rede social, legendas e audiodescrição para acessibilidade, e exportação com nomes de ficheiro uniformes e os metadados que escolher. Os originais nunca mudam.
+### As suas pastas, tal como estão
+
+> *"Abrir a coleção demora uma eternidade."*
+
+Sem importar e sem copiar as suas fotografias: o LionPhotos percorre as pastas tal como estão, faz cada miniatura uma vez e só a refaz quando o ficheiro muda. 100 mil itens deslizam como 100.
+
+Álbuns, pessoas, marcações, descrições, ajustes e recortes ficam também numa pasta oculta dentro da coleção, e o mesmo disco externo abre com tudo isso noutro computador, com qualquer letra de unidade.
+
+<p align="center"><img src="screenshots/photos-list.webp" alt="Lista" width="860"><br><sub><b>Lista</b> — pasta, tipo, dimensões, tamanho, data</sub></p>
+
+### Qualquer fotografia em segundos
+
+> *"Não encontro aquela fotografia."*
+
+Pesquisa por nome, pasta, câmara, autor, descrição, álbum, projeto, pessoa, animal ou lugar. Rostos e animais são reconhecidos no seu computador, e os lugares preenchem-se sozinhos a partir do GPS ou do lugar escrito na fotografia. Ou simplesmente pelo que a fotografia mostra: escreva *praia*, *cão* ou *aniversário*.
+
+<p align="center"><img src="screenshots/search.webp" alt="Pesquisa" width="860"><br><sub><b>Pesquisa</b> — na barra do título, em toda a coleção</sub></p>
+
+### Cada viagem num mapa-múndi
+
+Os locais preenchem-se sozinhos pelo GPS ou pelo local escrito em cada fotografia e aparecem num mapa-múndi desenhado no seu computador. Clique num ponto e as fotografias desse local estão lá.
+
+<p align="center"><img src="screenshots/places-map.webp" alt="Lugares" width="860"><br><sub><b>Lugares</b> — num mapa-múndi desenhado no computador</sub></p>
+
+### Álbuns que quase se fazem sozinhos
+
+*Sugerir álbuns* agrupa as fotografias como foram tiradas e dá-lhes nome pelo que mostram — uma praia, um casamento, um aniversário — para rever. Cada álbum tem capa, descrição e período, e abre em mosaico, grelha uniforme, lista ou destaques; o lápis põe-no na lista do que ainda está *por editar*.
+
+<p align="center"><img src="screenshots/albums.webp" alt="Álbuns" width="49%"> <img src="screenshots/album.webp" alt="Dentro de um álbum" width="49%"><br><sub><b>Álbuns</b> — mosaico por ano, com descrições · <b>Dentro de um álbum</b> — mosaico, grelha uniforme, lista ou destaques</sub></p>
+
+### As suas melhores fotografias, como um portefólio
+
+Marque as fotografias ótimas e as OK com `1` e `2` enquanto navega. *Destaques* mostra só essas — álbuns, pessoas, locais e projetos, uma linha cada, a fotografia escolhida em grande — uma página de portefólio feita das suas próprias marcações.
+
+<p align="center"><img src="screenshots/highlights.webp" alt="Destaques" width="860"><br><sub><b>Destaques</b> — só as fotografias com estrela ou OK, como um portefólio</sub></p>
+
+### Edição rápida, original intacto
+
+Exposição, cor, preto e branco, recorte, endireitar, correção de lente e de perspetiva, revelação de RAW — em tempo real, na placa gráfica. Tudo fica no catálogo: o ficheiro nunca muda, e `\` mostra o original a qualquer momento.
+
+<p align="center"><img src="screenshots/viewer.webp" alt="Visualizador" width="49%"> <img src="screenshots/lens.webp" alt="Correção da objetiva" width="49%"><br><sub><b>Visualizador</b> — com o painel de edição (preto e branco) · <b>Correção da objetiva</b> — perspetiva endireitada à mão</sub></p>
+
+### Pronto para cada rede
+
+> *"Preciso de entregar."*
+
+Edição rápida e recortes para cada rede social, legendas e audiodescrição para acessibilidade, e exportação com nomes de ficheiro uniformes e os metadados que escolher. Os originais nunca mudam.
+
+<p align="center"><img src="screenshots/crop.webp" alt="Recorte" width="49%"> <img src="screenshots/export.webp" alt="Exportar fotografias" width="49%"><br><sub><b>Recorte</b> — para Instagram, Stories, YouTube… · <b>Exportar fotografias</b> — nomes uniformes, tamanhos de cada rede</sub></p>
+
+### Descrito para todos
+
+Título, legenda, audiodescrição, autor e local para uma fotografia ou cem de uma vez — guardados enquanto escreve, legíveis por outros programas (IPTC e XMP) e gravados nos ficheiros só quando o pede.
+
+<p align="center"><img src="screenshots/metadata.webp" alt="Descrição" width="860"><br><sub><b>Descrição</b> — metadados IPTC, guardados enquanto escreve</sub></p>
+
+### Liberte espaço sem receio
+
+> *"O disco está cheio de coisas de que não preciso."*
+
+Marque os descartes enquanto vê e envie-os para o Limbo; encontre ficheiros repetidos pelo conteúdo. Tudo sai pela Reciclagem, nunca eliminado de vez.
+
+<p align="center"><img src="screenshots/duplicates.webp" alt="Ficheiros repetidos" width="860"><br><sub><b>Ficheiros repetidos</b> — encontrados pelo conteúdo</sub></p>
+
+### Ordem no disco — com anular
+
+> *"As minhas pastas estão uma confusão."*
+
+*Reorganizar a coleção* lê as pastas e propõe uma estrutura clara no disco (`2025/2025-12-24-Natal`, temas, uma entrada para triagem, testes de câmara), para rever antes de alguma coisa sair do sítio — e tudo pode ser anulado.
+
+<p align="center"><img src="screenshots/reorganize.webp" alt="Reorganizar a coleção: a proposta, pasta a pasta, antes de algo mudar de lugar" width="860"></p>
+
+**Pronto para reencontrar as suas fotografias?** [Descarregue o LionPhotos](#transferir) para Windows, macOS ou Linux — gratuito, sem conta, em 10 idiomas.
 
 ## Porquê o LionPhotos
 
@@ -279,7 +327,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotografias"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.57.2**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.57.4**.
 
 ## Créditos
 

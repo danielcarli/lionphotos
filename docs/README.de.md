@@ -26,7 +26,7 @@ Riesige Foto- und Videosammlungen dort durchsuchen und ordnen, wo sie schon lieg
 
 **Kein Import** · **Nichts verlässt Ihren Computer** · **100.000 Fotos scrollen wie 100** · **Kostenlos und Open Source**
 
-![Version 1.57.2](https://img.shields.io/badge/version-1.57.2-161214)
+![Version 1.57.4](https://img.shields.io/badge/version-1.57.4-161214)
 ![Status: Betatest](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Lizenz: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plattformen: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -39,33 +39,81 @@ Riesige Foto- und Videosammlungen dort durchsuchen und ordnen, wo sie schon lieg
 
 ## So sieht es aus
 
-Vom ersten Scrollen bis zum fertigen Album: ein Rundgang durch das, was LionPhotos mit einer echten Sammlung macht.
-
-| | |
-|---|---|
-| ![Alben](screenshots/albums.webp) **Alben** — Mosaik nach Jahr, mit Beschreibungen | ![Highlights](screenshots/highlights.webp) **Highlights** — nur die mit Stern oder OK markierten Fotos, wie ein Portfolio |
-| ![In einem Album](screenshots/album.webp) **In einem Album** — Mosaik, gleichmäßiges Raster, Liste oder Highlights | ![Suche](screenshots/search.webp) **Suche** — in der Titelleiste, über die ganze Sammlung |
-| ![Orte](screenshots/places-map.webp) **Orte** — auf einer Weltkarte, auf dem Computer gezeichnet | ![Betrachter](screenshots/viewer.webp) **Betrachter** — mit dem Bearbeitungsfeld (Schwarzweiß) |
-| ![Objektivkorrektur](screenshots/lens.webp) **Objektivkorrektur** — Perspektive von Hand begradigt | ![Zuschneiden](screenshots/crop.webp) **Zuschneiden** — für Instagram, Stories, YouTube… |
-| ![Beschreibung](screenshots/metadata.webp) **Beschreibung** — IPTC-Metadaten, beim Tippen gespeichert | ![Fotos exportieren](screenshots/export.webp) **Fotos exportieren** — einheitliche Namen, Größen je Netzwerk |
-| ![Liste](screenshots/photos-list.webp) **Liste** — Ordner, Typ, Abmessungen, Größe, Datum | ![Doppelte Dateien](screenshots/duplicates.webp) **Doppelte Dateien** — am Inhalt erkannt |
-
-<div align="center">
-<img src="screenshots/reorganize.webp" alt="Sammlung neu ordnen: der Vorschlag, Ordner für Ordner, bevor sich etwas bewegt" width="820">
-</div>
-
-**Bereit, Ihre Fotos wiederzufinden?** [LionPhotos herunterladen](#herunterladen) für Windows, macOS oder Linux — kostenlos, ohne Konto, in 10 Sprachen.
-
-## Was es löst
-
 Fotosammlungen wachsen schneller, als man sie sortieren kann: Jahre an Aufnahmen verteilt auf Ordner und externe Laufwerke, dasselbe Bild an drei Orten, RAW-Dateien, die die meisten Betrachter nicht öffnen, und die Sortierarbeit eingesperrt in einem Programm auf einem Computer. Genau dafür ist LionPhotos gemacht:
 
-- **„Ich finde das Foto nicht.“** Suche nach Name, Ordner, Kamera, Autor, Beschreibung, Album, Projekt, Person, Haustier oder Ort. Gesichter und Tiere werden auf Ihrem Computer erkannt, und Orte füllen sich selbst aus dem GPS oder dem im Foto eingetragenen Ort. Oder einfach nach dem, was das Foto zeigt: *Strand*, *Hund* oder *Geburtstagsfeier* eingeben.
-- **„Die Sammlung zu öffnen dauert ewig.“** Kein Import, keine Kopie Ihrer Fotos: LionPhotos durchsucht die Ordner, wie sie sind, erstellt jede Miniatur einmal und erneuert sie nur, wenn sich die Datei ändert. 100.000 Elemente scrollen wie 100.
-- **„Meine Ordner sind ein Durcheinander.“** *Sammlung neu ordnen* liest die Ordner und schlägt eine klare Struktur auf dem Datenträger vor (`2025/2025-12-24-Weihnachten`, Themen, ein Eingang, Kameratests) – zum Prüfen, bevor sich etwas bewegt, und alles lässt sich rückgängig machen.
-- **„Die Platte ist voll mit Dingen, die ich nicht brauche.“** Markieren Sie Ausschuss beim Durchsehen und schicken Sie ihn in den Limbo; finden Sie doppelte Dateien anhand ihres Inhalts. Alles geht über den Papierkorb, nichts wird endgültig gelöscht.
-- **„Meine Arbeit bleibt auf einem Computer.“** Alben, Personen, Markierungen, Beschreibungen, Anpassungen und Zuschnitte liegen auch in einem versteckten Ordner in der Sammlung: Dasselbe externe Laufwerk öffnet sich auf einem anderen Computer mit allem – unter jedem Laufwerksbuchstaben.
-- **„Ich muss liefern.“** Schnelle Bearbeitung und Zuschnitte für jedes soziale Netzwerk, Bildunterschriften und Audiodeskription für Barrierefreiheit, Export mit einheitlichen Dateinamen und den Metadaten Ihrer Wahl. Die Originale ändern sich nie.
+### Ihre Ordner, so wie sie sind
+
+> *„Die Sammlung zu öffnen dauert ewig.“*
+
+Kein Import, keine Kopie Ihrer Fotos: LionPhotos durchsucht die Ordner, wie sie sind, erstellt jede Miniatur einmal und erneuert sie nur, wenn sich die Datei ändert. 100.000 Elemente scrollen wie 100.
+
+Alben, Personen, Markierungen, Beschreibungen, Anpassungen und Zuschnitte liegen auch in einem versteckten Ordner in der Sammlung: Dasselbe externe Laufwerk öffnet sich auf einem anderen Computer mit allem – unter jedem Laufwerksbuchstaben.
+
+<p align="center"><img src="screenshots/photos-list.webp" alt="Liste" width="860"><br><sub><b>Liste</b> — Ordner, Typ, Abmessungen, Größe, Datum</sub></p>
+
+### Jedes Foto in Sekunden
+
+> *„Ich finde das Foto nicht.“*
+
+Suche nach Name, Ordner, Kamera, Autor, Beschreibung, Album, Projekt, Person, Haustier oder Ort. Gesichter und Tiere werden auf Ihrem Computer erkannt, und Orte füllen sich selbst aus dem GPS oder dem im Foto eingetragenen Ort. Oder einfach nach dem, was das Foto zeigt: *Strand*, *Hund* oder *Geburtstagsfeier* eingeben.
+
+<p align="center"><img src="screenshots/search.webp" alt="Suche" width="860"><br><sub><b>Suche</b> — in der Titelleiste, über die ganze Sammlung</sub></p>
+
+### Jede Reise auf einer Weltkarte
+
+Orte füllen sich selbst aus dem GPS oder dem im Foto notierten Ort und erscheinen auf einer Weltkarte, die auf Ihrem Computer gezeichnet wird. Ein Klick auf einen Punkt, und die Fotos dieses Ortes sind da.
+
+<p align="center"><img src="screenshots/places-map.webp" alt="Orte" width="860"><br><sub><b>Orte</b> — auf einer Weltkarte, auf dem Computer gezeichnet</sub></p>
+
+### Alben, die sich fast selbst machen
+
+*Alben vorschlagen* gruppiert die Fotos so, wie sie aufgenommen wurden, und benennt sie nach dem, was sie zeigen — ein Strand, eine Hochzeit, ein Geburtstag — zur Durchsicht. Jedes Album hat Titelbild, Beschreibung und Zeitraum und öffnet als Mosaik, gleichmäßiges Raster, Liste oder Highlights; der Stift setzt es auf die Liste dessen, was noch *zu bearbeiten* ist.
+
+<p align="center"><img src="screenshots/albums.webp" alt="Alben" width="49%"> <img src="screenshots/album.webp" alt="In einem Album" width="49%"><br><sub><b>Alben</b> — Mosaik nach Jahr, mit Beschreibungen · <b>In einem Album</b> — Mosaik, gleichmäßiges Raster, Liste oder Highlights</sub></p>
+
+### Ihre besten Fotos, wie ein Portfolio
+
+Markieren Sie beim Durchsehen die sehr guten und die guten Aufnahmen mit `1` und `2`. *Highlights* zeigt nur diese — Alben, Personen, Orte und Projekte, je eine Zeile, das gewählte Foto groß — eine Portfolio-Seite aus Ihren eigenen Markierungen.
+
+<p align="center"><img src="screenshots/highlights.webp" alt="Highlights" width="860"><br><sub><b>Highlights</b> — nur die mit Stern oder OK markierten Fotos, wie ein Portfolio</sub></p>
+
+### Schnell bearbeitet, Original unberührt
+
+Belichtung, Farbe, Schwarzweiß, Zuschnitt, Ausrichten, Objektiv- und Perspektivkorrektur, RAW-Entwicklung — live, auf der Grafikkarte. Alles bleibt im Katalog: Die Datei ändert sich nie, und `\` zeigt jederzeit das Original.
+
+<p align="center"><img src="screenshots/viewer.webp" alt="Betrachter" width="49%"> <img src="screenshots/lens.webp" alt="Objektivkorrektur" width="49%"><br><sub><b>Betrachter</b> — mit dem Bearbeitungsfeld (Schwarzweiß) · <b>Objektivkorrektur</b> — Perspektive von Hand begradigt</sub></p>
+
+### Bereit für jedes Netzwerk
+
+> *„Ich muss liefern.“*
+
+Schnelle Bearbeitung und Zuschnitte für jedes soziale Netzwerk, Bildunterschriften und Audiodeskription für Barrierefreiheit, Export mit einheitlichen Dateinamen und den Metadaten Ihrer Wahl. Die Originale ändern sich nie.
+
+<p align="center"><img src="screenshots/crop.webp" alt="Zuschneiden" width="49%"> <img src="screenshots/export.webp" alt="Fotos exportieren" width="49%"><br><sub><b>Zuschneiden</b> — für Instagram, Stories, YouTube… · <b>Fotos exportieren</b> — einheitliche Namen, Größen je Netzwerk</sub></p>
+
+### Beschrieben für alle
+
+Überschrift, Bildunterschrift, Audiodeskription, Urheber und Ort für ein Foto oder hundert auf einmal — beim Tippen gespeichert, von anderen Programmen lesbar (IPTC und XMP) und nur auf Wunsch in die Dateien geschrieben.
+
+<p align="center"><img src="screenshots/metadata.webp" alt="Beschreibung" width="860"><br><sub><b>Beschreibung</b> — IPTC-Metadaten, beim Tippen gespeichert</sub></p>
+
+### Platz schaffen ohne Risiko
+
+> *„Die Platte ist voll mit Dingen, die ich nicht brauche.“*
+
+Markieren Sie Ausschuss beim Durchsehen und schicken Sie ihn in den Limbo; finden Sie doppelte Dateien anhand ihres Inhalts. Alles geht über den Papierkorb, nichts wird endgültig gelöscht.
+
+<p align="center"><img src="screenshots/duplicates.webp" alt="Doppelte Dateien" width="860"><br><sub><b>Doppelte Dateien</b> — am Inhalt erkannt</sub></p>
+
+### Ordnung auf der Festplatte — mit Rückgängig
+
+> *„Meine Ordner sind ein Durcheinander.“*
+
+*Sammlung neu ordnen* liest die Ordner und schlägt eine klare Struktur auf dem Datenträger vor (`2025/2025-12-24-Weihnachten`, Themen, ein Eingang, Kameratests) – zum Prüfen, bevor sich etwas bewegt, und alles lässt sich rückgängig machen.
+
+<p align="center"><img src="screenshots/reorganize.webp" alt="Sammlung neu ordnen: der Vorschlag, Ordner für Ordner, bevor sich etwas bewegt" width="860"></p>
+
+**Bereit, Ihre Fotos wiederzufinden?** [LionPhotos herunterladen](#herunterladen) für Windows, macOS oder Linux — kostenlos, ohne Konto, in 10 Sprachen.
 
 ## Warum LionPhotos
 
@@ -279,7 +327,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\fotos-kopie"; npm run test:e2e
 
 ## Änderungsprotokoll
 
-Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.57.2**.
+Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.57.4**.
 
 ## Mitwirkende
 

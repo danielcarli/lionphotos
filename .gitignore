@@ -4,7 +4,8 @@ dist/
 dist-release/
 shots/
 __pycache__/
-models/
+# the content model, built by tools/models/build.py (the CI builds it: ci.yml, job "models")
+/models/
 # the message of the next commit, written beside the code (never committed)
 commit.txt
 # the script that publishes a version to GitHub (git-publish.cmd/.ps1/.sh: add, commit with commit.txt, tag, push)

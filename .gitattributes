@@ -9,3 +9,6 @@
 *.isl  text eol=crlf
 installer/info/*.txt text eol=crlf
 .githooks/* text eol=lf
+*.onnx binary
+*.bin  binary
+*.wasm binary

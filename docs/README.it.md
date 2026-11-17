@@ -11,7 +11,7 @@ Lavora sulle tue cartelle così come sono: miniature piccole create una volta so
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · **Italiano** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versione 1.54.0](https://img.shields.io/badge/version-1.54.0-161214)
+![Versione 1.56.0](https://img.shields.io/badge/version-1.56.0-161214)
 ![Stato: versione beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licenza: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Piattaforme: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -123,6 +123,8 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Panoramica** | Elementi, foto, video, peso e periodo; file per tipo, per anno, formati, fotocamere, codec; la cache delle miniature. |
 | **Organizza** | Cartelle per data (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` o `2024-07-14-tema`), cartelle per album (`2024/2024-07-14-album`), con `Raw/` e `Img/` dentro se si vuole; *Sposta in cartella* con sottocartelle per tipo; i file dello stesso scatto vanno insieme; operazioni recenti con annullamento. I file si spostano davvero sul disco e possono anche essere **rinominati** (`{data}-{álbum}-{fotógrafo}-{nº}` per impostazione predefinita, numerati per data; il RAW, il JPEG e l'`.xmp` di uno scatto tengono lo stesso nome), o solo rinominati dove sono. **Riorganizza la raccolta** legge le cartelle come sono e propone un'unica struttura sul disco — `2025/2025-12-24-Natale`, temi lunghi in `Temi/`, ciò che aspetta in `_Da-smistare/`, prove di fotocamere in `_Attrezzatura/` — da rivedere (rinominare o escludere qualsiasi cartella, vedere l'albero finale) prima di spostare cartelle intere, con annulla. **File collegati rimasti soli** (un `.xmp` o `.dop` rimasto solo dopo lo spostamento della foto) tornano accanto alla foto, con il suo nome. **Duplica** (Ctrl+D): una copia accanto alla foto, con regolazioni, ritaglio, segni e album, con codice digitato e annullabile. |
 | **File ripetuti** | SHA-256 in tre fasi (dimensione → primi/ultimi 64 KB → file intero), affiancati con le loro miniature. |
+| **Foto simili** | Per ogni giorno, gli scatti che in pratica sono la stessa immagine (una raffica, la stessa posa più volte) vengono raggruppati dalle miniature, sul computer, con la più nitida e meglio esposta suggerita da tenere. Un clic tiene o lascia andare ogni foto; le altre vanno insieme nel Limbo, il RAW e il suo JPG come una sola. Tre livelli: quasi uguali, simili, stessa scena. |
+| **Ricerca per ciò che mostra la foto** | Scrivi *spiaggia*, *cane*, *compleanno* o *tramonto* e trova le foto che lo mostrano, qualunque sia il loro nome. Un piccolo modello (TinyCLIP, MIT) legge ogni miniatura sul computer, con il processore, mentre si analizza «cosa mostrano le foto», e la confronta con 605 tipi di scene, eventi, oggetti e luoghi, con nomi nelle dieci lingue dell’app. Il pannello informazioni mostra cosa mostra la foto; ogni nome lo cerca. Niente viene scaricato o inviato. |
 | **Backup** | Una cartella principale e una di backup confrontate per contenuto; copie verificate di ciò che manca, nelle stesse sottocartelle o in cartelle per data. |
 | **Converti** | HEIC/HEIF → JPG o PNG a piena risoluzione, mantenendo EXIF e profilo colore, accanto all'originale. |
 | **Formati** | Foto: JPEG, PNG, GIF, WebP, AVIF, BMP, HEIC/HEIF, TIFF, PSD/PSB, RAW della fotocamera (CR3, CR2, NEF, NRW, ARW, SR2, ORF, RW2, RAF, SRW, PEF, DNG, 3FR, IIQ, ERF, RWL). Video: MP4, MOV, M4V, 3GP, WebM, MKV, MTS/M2TS, AVI. |
@@ -270,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-foto"; npm run test:e2e
 
 ## Registro delle modifiche
 
-Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.54.0**.
+Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.56.0**.
 
 ## Riconoscimenti
 
@@ -289,6 +291,7 @@ I componenti di terze parti inclusi mantengono le proprie licenze:
 | [libheif](https://github.com/strukturag/libheif) con libde265 (build WebAssembly di [libheif-js](https://github.com/catdad-experiments/libheif-js)) | GNU LGPL v3, non modificato | `src/platform/thumbs/electron-sandbox/vendor/libheif` |
 | [face-api](https://github.com/vladmandic/face-api) con TensorFlow.js e i suoi modelli dei volti | MIT | `src/platform/faces/electron-sandbox/vendor/face-api` |
 | Modelli [COCO-SSD e MobileNet](https://github.com/tensorflow/tfjs-models) | Apache 2.0 | `src/platform/faces/electron-sandbox/vendor/pets` |
+| [ONNX Runtime Web](https://github.com/microsoft/onnxruntime) 1.22 and the [TinyCLIP ViT-61M/32](https://huggingface.co/wkcn/TinyCLIP-ViT-61M-32-Text-29M-LAION400M) model (Microsoft; built by `tools/models/build.py`) | MIT · MIT | `src/platform/faces/electron-sandbox/vendor/onnxruntime-web` · `models/tinyclip` |
 | Confini e nomi dei paesi di [Natural Earth](https://www.naturalearthdata.com) (1:50m) | Pubblico dominio | `src/platform/geo` |
 | [GeoNames](https://www.geonames.org) — cities15000 | CC BY 4.0 | `src/platform/geo/node/cities.json` |
 | [LibRaw](https://www.libraw.org) 0.22 (raw development), in WebAssembly via [libraw-wasm](https://github.com/colorhythm/libraw-wasm) and [typed-cstruct](https://github.com/ssssota/typed-cstruct) | LGPL-2.1 or CDDL-1.0 · MIT · MIT | `src/platform/raw/electron-sandbox/vendor` |

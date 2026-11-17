@@ -569,7 +569,7 @@ app.whenReady().then(async () => {
       res.only = lib.view('main').every(same) && lib.view('main').some((x) => x.id === it.id);
       res.selected = lib.selection.has(it.id);
       res.chip = [...document.querySelectorAll('.filter-chips .filter-chip')].length;
-      res.linkGone = !document.querySelector('.info-panel .ip-day');
+      res.linkGone = !document.querySelector('.info-panel .ip-day:not(.ip-similar)');
       document.querySelector('.filter-chips .filter-chip .chip-x')?.click(); await wait(300);
       res.cleared = !lib.filter.day;
       lib.goHome(); lib.clearSelection(); await wait(200);
@@ -1683,6 +1683,55 @@ app.whenReady().then(async () => {
       for (const id of window.__pinPage?.made || []) await s.labels.remove(id);
       return res; })()`);
     check(!pinPage.error && pinPage.top > 100 && pinAfter.marked === 1 && Math.abs(pinAfter.top - pinPage.top) < 2, 'a real click on the pencil, down the page, does not move the page', JSON.stringify({ pinPage, pinAfter }));
+
+    // Similar photos of a day: a photo and its copy in "Backup antigo" (same day, same picture) form a group, one
+    // suggested to keep; "Send to the Limbo" sends the other, after asking; undone after. And a JPEG sent to the
+    // Limbo takes its raw twin along (an option of the dialog).
+    const sim = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      // an edited export ("IMG_….-Edit.jpg") and its original: the same picture, the same day (never twins)
+      const copy = lib.allItems.find((x) => /-Edit\.jpg$/i.test(x.name) && x.thumb === 1 && !x.mark && lib.allItems.some((y) => y.folder === x.folder && y.name === x.name.replace(/-Edit\.jpg$/i, '.JPG') && y.thumb === 1 && !y.mark));
+      const orig = lib.allItems.find((y) => y.folder === copy.folder && y.name === copy.name.replace(/-Edit\.jpg$/i, '.JPG'));
+      lib.showDay(copy.id); s.layout.openView('photos'); await wait(400);
+      document.querySelector('.view-photos .similar-btn').click();
+      for (let i = 0; i < 100 && !document.querySelector('.sim-group, .sim-empty'); i++) await wait(100);
+      const groups = [...document.querySelectorAll('.sim-group')].map((g) => [...g.querySelectorAll('.sim-tile')].map((t) => t.title.split('\\n')[0]));
+      const ours = [...document.querySelectorAll('.sim-group')].find((g) => [...g.querySelectorAll('.sim-tile')].some((t) => t.title.startsWith(copy.name)));
+      const res = { groups, title: document.querySelector('.sim-title')?.textContent, best: ours?.querySelectorAll('.sim-tile.is-best').length, out: ours?.querySelectorAll('.sim-tile.is-out').length, tiles: ours?.querySelectorAll('.sim-tile').length };
+      // keep only ours: the other groups keep all
+      for (const g of document.querySelectorAll('.sim-group')) if (g !== ours) [...g.querySelectorAll('.sim-group-head .btn')].find((b) => b.textContent === 'Keep all').click();
+      await wait(100);
+      res.send = document.querySelector('.sim-foot .btn-primary').textContent;
+      document.querySelector('.sim-foot .btn-primary').click(); await wait(300);
+      res.ask = document.querySelector('.cm-overlay .choice-dialog h2')?.textContent;
+      const limboBefore = new Set(lib.allItems.filter((x) => x.mark === 3).map((x) => x.id));
+      document.querySelector('.cm-overlay .btn-primary').click(); await wait(600);
+      const gone = [copy, orig].filter((x) => (lib.byId.get(x.id).mark || 0) === 3);
+      res.gone = gone.length; res.closed = !document.querySelector('.sim');
+      await lib.setMark(lib.allItems.filter((x) => x.mark === 3 && !limboBefore.has(x.id)).map((x) => x.id), 'reject'); // back, twins too
+      res.back = [copy, orig].every((x) => !lib.byId.get(x.id).mark);
+
+      // a JPEG with its raw twin (IMG_….JPG + IMG_….CR2 in the same folder) to the Limbo, from its menu
+      const raw = lib.allItems.find((x) => x.ext === 'cr2' && !x.mark);
+      const jpg = lib.allItems.find((x) => x.folder === raw.folder && x.name.toLowerCase() === raw.name.toLowerCase().replace(/cr2$/, 'jpg'));
+      res.twins = lib.twinsOf([jpg]).get(jpg.id)?.map((x) => x.name);
+      lib.showDay(jpg.id); s.layout.openView('photos'); await wait(400);
+      const tile = document.querySelector('.view-photos .tile[data-id="' + jpg.id + '"]');
+      tile.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 300, clientY: 300 })); await wait(900);
+      res.menuSimilar = [...document.querySelectorAll('.ctx-item .ctx-label')].some((x) => x.textContent === 'Similar photos of this day');
+      [...document.querySelectorAll('.ctx-item')].find((b) => b.querySelector('.ctx-label')?.textContent === 'Send to the Limbo')?.click(); await wait(300);
+      res.check = document.querySelector('.cm-overlay .choice-check span')?.textContent;
+      res.checked = document.querySelector('.cm-overlay .choice-check input')?.checked;
+      document.querySelector('.cm-overlay .btn-primary').click(); await wait(500);
+      res.limbo = [jpg, raw].map((x) => lib.byId.get(x.id).mark || 0).join();
+      await lib.setMark([jpg.id], 'reject'); await wait(300); // back from the Limbo: the twin comes too? (setMark alone: no)
+      await lib.setMark([raw.id], 'reject'); await wait(200);
+      res.after = [jpg, raw].map((x) => lib.byId.get(x.id).mark || 0).join();
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(sim.best === 1 && sim.out === sim.tiles - 1 && sim.tiles >= 2 && /^Similar photos · /.test(sim.title || '') && /^Send \d+ to the Limbo$/.test(sim.send || '') && /similar photos? to the Limbo\?$/.test(sim.ask || '')
+      && sim.gone === sim.tiles - 1 && sim.closed && sim.back,
+      'Similar photos: a photo and its copy of the same day form a group with one suggested to keep; the others go to the Limbo after asking', JSON.stringify(sim));
+    check(sim.twins?.length === 1 && /\.CR2$/i.test(sim.twins[0]) && sim.menuSimilar && /Also send the RAW or JPG/.test(sim.check || '') && sim.checked === true && sim.limbo === '3,3' && sim.after === '0,0',
+      'a JPEG sent to the Limbo takes its raw twin along (an option of the dialog, on by default)', JSON.stringify(sim));
     // the viewer's editing panel: the same sections; typing in a field does not reach the viewer's keys; a
     // photo moved to a category the filter does not show stays in view, greyed, with a note naming it
     const vw = await js(`(async () => {
@@ -1888,6 +1937,33 @@ app.whenReady().then(async () => {
     const tagLines = sceneTags.split('\n').filter(Boolean);
     check(tagLines.length === 3 && tagLines.every((l) => /^\d+ (\d+:\d+(,\d+:\d+)*)?;(\d+:\d+(,\d+:\d+)*)?$/.test(l)) && sceneState.photos === 3,
       'what the photos show: read from the thumbnails, kept as a few bytes per photo', JSON.stringify({ tagLines, photos: sceneState?.photos, backend: sceneState?.backend, error: sceneState?.error }));
+    // and their content (the content model, when this build has one: models/ is made by tools/models/build.py)
+    if (fs.existsSync(path.join(__dirname, '..', 'models', 'tinyclip', 'vision.onnx'))) {
+      const lines = (await js(`host.scenes.content()`)).split('\n').filter(Boolean);
+      check(lines.length === 3 && lines.every((l) => /^\d+ [a-zA-Z]+:\d+(,[a-zA-Z]+:\d+)*$/.test(l)) && sceneState.content?.photos === 3 && !sceneState.content?.error,
+        'what the photos show, from the content model (on the processor): the closest categories of each photo', JSON.stringify({ lines, content: sceneState.content }));
+      // the search finds a photo by what it shows, in the app's language (Photos and the title bar's search)
+      const [mid, cats] = lines[0].split(' ');
+      const top = cats.split(',').map((x) => x.split(':')).find(([, p]) => Number(p) >= 6);
+      if (top) {
+        const r = await js(`(async () => {
+          const s = ${S};
+          await s.content.refresh();
+          const name = s.content.name('${top[0]}');
+          s.library.setFilter({ query: name });
+          const ids = s.library.view('main').map((i) => i.id);
+          s.library.setFilter({ query: '' });
+          const gsRows = (() => { const g = document.querySelector('.gs-input'); g.focus(); g.value = name; g.dispatchEvent(new Event('input')); return null; })();
+          await new Promise((r) => setTimeout(r, 200));
+          const groups = [...document.querySelectorAll('.gs-group')].map((e) => e.textContent);
+          const row = [...document.querySelectorAll('.gs-row')].some((e) => e.textContent.includes(name));
+          document.querySelector('.gs-input').value = ''; document.querySelector('.gs-input').blur();
+          s.library.setSelection([${mid}]);
+          return { name, has: ids.includes(${mid}), n: ids.length, shows: s.content.of(s.library.byId.get(${mid})), groups, row, translated: name !== 'content.cat.${top[0]}' };
+        })()`);
+        check(r.has && r.translated && r.row && r.groups.length > 1, 'searching by what a photo shows (its category name in the app’s language) finds it, in Photos and in the title bar', JSON.stringify(r));
+      }
+    }
     delete process.env.LIONPHOTOS_RECOGNIZE_LIMIT;
     // the country of a photo from its GPS position, worked out on this computer (Rome → IT, at sea → nothing)
     {

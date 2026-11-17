@@ -112,7 +112,7 @@ contextBridge.exposeInMainWorld('host', {
   faces: recognizer('faces'),
   pets: recognizer('pets'),
   // what the photos show, read from their thumbnails (album suggestions); tags: "id data" per line
-  scenes: { ...recognizer('scenes'), tags: () => ipcRenderer.invoke('scenes:tags') },
+  scenes: { ...recognizer('scenes'), tags: () => ipcRenderer.invoke('scenes:tags'), content: () => ipcRenderer.invoke('scenes:content') },
 
   // repeated files by content (SHA-256)
   dupes: {

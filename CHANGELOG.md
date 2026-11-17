@@ -2,6 +2,29 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.56.0] — 2026-11-17
+
+### Added
+- Search by what the photo shows. Type *praia*, *cachorro*, *aniversário* or *pôr do sol* — in Photos or in the search of the title bar (Ctrl+K) — and the photos that show it are found, whatever their names or folders. The title bar's search also lists what the photos show as its own group, with how many photos each.
+  - A small model, TinyCLIP ViT-61M/32 (Microsoft, MIT), reads each thumbnail on this computer while "what the photos show" is analysed (the same run as the album suggestions; Ctrl+K offers to start it). It runs on the processor, on several threads, through ONNX Runtime Web: a fraction of a second per photo.
+  - Each photo is compared with 605 kinds of scenes, events, objects, places and kinds of photo (black and white, blurred…), named in the ten languages of the app. A photo shows a category when it is among its closest four and at least 6 % likely.
+  - The photo's "impression" (512 numbers) is kept in the catalog: a new list of categories in a later version is worked out again without reading the photos.
+  - The info panel shows what a photo shows; each name searches Photos for it.
+  - Nothing is downloaded and nothing leaves the computer: the model is part of the app (the installers grow by about 80 MB).
+
+## [1.55.1] — 2026-11-17
+
+### Fixed
+- Big folders on a cloud drive (Google Drive, OneDrive…): a HEIC photo or a video waiting for its turn no longer stops the other thumbnail slots — before, a folder full of HEIC made one thumbnail at a time and looked stuck. The waiting files keep their place and go as soon as their lane is free.
+- On a slow source (the thumbnails take more than a few seconds each), the next files are read ahead while the current ones are made, so the drive downloads them in parallel. The status bar tooltip says so, and suggests marking the folder "Available offline" in the drive's app.
+
+## [1.55.0] — 2026-11-17
+
+### Added
+- **Similar photos of a day.** The shots that are, in practice, the same picture — a burst, the same pose a few times, a scene shot again and again — are grouped, and the one to keep is suggested: the sharpest and best exposed, or one already marked with a star or OK, or adjusted. The others are set to go to the Limbo; a click keeps or lets go each photo, a double-click compares the group side by side, and *Send to the Limbo* does it all at once after asking (only the catalog changes; *Undo* in the notice). Three levels: *Almost the same*, *Similar* (the default) and *Same scene*. Opened from the day in Photos (the *Similar photos* button beside the day's filter), from *Photos of the day* in the info panel and the viewer, and from a photo's menu; ‹ › go to the day before or after.
+- How it works: everything is read from the thumbnails already made, on the computer — the light and shade in 16 × 16 squares (compared by correlation) and the colours in 4 × 4, among photos taken within a few minutes of each other; sharpness from a Laplacian, exposure from the burnt-out and blocked-up pixels. About 5 ms a photo: a day of 5,000 photos is read in about half a minute, with its progress and the time left, and kept for the session.
+- **The raw file and its JPEG go to the Limbo together.** Sending a photo to the Limbo now offers to send the other file of the same shot too — on by default, remembered — and bringing it back brings both. Twins are the files with the same name in the same folder, or in its *Raw* and *Img* subfolders (as Organize leaves them) taken in the same second and numbered one after the other. Edited copies are never twins. The similar photos treat a raw file and its JPEG as one photo.
+
 ## [1.54.0] — 2026-11-17
 
 ### Changed

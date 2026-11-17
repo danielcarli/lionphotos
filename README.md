@@ -11,7 +11,7 @@ Works on your folders as they are: small thumbnails made once, the metadata that
 
 **English** · [Português (Brasil)](docs/README.pt-BR.md) · [Português (Portugal)](docs/README.pt-PT.md) · [Español](docs/README.es.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Italiano](docs/README.it.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md)
 
-![Version 1.54.0](https://img.shields.io/badge/version-1.54.0-161214)
+![Version 1.56.0](https://img.shields.io/badge/version-1.56.0-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -123,6 +123,8 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Overview** | Items, photos, videos, size and period; files by kind, by year, formats, cameras, codecs; the thumbnail cache. |
 | **Organize** | Date folders (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14`, or `2024-07-14-theme`), folders by album (`2024/2024-07-14-album`), optionally with `Raw/` and `Img/` inside; *Move to folder* with subfolders by kind; the files of the same shot go along; recent operations with undo. The files really move on the disk, and can also be **renamed** (`{data}-{álbum}-{fotógrafo}-{nº}` by default, numbered by date; the raw, JPEG and `.xmp` of a shot keep the same name), or only renamed where they are. **Reorganize the collection** reads the folders as they are and proposes one structure on the disk — `2025/2025-12-24-Natal`, long themes in `Themes/`, what waits to be sorted in `_Inbox/`, camera tests in `_Gear/` — for review (rename or leave out any folder, see the tree as it will be) before whole folders move, with undo. **Related files left behind** (an `.xmp` or `.dop` alone after its photo moved) go back next to their photo, with its name. **Duplicate** (Ctrl+D): a copy next to the photo with its adjustments, crop, marks and albums, with the typed code and undo. |
 | **Repeated files** | SHA-256 in three stages (size → first/last 64 KB → whole file), side by side with their thumbnails. |
+| **Similar photos** | For any day, the shots that are in practice the same picture (a burst, the same pose a few times) are grouped from their thumbnails, on the computer, with the sharpest and best exposed suggested to keep. One click keeps or lets go each photo; the others go to the Limbo together, the raw file and its JPEG as one. Three levels: almost the same, similar, same scene. |
+| **Search by what the photo shows** | Type *beach*, *dog*, *birthday* or *sunset* and find the photos that show it, whatever their names. A small model (TinyCLIP, MIT) reads each thumbnail on the computer, on the processor, while “what the photos show” is analysed, and matches it with 605 kinds of scenes, events, objects and places, named in the ten languages of the app. The info panel shows what a photo shows; each name searches for it. Nothing is downloaded or sent. |
 | **Backup** | A master and a backup folder compared by content; verified copies of what is missing, in the same subfolders or in date folders. |
 | **Convert** | HEIC/HEIF → JPG or PNG at full resolution, EXIF and colour profile kept, next to the original. |
 | **Formats** | Photos: JPEG, PNG, GIF, WebP, AVIF, BMP, HEIC/HEIF, TIFF, PSD/PSB, camera raw (CR3, CR2, NEF, NRW, ARW, SR2, ORF, RW2, RAF, SRW, PEF, DNG, 3FR, IIQ, ERF, RWL). Videos: MP4, MOV, M4V, 3GP, WebM, MKV, MTS/M2TS, AVI. |
@@ -270,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.54.0**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.56.0**.
 
 ## Credits
 
@@ -289,6 +291,7 @@ Bundled third-party components keep their own licenses:
 | [libheif](https://github.com/strukturag/libheif) with libde265 (WebAssembly build from [libheif-js](https://github.com/catdad-experiments/libheif-js)) | GNU LGPL v3, unmodified | `src/platform/thumbs/electron-sandbox/vendor/libheif` |
 | [face-api](https://github.com/vladmandic/face-api) with TensorFlow.js and its face models | MIT | `src/platform/faces/electron-sandbox/vendor/face-api` |
 | [COCO-SSD and MobileNet](https://github.com/tensorflow/tfjs-models) models | Apache 2.0 | `src/platform/faces/electron-sandbox/vendor/pets` |
+| [ONNX Runtime Web](https://github.com/microsoft/onnxruntime) 1.22 and the [TinyCLIP ViT-61M/32](https://huggingface.co/wkcn/TinyCLIP-ViT-61M-32-Text-29M-LAION400M) model (Microsoft; built by `tools/models/build.py`) | MIT · MIT | `src/platform/faces/electron-sandbox/vendor/onnxruntime-web` · `models/tinyclip` |
 | [Natural Earth](https://www.naturalearthdata.com) country borders and names (1:50m) | Public domain | `src/platform/geo` |
 | [GeoNames](https://www.geonames.org) — cities15000 | CC BY 4.0 | `src/platform/geo/node/cities.json` |
 | [LibRaw](https://www.libraw.org) 0.22 (raw development), in WebAssembly via [libraw-wasm](https://github.com/colorhythm/libraw-wasm) and [typed-cstruct](https://github.com/ssssota/typed-cstruct) | LGPL-2.1 or CDDL-1.0 · MIT · MIT | `src/platform/raw/electron-sandbox/vendor` |

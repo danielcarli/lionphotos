@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · **日本語** · [한국어](README.ko.md)
 
-![バージョン 1.54.0](https://img.shields.io/badge/version-1.54.0-161214)
+![バージョン 1.56.0](https://img.shields.io/badge/version-1.56.0-161214)
 ![ステータス：ベータテスト](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![ライセンス: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![対応: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -123,6 +123,8 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **概要** | 項目数、写真、動画、容量、期間。種類別、年別、形式、カメラ、コーデック別のファイル。サムネイルのキャッシュ。 |
 | **整理** | 日付フォルダー（`2024/2024-07`、`2024-07`、`2024`、`2024/2024-07-14`、`2024-07-14-テーマ`）、アルバム別フォルダー（`2024/2024-07-14-アルバム`）、必要なら中に `Raw/` と `Img/`；種類別サブフォルダー付きの *フォルダーへ移動*；同じ撮影のファイルも一緒に移動；元に戻せる最近の操作。 ファイルはディスク上で実際に移動し、**名前の変更**もできます（既定は `{data}-{álbum}-{fotógrafo}-{nº}`、日付順の番号。同じ写真の RAW・JPEG・`.xmp` は同じ名前のまま）。その場で名前だけ変えることもできます。 「コレクションを整理し直す」は今のフォルダーを読み取り、ディスク上の統一した構成を提案します——`2025/2025-12-24-クリスマス`、長期のテーマは `テーマ/`、整理待ちは `_整理待ち/`、カメラのテストは `_機材/`。フォルダーごとに名前の変更や除外ができ、整理後のツリーを確認してからフォルダーを丸ごと移動します。元に戻せます。**取り残された関連ファイル**（写真の移動後に残った `.xmp` や `.dop`）を写真の隣に戻し、写真と同じ名前にします。 **複製**（Ctrl+D）：調整、切り抜き、マーク、アルバムを引き継いだコピーを写真の隣に作成（確認コード入力、元に戻せます）。 |
 | **重複ファイル** | 3 段階の SHA-256（サイズ → 先頭/末尾 64 KB → ファイル全体）。サムネイルを並べて表示。 |
+| **似ている写真** | 日ごとに、実質的に同じ写真（連写、同じポーズを数回）をサムネイルからコンピューター上でまとめ、最もシャープで露出の良い 1 枚を残す候補にします。クリックで写真ごとに残す／送るを切り替え、それ以外はまとめて「保留」へ。RAW と JPG は 1 枚として扱います。3 段階：ほぼ同じ、似ている、同じ場面。 |
+| **写っているもので検索** | 「ビーチ」「犬」「誕生日パーティー」「夕焼け」などと入力すると、ファイル名に関係なく、それが写っている写真が見つかります。小さなモデル（TinyCLIP、MIT）が「写真に写っているもの」の分析中に各サムネイルをコンピューター上でプロセッサーを使って読み取り、アプリの10言語で名前の付いた605種類の場面・行事・物・場所と照らし合わせます。情報パネルには写っているものが表示され、名前をクリックするとそれで検索します。何もダウンロードも送信もされません。 |
 | **バックアップ** | マスターとバックアップのフォルダーを内容で比較。足りないものを検証付きで、同じサブフォルダーまたは日付フォルダーにコピー。 |
 | **変換** | HEIC/HEIF → フル解像度の JPG または PNG。EXIF とカラープロファイルを保持し、元のファイルの横に保存。 |
 | **形式** | 写真：JPEG、PNG、GIF、WebP、AVIF、BMP、HEIC/HEIF、TIFF、PSD/PSB、カメラ RAW（CR3、CR2、NEF、NRW、ARW、SR2、ORF、RW2、RAF、SRW、PEF、DNG、3FR、IIQ、ERF、RWL）。動画：MP4、MOV、M4V、3GP、WebM、MKV、MTS/M2TS、AVI。 |
@@ -270,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 変更履歴
 
-[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.54.0**。
+[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.56.0**。
 
 ## クレジット
 
@@ -289,6 +291,7 @@ LionPhotos は **[MIT ライセンス](../LICENSE)** のオープンソースで
 | [libheif](https://github.com/strukturag/libheif) と libde265（[libheif-js](https://github.com/catdad-experiments/libheif-js) の WebAssembly ビルド） | GNU LGPL v3、未改変 | `src/platform/thumbs/electron-sandbox/vendor/libheif` |
 | [face-api](https://github.com/vladmandic/face-api) と TensorFlow.js、その顔モデル | MIT | `src/platform/faces/electron-sandbox/vendor/face-api` |
 | [COCO-SSD と MobileNet](https://github.com/tensorflow/tfjs-models) のモデル | Apache 2.0 | `src/platform/faces/electron-sandbox/vendor/pets` |
+| [ONNX Runtime Web](https://github.com/microsoft/onnxruntime) 1.22 and the [TinyCLIP ViT-61M/32](https://huggingface.co/wkcn/TinyCLIP-ViT-61M-32-Text-29M-LAION400M) model (Microsoft; built by `tools/models/build.py`) | MIT · MIT | `src/platform/faces/electron-sandbox/vendor/onnxruntime-web` · `models/tinyclip` |
 | [Natural Earth](https://www.naturalearthdata.com) の国境と国名（1:50m） | パブリックドメイン | `src/platform/geo` |
 | [GeoNames](https://www.geonames.org) — cities15000 | CC BY 4.0 | `src/platform/geo/node/cities.json` |
 | [LibRaw](https://www.libraw.org) 0.22 (raw development), in WebAssembly via [libraw-wasm](https://github.com/colorhythm/libraw-wasm) and [typed-cstruct](https://github.com/ssssota/typed-cstruct) | LGPL-2.1 or CDDL-1.0 · MIT · MIT | `src/platform/raw/electron-sandbox/vendor` |

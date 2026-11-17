@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · **简体中文** · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![版本 1.54.0](https://img.shields.io/badge/version-1.54.0-161214)
+![版本 1.56.0](https://img.shields.io/badge/version-1.56.0-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -123,6 +123,8 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **概览** | 项目数、照片、视频、大小和时间段；按种类、按年份、格式、相机、编解码器统计文件；缩略图缓存。 |
 | **整理** | 日期文件夹（`2024/2024-07`、`2024-07`、`2024`、`2024/2024-07-14` 或 `2024-07-14-主题`），按相册的文件夹（`2024/2024-07-14-相册`），可在其中分出 `Raw/` 和 `Img/`；*移动到文件夹*（按种类分子文件夹）；同一次拍摄的文件一起移动；最近操作可撤销。 文件会在磁盘上真正移动，也可以**重命名**（默认 `{data}-{álbum}-{fotógrafo}-{nº}`，按日期编号；同一张照片的 RAW、JPEG 和 `.xmp` 保持同名），或只在原处重命名。 “重新整理收藏”会读取现有文件夹并在磁盘上提出统一结构——`2025/2025-12-24-圣诞`、长期主题放在 `主题/`、待整理放在 `_待整理/`、相机测试放在 `_器材/`——先检查（可重命名或排除任何文件夹，预览整理后的目录树），再整体移动文件夹，并可撤消。**遗留的关联文件**（照片移动后单独留下的 `.xmp` 或 `.dop`）会回到照片旁，并使用照片的名称。 **复制一份**（Ctrl+D）：在照片旁创建副本，带上调整、裁剪、标记和相册（需输入确认码，可撤销）。 |
 | **重复文件** | 分三步计算 SHA-256（大小 → 开头/结尾 64 KB → 整个文件），与缩略图并排显示。 |
+| **相似照片** | 按天将实际上是同一张图的照片（连拍、同一姿势拍了几次）根据缩略图在本机分组，并建议保留最清晰、曝光最好的一张。单击可切换每张照片保留或送出；其余的一起送入待删区，RAW 和 JPG 算作一张。三个级别：几乎相同、相似、同一场景。 |
+| **按照片内容搜索** | 输入“海滩”“狗”“生日派对”或“日落”，就能找到拍到这些的照片，无论文件名是什么。一个小模型（TinyCLIP，MIT）在分析“照片里有什么”时，于本机用处理器读取每张缩略图，并与 605 种场景、活动、物品和地点比对，这些名称涵盖应用的十种语言。信息面板显示照片里有什么；点击名称即可按它搜索。不下载也不发送任何内容。 |
 | **备份** | 按内容比较主文件夹和备份文件夹；把缺少的内容经校验后复制到相同的子文件夹或日期文件夹中。 |
 | **转换** | HEIC/HEIF → 全分辨率 JPG 或 PNG，保留 EXIF 和色彩配置文件，保存在原文件旁边。 |
 | **格式** | 照片：JPEG、PNG、GIF、WebP、AVIF、BMP、HEIC/HEIF、TIFF、PSD/PSB、相机 RAW（CR3、CR2、NEF、NRW、ARW、SR2、ORF、RW2、RAF、SRW、PEF、DNG、3FR、IIQ、ERF、RWL）。视频：MP4、MOV、M4V、3GP、WebM、MKV、MTS/M2TS、AVI。 |
@@ -270,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.54.0**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.56.0**。
 
 ## 致谢
 
@@ -289,6 +291,7 @@ LionPhotos 以 **[MIT 许可证](../LICENSE)** 开源：可以自由使用、复
 | [libheif](https://github.com/strukturag/libheif) 及 libde265（[libheif-js](https://github.com/catdad-experiments/libheif-js) 的 WebAssembly 构建） | GNU LGPL v3，未修改 | `src/platform/thumbs/electron-sandbox/vendor/libheif` |
 | [face-api](https://github.com/vladmandic/face-api) 及 TensorFlow.js 和其人脸模型 | MIT | `src/platform/faces/electron-sandbox/vendor/face-api` |
 | [COCO-SSD 和 MobileNet](https://github.com/tensorflow/tfjs-models) 模型 | Apache 2.0 | `src/platform/faces/electron-sandbox/vendor/pets` |
+| [ONNX Runtime Web](https://github.com/microsoft/onnxruntime) 1.22 and the [TinyCLIP ViT-61M/32](https://huggingface.co/wkcn/TinyCLIP-ViT-61M-32-Text-29M-LAION400M) model (Microsoft; built by `tools/models/build.py`) | MIT · MIT | `src/platform/faces/electron-sandbox/vendor/onnxruntime-web` · `models/tinyclip` |
 | [Natural Earth](https://www.naturalearthdata.com) 国界与国名（1:50m） | 公有领域 | `src/platform/geo` |
 | [GeoNames](https://www.geonames.org) — cities15000 | CC BY 4.0 | `src/platform/geo/node/cities.json` |
 | [LibRaw](https://www.libraw.org) 0.22 (raw development), in WebAssembly via [libraw-wasm](https://github.com/colorhythm/libraw-wasm) and [typed-cstruct](https://github.com/ssssota/typed-cstruct) | LGPL-2.1 or CDDL-1.0 · MIT · MIT | `src/platform/raw/electron-sandbox/vendor` |

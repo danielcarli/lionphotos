@@ -12,7 +12,7 @@ const { Worker, isMainThread, parentPort, workerData } = require('worker_threads
 
 if (!isMainThread && workerData?.catalogReader) {
   const { DatabaseSync } = require('node:sqlite');
-  const { LIST_JSON, THUMB_VALID, THUMB_FAILED, scanTable, candidateWhere } = require('./libraryDatabase');
+  const { LIST_JSON, THUMB_VALID, THUMB_FAILED, candidatesSql, candidateArgs } = require('./libraryDatabase');
   const db = new DatabaseSync(workerData.file, { readOnly: true });
   db.exec('PRAGMA busy_timeout = 5000; PRAGMA cache_size = -16000;');
   const q = {
@@ -21,9 +21,7 @@ if (!isMainThread && workerData?.catalogReader) {
       ORDER BY coalesce(taken_at, mtime) DESC`),
     roots: db.prepare(`SELECT r.path, r.last_scan_at AS lastScanAt, count(m.id) AS count, coalesce(sum(m.kind = 2), 0) AS videos,
       coalesce(sum(m.size), 0) AS bytes FROM roots r LEFT JOIN media m ON m.root_id = r.id GROUP BY r.id ORDER BY r.last_scan_at DESC`),
-    faceCandidates: Object.fromEntries(['face', 'pet', 'scene'].map((k) => [k, db.prepare(`SELECT m.id FROM media m LEFT JOIN ${scanTable(k)} s ON s.media_id = m.id
-      WHERE m.root_id = ? AND ${candidateWhere(k)} AND (s.media_id IS NULL OR s.size != m.size OR s.mtime != m.mtime)
-      ORDER BY coalesce(m.taken_at, m.mtime) DESC`)])),
+    faceCandidates: Object.fromEntries(['face', 'pet', 'scene'].map((k) => [k, db.prepare(candidatesSql(k))])),
     // what a photo says of where it was taken: the place written in LionPhotos, the one in the file, its GPS
     places: db.prepare(`SELECT id, json_extract(meta, '$.gps.lat') AS lat, json_extract(meta, '$.gps.lon') AS lon,
       json_extract(meta, '$.city') AS city, json_extract(meta, '$.state') AS state, json_extract(meta, '$.country') AS country,
@@ -33,6 +31,9 @@ if (!isMainThread && workerData?.catalogReader) {
         OR json_extract(meta, '$.country') IS NOT NULL OR json_extract(meta_edit, '$.city') IS NOT NULL OR json_extract(meta_edit, '$.country') IS NOT NULL)`),
     gps: db.prepare(`SELECT id, json_extract(meta, '$.gps.lat') AS lat, json_extract(meta, '$.gps.lon') AS lon FROM media
       WHERE root_id = ? AND meta LIKE '%"gps"%'`),
+    // what each photo shows, from the content model: "id cats" per line
+    content: db.prepare(`SELECT group_concat(m.id || ' ' || c.cats, char(10)) AS j FROM content_scans c JOIN media m ON m.id = c.media_id
+      WHERE m.root_id = ? AND c.model = ? AND c.size = m.size AND c.mtime = m.mtime AND c.cats IS NOT NULL AND c.cats != ''`),
     scenes: db.prepare(`SELECT group_concat(m.id || ' ' || s.data, char(10)) AS j FROM scene_scans s JOIN media m ON m.id = s.media_id
       WHERE m.root_id = ? AND s.size = m.size AND s.mtime = m.mtime AND s.data IS NOT NULL AND s.data != ''`),
   };
@@ -43,7 +44,8 @@ if (!isMainThread && workerData?.catalogReader) {
     pendingThumbs: (rootId) => q.pendingThumbs.all(rootId).map((r) => r.id),
     roots: () => q.roots.all(),
     cacheStats: () => require('./cacheStats').cacheStats(db, workerData.file),
-    faceCandidates: (rootId, kind = 'face') => q.faceCandidates[q.faceCandidates[kind] ? kind : 'face'].all(rootId).map((r) => r.id),
+    faceCandidates: (rootId, kind = 'face', model = '') => { const k = q.faceCandidates[kind] ? kind : 'face'; return q.faceCandidates[k].all(...candidateArgs(k, rootId, model)).map((r) => r.id); },
+    content: (rootId, model) => q.content.get(rootId, model).j || '',
     // what each photo shows (scenes), still valid: one string "id data" per line, made by SQLite
     scenes: (rootId) => q.scenes.get(rootId).j || '',
     // the country of each item with a GPS position (from the metadata already read): "id CC" per line
@@ -123,7 +125,8 @@ class CatalogReader {
   listBuffer(rootId) { return this.#call('listBuffer', rootId); }
   pendingThumbs(rootId) { return this.#call('pendingThumbs', rootId); }
   roots() { return this.#call('roots'); }
-  faceCandidates(rootId, kind = 'face') { return this.#call('faceCandidates', rootId, kind); }
+  faceCandidates(rootId, kind = 'face', model = '') { return this.#call('faceCandidates', rootId, kind, model); }
+  content(rootId, model) { return this.#call('content', rootId, model); }
   scenes(rootId) { return this.#call('scenes', rootId); }
   countries(rootId) { return this.#call('countries', rootId); }
   places(rootId) { return this.#call('places', rootId); }

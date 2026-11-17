@@ -80,7 +80,7 @@ export class StatusbarPart {
       const all = Math.max(library.allItems.length, s.thumbTotal);
       const kept = all - s.thumbTotal;
       left.push(item('image', [t('statusbar.thumbs', { done: formatNumber(kept + s.thumbDone + s.thumbFailed), total: formatNumber(all) }), thumbEta].filter(Boolean).join(' · '),
-        { spin: false, cls: 'status-work', title: `${t('statusbar.thumbsTitle')}\n${t('statusbar.thumbsKept', { kept: formatNumber(kept), missing: formatNumber(s.thumbTotal) })}` }));
+        { spin: false, cls: 'status-work', title: `${t('statusbar.thumbsTitle')}\n${t('statusbar.thumbsKept', { kept: formatNumber(kept), missing: formatNumber(s.thumbTotal) })}${s.slowSource ? `\n${t('statusbar.slowSource')}` : ''}` }));
     }
     if (s.previewPending > 0) {
       left.push(h('span.status-item.status-work', { title: s.currentPreview?.name || '' },

@@ -19,6 +19,10 @@ const path = require('path');
 const { thumbDecoder } = require('../../library/node/mediaTypes');
 const { readRawPreview, TIFF_RAW } = require('../../library/node/rawPreview');
 const { FaceIndex } = require('./faceIndex');
+const { loadContentIndex, categoriesOf } = require('./contentIndex');
+
+// the content model the app carries (none in a build without it: the scenes are read as before)
+const MODEL_DIR = path.join(__dirname, '..', '..', '..', '..', 'models', 'tinyclip');
 
 const JOB_TIMEOUT_MS = 90000;   // the first photo also waits for the models to load
 const IDLE_CLOSE_MS = 20000;    // the page (and its memory) goes when there is nothing more to look at
@@ -145,6 +149,10 @@ class FacesMainService {
     this.jobSeq = 0;
     this.timers = {};
     this.support = null; // null while checking
+    // what the photos show, for the search (scenes only): the content model and its categories
+    this.content = kind === 'scene' ? loadContentIndex(MODEL_DIR) : null;
+    this.contentError = null;
+    if (this.content) setImmediate(() => this.#recount());
     supportOnce().then((s) => { this.support = s; this.#emitProgress(); });
 
     const can = () => this.support?.supported !== false;
@@ -181,6 +189,8 @@ class FacesMainService {
     ipc.handle(`${this.channel}:person`, (_e, personId) => this.index.ofPerson(Number(personId), this.library.rootId));
     ipc.handle(`${this.channel}:group`, (_e, cluster) => this.#mine(this.index.groupFaces(Number(cluster))).map((f) => ({ id: f.id, mediaId: f.mediaId, status: f.status })));
     if (this.kind === 'scene') ipc.handle(`${this.channel}:tags`, () => (this.library.rootId ? this.library.reader.scenes(this.library.rootId).catch(() => '') : ''));
+    // what each photo shows (the content model): "id category:percent,…" per line
+    if (this.kind === 'scene') ipc.handle(`${this.channel}:content`, () => (this.library.rootId && this.content ? this.library.reader.content(this.library.rootId, this.content.id).catch(() => '') : ''));
     ipc.handle(`${this.channel}:ignored`, () => this.index.ignoredFaces(this.library.rootId));
     ipc.handle(`${this.channel}:ofMedia`, (_e, mediaId) => this.db.facesOfMedia(Number(mediaId)));
     ipc.handle(`${this.channel}:assign`, (_e, op) => this.assign(op || {}));
@@ -192,6 +202,11 @@ class FacesMainService {
       if (!this.host || e.sender !== this.host.webContents) return;
       this.backend = info?.backend || null;
       if (info?.error) this.error = info.error;
+      if (this.content && info?.content) {
+        // the content model could not start here: the scenes go on without it (and the photos are not asked again)
+        if (info.content.error) { this.contentError = info.content.error; console.warn(`[${this.channel}] content model: ${info.content.error}`); }
+        else console.log(`[${this.channel}] content model: ${info.content.id}${info.content.threads ? ' (threads)' : ' (one thread)'}`);
+      }
       // the recognition could only run on the processor: not supported here
       console.log(`[${this.channel}] engine: ${this.backend || 'none'}${info?.renderer ? ` · ${info.renderer}` : ''}${info?.error ? ` · ${info.error}` : ''}`);
       if (this.backend && this.backend !== 'webgl' && !FORCE) this.#unsupported('gpu', `TensorFlow.js: ${this.backend}${info?.webglError ? ` (${info.webglError})` : ''}`);
@@ -229,6 +244,8 @@ class FacesMainService {
       faces: counts.faces,
       backend: this.backend,
       error: this.error,
+      // what the photos show (scenes): photos read by the content model; null: the app has none
+      content: this.content && rootId ? { model: this.content.id, photos: this.db.contentCount(rootId, this.content.id), error: this.contentError } : null,
     };
   }
 
@@ -296,7 +313,8 @@ class FacesMainService {
     const rootId = this.library.rootId;
     if (!rootId) return;
     const seq = (this.fillSeq = (this.fillSeq || 0) + 1);
-    this.library.reader.faceCandidates(rootId, this.kind).catch(() => this.db.faceCandidates(rootId, this.kind)).then((list) => {
+    const model = this.#contentModel();
+    this.library.reader.faceCandidates(rootId, this.kind, model).catch(() => this.db.faceCandidates(rootId, this.kind, model)).then((list) => {
       if (seq !== this.fillSeq || rootId !== this.library.rootId || this.disposed) return;
       const running = this.busy ? this.current : null;
       this.queue = list.filter((id) => id !== running);
@@ -396,14 +414,42 @@ class FacesMainService {
     if (!row || (row.kind !== 1 && row.kind !== 2)) return;
     const bytes = this.db.thumbData(id);
     if (!bytes) return; // no thumbnail (yet): looked at in a later run
-    const res = await this.#hostJob({ kind: 'image', bytes, orientation: 1, max: 320 });
+    // the scenes, the content, or both (a photo read before the app had the content model: only the content)
+    const wantScene = !this.db.sceneValid(id, row.size, row.mtime);
+    const wantContent = !!this.#contentModel() && !this.db.contentValid(id, row.size, row.mtime, this.content.id);
+    if (!wantScene && !wantContent) return;
+    const res = await this.#hostJob({ kind: 'image', bytes, orientation: 1, max: 320, scene: wantScene, content: wantContent });
     if (this.disposed || this.db.closed) return;
     if (res?.aborted) { if (this.support?.supported !== false) this.queue.push(id); return; }
     if (res?.fatal) { this.error = res.error; this.paused = true; this.queue.unshift(id); this.counts.done--; this.#closeHost(); return; }
     if (res?.backend) this.backend = res.backend;
-    const scene = res?.ok ? res.scene : null;
-    this.db.saveScene(id, row.size, row.mtime, scene ? scene.data : null, scene ? scene.count : 0);
+    if (wantScene) {
+      const scene = res?.ok ? res.scene : null;
+      this.db.saveScene(id, row.size, row.mtime, scene ? scene.data : null, scene ? scene.count : 0);
+    }
+    // the page had no content model after all (it could not start): the next photos are not asked for it
+    if (wantContent && this.#contentModel()) {
+      const c = res?.ok ? res.content : null;
+      if (c?.error) console.warn(`content ${row.path}: ${c.error}`);
+      if (c?.vec) {
+        const vec = Buffer.from(c.vec);
+        this.db.saveContent(id, row.size, row.mtime, this.content.id, vec, this.content.catv, categoriesOf(this.content, vec));
+      } else if (res?.ok && !c?.error) this.db.saveContent(id, row.size, row.mtime, this.content.id, null, this.content.catv, null);
+    }
     this.#emitChanged(false, BACKGROUND_MS);
+  }
+
+  /** The content model photos are read with now ('' : none, or it could not start on this computer). */
+  #contentModel() { return this.content && !this.contentError ? this.content.id : ''; }
+
+  /** The list of categories changed (a new version of the app): every photo's categories are worked out again. */
+  #recount() {
+    if (this.disposed || this.db.closed || !this.content) return;
+    const rows = this.db.contentToRecount(this.content.id, this.content.catv, 500);
+    if (!rows.length) return;
+    this.db.setContentCats(rows.map((r) => ({ id: r.id, cats: categoriesOf(this.content, r.vec) })), this.content.catv);
+    this.#emitChanged(false, BACKGROUND_MS);
+    setTimeout(() => this.#recount(), 50);
   }
 
   // ------------------------------------------------------------------ what the person does

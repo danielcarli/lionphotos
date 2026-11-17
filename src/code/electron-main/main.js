@@ -79,7 +79,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: lionthumb: lionmedia:",
   "media-src lionthumb: lionmedia:",
-  "connect-src 'self' lionmedia:",
+  "connect-src 'self' lionmedia: lionthumb:", // lionthumb: the similar photos read thumbnails
   "font-src 'self'",
 ].join('; ');
 // The thumbnail page and its workers run WebAssembly (libheif, for HEIC photos), and so does the raw developer.
@@ -91,7 +91,9 @@ const FACES_DIR = path.join(APP_ROOT, 'src', 'platform', 'faces', 'electron-sand
 const RAW_DIR = path.join(APP_ROOT, 'src', 'platform', 'raw', 'electron-sandbox');
 
 // Only files inside this folder may be served to the UI.
-const SERVABLE = [path.join(APP_ROOT, 'src')];
+// the content model (models/tinyclip, built by tools/models/build.py) is read by the scene page
+const MODELS_DIR = path.join(APP_ROOT, 'models');
+const SERVABLE = [path.join(APP_ROOT, 'src'), MODELS_DIR];
 
 function registerAppProtocol() {
   protocol.handle(SCHEME, async (request) => {
@@ -102,9 +104,16 @@ function registerAppProtocol() {
     }
     try {
       const body = await fs.promises.readFile(filePath);
-      return new Response(body, {
-        headers: { 'content-type': MIME[path.extname(filePath)] || 'application/octet-stream', 'content-security-policy': [THUMBS_DIR, FACES_DIR, RAW_DIR].some((d) => filePath.startsWith(d + path.sep)) ? THUMBS_CSP : CSP },
-      });
+      const headers = { 'content-type': MIME[path.extname(filePath)] || 'application/octet-stream', 'content-security-policy': [THUMBS_DIR, FACES_DIR, RAW_DIR].some((d) => filePath.startsWith(d + path.sep)) ? THUMBS_CSP : CSP };
+      // the scene page is isolated, so the content model can run on several threads (SharedArrayBuffer): its
+      // scripts, workers and model say they may be used by it (the face and pet pages read lionmedia: and stay
+      // as they are)
+      if ([FACES_DIR, MODELS_DIR].some((d) => filePath.startsWith(d + path.sep)) && path.extname(filePath) !== '.html') {
+        Object.assign(headers, { 'cross-origin-embedder-policy': 'require-corp', 'cross-origin-resource-policy': 'same-origin' });
+      } else if (filePath.startsWith(FACES_DIR + path.sep) && url.searchParams.get('mode') === 'scene') {
+        Object.assign(headers, { 'cross-origin-opener-policy': 'same-origin', 'cross-origin-embedder-policy': 'require-corp' });
+      }
+      return new Response(body, { headers });
     } catch {
       return new Response('Not found', { status: 404 });
     }

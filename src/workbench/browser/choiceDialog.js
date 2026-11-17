@@ -10,8 +10,13 @@ import { icon } from '../../base/browser/icons.js';
 import { t } from '../../base/common/nls.js';
 
 /** @returns {Promise<boolean>} */
-export function showChoiceDialog({ icon: iconName = 'info', eyebrow, title, message, facts = [], note, confirmLabel }) {
+/**
+ * `check`: an option under the message — `{ label, checked }`; its `checked` is updated when the dialog closes
+ * (read it after a confirm).
+ */
+export function showChoiceDialog({ icon: iconName = 'info', eyebrow, title, message, facts = [], note, check, confirmLabel }) {
   return new Promise((resolve) => {
+    let box = null;
     const confirm = h('button.btn.btn-primary', confirmLabel || t('common.confirm'));
     const cancel = h('button.btn.btn-secondary', t('common.cancel'));
     const dialog = h('div.cm-dialog.choice-dialog', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'cd-title' },
@@ -21,9 +26,10 @@ export function showChoiceDialog({ icon: iconName = 'info', eyebrow, title, mess
       message ? h('p.cm-message', message) : null,
       facts.length ? h('dl.choice-facts', facts.flatMap(([k, v]) => [h('dt', k), h('dd', v)])) : null,
       note ? h('p.choice-note', h('span', { html: icon('warning', 14) }), h('span', note)) : null,
+      check ? h('label.switch-label.choice-check', box = h('input', { type: 'checkbox', checked: !!check.checked }), h('span', check.label)) : null,
       h('footer.cm-actions', cancel, confirm));
     const overlay = h('div.cm-overlay', dialog);
-    const close = (v) => { document.removeEventListener('keydown', onKey, true); overlay.remove(); resolve(v); };
+    const close = (v) => { if (check && box) check.checked = box.checked; document.removeEventListener('keydown', onKey, true); overlay.remove(); resolve(v); };
     const onKey = (e) => {
       if (e.key === 'Escape') { e.preventDefault(); close(false); }
       else if (e.key === 'Enter') { e.preventDefault(); close(true); }

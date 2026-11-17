@@ -20,9 +20,16 @@ def flatten(d, prefix=''):
             out[key] = v
     return out
 
-en = flatten(importlib.import_module('en').MESSAGES)
+# the names of the content categories, one table for every language (content_categories.tsv)
+def categories():
+    rows = [l.rstrip('\n').split('\t') for l in open(os.path.join(HERE, 'content_categories.tsv'), encoding='utf-8') if l.strip() and not l.startswith('#')]
+    head, rows = rows[0], rows[1:]
+    return {loc: {f'content.cat.{r[0]}': r[head.index(loc.replace('-', '_'))] for r in rows} for loc in LOCALES}
+CATS = categories()
+
+en = flatten(importlib.import_module('en').MESSAGES) | CATS['en']
 for loc in LOCALES:
-    msgs = flatten(importlib.import_module(loc.replace('-', '_')).MESSAGES)
+    msgs = flatten(importlib.import_module(loc.replace('-', '_')).MESSAGES) | CATS[loc]
     out, missing = {}, []
     for key in en:
         if key in msgs: out[key] = msgs[key]

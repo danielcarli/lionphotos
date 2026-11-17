@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · **한국어**
 
-![버전 1.54.0](https://img.shields.io/badge/version-1.54.0-161214)
+![버전 1.56.0](https://img.shields.io/badge/version-1.56.0-161214)
 ![상태: 베타 테스트](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![라이선스: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![플랫폼: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -123,6 +123,8 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **개요** | 항목, 사진, 동영상, 용량, 기간. 종류별, 연도별, 형식, 카메라, 코덱별 파일. 썸네일 캐시. |
 | **정리** | 날짜 폴더(`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` 또는 `2024-07-14-주제`), 앨범별 폴더(`2024/2024-07-14-앨범`), 원하면 안에 `Raw/`와 `Img/`; 종류별 하위 폴더가 있는 *폴더로 이동*; 같은 촬영의 파일도 함께 이동; 되돌릴 수 있는 최근 작업. 파일은 디스크에서 실제로 옮겨지며 **이름 바꾸기**도 됩니다(기본 `{data}-{álbum}-{fotógrafo}-{nº}`, 날짜순 번호; 같은 사진의 RAW, JPEG, `.xmp`는 같은 이름 유지). 제자리에서 이름만 바꿀 수도 있습니다. **컬렉션 다시 정리**는 지금의 폴더를 읽고 디스크에 하나의 구조를 제안합니다 — `2025/2025-12-24-크리스마스`, 긴 주제는 `주제/`, 정리 대기는 `_정리대기/`, 카메라 테스트는 `_장비/` — 폴더마다 이름을 바꾸거나 제외하고 정리 후 트리를 확인한 뒤 폴더 전체를 옮기며, 실행 취소할 수 있습니다. **남겨진 관련 파일**(사진을 옮긴 뒤 홀로 남은 `.xmp`, `.dop`)을 사진 옆으로 돌려놓고 사진과 같은 이름을 붙입니다. **복제**(Ctrl+D): 조정, 자르기, 표시, 앨범을 그대로 가진 사본을 사진 옆에 만듭니다(확인 코드 입력, 실행 취소 가능). |
 | **중복 파일** | 3단계 SHA-256(크기 → 처음/마지막 64 KB → 파일 전체), 썸네일과 나란히 표시. |
+| **비슷한 사진** | 날마다 사실상 같은 사진(연속 촬영, 같은 포즈 여러 장)을 썸네일로 컴퓨터에서 묶고, 가장 선명하고 노출이 좋은 사진을 남길 후보로 제안합니다. 클릭으로 사진마다 남기기/보내기를 바꾸고, 나머지는 함께 보류함으로 보냅니다. RAW와 JPG는 한 장으로 다룹니다. 세 단계: 거의 같음, 비슷함, 같은 장면. |
+| **사진에 담긴 것으로 검색** | *해변*, *개*, *생일 파티*, *일몰*처럼 입력하면 파일 이름과 상관없이 그것이 담긴 사진을 찾습니다. 작은 모델(TinyCLIP, MIT)이 “사진에 담긴 것”을 분석하는 동안 각 썸네일을 컴퓨터에서 프로세서로 읽고, 앱의 10개 언어로 이름이 붙은 605가지 장면·행사·사물·장소와 비교합니다. 정보 패널에 사진에 담긴 것이 표시되며, 각 이름을 누르면 그것으로 검색합니다. 아무것도 내려받거나 보내지 않습니다. |
 | **백업** | 마스터 폴더와 백업 폴더를 내용으로 비교. 빠진 것을 검증된 사본으로 같은 하위 폴더나 날짜 폴더에 복사. |
 | **변환** | HEIC/HEIF → 원본 해상도 JPG 또는 PNG, EXIF와 색상 프로필 유지, 원본 옆에 저장. |
 | **형식** | 사진: JPEG, PNG, GIF, WebP, AVIF, BMP, HEIC/HEIF, TIFF, PSD/PSB, 카메라 RAW(CR3, CR2, NEF, NRW, ARW, SR2, ORF, RW2, RAF, SRW, PEF, DNG, 3FR, IIQ, ERF, RWL). 동영상: MP4, MOV, M4V, 3GP, WebM, MKV, MTS/M2TS, AVI. |
@@ -270,7 +272,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 변경 내역
 
-[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.54.0**.
+[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.56.0**.
 
 ## 만든 사람들
 
@@ -289,6 +291,7 @@ LionPhotos는 **[MIT 라이선스](../LICENSE)**의 오픈 소스입니다. 저�
 | [libheif](https://github.com/strukturag/libheif)와 libde265([libheif-js](https://github.com/catdad-experiments/libheif-js)의 WebAssembly 빌드) | GNU LGPL v3, 수정 없음 | `src/platform/thumbs/electron-sandbox/vendor/libheif` |
 | [face-api](https://github.com/vladmandic/face-api)와 TensorFlow.js, 얼굴 모델 | MIT | `src/platform/faces/electron-sandbox/vendor/face-api` |
 | [COCO-SSD와 MobileNet](https://github.com/tensorflow/tfjs-models) 모델 | Apache 2.0 | `src/platform/faces/electron-sandbox/vendor/pets` |
+| [ONNX Runtime Web](https://github.com/microsoft/onnxruntime) 1.22 and the [TinyCLIP ViT-61M/32](https://huggingface.co/wkcn/TinyCLIP-ViT-61M-32-Text-29M-LAION400M) model (Microsoft; built by `tools/models/build.py`) | MIT · MIT | `src/platform/faces/electron-sandbox/vendor/onnxruntime-web` · `models/tinyclip` |
 | [Natural Earth](https://www.naturalearthdata.com) 국경과 국가 이름(1:50m) | 퍼블릭 도메인 | `src/platform/geo` |
 | [GeoNames](https://www.geonames.org) — cities15000 | CC BY 4.0 | `src/platform/geo/node/cities.json` |
 | [LibRaw](https://www.libraw.org) 0.22 (raw development), in WebAssembly via [libraw-wasm](https://github.com/colorhythm/libraw-wasm) and [typed-cstruct](https://github.com/ssssota/typed-cstruct) | LGPL-2.1 or CDDL-1.0 · MIT · MIT | `src/platform/raw/electron-sandbox/vendor` |

@@ -10,7 +10,7 @@
 // it with a scan that only reads file metadata — files that did not change keep their thumbnails.
 import { Emitter } from '../../../../base/common/event.js';
 import { getLocale } from '../../../../base/common/nls.js';
-import { categoryOf } from '../common/mediaCategories.js';
+import { categoryOf, isRawExt, isPhotoExt } from '../common/mediaCategories.js';
 import { GEO_KEYS } from '../../adjust/common/geometry.js';
 import { LENS_KEYS } from '../../adjust/common/lens.js';
 
@@ -503,6 +503,71 @@ export class LibraryService {
     const day = dayOf(it);
     this.setFilter({ folder: '', recursive: true, year: 0, day, labelId: 0, mark: '', query: '', category: '', kind: 'all', noAlbum: false }, { keepSelection: true });
     return day;
+  }
+
+  // ---- twins: the raw file and the JPEG (or HEIC) the camera wrote of the same shot
+  #twins = null;
+
+  /**
+   * The other file of the same shot, for each of `items`: a raw file and its camera photo. Two files are twins
+   * when they are in the same folder — or in its "Raw" and "Img" (or "JPG") subfolders, as Organize leaves
+   * them — and either have the same name ("IMG_1234.CR3" and "IMG_1234.JPG"), or were taken in the same
+   * second and are numbered one after the other ("…-0891.CR3", "…-0892.JPG": renamed by Organize). Edited
+   * copies ("-Edit.jpg") are never twins. @returns {Map<number, object[]>} id → its twins
+   */
+  twinsOf(items) {
+    const index = this.#twinIndex();
+    const out = new Map();
+    for (const it of items) {
+      const twins = index.get(it.id);
+      if (twins?.length) out.set(it.id, twins.map((id) => this.byId.get(id)).filter(Boolean));
+    }
+    return out;
+  }
+
+  #twinIndex() {
+    if (this.#twins?.items === this.allItems && this.#twins.n === this.allItems.length) return this.#twins.index;
+    const index = new Map();
+    const link = (a, b) => {
+      if (!index.has(a.id)) index.set(a.id, []);
+      if (!index.has(b.id)) index.set(b.id, []);
+      if (!index.get(a.id).includes(b.id)) index.get(a.id).push(b.id);
+      if (!index.get(b.id).includes(a.id)) index.get(b.id).push(a.id);
+    };
+    const shotFolder = (folder) => String(folder || '').replace(/[\\/](raw|raws|img|imgs|jpg|jpgs|jpeg)$/i, '').toLowerCase();
+    const stem = (it) => it.name.slice(0, it.name.length - (it.ext ? it.ext.length + 1 : 0));
+    const byName = new Map();
+    const bySecond = new Map();
+    for (const it of this.allItems) {
+      const raw = isRawExt(it.ext);
+      if (it.kind !== KIND.image || (!raw && !isPhotoExt(it.ext))) continue;
+      const where = shotFolder(String(it.path || '').replace(/[\\/][^\\/]*$/, ''));
+      const k1 = `${where}\u0000${stem(it).toLowerCase()}`;
+      (byName.get(k1) || byName.set(k1, []).get(k1)).push(it);
+      if (it.taken) {
+        const k2 = `${where}\u0000${Math.floor(it.taken / 1000)}`;
+        (bySecond.get(k2) || bySecond.set(k2, []).get(k2)).push(it);
+      }
+    }
+    for (const list of byName.values()) {
+      if (list.length < 2) continue;
+      const raws = list.filter((x) => isRawExt(x.ext));
+      const photos = list.filter((x) => !isRawExt(x.ext));
+      for (const r of raws) for (const p of photos) link(r, p);
+    }
+    // renamed in sequence: in each second, walk the files by their number and pair a raw with the photo next to it
+    const numbered = (it) => { const m = /^(.*?)(\d+)$/.exec(stem(it)); return m ? { it, prefix: m[1].toLowerCase(), n: Number(m[2]) } : null; };
+    for (const list of bySecond.values()) {
+      if (list.length < 2) continue;
+      const seq = list.map(numbered).filter(Boolean).sort((a, b) => a.n - b.n);
+      for (let i = 0; i + 1 < seq.length; i++) {
+        const a = seq[i], b = seq[i + 1];
+        if (index.has(a.it.id)) continue; // already twinned by name
+        if (a.prefix === b.prefix && b.n === a.n + 1 && isRawExt(a.it.ext) !== isRawExt(b.it.ext) && !index.has(b.it.id)) { link(a.it, b.it); i++; }
+      }
+    }
+    this.#twins = { items: this.allItems, n: this.allItems.length, index };
+    return index;
   }
 
   /** Every delete candidate of the collection (what the Limbo shows), whatever the folder in focus or the filters. */

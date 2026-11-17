@@ -41,6 +41,13 @@ const MAX_HEIC_THUMBS = 1;      // HEIC files go to one worker of their own, one
 const READY_FLUSH_MS = 120;
 const PROGRESS_MS = 250;
 const HOLD_MS = 220;            // no new job starts while the person scrolls (and this long after)
+// a cloud drive (Google Drive, OneDrive…) or a slow network disk: found when thumbnails take this long; the
+// next files are then read ahead, a few at a time, so they are on the computer when their turn comes
+const SLOW_MEDIAN_MS = 3000;    // the median of the last photos' thumbnails above this (a local disk: well under 1 s)
+const SLOW_SAMPLE = 12;
+const WARM_AT_ONCE = 3;
+const WARM_AHEAD = 10;          // files looked at ahead of the queue
+const DEFERRED_MAX = 600;       // HEIC files or videos waiting for their lane (the other slots go on)
 
 /** Reads a file to its end and forgets it: a cloud drive (Google Drive, OneDrive) downloads it meanwhile. */
 function readWhole(file, maxMs, stop) {
@@ -63,6 +70,11 @@ class ThumbnailMainService {
     this.retryFailed = new Set(); // failed thumbnails tried again in this session
     this.slow = [];              // timed out once: tried again at the end, read whole first, given longer
     this.slowTried = new Set();
+    this.deferred = [];          // a HEIC or a video whose lane is full: waits aside while the other slots work
+    this.slowSource = false;     // the folder is on a cloud drive or a slow disk (see SLOW_JOB_MS)
+    this.jobTimes = [];
+    this.warming = new Set();    // files being read ahead
+    this.warmed = new Set();
     this.visible = [];
     this.low = [];
     this.lowAt = 0;
@@ -146,6 +158,7 @@ class ThumbnailMainService {
       thumbDone: this.thumbDone.size - this.thumbFailed.size,
       thumbFailed: this.thumbFailed.size,
       thumbPending: this.#thumbPending(),
+      slowSource: this.slowSource, // a cloud drive: the next files are read ahead
       previewPending: this.previews.length + (this.currentPreview ? 1 : 0),
       currentPreview: this.currentPreview,
       previewAvgMs: this.#previewAvg(),
@@ -159,6 +172,10 @@ class ThumbnailMainService {
     this.lowAt = 0;
     this.lowSet = new Set();
     this.slow = [];
+    this.deferred = [];
+    this.slowSource = false;
+    this.jobTimes = [];
+    this.warmed.clear();
     this.counts.thumbTotal = 0;
     this.thumbDone.clear();
     this.thumbFailed.clear();
@@ -209,7 +226,7 @@ class ThumbnailMainService {
 
   #thumbPending() {
     // nothing left in the lanes and nothing being made: done, whatever the count says
-    if (this.lowAt >= this.low.length && !this.visible.length && !this.slow.length && this.running.size === 0) return 0;
+    if (this.lowAt >= this.low.length && !this.visible.length && !this.slow.length && !this.deferred.length && this.running.size === 0) return 0;
     return Math.max(0, this.counts.thumbTotal - this.thumbDone.size);
   }
 
@@ -219,19 +236,41 @@ class ThumbnailMainService {
     return false;
   }
 
-  #nextThumb() {
+  #laneOf(row) { return thumbDecoder(row.ext) === 'heic' ? 'heic' : row.kind === 2 ? 'video' : 'image'; }
+
+  /**
+   * The next file to make a thumbnail of. A file whose lane is full (`blocked`: one HEIC, two videos at a time)
+   * waits aside — before, it stopped every slot until its lane was free, and a cloud folder of iPhone photos
+   * went one file at a time.
+   */
+  #nextThumb(blocked = new Set()) {
+    const take = (id) => {
+      if (!blocked.size) return id;
+      const row = this.db.get(id);
+      if (!row || !blocked.has(this.#laneOf(row))) return id;
+      this.deferred.push(id);
+      return null;
+    };
+    // first the ones that waited for their lane, as soon as it is free
+    for (let i = 0; i < this.deferred.length; i++) {
+      const id = this.deferred[i];
+      if (this.running.has(id)) continue;
+      if (!this.#needs(id)) { this.deferred.splice(i--, 1); if (this.lowSet.has(id)) this.thumbDone.add(id); continue; }
+      const row = this.db.get(id);
+      if (row && !blocked.has(this.#laneOf(row))) { this.deferred.splice(i, 1); return id; }
+    }
     while (this.visible.length) {
       const id = this.visible.shift();
-      if (this.running.has(id)) continue;
-      if (this.#needs(id)) return id;
+      if (this.running.has(id) || this.deferred.includes(id)) continue;
+      if (this.#needs(id)) { if (take(id) !== null) return id; continue; }
       if (this.lowSet.has(id)) this.thumbDone.add(id); // counted, and made meanwhile
       // on screen without a thumbnail, yet one is made: the window had an old picture of it — it is told again
       // (otherwise the tile waited for good)
       this.#ready(id);
     }
-    while (this.lowAt < this.low.length) {
+    while (this.lowAt < this.low.length && this.deferred.length < DEFERRED_MAX) {
       const id = this.low[this.lowAt++];
-      if (!this.running.has(id) && this.#needs(id)) return id;
+      if (!this.running.has(id) && this.#needs(id)) { if (take(id) !== null) return id; continue; }
       if (!this.running.has(id)) this.thumbDone.add(id); // made meanwhile (e.g. it was on screen)
     }
     // the slow ones last, one at a time (each may wait minutes for a cloud drive to bring it)
@@ -241,6 +280,42 @@ class ThumbnailMainService {
       this.thumbDone.add(id); // made meanwhile (it was on screen)
     }
     return null;
+  }
+
+  /**
+   * On a cloud drive: the next files are read ahead (a few at a time), so the drive brings them while the
+   * thumbnails of the ones before are made — reading is what takes the time there, not the decoding.
+   */
+  #warmAhead() {
+    if (!this.slowSource || this.disposed || this.warming.size >= WARM_AT_ONCE) return;
+    const next = [...this.deferred.slice(0, WARM_AHEAD), ...this.low.slice(this.lowAt, this.lowAt + WARM_AHEAD)];
+    for (const id of next) {
+      if (this.warming.size >= WARM_AT_ONCE) break;
+      if (this.warming.has(id) || this.warmed.has(id) || this.running.has(id)) continue;
+      const row = this.db.get(id);
+      if (!row || !this.db.needsThumb(id)) continue;
+      this.warming.add(id);
+      readWhole(row.path, SLOW_READ_MS, () => this.disposed || !this.slowSource).finally(() => {
+        this.warming.delete(id);
+        this.warmed.add(id);
+        if (this.warmed.size > 2000) this.warmed.clear();
+        this.#warmAhead();
+      });
+    }
+  }
+
+  /**
+   * How long the photos' thumbnails take: one that timed out, or a median of the last ones above 3 s (a local
+   * disk, even a USB one, stays well under 1 s), and the folder counts as a cloud drive (read ahead).
+   */
+  #slowJob(ms, timedOut, lane = 'image') {
+    if (lane !== 'video') { this.jobTimes.push(ms); if (this.jobTimes.length > SLOW_SAMPLE) this.jobTimes.shift(); }
+    const sorted = [...this.jobTimes].sort((a, b) => a - b);
+    const median = sorted.length >= SLOW_SAMPLE / 2 ? sorted[Math.floor(sorted.length / 2)] : 0;
+    if (!this.slowSource && (timedOut || median > SLOW_MEDIAN_MS)) {
+      this.slowSource = true;
+      console.warn('thumbnails: slow source (cloud drive?), reading the next files ahead');
+    }
   }
 
   #pump() {
@@ -270,19 +345,22 @@ class ThumbnailMainService {
     }
     while (this.running.size < this.slots) {
       const lanes = [...this.running.values()];
-      const id = this.#nextThumb();
+      const blocked = new Set();
+      if (lanes.filter((l) => l === 'video').length >= MAX_VIDEO_THUMBS) blocked.add('video');
+      if (lanes.filter((l) => l === 'heic').length >= MAX_HEIC_THUMBS) blocked.add('heic');
+      const id = this.#nextThumb(blocked);
       if (id === null) break;
       const row = this.db.get(id);
       if (!row) continue;
-      const lane = thumbDecoder(row.ext) === 'heic' ? 'heic' : row.kind === 2 ? 'video' : 'image';
-      if ((lane === 'video' && lanes.filter((l) => l === 'video').length >= MAX_VIDEO_THUMBS)
-        || (lane === 'heic' && lanes.filter((l) => l === 'heic').length >= MAX_HEIC_THUMBS)) {
-        this.visible.unshift(id); // retried as soon as its slot frees up
-        break;
-      }
+      const lane = this.#laneOf(row);
       this.running.set(id, lane);
-      this.#makeThumb(row).catch((err) => console.error('thumbnail', row.path, err)).finally(this.#after(() => this.running.delete(id)));
+      const t0 = Date.now();
+      this.#makeThumb(row).catch((err) => console.error('thumbnail', row.path, err)).finally(this.#after(() => {
+        this.running.delete(id);
+        this.#slowJob(Date.now() - t0, false, lane);
+      }));
     }
+    this.#warmAhead();
     // faces in thumbnails made before 1.2.0, a few at a time, when nothing else is waiting
     if (this.faceDetector !== false && !this.focusBusy && this.running.size === 0 && this.#thumbPending() === 0 && !this.currentPreview && this.library.rootId && !this.focusDone?.has(this.library.rootId)) {
       this.focusBusy = true;
@@ -383,6 +461,7 @@ class ThumbnailMainService {
     // too long: not a failure yet — tried again when the rest is done (still counted as missing)
     if (res && !res.ok && res.error === 'timeout' && !slow && !this.disposed) {
       console.warn(`thumbnail (${how}) ${row.path}: slow, tried again at the end`);
+      this.#slowJob(JOB_TIMEOUT_MS, true);
       this.slowTried.add(row.id);
       this.slow.push(row.id);
       return;

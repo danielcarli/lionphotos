@@ -16,7 +16,7 @@ import { baseName, formatNumber } from '../../../base/common/format.js';
 import { dateOf, editsOf, fold, matches } from '../../services/library/browser/libraryService.js';
 import { POWERED_BY } from '../../services/brand/browser/brandService.js';
 
-const PER_GROUP = { label: 4, people: 4, author: 4, camera: 3, keyword: 5, folder: 4, photo: 5 };
+const PER_GROUP = { label: 4, people: 4, author: 4, camera: 3, keyword: 5, folder: 4, photo: 5, content: 4 };
 const TYPES = [['album', 'album'], ['project', 'layers'], ['person', 'users'], ['pet', 'paw'], ['place', 'pin']];
 
 export class GlobalSearch {
@@ -111,7 +111,9 @@ export class GlobalSearch {
       return;
     }
     // the photos: every one that matches (as the search of Photos), and the best few — the name or the headline first
-    const all = library.allItems.filter((it) => it.mark !== 3 && matches(it, raw, labels.names(it)));
+    // (the names of what each photo shows, from the content model, are among its words: library.assignmentNames)
+    const names = library.assignmentNames || ((it) => labels.names(it));
+    const all = library.allItems.filter((it) => it.mark !== 3 && matches(it, raw, names(it)));
     all.sort((a, b) => dateOf(b) - dateOf(a));
     rows.push({ group: 'photos', kind: 'all', label: all.length ? tn('gs.allPhotos', all.length, { q: raw }) : t('gs.noPhotos', { q: raw }), disabled: !all.length,
       run: () => { library.setFilter({ query: raw, folder: '', recursive: true, labelId: 0, mark: '' }); this.services.layout.openView('photos'); } });
@@ -119,6 +121,17 @@ export class GlobalSearch {
     for (const it of strong) {
       rows.push({ group: 'photos', kind: 'photo', it, label: editsOf(it).headline || it.name, sub: [it.folder, it.by || it.author].filter(Boolean).join(' · '),
         run: () => this.services.viewer.open(all, all.indexOf(it), null, { title: raw }) });
+    }
+    // what the photos show (beach, dog, birthday…), in the app's language
+    const content = this.services.content;
+    if (content) {
+      const shown = content.matching(raw, library.allItems.filter((it) => it.mark !== 3)).slice(0, PER_GROUP.content);
+      for (const c of shown) rows.push({ group: 'content', kind: 'text', icon: 'sparkle', label: c.name, sub: tn('common.items', c.count), run: () => this.#query(c.name) });
+      // nothing read yet: the search can learn it
+      if (!content.available && q.length >= 3 && this.services.host.scenes) {
+        rows.push({ group: 'content', kind: 'text', icon: 'sparkle', label: t('gs.content.analyse'), sub: t('gs.content.analyseSub'),
+          run: () => this.services.host.scenes.auto(true).then((st) => this.services.notifications?.info?.(st?.support?.supported === false ? t('gs.content.unsupported') : t('gs.content.started'))) });
+      }
     }
     // albums, projects, people, pets, places
     const stats = this.#stats();

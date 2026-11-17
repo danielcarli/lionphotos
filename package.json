@@ -1,6 +1,6 @@
 {
   "name": "lionphotos",
-  "version": "1.54.0",
+  "version": "1.56.0",
   "description": "LionPhotos — fast photo & video browser and organizer. Browse folders of pictures and videos as small cached thumbnails, regenerated only when a file changes, and organize them safely.",
   "main": "src/code/electron-main/main.js",
   "desktopName": "lionphotos.desktop",
@@ -15,6 +15,8 @@
     "test:faces": "node tools/test-faces.js",
     "test:openwith": "node tools/test-openwith.js",
     "test:plugins": "node tools/test-plugins.js",
+    "test:similar": "node tools/test-similar.js",
+    "test:content": "node tools/test-content.js",
     "plugin": "node tools/build-plugin.js",
     "shots": "electron tools/shots.js",
     "nls": "python3 tools/nls/build.py",
@@ -37,6 +39,7 @@
     },
     "files": [
       "src/**/*",
+      "models/tinyclip/**/*",
       "package.json"
     ],
     "asar": true,

@@ -34,6 +34,11 @@ export function categoryOf(it) {
   return PHOTO.has(it.ext) ? 'original' : 'graphic';
 }
 
+/** A camera raw file (CR3, NEF, ARW, DNG…). */
+export const isRawExt = (ext) => RAW.has(String(ext || '').toLowerCase());
+/** A photo the camera writes beside the raw file (JPEG, HEIC, TIFF). */
+export const isPhotoExt = (ext) => PHOTO.has(String(ext || '').toLowerCase());
+
 export function categoryColor(id) {
   const slot = CATEGORIES.find((c) => c.id === id)?.slot ?? 0;
   return cssVar(slot ? `--series-${slot}` : '--series-other');

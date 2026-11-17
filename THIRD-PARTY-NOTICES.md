@@ -10,4 +10,9 @@ their own licenses:
   in src/platform/faces/electron-sandbox/vendor/face-api.
 - COCO-SSD and MobileNet models (TensorFlow.js models) — Apache License 2.0,
   in src/platform/faces/electron-sandbox/vendor/pets.
+- ONNX Runtime Web 1.22 (Microsoft) — MIT, unmodified,
+  in src/platform/faces/electron-sandbox/vendor/onnxruntime-web.
+- TinyCLIP ViT-61M/32 (Microsoft, wkcn/TinyCLIP-ViT-61M-32-Text-29M-LAION400M) — MIT; its image half
+  converted to ONNX (int8) and its text half turned into category numbers by tools/models/build.py,
+  in models/tinyclip.
 - Plus Jakarta Sans and JetBrains Mono fonts — SIL Open Font License 1.1.

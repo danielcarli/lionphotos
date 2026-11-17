@@ -15,6 +15,7 @@ import { OperationsService } from '../services/operations/browser/operationsServ
 import { DuplicatesService } from '../services/duplicates/browser/duplicatesService.js';
 import { ActionsService } from '../services/actions/browser/actionsService.js';
 import { LabelsService } from '../services/labels/browser/labelsService.js';
+import { ContentService } from '../services/content/browser/contentService.js';
 
 import { TitlebarPart } from './parts/titlebarPart.js';
 import { ActivitybarPart } from './parts/activitybarPart.js';
@@ -67,6 +68,7 @@ services.adjust.pictureUrlOf = (it) => pictureUrl(services, it);
 services.operations = new OperationsService(services);
 services.duplicates = new DuplicatesService(services);
 services.labels = new LabelsService(services);
+services.content = new ContentService(services); // what the photos show (after the labels: their names are searched together)
 services.faces = new FacesService(services, { api: 'faces' });
 services.pets = new FacesService(services, { api: 'pets' });
 services.backup = new BackupService(services);

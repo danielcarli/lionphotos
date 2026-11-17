@@ -16,7 +16,7 @@ import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { formatBytes, bytesParts, formatNumber, formatDate, formatClock, formatMonth, formatMonthName, formatDayRange, splitRel, baseName } from '../../../base/common/format.js';
 import { ViewPane } from '../../browser/viewPane.js';
-import { dateOf, KIND, MARK, MARK_NAMES, adjustOf } from '../../services/library/browser/libraryService.js';
+import { dateOf, dayOf, KIND, MARK, MARK_NAMES, adjustOf } from '../../services/library/browser/libraryService.js';
 import { sphereIcons, sphereScope } from '../labels/sphereIcons.js';
 import { adjustSection } from './adjustSection.js';
 import { THUMB_ADJUSTED } from '../../services/adjust/browser/adjustService.js';
@@ -37,6 +37,7 @@ import { openWithItem } from './openWithMenu.js';
 import { exportPhotos, exportMenuItem } from '../export/exportPhotos.js';
 import { LABEL_ICON } from '../../services/labels/browser/labelsService.js';
 import { applyMark } from '../limbo/sendToLimbo.js';
+import { showSimilar } from '../similar/similarView.js';
 import { sharpenCover } from '../albums/albumCovers.js';
 import { renderPhotoShowcase } from '../labels/showcase.js';
 import { focusImage } from '../../services/thumbs/browser/thumbFocus.js';
@@ -214,6 +215,9 @@ export class PhotosView extends ViewPane {
       h('button.btn.btn-secondary.btn-sm.filters-btn', { class: `btn btn-secondary btn-sm filters-btn${chips.length ? ' is-active' : ''}`, title: t('photos.filtersTitle'), 'aria-haspopup': 'menu', onclick: (e) => this.#filtersMenu(e.currentTarget) },
         h('span', { html: icon('filter', 14) }), t('photos.filters'), chips.length ? h('span.filters-count', String(chips.length)) : null),
       chips.length ? h('div.filter-chips', chips) : null,
+      // the photos of one day: their similar shots, to keep the best of each sequence
+      f.day && !this.limbo ? h('button.btn.btn-secondary.btn-sm.similar-btn', { title: t('similar.linkTitle'), onclick: () => showSimilar(this.services, f.day) },
+        h('span', { html: icon('similar', 14) }), t('similar.link')) : null,
       this.#viewControls(false),
       // how the photos are shown: at the end of the row, as on every page (left: where and what to do; right: how it is seen) — the info panel's switch after it, beside the panel
       h('div.view-mode', { role: 'radiogroup', 'aria-label': t('photos.modeLabel') },
@@ -915,6 +919,9 @@ export class PhotosView extends ViewPane {
         title: label.type === 'album' ? t('albums.removeTitle', { name: label.name }) : t('labels.removeFromTitle', { name: label.name }), run: () => removeFromLabel(this, label.id, sel) }] : []),
       // inside an album: this photo as its cover
       ...this.#coverItem(label, sel),
+      // the similar photos of the day these were taken
+      ...(!inLimbo && sel.every((x) => x.kind === KIND.image && dayOf(x) === dayOf(sel[0]))
+        ? [{ label: t('similar.menu'), icon: 'similar', run: () => showSimilar(this.services, dayOf(sel[0])) }] : []),
       '-',
       inLimbo
         ? { label: t('contextMenu.restore'), icon: 'undo', run: () => library.setMark(ids, 0) }
@@ -1219,6 +1226,7 @@ export class PhotosView extends ViewPane {
         ...nameLines(it, d),
         h('div.ip-meta', [detailsLine(d), dims].filter(Boolean).join(' · ')),
         dayLink(this, [it]),
+        this.#shows(it),
         h('div.ip-tools',
           this.#marks([id], MARK_NAMES[it.mark || 0], 'info-mark-btns'),
           h('span.ip-sp'),
@@ -1281,6 +1289,18 @@ export class PhotosView extends ViewPane {
   }
 
   /** Next (or previous) photo, keeping the panel as it is — to describe a series one after the other. */
+  /** What the photo shows (the content model): each name searches Photos for it. */
+  #shows(it) {
+    const c = this.services.content;
+    const ids = c?.of(it) || [];
+    if (!ids.length) return null;
+    return h('div.ip-shows', h('span.ip-shows-label', t('content.shows')),
+      ...ids.map((cid) => h('button.ip-shows-chip', {
+        title: t('content.searchTitle', { name: c.name(cid) }),
+        onclick: () => this.library.setFilter({ query: c.name(cid), folder: '', recursive: true, labelId: 0, mark: '', year: 0, day: '' }),
+      }, c.name(cid))));
+  }
+
   #stepInfo(step) {
     const cur = this.focusId ?? [...this.library.selection][0];
     const index = this.indexOf.get(cur);

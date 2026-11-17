@@ -140,6 +140,18 @@ CREATE TABLE IF NOT EXISTS scene_scans (
   data TEXT
 );
 
+-- what a photo (or a video's frame) shows, as its "impression" from the content model (TinyCLIP): 512 numbers
+-- (int8), read from its thumbnail; and the categories it is closest to ("beach:41,sunset:12"), worked out from
+-- them for one version of the list of categories (catv) — a new list only needs them worked out again
+CREATE TABLE IF NOT EXISTS content_scans (
+  media_id INTEGER PRIMARY KEY REFERENCES media(id) ON DELETE CASCADE,
+  size INTEGER NOT NULL, mtime INTEGER NOT NULL,
+  model TEXT NOT NULL,
+  vec BLOB,                        -- NULL: the thumbnail could not be read
+  catv INTEGER NOT NULL DEFAULT 0,
+  cats TEXT
+);
+
 CREATE TABLE IF NOT EXISTS operations (
   id INTEGER PRIMARY KEY,
   at INTEGER NOT NULL,
@@ -166,6 +178,14 @@ const LIST_COLUMNS = `id, path, folder, name, ext, kind, size, mtime, width AS w
 const scanTable = (kind) => (kind === 'pet' ? 'pet_scans' : kind === 'scene' ? 'scene_scans' : 'face_scans');
 // what each recognizer looks at: photos (faces, pets); photos and videos with a thumbnail made (scenes)
 const candidateWhere = (kind) => (kind === 'scene' ? `m.kind IN (1, 2) AND ${THUMB_VALID.replace(/(thumb_\w+|size|mtime)/g, 'm.$1')}` : 'm.kind = 1');
+
+// the photos a recognizer has still to look at: not looked at, or changed since; for the scenes, also those the
+// content model (model: its id, '' when the app has none) has not read
+const candidatesSql = (kind) => `SELECT m.id FROM media m LEFT JOIN ${scanTable(kind)} s ON s.media_id = m.id
+  WHERE m.root_id = ? AND ${candidateWhere(kind)} AND (s.media_id IS NULL OR s.size != m.size OR s.mtime != m.mtime${kind === 'scene'
+    ? ` OR (? != '' AND NOT EXISTS (SELECT 1 FROM content_scans c WHERE c.media_id = m.id AND c.model = ? AND c.size = m.size AND c.mtime = m.mtime))` : ''})
+  ORDER BY coalesce(m.taken_at, m.mtime) DESC`;
+const candidateArgs = (kind, rootId, model) => (kind === 'scene' ? [rootId, model || '', model || ''] : [rootId]);
 
 // fx, fy: where the picture's subject is (0..1 of the upright picture: the faces), for crops (thumbnails)
 // cap, alt: the description and the audio description written in LionPhotos (only the catalog)
@@ -852,7 +872,7 @@ class LibraryDatabase {
       const vals = cols.map((k) => (k === 'path' ? dst : k === 'name' ? path.basename(dst) : row[k]));
       const id = this.db.prepare(`INSERT INTO media(${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')}) RETURNING id`).get(...vals).id;
       // the tables keyed by the photo: the same rows for the copy
-      for (const table of ['thumbs', 'adjusted_thumbs', 'previews', 'face_scans', 'pet_scans', 'scene_scans', 'faces']) {
+      for (const table of ['thumbs', 'adjusted_thumbs', 'previews', 'face_scans', 'pet_scans', 'scene_scans', 'content_scans', 'faces']) {
         const all = columnsOf(table).filter((c) => c !== 'id' && c !== 'media_id');
         this.db.prepare(`INSERT OR IGNORE INTO ${table}(media_id${all.length ? ', ' + all.join(', ') : ''}) SELECT ?${all.length ? ', ' + all.join(', ') : ''} FROM ${table} WHERE media_id = ?`).run(id, row.id);
       }
@@ -1026,10 +1046,8 @@ class LibraryDatabase {
 
   // ------------------------------------------------------------------ faces and pets (kind: 'face' | 'pet')
   /** Photos of a collection not looked at yet (or changed since), newest first. */
-  faceCandidates(rootId, kind = 'face') {
-    return this.db.prepare(`SELECT m.id FROM media m LEFT JOIN ${scanTable(kind)} s ON s.media_id = m.id
-      WHERE m.root_id = ? AND ${candidateWhere(kind)} AND (s.media_id IS NULL OR s.size != m.size OR s.mtime != m.mtime)
-      ORDER BY coalesce(m.taken_at, m.mtime) DESC`).all(rootId).map((r) => r.id);
+  faceCandidates(rootId, kind = 'face', model = '') {
+    return this.db.prepare(candidatesSql(kind)).all(...candidateArgs(kind, rootId, model)).map((r) => r.id);
   }
 
   faceScanCounts(rootId, kind = 'face') {
@@ -1058,6 +1076,37 @@ class LibraryDatabase {
   /** What a photo shows (scenes): replaces what was read before. @param {string|null} data null: unreadable */
   saveScene(mediaId, size, mtime, data, count) {
     this.db.prepare('INSERT OR REPLACE INTO scene_scans(media_id, size, mtime, faces, data) VALUES (?, ?, ?, ?, ?)').run(mediaId, size, mtime, data == null ? -1 : count, data);
+  }
+
+  /** Whether a photo's scenes are still to read (the content may be all that is missing). */
+  sceneValid(mediaId, size, mtime) {
+    return !!this.db.prepare('SELECT 1 FROM scene_scans WHERE media_id = ? AND size = ? AND mtime = ?').get(mediaId, size, mtime);
+  }
+
+  contentValid(mediaId, size, mtime, model) {
+    return !!this.db.prepare('SELECT 1 FROM content_scans WHERE media_id = ? AND size = ? AND mtime = ? AND model = ?').get(mediaId, size, mtime, model);
+  }
+
+  /** A photo's impression from the content model and the categories worked out from it (vec null: unreadable). */
+  saveContent(mediaId, size, mtime, model, vec, catv, cats) {
+    this.db.prepare('INSERT OR REPLACE INTO content_scans(media_id, size, mtime, model, vec, catv, cats) VALUES (?, ?, ?, ?, ?, ?, ?)').run(mediaId, size, mtime, model, vec, catv, cats);
+  }
+
+  /** The impressions whose categories were worked out from another list (or another model's list). */
+  contentToRecount(model, catv, limit = 2000) {
+    return this.db.prepare('SELECT media_id AS id, vec FROM content_scans WHERE model = ? AND catv != ? AND vec IS NOT NULL LIMIT ?').all(model, catv, limit);
+  }
+
+  setContentCats(rows, catv) {
+    const up = this.db.prepare('UPDATE content_scans SET catv = ?, cats = ? WHERE media_id = ?');
+    this.db.exec('BEGIN');
+    try { for (const r of rows) up.run(catv, r.cats, r.id); this.db.exec('COMMIT'); } catch (err) { this.db.exec('ROLLBACK'); throw err; }
+  }
+
+  /** Photos of a collection with their content read by this model. */
+  contentCount(rootId, model) {
+    return this.db.prepare(`SELECT count(*) AS n FROM content_scans c JOIN media m ON m.id = c.media_id
+      WHERE m.root_id = ? AND c.model = ? AND c.size = m.size AND c.mtime = m.mtime`).get(rootId, model).n;
   }
 
   /** Every face (or pet), all collections: what matching and grouping need. */
@@ -1155,4 +1204,4 @@ class LibraryDatabase {
 const ADJUST_KEYS = ['exposure', 'contrast', 'highlights', 'shadows', 'whites', 'blacks', 'temperature', 'tint', 'vibrance', 'saturation', 'bw', 'bwRed', 'bwGreen', 'bwBlue', 'sharpness', 'texture', 'clarity', 'vignette'];
 const META_EDIT_KEYS = { headline: 300, authorTitle: 120, sublocation: 160, city: 120, state: 80, country: 80, instructions: 500, keywords: 60 };
 
-module.exports = { ADJUST_KEYS, META_EDIT_KEYS, LibraryDatabase, LIST_KEYS, LIST_JSON, THUMB_VALID, THUMB_FAILED, scanTable, candidateWhere, focusOfBoxes };
+module.exports = { ADJUST_KEYS, META_EDIT_KEYS, LibraryDatabase, LIST_KEYS, LIST_JSON, THUMB_VALID, THUMB_FAILED, scanTable, candidateWhere, candidatesSql, candidateArgs, focusOfBoxes };

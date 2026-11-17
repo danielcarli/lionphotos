@@ -1,0 +1,608 @@
+# The names of the content categories (src/workbench/contrib/albums/contentCategories.js), one per line, in the
+# 10 languages of the app: merged into the strings as content.cat.<id> by build.py. Tab separated.
+id	en	pt_BR	pt_PT	es	fr	de	it	ja	ko	zh_CN
+birthdayKids	Kids' birthday party	Aniversário infantil	Aniversário infantil	Cumpleaños infantil	Anniversaire d'enfant	Kindergeburtstag	Compleanno per bambini	子どもの誕生日会	어린이 생일 파티	儿童生日派对
+birthday	Birthday party	Festa de aniversário	Festa de aniversário	Fiesta de cumpleaños	Fête d'anniversaire	Geburtstagsfeier	Festa di compleanno	誕生日パーティー	생일 파티	生日派对
+monthsary	Baby's monthly birthday	Mesversário	Mesversário	Mesario del bebé	Mois-anniversaire de bébé	Monatsgeburtstag	Mesiversario	月誕生日	아기 개월 기념일	宝宝月生日
+babyShower	Baby shower	Chá de bebê	Chá de bebé	Baby shower	Baby shower	Babyparty	Baby shower	ベビーシャワー	베이비 샤워	迎婴派对
+genderReveal	Gender reveal	Chá revelação	Revelação do sexo	Revelación de género	Gender reveal	Gender Reveal	Gender reveal	ジェンダーリビール	성별 공개 파티	性别揭晓派对
+bridalShower	Bridal or housewarming shower	Chá de panela	Chá de cozinha	Despedida de soltera o inauguración de casa	Pendaison de crémaillère	Polterabend	Festa per la casa nuova	ブライダルシャワー	브라이덜 샤워	新婚送礼会
+engagement	Engagement	Noivado	Noivado	Compromiso	Fiançailles	Verlobung	Fidanzamento	婚約	약혼	订婚
+weddingCeremony	Wedding ceremony	Cerimônia de casamento	Cerimónia de casamento	Ceremonia de boda	Cérémonie de mariage	Trauung	Cerimonia di nozze	結婚式	결혼식	婚礼仪式
+weddingParty	Wedding reception	Festa de casamento	Copo de água	Banquete de boda	Réception de mariage	Hochzeitsfeier	Ricevimento di nozze	結婚披露宴	결혼 피로연	婚宴
+civilWedding	Civil wedding	Casamento civil	Casamento civil	Boda civil	Mariage civil	Standesamtliche Trauung	Matrimonio civile	入籍・婚姻届	혼인 신고식	民政登记结婚
+anniversary	Wedding anniversary	Bodas	Bodas	Aniversario de boda	Anniversaire de mariage	Hochzeitstag	Anniversario di matrimonio	結婚記念日	결혼기념일	结婚纪念日
+bachelorParty	Bachelor party	Despedida de solteiro	Despedida de solteiro	Despedida de soltero	Enterrement de vie de garçon	Junggesellenabschied	Addio al celibato	独身さよならパーティー	총각·처녀 파티	告别单身派对
+graduationCeremony	Graduation ceremony	Colação de grau	Cerimónia de formatura	Ceremonia de graduación	Remise des diplômes	Abschlussfeier	Cerimonia di laurea	卒業式	졸업식	毕业典礼
+graduationBall	Graduation ball	Baile de formatura	Baile de finalistas	Baile de graduación	Bal de promo	Abschlussball	Ballo di fine corso	卒業パーティー	졸업 무도회	毕业舞会
+baptism	Baptism	Batizado	Batizado	Bautizo	Baptême	Taufe	Battesimo	洗礼式	세례식	洗礼
+firstCommunion	First communion	Primeira comunhão	Primeira comunhão	Primera comunión	Première communion	Erstkommunion	Prima comunione	初聖体	첫영성체	首领圣餐
+confirmation	Confirmation	Crisma	Crisma	Confirmación	Confirmation	Firmung	Cresima	堅信式	견진성사	坚振礼
+quinceanera	Fifteenth birthday party	Festa de 15 anos	Festa dos 15 anos	Fiesta de quince años	Fête des 15 ans	Feier zum 15. Geburtstag	Festa dei 15 anni	15歳の誕生日パーティー	15세 생일 파티	十五岁成人礼
+yearEndParty	Year-end party	Confraternização	Jantar de Natal da empresa	Fiesta de fin de año	Fête de fin d'année	Jahresabschlussfeier	Festa di fine anno	忘年会	송년회	年终聚会
+juneFestival	June festival	Festa junina	Santos populares	Fiesta de San Juan	Fête de la Saint-Jean	Johannisfest	Festa di San Giovanni	6月祭り（フェスタ・ジュニーナ）	6월 축제	六月节
+halloween	Halloween	Halloween	Halloween	Halloween	Halloween	Halloween	Halloween	ハロウィン	핼러윈	万圣节
+costumeParty	Costume party	Festa à fantasia	Festa de máscaras	Fiesta de disfraces	Soirée déguisée	Kostümparty	Festa in maschera	仮装パーティー	코스튬 파티	化装派对
+opening	Opening	Inauguração	Inauguração	Inauguración	Inauguration	Eröffnung	Inaugurazione	オープニング	개업식	开业典礼
+religiousService	Religious service	Celebração religiosa	Celebração religiosa	Servicio religioso	Office religieux	Gottesdienst	Funzione religiosa	礼拝・ミサ	예배	宗教仪式
+christmas	Christmas	Natal	Natal	Navidad	Noël	Weihnachten	Natale	クリスマス	크리스마스	圣诞节
+christmasDinner	Christmas dinner	Ceia de Natal	Consoada	Cena de Nochebuena	Réveillon de Noël	Weihnachtsessen	Cenone di Natale	クリスマスディナー	크리스마스 만찬	圣诞晚餐
+newYear	New Year's Eve	Réveillon	Passagem de ano	Nochevieja	Réveillon du Nouvel An	Silvester	Capodanno	大晦日・年越し	새해 전야	跨年夜
+carnival	Carnival	Carnaval	Carnaval	Carnaval	Carnaval	Karneval	Carnevale	カーニバル	카니발	狂欢节
+easter	Easter	Páscoa	Páscoa	Pascua	Pâques	Ostern	Pasqua	イースター	부활절	复活节
+mothersDay	Mother's Day	Dia das Mães	Dia da Mãe	Día de la Madre	Fête des mères	Muttertag	Festa della mamma	母の日	어머니날	母亲节
+fathersDay	Father's Day	Dia dos Pais	Dia do Pai	Día del Padre	Fête des pères	Vatertag	Festa del papà	父の日	아버지날	父亲节
+childrensDay	Children's Day	Dia das Crianças	Dia da Criança	Día del Niño	Journée des enfants	Kindertag	Giornata dei bambini	こどもの日	어린이날	儿童节
+valentines	Valentine's Day	Dia dos Namorados	Dia dos Namorados	San Valentín	Saint-Valentin	Valentinstag	San Valentino	バレンタインデー	밸런타인데이	情人节
+farroupilha	Gaucho festival	Semana Farroupilha	Festa gaúcha	Fiesta gaucha	Fête gaucho	Gaúcho-Fest	Festa gaucha	ガウチョ祭り	가우초 축제	高乔节
+independenceParade	Independence Day parade	Desfile de 7 de Setembro	Desfile do Dia da Independência	Desfile de la Independencia	Défilé de la fête nationale	Parade zum Unabhängigkeitstag	Parata della festa nazionale	独立記念日パレード	독립기념일 퍼레이드	独立日游行
+corpusChristi	Corpus Christi carpets	Tapetes de Corpus Christi	Tapetes do Corpo de Deus	Alfombras de Corpus Christi	Tapis de la Fête-Dieu	Fronleichnamsteppiche	Infiorata del Corpus Domini	聖体祭の花絨毯	성체 축일 꽃길	基督圣体节花毯
+newborn	Newborn	Recém-nascido	Recém-nascido	Recién nacido	Nouveau-né	Neugeborenes	Neonato	新生児	신생아	新生儿
+baby	Baby	Bebê	Bebé	Bebé	Bébé	Baby	Bebè	赤ちゃん	아기	婴儿
+firstSteps	First steps	Primeiros passos	Primeiros passos	Primeros pasos	Premiers pas	Erste Schritte	Primi passi	はじめての一歩	첫걸음	学步
+kidsPlaying	Kids playing	Crianças brincando	Crianças a brincar	Niños jugando	Enfants qui jouent	Spielende Kinder	Bambini che giocano	遊ぶ子どもたち	노는 아이들	孩子们玩耍
+babyBath	Baby's bath	Banho de bebê	Banho do bebé	Baño del bebé	Bain de bébé	Babybad	Bagnetto	赤ちゃんのお風呂	아기 목욕	宝宝洗澡
+maternityShoot	Maternity shoot	Ensaio de gestante	Sessão de grávida	Sesión de embarazo	Séance grossesse	Babybauch-Shooting	Servizio premaman	マタニティフォト	만삭 촬영	孕妇照
+newbornShoot	Newborn shoot	Ensaio newborn	Sessão newborn	Sesión de recién nacido	Séance nouveau-né	Neugeborenen-Shooting	Servizio newborn	ニューボーンフォト	신생아 촬영	新生儿写真
+familyShoot	Family shoot	Ensaio de família	Sessão de família	Sesión familiar	Séance photo de famille	Familien-Shooting	Servizio di famiglia	家族写真の撮影	가족 촬영	家庭写真
+grandparents	Grandparents and grandchildren	Avós e netos	Avós e netos	Abuelos y nietos	Grands-parents et petits-enfants	Großeltern und Enkel	Nonni e nipoti	祖父母と孫	조부모와 손주	祖孙
+familyLunch	Family lunch	Almoço de família	Almoço de família	Comida familiar	Repas de famille	Familienessen	Pranzo in famiglia	家族のランチ	가족 점심	家庭午餐
+homeBarbecue	Barbecue at home	Churrasco em casa	Churrasco em casa	Asado en casa	Barbecue à la maison	Grillen zu Hause	Grigliata in casa	家でのバーベキュー	집 바비큐	家庭烧烤
+picnic	Picnic	Piquenique	Piquenique	Pícnic	Pique-nique	Picknick	Picnic	ピクニック	피크닉	野餐
+poolDay	Pool day	Dia na piscina	Dia na piscina	Día de piscina	Journée à la piscine	Tag am Pool	Giornata in piscina	プールの日	수영장 나들이	泳池日
+camping	Camping	Acampamento	Campismo	Acampada	Camping	Camping	Campeggio	キャンプ	캠핑	露营
+moving	Moving house	Mudança	Mudança de casa	Mudanza	Déménagement	Umzug	Trasloco	引っ越し	이사	搬家
+renovation	Home renovation	Reforma da casa	Obras em casa	Reforma de la casa	Rénovation	Renovierung	Ristrutturazione	リフォーム	집수리	房屋装修
+firstSchoolDay	First day of school	Primeiro dia de aula	Primeiro dia de aulas	Primer día de clase	Rentrée scolaire	Einschulung	Primo giorno di scuola	入学・初登校	첫 등교	开学第一天
+schoolShow	School show	Apresentação na escola	Espetáculo da escola	Función escolar	Spectacle d'école	Schulaufführung	Recita scolastica	学芸会	학예회	学校演出
+portrait	Portrait	Retrato	Retrato	Retrato	Portrait	Porträt	Ritratto	ポートレート	인물 사진	肖像
+selfie	Selfie	Selfie	Selfie	Selfi	Selfie	Selfie	Selfie	自撮り	셀카	自拍
+groupPhoto	Group photo	Foto em grupo	Foto de grupo	Foto de grupo	Photo de groupe	Gruppenfoto	Foto di gruppo	グループ写真	단체 사진	合影
+bigGroup	Large group photo	Foto de turma	Foto de turma	Foto de grupo grande	Grande photo de groupe	Großes Gruppenfoto	Foto di gruppo numeroso	大人数の集合写真	대규모 단체 사진	大合影
+couple	Couple	Casal	Casal	Pareja	Couple	Paar	Coppia	カップル	커플	情侣
+photoShoot	Photo shoot	Ensaio fotográfico	Sessão fotográfica	Sesión de fotos	Séance photo	Fotoshooting	Servizio fotografico	撮影会	화보 촬영	写真拍摄
+corporatePortrait	Corporate portrait	Retrato corporativo	Retrato corporativo	Retrato corporativo	Portrait professionnel	Business-Porträt	Ritratto aziendale	ビジネスポートレート	프로필 사진	职业形象照
+idPhoto	ID photo	Foto 3×4	Foto tipo passe	Foto de carné	Photo d'identité	Passfoto	Fototessera	証明写真	증명사진	证件照
+studioPortrait	Studio portrait	Retrato em estúdio	Retrato em estúdio	Retrato de estudio	Portrait en studio	Studioporträt	Ritratto in studio	スタジオポートレート	스튜디오 인물 사진	影棚人像
+outdoorPortrait	Outdoor portrait	Retrato ao ar livre	Retrato ao ar livre	Retrato al aire libre	Portrait en extérieur	Porträt im Freien	Ritratto all'aperto	屋外ポートレート	야외 인물 사진	户外人像
+crowd	Crowd	Multidão	Multidão	Multitud	Foule	Menschenmenge	Folla	人混み・群衆	군중	人群
+handsDetail	Hands	Mãos	Mãos	Manos	Mains	Hände	Mani	手のアップ	손	手部特写
+silhouette	Silhouette	Silhueta	Silhueta	Silueta	Silhouette	Silhouette	Silhouette	シルエット	실루엣	剪影
+childPortrait	Child portrait	Retrato de criança	Retrato de criança	Retrato infantil	Portrait d'enfant	Kinderporträt	Ritratto di bambino	子どものポートレート	아이 사진	儿童肖像
+beach	Beach	Praia	Praia	Playa	Plage	Strand	Spiaggia	ビーチ	해변	海滩
+beachSunset	Beach at sunset	Praia ao pôr do sol	Praia ao pôr do sol	Playa al atardecer	Plage au coucher du soleil	Strand bei Sonnenuntergang	Spiaggia al tramonto	夕暮れのビーチ	해 질 녘 해변	日落海滩
+openSea	Open sea	Mar aberto	Mar alto	Mar abierto	Pleine mer	Offenes Meer	Mare aperto	大海	넓은 바다	大海
+seaCliff	Sea cliffs	Costão	Falésia	Acantilado	Falaise	Steilküste	Scogliera	海岸の断崖	해안 절벽	海崖
+island	Island	Ilha	Ilha	Isla	Île	Insel	Isola	島	섬	海岛
+coralReef	Coral reef	Recife de coral	Recife de coral	Arrecife de coral	Récif de corail	Korallenriff	Barriera corallina	サンゴ礁	산호초	珊瑚礁
+diving	Scuba diving	Mergulho	Mergulho	Buceo	Plongée	Tauchen	Immersione	ダイビング	스쿠버 다이빙	潜水
+snorkeling	Snorkeling	Snorkel	Snorkeling	Esnórquel	Snorkeling	Schnorcheln	Snorkeling	シュノーケリング	스노클링	浮潜
+surfing	Surfing	Surfe	Surf	Surf	Surf	Surfen	Surf	サーフィン	서핑	冲浪
+paddle	Stand-up paddle	Stand-up paddle	Stand-up paddle	Paddle surf	Stand-up paddle	Stand-up-Paddling	Stand up paddle	SUP（スタンドアップパドル）	패들보드	桨板
+kitesurf	Kitesurfing	Kitesurfe	Kitesurf	Kitesurf	Kitesurf	Kitesurfen	Kitesurf	カイトサーフィン	카이트서핑	风筝冲浪
+sailing	Sailing	Veleiro	Vela	Vela	Voile	Segeln	Vela	セーリング	요트 항해	帆船
+boatTrip	Boat trip	Passeio de barco	Passeio de barco	Paseo en barco	Balade en bateau	Bootsausflug	Gita in barca	ボートツアー	보트 여행	乘船游览
+pier	Pier	Píer	Pontão	Muelle	Ponton	Steg	Pontile	桟橋	부두	码头栈桥
+lighthouse	Lighthouse	Farol	Farol	Faro	Phare	Leuchtturm	Faro	灯台	등대	灯塔
+marina	Marina	Marina	Marina	Puerto deportivo	Port de plaisance	Jachthafen	Porto turistico	マリーナ	마리나	游艇码头
+naturalPool	Natural pool	Piscina natural	Piscina natural	Piscina natural	Piscine naturelle	Naturbecken	Piscina naturale	天然プール	천연 수영장	天然泳池
+waterPark	Water park	Parque aquático	Parque aquático	Parque acuático	Parc aquatique	Wasserpark	Parco acquatico	ウォーターパーク	워터파크	水上乐园
+mountain	Mountain	Montanha	Montanha	Montaña	Montagne	Berg	Montagna	山	산	山
+mountainRange	Mountain range	Serra	Serra	Sierra	Chaîne de montagnes	Gebirge	Catena montuosa	山並み	산맥	山脉
+canyon	Canyon	Cânion	Desfiladeiro	Cañón	Canyon	Schlucht	Canyon	渓谷・キャニオン	협곡	峡谷
+valley	Valley	Vale	Vale	Valle	Vallée	Tal	Valle	谷	계곡	山谷
+waterfall	Waterfall	Cachoeira	Cascata	Cascada	Cascade	Wasserfall	Cascata	滝	폭포	瀑布
+river	River	Rio	Rio	Río	Rivière	Fluss	Fiume	川	강	河流
+lake	Lake	Lago	Lago	Lago	Lac	See	Lago	湖	호수	湖泊
+dam	Dam	Represa	Barragem	Presa	Barrage	Staudamm	Diga	ダム	댐	水坝
+hiking	Hiking	Trilha	Caminhada	Senderismo	Randonnée	Wandern	Escursione	ハイキング	등산	徒步
+viewpoint	Viewpoint	Mirante	Miradouro	Mirador	Point de vue	Aussichtspunkt	Belvedere	展望台	전망대	观景台
+forest	Forest	Floresta	Floresta	Bosque	Forêt	Wald	Foresta	森	숲	森林
+grassland	Grassland	Campo	Prado	Pradera	Prairie	Grasland	Prateria	草原	초원	草原
+farmField	Farm field	Lavoura	Campo agrícola	Campo de cultivo	Champ cultivé	Acker	Campo coltivato	畑	농경지	农田
+vineyard	Vineyard	Vinhedo	Vinha	Viñedo	Vignoble	Weinberg	Vigneto	ぶどう畑	포도밭	葡萄园
+park	Park	Parque	Parque	Parque	Parc	Park	Parco	公園	공원	公园
+garden	Garden	Jardim	Jardim	Jardín	Jardin	Garten	Giardino	庭園	정원	花园
+flowers	Flowers	Flores	Flores	Flores	Fleurs	Blumen	Fiori	花	꽃	花卉
+orchids	Orchids	Orquídeas	Orquídeas	Orquídeas	Orchidées	Orchideen	Orchidee	ラン（蘭）	난초	兰花
+sunflowers	Sunflowers	Girassóis	Girassóis	Girasoles	Tournesols	Sonnenblumen	Girasoli	ひまわり	해바라기	向日葵
+succulents	Cacti and succulents	Cactos e suculentas	Cactos e suculentas	Cactus y suculentas	Cactus et plantes grasses	Kakteen und Sukkulenten	Cactus e piante grasse	サボテンと多肉植物	선인장과 다육식물	仙人掌和多肉
+trees	Trees	Árvores	Árvores	Árboles	Arbres	Bäume	Alberi	木	나무	树木
+autumn	Autumn leaves	Outono	Outono	Otoño	Automne	Herbstlaub	Autunno	紅葉	단풍	秋叶
+desert	Desert	Deserto	Deserto	Desierto	Désert	Wüste	Deserto	砂漠	사막	沙漠
+dunes	Dunes	Dunas	Dunas	Dunas	Dunes	Dünen	Dune	砂丘	모래 언덕	沙丘
+cave	Cave	Caverna	Gruta	Cueva	Grotte	Höhle	Grotta	洞窟	동굴	洞穴
+volcano	Volcano	Vulcão	Vulcão	Volcán	Volcan	Vulkan	Vulcano	火山	화산	火山
+glacier	Glacier	Geleira	Glaciar	Glaciar	Glacier	Gletscher	Ghiacciaio	氷河	빙하	冰川
+rocks	Rock formations	Formações rochosas	Formações rochosas	Formaciones rocosas	Formations rocheuses	Felsformationen	Formazioni rocciose	岩・奇岩	암석 지형	岩石
+sunset	Sunset	Pôr do sol	Pôr do sol	Puesta de sol	Coucher de soleil	Sonnenuntergang	Tramonto	夕焼け	일몰	日落
+sunrise	Sunrise	Nascer do sol	Nascer do sol	Amanecer	Lever de soleil	Sonnenaufgang	Alba	日の出	일출	日出
+starrySky	Starry sky	Céu estrelado	Céu estrelado	Cielo estrellado	Ciel étoilé	Sternenhimmel	Cielo stellato	星空	별이 빛나는 하늘	星空
+milkyWay	Milky Way	Via Láctea	Via Láctea	Vía Láctea	Voie lactée	Milchstraße	Via Lattea	天の川	은하수	银河
+moon	Moon	Lua	Lua	Luna	Lune	Mond	Luna	月	달	月亮
+eclipse	Eclipse	Eclipse	Eclipse	Eclipse	Éclipse	Finsternis	Eclissi	日食・月食	일식·월식	日食月食
+aurora	Northern lights	Aurora boreal	Aurora boreal	Aurora boreal	Aurore boréale	Polarlicht	Aurora boreale	オーロラ	오로라	极光
+rainbow	Rainbow	Arco-íris	Arco-íris	Arcoíris	Arc-en-ciel	Regenbogen	Arcobaleno	虹	무지개	彩虹
+storm	Storm	Tempestade	Tempestade	Tormenta	Orage	Gewitter	Temporale	嵐・雷	폭풍	暴风雨
+clouds	Clouds	Nuvens	Nuvens	Nubes	Nuages	Wolken	Nuvole	雲	구름	云
+fog	Fog	Neblina	Nevoeiro	Niebla	Brouillard	Nebel	Nebbia	霧	안개	雾
+rain	Rain	Chuva	Chuva	Lluvia	Pluie	Regen	Pioggia	雨	비	雨
+snow	Snow	Neve	Neve	Nieve	Neige	Schnee	Neve	雪	눈	雪
+frost	Frost	Geada	Geada	Escarcha	Givre	Raureif	Brina	霜	서리	霜
+blueSky	Blue sky	Céu azul	Céu azul	Cielo azul	Ciel bleu	Blauer Himmel	Cielo azzurro	青空	푸른 하늘	蓝天
+fireworks	Fireworks	Fogos de artifício	Fogo de artifício	Fuegos artificiales	Feu d'artifice	Feuerwerk	Fuochi d'artificio	花火	불꽃놀이	烟花
+downtown	Downtown	Centro da cidade	Centro da cidade	Centro de la ciudad	Centre-ville	Innenstadt	Centro città	繁華街	도심	市中心
+skyline	City skyline	Vista da cidade	Vista da cidade	Horizonte urbano	Panorama urbain	Skyline	Skyline	街のスカイライン	도시 스카이라인	城市天际线
+street	Street	Rua	Rua	Calle	Rue	Straße	Strada	通り	거리	街道
+pedestrianStreet	Pedestrian street	Calçadão	Rua pedonal	Calle peatonal	Rue piétonne	Fußgängerzone	Via pedonale	歩行者天国	보행자 거리	步行街
+square	Square	Praça	Praça	Plaza	Place	Platz	Piazza	広場	광장	广场
+modernArchitecture	Modern architecture	Arquitetura moderna	Arquitetura moderna	Arquitectura moderna	Architecture moderne	Moderne Architektur	Architettura moderna	モダン建築	모더니즘 건축	现代主义建筑
+contemporaryArchitecture	Contemporary architecture	Arquitetura contemporânea	Arquitetura contemporânea	Arquitectura contemporánea	Architecture contemporaine	Zeitgenössische Architektur	Architettura contemporanea	現代建築	현대 건축	当代建筑
+colonialArchitecture	Colonial architecture	Arquitetura colonial	Arquitetura colonial	Arquitectura colonial	Architecture coloniale	Kolonialarchitektur	Architettura coloniale	植民地時代の建築	식민지 시대 건축	殖民地建筑
+historicArchitecture	Historic architecture	Arquitetura histórica	Arquitetura histórica	Arquitectura histórica	Architecture historique	Historische Architektur	Architettura storica	歴史的建築	역사적 건축	历史建筑
+heritage	Heritage building	Patrimônio histórico	Património histórico	Patrimonio histórico	Patrimoine historique	Denkmal	Patrimonio storico	歴史的建造物	문화유산	历史遗产
+church	Church	Igreja	Igreja	Iglesia	Église	Kirche	Chiesa	教会	교회	教堂
+cathedral	Cathedral	Catedral	Catedral	Catedral	Cathédrale	Kathedrale	Cattedrale	大聖堂	대성당	大教堂
+monastery	Monastery	Mosteiro	Mosteiro	Monasterio	Monastère	Kloster	Monastero	修道院	수도원	修道院
+mosque	Mosque	Mesquita	Mesquita	Mezquita	Mosquée	Moschee	Moschea	モスク	모스크	清真寺
+temple	Temple	Templo	Templo	Templo	Temple	Tempel	Tempio	寺院	사원	寺庙
+castle	Castle	Castelo	Castelo	Castillo	Château fort	Burg	Castello	城	성	城堡
+palace	Palace	Palácio	Palácio	Palacio	Palais	Palast	Palazzo	宮殿	궁전	宫殿
+bridge	Bridge	Ponte	Ponte	Puente	Pont	Brücke	Ponte	橋	다리	桥
+viaduct	Viaduct or footbridge	Viaduto	Viaduto	Viaducto	Viaduc	Viadukt	Viadotto	高架橋・歩道橋	고가도로·육교	高架桥
+monument	Monument	Monumento	Monumento	Monumento	Monument	Monument	Monumento	記念碑	기념비	纪念碑
+statue	Statue	Estátua	Estátua	Estatua	Statue	Statue	Statua	彫像	조각상	雕像
+museum	Museum	Museu	Museu	Museo	Musée	Museum	Museo	博物館	박물관	博物馆
+facade	Facade	Fachada	Fachada	Fachada	Façade	Fassade	Facciata	建物の外観	건물 외관	建筑立面
+interior	Interior	Interiores	Interiores	Interiores	Intérieur	Innenraum	Interni	インテリア	실내	室内
+kitchenInterior	Kitchen	Cozinha	Cozinha	Cocina	Cuisine	Küche	Cucina	キッチン	주방	厨房
+bathroom	Bathroom	Banheiro	Casa de banho	Baño	Salle de bain	Badezimmer	Bagno	浴室	욕실	浴室
+stairs	Staircase	Escada	Escadaria	Escalera	Escalier	Treppe	Scala	階段	계단	楼梯
+architecturalDetail	Architectural detail	Detalhe arquitetônico	Pormenor arquitetónico	Detalle arquitectónico	Détail architectural	Architekturdetail	Dettaglio architettonico	建築のディテール	건축 디테일	建筑细节
+architecturalModel	Architectural model	Maquete	Maqueta	Maqueta	Maquette	Architekturmodell	Plastico architettonico	建築模型	건축 모형	建筑模型
+constructionSite	Construction site	Canteiro de obras	Estaleiro de obras	Obra en construcción	Chantier	Baustelle	Cantiere	工事現場	공사 현장	建筑工地
+buildingWork	Building under construction	Obra em andamento	Obra em curso	Edificio en obras	Bâtiment en construction	Rohbau	Edificio in costruzione	建設中の建物	건설 중인 건물	在建建筑
+ruins	Ruins	Ruínas	Ruínas	Ruinas	Ruines	Ruinen	Rovine	遺跡	유적	遗址
+streetArt	Street art	Arte urbana	Arte urbana	Arte urbano	Street art	Street-Art	Street art	ストリートアート	거리 예술	街头艺术
+market	Market hall	Mercado público	Mercado	Mercado	Halles	Markthalle	Mercato coperto	市場	시장	市场
+station	Station	Estação	Estação	Estación	Gare	Bahnhof	Stazione	駅	역	车站
+airport	Airport	Aeroporto	Aeroporto	Aeropuerto	Aéroport	Flughafen	Aeroporto	空港	공항	机场
+campus	University campus	Campus universitário	Campus universitário	Campus universitario	Campus universitaire	Universitätscampus	Campus universitario	大学キャンパス	대학 캠퍼스	大学校园
+library	Library	Biblioteca	Biblioteca	Biblioteca	Bibliothèque	Bibliothek	Biblioteca	図書館	도서관	图书馆
+stadium	Stadium	Estádio	Estádio	Estadio	Stade	Stadion	Stadio	スタジアム	경기장	体育场
+cityNight	City at night	Cidade à noite	Cidade à noite	Ciudad de noche	Ville la nuit	Stadt bei Nacht	Città di notte	夜の街	밤의 도시	城市夜景
+concert	Concert	Show	Concerto	Concierto	Concert	Konzert	Concerto	コンサート	콘서트	音乐会
+musicFestival	Music festival	Festival de música	Festival de música	Festival de música	Festival de musique	Musikfestival	Festival musicale	音楽フェス	음악 축제	音乐节
+theater	Theater	Teatro	Teatro	Teatro	Théâtre	Theater	Teatro	演劇	연극	戏剧
+dance	Dance performance	Dança	Dança	Danza	Danse	Tanz	Danza	ダンス公演	무용 공연	舞蹈表演
+orchestra	Orchestra	Orquestra	Orquestra	Orquesta	Orchestre	Orchester	Orchestra	オーケストラ	오케스트라	管弦乐团
+choir	Choir	Coral	Coro	Coro	Chorale	Chor	Coro	合唱	합창	合唱团
+artExhibition	Art exhibition	Exposição de arte	Exposição de arte	Exposición de arte	Exposition d'art	Kunstausstellung	Mostra d'arte	美術展	미술 전시	艺术展览
+gallery	Art gallery	Galeria de arte	Galeria de arte	Galería de arte	Galerie d'art	Kunstgalerie	Galleria d'arte	ギャラリー	갤러리	画廊
+installation	Art installation	Instalação artística	Instalação artística	Instalación artística	Installation artistique	Kunstinstallation	Installazione artistica	インスタレーション	설치 미술	艺术装置
+cinema	Cinema	Cinema	Cinema	Cine	Cinéma	Kino	Cinema	映画館	영화관	电影院
+lecture	Lecture	Palestra	Palestra	Conferencia	Conférence	Vortrag	Conferenza	講演	강연	讲座
+conference	Conference	Congresso	Congresso	Congreso	Congrès	Kongress	Congresso	学会・会議	학술 대회	学术会议
+classroom	Classroom	Sala de aula	Sala de aula	Aula	Salle de classe	Klassenzimmer	Aula	教室	교실	教室
+workshop	Workshop	Oficina	Workshop	Taller	Atelier	Workshop	Laboratorio pratico	ワークショップ	워크숍	工作坊
+fair	Trade fair	Feira	Feira	Feria	Salon professionnel	Messe	Fiera	展示会	박람회	展会
+fashionShow	Fashion show	Desfile de moda	Desfile de moda	Desfile de moda	Défilé de mode	Modenschau	Sfilata di moda	ファッションショー	패션쇼	时装秀
+folkDance	Folk dance	Dança folclórica	Dança folclórica	Danza folclórica	Danse folklorique	Volkstanz	Danza folcloristica	民族舞踊	민속춤	民间舞蹈
+poetryReading	Poetry reading	Sarau	Sarau	Recital de poesía	Lecture de poésie	Lesung	Reading di poesia	朗読会	시 낭독회	诗歌朗诵会
+football	Soccer	Futebol	Futebol	Fútbol	Football	Fußball	Calcio	サッカー	축구	足球
+futsal	Futsal	Futsal	Futsal	Fútbol sala	Futsal	Futsal	Calcio a 5	フットサル	풋살	室内五人制足球
+volleyball	Volleyball	Vôlei	Voleibol	Voleibol	Volley-ball	Volleyball	Pallavolo	バレーボール	배구	排球
+beachVolleyball	Beach volleyball	Vôlei de praia	Voleibol de praia	Vóley playa	Beach-volley	Beachvolleyball	Beach volley	ビーチバレー	비치발리볼	沙滩排球
+basketball	Basketball	Basquete	Basquetebol	Baloncesto	Basket-ball	Basketball	Pallacanestro	バスケットボール	농구	篮球
+tennis	Tennis	Tênis	Ténis	Tenis	Tennis	Tennis	Tennis	テニス	테니스	网球
+beachTennis	Beach tennis	Beach tennis	Beach ténis	Tenis playa	Beach tennis	Beachtennis	Beach tennis	ビーチテニス	비치 테니스	沙滩网球
+running	Running race	Corrida de rua	Corrida	Carrera	Course à pied	Laufwettbewerb	Corsa podistica	マラソン・ランニング	달리기 대회	跑步比赛
+cycling	Cycling	Ciclismo	Ciclismo	Ciclismo	Cyclisme	Radfahren	Ciclismo	サイクリング	자전거 타기	骑行
+mountainBike	Mountain biking	Mountain bike	BTT	Bicicleta de montaña	VTT	Mountainbiken	Mountain bike	マウンテンバイク	산악자전거	山地自行车
+swimming	Swimming	Natação	Natação	Natación	Natation	Schwimmen	Nuoto	水泳	수영	游泳
+athletics	Athletics	Atletismo	Atletismo	Atletismo	Athlétisme	Leichtathletik	Atletica	陸上競技	육상	田径
+gymnastics	Gymnastics	Ginástica	Ginástica	Gimnasia	Gymnastique	Turnen	Ginnastica	体操	체조	体操
+martialArts	Martial arts	Artes marciais	Artes marciais	Artes marciales	Arts martiaux	Kampfsport	Arti marziali	武道・格闘技	무술	武术
+boxing	Boxing	Boxe	Boxe	Boxeo	Boxe	Boxen	Pugilato	ボクシング	권투	拳击
+gym	Gym workout	Academia	Ginásio	Gimnasio	Salle de sport	Fitnessstudio	Palestra	ジム	헬스장	健身房
+yoga	Yoga	Ioga	Ioga	Yoga	Yoga	Yoga	Yoga	ヨガ	요가	瑜伽
+skateboarding	Skateboarding	Skate	Skate	Skate	Skateboard	Skateboarden	Skateboard	スケートボード	스케이트보드	滑板
+climbing	Climbing	Escalada	Escalada	Escalada	Escalade	Klettern	Arrampicata	クライミング	암벽 등반	攀岩
+skiing	Skiing	Esqui	Esqui	Esquí	Ski	Skifahren	Sci	スキー	스키	滑雪
+snowboarding	Snowboarding	Snowboard	Snowboard	Snowboard	Snowboard	Snowboarden	Snowboard	スノーボード	스노보드	单板滑雪
+golf	Golf	Golfe	Golfe	Golf	Golf	Golf	Golf	ゴルフ	골프	高尔夫
+horseRiding	Horse riding	Hipismo	Equitação	Equitación	Équitation	Reiten	Equitazione	乗馬	승마	骑马
+motorsport	Motorsport	Automobilismo	Automobilismo	Automovilismo	Sport automobile	Motorsport	Automobilismo	モータースポーツ	모터스포츠	赛车
+motocross	Motocross	Motocross	Motocrosse	Motocross	Motocross	Motocross	Motocross	モトクロス	모토크로스	越野摩托
+rowing	Rowing and canoeing	Remo e canoagem	Remo e canoagem	Remo y piragüismo	Aviron et canoë	Rudern und Kanu	Canottaggio e canoa	ボート・カヌー	조정·카누	赛艇与皮划艇
+planeWindow	View from a plane window	Janela do avião	Janela do avião	Ventanilla del avión	Hublot d'avion	Blick aus dem Flugzeugfenster	Finestrino dell'aereo	飛行機の窓からの景色	비행기 창밖 풍경	飞机舷窗
+flight	Flight	Voo	Voo	Vuelo	Vol	Flug	Volo	フライト	비행	飞行
+trainTrip	Train trip	Viagem de trem	Viagem de comboio	Viaje en tren	Voyage en train	Zugreise	Viaggio in treno	列車の旅	기차 여행	火车旅行
+subway	Subway	Metrô	Metro	Metro	Métro	U-Bahn	Metropolitana	地下鉄	지하철	地铁
+busTrip	Bus trip	Viagem de ônibus	Viagem de autocarro	Viaje en autobús	Voyage en bus	Busreise	Viaggio in autobus	バス旅行	버스 여행	巴士旅行
+roadTrip	Road trip	Viagem de carro	Viagem de carro	Viaje por carretera	Road trip	Autoreise	Viaggio in auto	ドライブ旅行	자동차 여행	自驾游
+motorcycleTrip	Motorcycle trip	Viagem de moto	Viagem de mota	Viaje en moto	Voyage à moto	Motorradtour	Viaggio in moto	バイク旅行	오토바이 여행	摩托车旅行
+cruise	Cruise	Cruzeiro	Cruzeiro	Crucero	Croisière	Kreuzfahrt	Crociera	クルーズ	크루즈	邮轮
+hotel	Hotel	Hotel	Hotel	Hotel	Hôtel	Hotel	Hotel	ホテル	호텔	酒店
+resort	Resort	Resort	Resort	Resort	Complexe hôtelier	Resort	Resort	リゾート	리조트	度假村
+luggage	Luggage	Malas	Malas	Equipaje	Bagages	Gepäck	Bagagli	荷物・スーツケース	여행 가방	行李
+landmark	Tourist landmark	Ponto turístico	Ponto turístico	Lugar turístico	Site touristique	Sehenswürdigkeit	Attrazione turistica	観光名所	관광 명소	旅游景点
+cableCar	Cable car	Teleférico	Teleférico	Teleférico	Téléphérique	Seilbahn	Funivia	ロープウェイ	케이블카	缆车
+amusementPark	Amusement park	Parque de diversões	Parque de diversões	Parque de atracciones	Parc d'attractions	Freizeitpark	Luna park	遊園地	놀이공원	游乐园
+touristSign	Tourist sign or map	Placa ou mapa turístico	Placa ou mapa turístico	Cartel o mapa turístico	Panneau ou plan touristique	Ortsschild oder Karte	Cartello o mappa turistica	観光案内板	관광 안내판	旅游标牌
+border	Border crossing	Fronteira	Fronteira	Frontera	Frontière	Grenze	Frontiera	国境	국경	边境
+car	Car	Carro	Carro	Coche	Voiture	Auto	Auto	車	자동차	汽车
+classicCar	Classic car	Carro antigo	Carro clássico	Coche clásico	Voiture ancienne	Oldtimer	Auto d'epoca	クラシックカー	클래식카	老爷车
+sportsCar	Sports car	Carro esportivo	Carro desportivo	Deportivo	Voiture de sport	Sportwagen	Auto sportiva	スポーツカー	스포츠카	跑车
+truck	Truck	Caminhão	Camião	Camión	Camion	Lastwagen	Camion	トラック	트럭	卡车
+tractor	Tractor	Trator	Trator	Tractor	Tracteur	Traktor	Trattore	トラクター	트랙터	拖拉机
+heavyMachinery	Heavy machinery	Máquinas pesadas	Máquinas pesadas	Maquinaria pesada	Engins de chantier	Baumaschinen	Macchine pesanti	重機	중장비	重型机械
+industrialMachinery	Industrial machinery	Máquinas industriais	Máquinas industriais	Maquinaria industrial	Machines industrielles	Industriemaschinen	Macchinari industriali	産業機械	산업 기계	工业机械
+motorcycle	Motorcycle	Moto	Mota	Moto	Moto	Motorrad	Moto	オートバイ	오토바이	摩托车
+bicycle	Bicycle	Bicicleta	Bicicleta	Bicicleta	Vélo	Fahrrad	Bicicletta	自転車	자전거	自行车
+boat	Boat	Barco	Barco	Barco	Bateau	Boot	Barca	ボート	보트	船
+airplane	Airplane	Avião	Avião	Avión	Avion	Flugzeug	Aereo	飛行機	비행기	飞机
+helicopter	Helicopter	Helicóptero	Helicóptero	Helicóptero	Hélicoptère	Hubschrauber	Elicottero	ヘリコプター	헬리콥터	直升机
+train	Train	Trem	Comboio	Tren	Train	Zug	Treno	列車	기차	火车
+tram	Tram	Bonde	Elétrico	Tranvía	Tramway	Straßenbahn	Tram	路面電車	트램	有轨电车
+drone	Drone	Drone	Drone	Dron	Drone	Drohne	Drone	ドローン	드론	无人机
+carShow	Car show	Encontro de carros	Exposição de automóveis	Exposición de coches	Salon automobile	Autoausstellung	Raduno di auto	カーショー	자동차 전시회	车展
+dish	Food	Prato de comida	Prato de comida	Plato de comida	Plat	Essen	Piatto	料理	음식	菜肴
+barbecue	Barbecue	Churrasco	Churrasco	Asado	Barbecue	Grillfleisch	Grigliata	バーベキュー	바비큐	烧烤
+pizza	Pizza	Pizza	Piza	Pizza	Pizza	Pizza	Pizza	ピザ	피자	披萨
+burger	Burger	Hambúrguer	Hambúrguer	Hamburguesa	Burger	Burger	Hamburger	ハンバーガー	햄버거	汉堡
+pasta	Pasta	Massa	Massa	Pasta	Pâtes	Pasta	Pasta	パスタ	파스타	意大利面
+sushi	Sushi	Sushi	Sushi	Sushi	Sushi	Sushi	Sushi	寿司	초밥	寿司
+salad	Salad	Salada	Salada	Ensalada	Salade	Salat	Insalata	サラダ	샐러드	沙拉
+fruit	Fruit	Frutas	Fruta	Fruta	Fruits	Obst	Frutta	果物	과일	水果
+vegetables	Vegetables	Legumes e verduras	Legumes	Verduras	Légumes	Gemüse	Verdure	野菜	채소	蔬菜
+dessert	Dessert	Sobremesa	Sobremesa	Postre	Dessert	Dessert	Dessert	デザート	디저트	甜点
+cake	Cake	Bolo	Bolo	Tarta	Gâteau	Kuchen	Torta	ケーキ	케이크	蛋糕
+sweets	Party sweets	Docinhos	Docinhos	Dulces	Confiseries	Süßigkeiten	Dolcetti	お菓子	과자·사탕	糖果甜品
+iceCream	Ice cream	Sorvete	Gelado	Helado	Glace	Eis	Gelato	アイスクリーム	아이스크림	冰淇淋
+bread	Bread	Pão	Pão	Pan	Pain	Brot	Pane	パン	빵	面包
+breakfast	Breakfast	Café da manhã	Pequeno-almoço	Desayuno	Petit-déjeuner	Frühstück	Colazione	朝食	아침 식사	早餐
+coffee	Coffee	Café	Café	Café	Café	Kaffee	Caffè	コーヒー	커피	咖啡
+mate	Mate tea	Chimarrão	Chimarrão	Mate	Maté	Mate	Mate	マテ茶	마테차	马黛茶
+wine	Wine	Vinho	Vinho	Vino	Vin	Wein	Vino	ワイン	와인	葡萄酒
+beer	Beer	Cerveja	Cerveja	Cerveza	Bière	Bier	Birra	ビール	맥주	啤酒
+cocktails	Cocktails	Drinks	Cocktails	Cócteles	Cocktails	Cocktails	Cocktail	カクテル	칵테일	鸡尾酒
+tableSetting	Table setting	Mesa posta	Mesa posta	Mesa puesta	Table dressée	Gedeckter Tisch	Tavola apparecchiata	テーブルセッティング	테이블 세팅	餐桌布置
+restaurant	Restaurant	Restaurante	Restaurante	Restaurante	Restaurant	Restaurant	Ristorante	レストラン	레스토랑	餐厅
+cooking	Cooking	Cozinhando	A cozinhar	Cocinando	Cuisine maison	Kochen	Cucinare	料理中	요리	烹饪
+streetMarket	Street market	Feira livre	Mercado de rua	Mercadillo	Marché en plein air	Wochenmarkt	Mercato all'aperto	青空市場	노천 시장	露天市场
+streetFood	Street food	Comida de rua	Comida de rua	Comida callejera	Cuisine de rue	Streetfood	Cibo di strada	屋台料理	길거리 음식	街头小吃
+seafood	Seafood	Frutos do mar	Marisco	Mariscos	Fruits de mer	Meeresfrüchte	Frutti di mare	シーフード	해산물	海鲜
+chocolate	Chocolate	Chocolate	Chocolate	Chocolate	Chocolat	Schokolade	Cioccolato	チョコレート	초콜릿	巧克力
+menuDish	Food photography	Foto de cardápio	Fotografia de menu	Foto de menú	Photo culinaire	Food-Fotografie	Foto per il menù	料理写真	메뉴 사진	菜品摄影
+dog	Dog	Cachorro	Cão	Perro	Chien	Hund	Cane	犬	개	狗
+cat	Cat	Gato	Gato	Gato	Chat	Katze	Gatto	猫	고양이	猫
+puppy	Puppy or kitten	Filhote	Cachorro ou gatinho	Cachorro o gatito	Chiot ou chaton	Welpe oder Kätzchen	Cucciolo	子犬・子猫	강아지·새끼 고양이	幼崽
+birds	Birds	Pássaros	Pássaros	Pájaros	Oiseaux	Vögel	Uccelli	鳥	새	鸟
+waterBirds	Water birds	Aves aquáticas	Aves aquáticas	Aves acuáticas	Oiseaux aquatiques	Wasservögel	Uccelli acquatici	水鳥	물새	水鸟
+parrot	Parrot or macaw	Papagaio ou arara	Papagaio ou arara	Loro o guacamayo	Perroquet ou ara	Papagei	Pappagallo	オウム・インコ	앵무새	鹦鹉
+horse	Horse	Cavalo	Cavalo	Caballo	Cheval	Pferd	Cavallo	馬	말	马
+cattle	Cattle	Gado	Gado	Ganado	Bétail	Rinder	Bestiame	牛	소	牛
+sheep	Sheep	Ovelhas	Ovelhas	Ovejas	Moutons	Schafe	Pecore	羊	양	羊
+pig	Pig	Porco	Porco	Cerdo	Cochon	Schwein	Maiale	豚	돼지	猪
+chicken	Chickens	Galinhas	Galinhas	Gallinas	Poules	Hühner	Galline	ニワトリ	닭	鸡
+fish	Fish	Peixes	Peixes	Peces	Poissons	Fische	Pesci	魚	물고기	鱼
+turtle	Turtle	Tartaruga	Tartaruga	Tortuga	Tortue	Schildkröte	Tartaruga	カメ	거북	乌龟
+reptiles	Reptiles	Répteis	Répteis	Reptiles	Reptiles	Reptilien	Rettili	爬虫類	파충류	爬行动物
+insects	Insects	Insetos	Insetos	Insectos	Insectes	Insekten	Insetti	昆虫	곤충	昆虫
+butterfly	Butterfly	Borboleta	Borboleta	Mariposa	Papillon	Schmetterling	Farfalla	蝶	나비	蝴蝶
+bee	Bee	Abelha	Abelha	Abeja	Abeille	Biene	Ape	ハチ	벌	蜜蜂
+safari	Safari	Safári	Safari	Safari	Safari	Safari	Safari	サファリ	사파리	野生动物园之旅
+zoo	Zoo	Zoológico	Jardim zoológico	Zoológico	Zoo	Zoo	Zoo	動物園	동물원	动物园
+marineAnimals	Marine animals	Animais marinhos	Animais marinhos	Animales marinos	Animaux marins	Meerestiere	Animali marini	海の生き物	해양 동물	海洋动物
+penguin	Penguin	Pinguim	Pinguim	Pingüino	Manchot	Pinguin	Pinguino	ペンギン	펭귄	企鹅
+monkey	Monkey	Macaco	Macaco	Mono	Singe	Affe	Scimmia	サル	원숭이	猴子
+meeting	Meeting	Reunião	Reunião	Reunión	Réunion	Besprechung	Riunione	会議	회의	会议
+office	Office	Escritório	Escritório	Oficina	Bureau	Büro	Ufficio	オフィス	사무실	办公室
+pressConference	Press conference	Coletiva de imprensa	Conferência de imprensa	Rueda de prensa	Conférence de presse	Pressekonferenz	Conferenza stampa	記者会見	기자 회견	新闻发布会
+interview	Interview	Entrevista	Entrevista	Entrevista	Interview	Interview	Intervista	インタビュー	인터뷰	采访
+speech	Speech	Discurso	Discurso	Discurso	Discours	Rede	Discorso	スピーチ	연설	演讲
+signing	Official signing	Assinatura oficial	Assinatura oficial	Firma oficial	Signature officielle	Offizielle Unterzeichnung	Firma ufficiale	調印式	공식 서명식	签约仪式
+officialVisit	Official visit	Visita oficial	Visita oficial	Visita oficial	Visite officielle	Offizieller Besuch	Visita ufficiale	公式訪問	공식 방문	官方访问
+institutionalEvent	Institutional event	Evento institucional	Evento institucional	Evento institucional	Événement institutionnel	Offizielle Veranstaltung	Evento istituzionale	式典	기관 행사	机构活动
+laboratory	Laboratory	Laboratório	Laboratório	Laboratorio	Laboratoire	Labor	Laboratorio	研究室	실험실	实验室
+fieldResearch	Field research	Pesquisa de campo	Trabalho de campo	Trabajo de campo	Recherche sur le terrain	Feldforschung	Ricerca sul campo	フィールド調査	현장 조사	野外考察
+archaeologicalSite	Archaeological site	Sítio arqueológico	Sítio arqueológico	Yacimiento arqueológico	Site archéologique	Ausgrabungsstätte	Sito archeologico	発掘現場	고고학 발굴지	考古遗址
+hospital	Hospital	Hospital	Hospital	Hospital	Hôpital	Krankenhaus	Ospedale	病院	병원	医院
+factory	Factory	Fábrica	Fábrica	Fábrica	Usine	Fabrik	Fabbrica	工場	공장	工厂
+workshopGarage	Mechanic's workshop	Oficina mecânica	Oficina mecânica	Taller mecánico	Garage automobile	Autowerkstatt	Officina meccanica	整備工場	정비소	汽修厂
+harvest	Harvest	Colheita	Colheita	Cosecha	Récolte	Ernte	Raccolto	収穫	수확	收获
+constructionWorkers	Construction workers	Operários da construção	Trabalhadores da construção	Obreros de la construcción	Ouvriers du bâtiment	Bauarbeiter	Operai edili	建設作業員	건설 노동자	建筑工人
+shop	Shop	Loja	Loja	Tienda	Boutique	Geschäft	Negozio	お店	가게	商店
+photoStudio	Photo studio	Estúdio fotográfico	Estúdio fotográfico	Estudio fotográfico	Studio photo	Fotostudio	Studio fotografico	写真スタジオ	사진 스튜디오	摄影棚
+backstage	Behind the scenes	Bastidores	Bastidores	Detrás de cámaras	Coulisses	Hinter den Kulissen	Dietro le quinte	舞台裏	비하인드	幕后
+cameraGear	Camera gear	Equipamento fotográfico	Equipamento fotográfico	Equipo fotográfico	Matériel photo	Kameraausrüstung	Attrezzatura fotografica	カメラ機材	카메라 장비	摄影器材
+productPhoto	Product photo	Foto de produto	Fotografia de produto	Foto de producto	Photo de produit	Produktfoto	Foto di prodotto	商品写真	제품 사진	产品照
+realEstate	Real estate photo	Foto imobiliária	Fotografia imobiliária	Foto inmobiliaria	Photo immobilière	Immobilienfoto	Foto immobiliare	不動産写真	부동산 사진	房产照片
+protest	Protest	Manifestação	Manifestação	Manifestación	Manifestation	Demonstration	Manifestazione	デモ	시위	抗议活动
+classPhoto	Graduating class photo	Foto de formandos	Foto de curso	Orla de graduación	Photo de promotion	Abschlussklassenfoto	Foto di classe di laurea	卒業記念写真	졸업 단체 사진	毕业班合影
+books	Books	Livros	Livros	Libros	Livres	Bücher	Libri	本	책	书籍
+instruments	Musical instruments	Instrumentos musicais	Instrumentos musicais	Instrumentos musicales	Instruments de musique	Musikinstrumente	Strumenti musicali	楽器	악기	乐器
+toys	Toys	Brinquedos	Brinquedos	Juguetes	Jouets	Spielzeug	Giocattoli	おもちゃ	장난감	玩具
+boardGames	Board games	Jogos de tabuleiro	Jogos de tabuleiro	Juegos de mesa	Jeux de société	Brettspiele	Giochi da tavolo	ボードゲーム	보드게임	桌游
+watches	Watches	Relógios	Relógios	Relojes	Montres	Uhren	Orologi	腕時計	시계	手表
+jewelry	Jewelry	Joias	Joias	Joyas	Bijoux	Schmuck	Gioielli	ジュエリー	보석	首饰
+clothes	Clothes	Roupas	Roupa	Ropa	Vêtements	Kleidung	Vestiti	服	옷	服装
+shoes	Shoes	Sapatos	Sapatos	Zapatos	Chaussures	Schuhe	Scarpe	靴	신발	鞋子
+pottedPlants	Potted plants	Plantas em vaso	Plantas em vaso	Plantas en maceta	Plantes en pot	Topfpflanzen	Piante in vaso	鉢植え	화분	盆栽
+decoration	Decoration	Decoração	Decoração	Decoración	Décoration	Dekoration	Decorazione	インテリア雑貨	장식	装饰
+crafts	Crafts	Artesanato	Artesanato	Artesanía	Artisanat	Kunsthandwerk	Artigianato	手工芸品	공예품	手工艺品
+electronics	Electronics	Eletrônicos	Eletrónica	Electrónica	Électronique	Elektronik	Elettronica	電子機器	전자기기	电子产品
+document	Document	Documento	Documento	Documento	Document	Dokument	Documento	書類	문서	文件
+receipt	Receipt	Recibo	Recibo	Recibo	Reçu	Quittung	Ricevuta	レシート	영수증	收据
+bookPage	Book page	Página de livro	Página de livro	Página de libro	Page de livre	Buchseite	Pagina di libro	本のページ	책 페이지	书页
+whiteboard	Whiteboard	Quadro	Quadro	Pizarra	Tableau	Tafel	Lavagna	ホワイトボード	화이트보드	白板
+slide	Presentation slide	Slide	Diapositivo	Diapositiva	Diapositive	Folie	Diapositiva	スライド	발표 슬라이드	幻灯片
+screenshot	Screenshot	Captura de tela	Captura de ecrã	Captura de pantalla	Capture d'écran	Bildschirmfoto	Screenshot	スクリーンショット	스크린샷	截图
+screenPhoto	Photo of a screen	Foto de tela	Fotografia de ecrã	Foto de pantalla	Photo d'écran	Foto eines Bildschirms	Foto di uno schermo	画面の写真	화면 사진	屏幕照片
+floorPlan	Floor plan	Planta baixa	Planta	Plano	Plan d'étage	Grundriss	Pianta	間取り図	평면도	平面图
+sketch	Sketch	Croqui	Esboço	Boceto	Croquis	Skizze	Schizzo	スケッチ	스케치	草图
+notebook	Notes	Anotações	Apontamentos	Apuntes	Notes	Notizen	Appunti	ノート	노트	笔记
+poster	Poster	Cartaz	Cartaz	Cartel	Affiche	Plakat	Manifesto	ポスター	포스터	海报
+invitation	Invitation or card	Convite	Convite	Invitación	Invitation	Einladung	Invito	招待状	초대장	请柬
+map	Map	Mapa	Mapa	Mapa	Carte	Karte	Mappa	地図	지도	地图
+presentationBoard	Presentation board	Prancha de apresentação	Prancha de apresentação	Lámina de presentación	Planche de présentation	Präsentationstafel	Tavola di presentazione	プレゼンボード	프레젠테이션 보드	展板
+familyGathering	Family gathering	Encontro de família	Reunião de família	Reunión familiar	Réunion de famille	Familientreffen	Riunione di famiglia	親族の集まり	가족 모임	家庭聚会
+siblings	Siblings	Irmãos	Irmãos	Hermanos	Frères et sœurs	Geschwister	Fratelli	きょうだい	형제자매	兄弟姐妹
+parentAndChild	Parent and child	Pais e filhos	Pais e filhos	Padres e hijos	Parent et enfant	Eltern und Kind	Genitori e figli	親子	부모와 아이	亲子
+storyTime	Bedtime story	Hora da história	Hora do conto	Cuento antes de dormir	Histoire du soir	Gutenachtgeschichte	Favola della buonanotte	読み聞かせ	잠자리 동화	睡前故事
+movieNight	Movie night	Sessão de cinema em casa	Noite de cinema	Noche de películas	Soirée cinéma	Filmabend	Serata film	映画鑑賞の夜	영화의 밤	家庭电影夜
+gameNight	Game night	Noite de jogos	Noite de jogos	Noche de juegos	Soirée jeux	Spieleabend	Serata giochi	ゲームナイト	게임의 밤	游戏之夜
+bakingTogether	Baking together	Cozinhando com as crianças	A cozinhar com os miúdos	Cocinar con los niños	Pâtisserie en famille	Gemeinsam backen	Cucinare con i bambini	親子でお菓子作り	함께 베이킹	一起烘焙
+gardening	Gardening	Jardinagem	Jardinagem	Jardinería	Jardinage	Gärtnern	Giardinaggio	ガーデニング	정원 가꾸기	园艺
+backyard	Backyard	Quintal	Quintal	Patio trasero	Jardin derrière la maison	Hinterhof	Cortile	裏庭	뒷마당	后院
+kidsArt	Kids' art	Desenho e pintura infantil	Desenhos das crianças	Dibujos de niños	Dessins d'enfants	Kinder malen	Disegni dei bambini	子どものお絵かき	아이들 그림	儿童绘画
+playground	Playground	Parquinho	Parque infantil	Parque infantil	Aire de jeux	Spielplatz	Parco giochi	公園の遊具	놀이터	游乐场
+swing	Swing	Balanço	Baloiço	Columpio	Balançoire	Schaukel	Altalena	ブランコ	그네	秋千
+sandCastle	Sand castle	Castelo de areia	Castelo de areia	Castillo de arena	Château de sable	Sandburg	Castello di sabbia	砂の城	모래성	沙堡
+soapBubbles	Soap bubbles	Bolhas de sabão	Bolas de sabão	Pompas de jabón	Bulles de savon	Seifenblasen	Bolle di sapone	シャボン玉	비눗방울	肥皂泡
+kiteFlying	Kite flying	Pipa	Papagaio de papel	Volar la cometa	Cerf-volant	Drachensteigen	Aquilone	凧揚げ	연날리기	放风筝
+waterPlay	Water play	Brincadeira com água	Brincadeiras com água	Juegos de agua	Jeux d'eau	Wasserspiele	Giochi d'acqua	水遊び	물놀이	玩水
+ballGames	Ball games	Jogo de bola	Jogos de bola	Juegos de pelota	Jeux de ballon	Ballspiele	Giochi con la palla	ボール遊び	공놀이	球类游戏
+dollsAndToys	Dolls and toy cars	Bonecas e carrinhos	Bonecas e carrinhos	Muñecas y cochecitos	Poupées et petites voitures	Puppen und Spielzeugautos	Bambole e macchinine	人形とミニカー	인형과 장난감 자동차	玩偶和玩具车
+buildingBlocks	Building blocks	Blocos de montar	Blocos de construção	Bloques de construcción	Jeux de construction	Bauklötze	Mattoncini	ブロック遊び	블록 놀이	积木
+videoGames	Video games	Videogame	Videojogos	Videojuegos	Jeux vidéo	Videospiele	Videogiochi	テレビゲーム	비디오 게임	电子游戏
+trampoline	Trampoline	Cama elástica	Trampolim	Cama elástica	Trampoline	Trampolin	Tappeto elastico	トランポリン	트램펄린	蹦床
+kidsBike	Kids on bikes and scooters	Bicicleta infantil	Bicicleta de criança	Bici infantil	Vélo d'enfant	Kinderfahrrad	Bici per bambini	子どもの自転車	어린이 자전거	儿童自行车
+dressUp	Dress-up	Fantasias	Disfarces	Disfraces	Déguisements	Verkleiden	Travestimenti	お着替えごっこ	분장 놀이	角色扮演
+puzzle	Jigsaw puzzle	Quebra-cabeça	Puzzle	Rompecabezas	Puzzle	Puzzle	Puzzle	ジグソーパズル	퍼즐	拼图
+bouncyCastle	Bouncy castle	Pula-pula	Insuflável	Castillo hinchable	Château gonflable	Hüpfburg	Gonfiabile	エアー遊具	에어 바운스	充气城堡
+facePainting	Face painting	Pintura facial	Pinturas faciais	Pintacaras	Maquillage pour enfants	Kinderschminken	Trucca bimbi	フェイスペイント	페이스 페인팅	脸部彩绘
+schoolClassroom	School classroom	Sala de aula da escola	Sala de aula da escola	Aula de primaria	Classe d'école	Schulklasse	Aula scolastica	小学校の教室	초등학교 교실	小学教室
+schoolTrip	School trip	Passeio da escola	Visita de estudo	Excursión escolar	Sortie scolaire	Klassenausflug	Gita scolastica	遠足	현장 학습	学校郊游
+schoolSports	School sports day	Gincana escolar	Dia do desporto escolar	Jornada deportiva escolar	Journée sportive	Sportfest	Giornata dello sport	運動会	운동회	学校运动会
+schoolScienceFair	School science fair	Feira de ciências	Feira de ciências	Feria de ciencias	Fête de la science	Schul-Wissenschaftsmesse	Fiera della scienza	科学展示会	과학 전시회	科学展
+kidsGraduation	Kindergarten graduation	Formatura infantil	Finalistas do pré-escolar	Graduación infantil	Remise de diplôme maternelle	Kindergarten-Abschluss	Diploma della materna	卒園式	유치원 졸업식	幼儿园毕业典礼
+schoolParty	School festival	Festa da escola	Festa da escola	Fiesta escolar	Kermesse de l'école	Schulfest	Festa della scuola	学校のお祭り	학교 축제	学校联欢会
+homework	Homework	Lição de casa	Trabalhos de casa	Deberes	Devoirs	Hausaufgaben	Compiti	宿題	숙제	家庭作业
+schoolKids	Schoolchildren	Crianças de uniforme escolar	Crianças de farda escolar	Niños con uniforme escolar	Écoliers	Schulkinder	Scolari	制服の子どもたち	교복 입은 아이들	小学生
+schoolBus	School bus	Ônibus escolar	Autocarro escolar	Autobús escolar	Bus scolaire	Schulbus	Scuolabus	スクールバス	스쿨버스	校车
+kidsReading	Kids reading	Crianças lendo	Crianças a ler	Niños leyendo	Enfants qui lisent	Lesende Kinder	Bambini che leggono	本を読む子どもたち	책 읽는 아이들	孩子们阅读
+schoolCafeteria	School cafeteria	Refeitório da escola	Cantina escolar	Comedor escolar	Cantine scolaire	Schulkantine	Mensa scolastica	給食	학교 급식실	学校食堂
+teamBuilding	Team building	Integração da equipe	Team building	Team building	Team building	Teambuilding	Team building	チームビルディング	팀 빌딩	团建
+trainingSession	Training session	Treinamento	Formação	Capacitación	Formation	Schulung	Corso di formazione	研修	교육 세션	培训
+onlineMeeting	Online meeting	Reunião on-line	Reunião online	Reunión en línea	Réunion en ligne	Online-Besprechung	Riunione online	オンライン会議	온라인 회의	线上会议
+brainstorm	Brainstorming	Brainstorming	Brainstorming	Lluvia de ideas	Brainstorming	Brainstorming	Brainstorming	ブレインストーミング	브레인스토밍	头脑风暴
+networking	Networking	Networking	Networking	Networking	Réseautage	Networking	Networking	交流会	네트워킹	社交交流
+coffeeBreak	Coffee break	Coffee break	Pausa para café	Pausa para el café	Pause café	Kaffeepause	Pausa caffè	コーヒーブレイク	커피 브레이크	茶歇
+businessLunch	Business lunch	Almoço de negócios	Almoço de negócios	Comida de negocios	Déjeuner d'affaires	Geschäftsessen	Pranzo di lavoro	ビジネスランチ	비즈니스 점심	商务午餐
+awardCeremony	Award ceremony	Premiação	Cerimónia de prémios	Entrega de premios	Remise de prix	Preisverleihung	Premiazione	表彰式	시상식	颁奖典礼
+productLaunch	Product launch	Lançamento de produto	Lançamento de produto	Lanzamiento de producto	Lancement de produit	Produkteinführung	Lancio di prodotto	製品発表会	제품 출시 행사	产品发布会
+officeBirthday	Birthday at work	Aniversário no trabalho	Aniversário no trabalho	Cumpleaños en el trabajo	Anniversaire au bureau	Geburtstag im Büro	Compleanno in ufficio	職場での誕生日祝い	회사 생일 축하	办公室生日会
+teamPhoto	Team photo	Foto da equipe	Foto da equipa	Foto del equipo	Photo d'équipe	Teamfoto	Foto del team	社員の集合写真	팀 사진	团队合影
+presentation	Presentation	Apresentação	Apresentação	Presentación	Présentation	Präsentation	Presentazione	プレゼンテーション	발표	演示汇报
+certificates	Certificate ceremony	Entrega de certificados	Entrega de certificados	Entrega de diplomas	Remise de certificats	Zertifikatsübergabe	Consegna degli attestati	修了証授与	수료증 수여	证书颁发
+eventCheckIn	Event check-in	Credenciamento	Acreditação	Acreditación	Accueil des participants	Anmeldung	Accredito	受付	행사 등록	活动签到
+classicalArchitecture	Classical architecture	Arquitetura clássica	Arquitetura clássica	Arquitectura clásica	Architecture classique	Klassische Architektur	Architettura classica	古典建築	고전 건축	古典建筑
+romanesque	Romanesque architecture	Arquitetura românica	Arquitetura românica	Arquitectura románica	Architecture romane	Romanik	Architettura romanica	ロマネスク建築	로마네스크 건축	罗马式建筑
+gothic	Gothic architecture	Arquitetura gótica	Arquitetura gótica	Arquitectura gótica	Architecture gothique	Gotik	Architettura gotica	ゴシック建築	고딕 건축	哥特式建筑
+renaissance	Renaissance architecture	Arquitetura renascentista	Arquitetura renascentista	Arquitectura renacentista	Architecture Renaissance	Renaissance-Architektur	Architettura rinascimentale	ルネサンス建築	르네상스 건축	文艺复兴建筑
+baroque	Baroque architecture	Arquitetura barroca	Arquitetura barroca	Arquitectura barroca	Architecture baroque	Barock	Architettura barocca	バロック建築	바로크 건축	巴洛克建筑
+neoclassical	Neoclassical architecture	Arquitetura neoclássica	Arquitetura neoclássica	Arquitectura neoclásica	Architecture néoclassique	Klassizismus	Architettura neoclassica	新古典主義建築	신고전주의 건축	新古典主义建筑
+victorian	Victorian houses	Casas vitorianas	Casas vitorianas	Casas victorianas	Maisons victoriennes	Viktorianische Häuser	Case vittoriane	ヴィクトリア朝の家	빅토리아풍 주택	维多利亚式房屋
+artNouveau	Art Nouveau	Art nouveau	Arte nova	Modernismo (art nouveau)	Art nouveau	Jugendstil	Liberty	アール・ヌーヴォー	아르누보	新艺术运动建筑
+artDeco	Art Deco	Art déco	Art déco	Art déco	Art déco	Art déco	Art déco	アール・デコ	아르데코	装饰艺术风格
+brazilianModernism	Brazilian modernism	Modernismo brasileiro	Modernismo brasileiro	Modernismo brasileño	Modernisme brésilien	Brasilianische Moderne	Modernismo brasiliano	ブラジル近代建築	브라질 모더니즘	巴西现代主义建筑
+brutalist	Brutalist architecture	Arquitetura brutalista	Arquitetura brutalista	Arquitectura brutalista	Architecture brutaliste	Brutalismus	Architettura brutalista	ブルータリズム建築	브루탈리즘 건축	粗野主义建筑
+minimalist	Minimalist architecture	Arquitetura minimalista	Arquitetura minimalista	Arquitectura minimalista	Architecture minimaliste	Minimalistische Architektur	Architettura minimalista	ミニマリズム建築	미니멀리즘 건축	极简主义建筑
+highTech	High-tech architecture	Arquitetura high-tech	Arquitetura high-tech	Arquitectura high-tech	Architecture high-tech	High-Tech-Architektur	Architettura high-tech	ハイテク建築	하이테크 건축	高技派建筑
+organicArchitecture	Organic architecture	Arquitetura orgânica	Arquitetura orgânica	Arquitectura orgánica	Architecture organique	Organische Architektur	Architettura organica	有機的建築	유기적 건축	有机建筑
+greenArchitecture	Green architecture	Arquitetura verde	Arquitetura verde	Arquitectura verde	Architecture végétalisée	Begrünte Architektur	Architettura verde	緑化建築	녹색 건축	绿色建筑
+vernacular	Vernacular architecture	Arquitetura vernacular	Arquitetura vernacular	Arquitectura vernácula	Architecture vernaculaire	Ländliche Bauweise	Architettura vernacolare	民家・土着建築	토속 건축	乡土建筑
+halfTimbered	Half-timbered house	Casa enxaimel	Casa de enxaimel	Casa de entramado	Maison à colombages	Fachwerkhaus	Casa a graticcio	木骨造の家	목골조 주택	半木结构房屋
+islamicArchitecture	Islamic architecture	Arquitetura islâmica	Arquitetura islâmica	Arquitectura islámica	Architecture islamique	Islamische Architektur	Architettura islamica	イスラム建築	이슬람 건축	伊斯兰建筑
+asianTraditional	Traditional Asian architecture	Arquitetura tradicional asiática	Arquitetura tradicional asiática	Arquitectura tradicional asiática	Architecture asiatique traditionnelle	Traditionelle asiatische Architektur	Architettura tradizionale asiatica	アジアの伝統建築	아시아 전통 건축	亚洲传统建筑
+oldBuilding	Old building	Prédio antigo	Edifício antigo	Edificio antiguo	Vieux bâtiment	Altbau	Edificio vecchio	古い建物	오래된 건물	老建筑
+newBuilding	New building	Prédio novo	Edifício novo	Edificio nuevo	Bâtiment neuf	Neubau	Edificio nuovo	新しい建物	새 건물	新建筑
+vintage	Vintage	Retrô	Retro	Vintage	Vintage	Vintage	Vintage	レトロ	빈티지	复古
+classicInterior	Classic interior	Interior clássico	Interior clássico	Interior clásico	Intérieur classique	Klassisches Interieur	Interno classico	クラシックなインテリア	클래식 인테리어	古典室内
+stoneBuilding	Stone building	Construção em pedra	Construção em pedra	Edificio de piedra	Bâtiment en pierre	Steinbau	Edificio in pietra	石造りの建物	석조 건물	石头建筑
+brickBuilding	Brick building	Tijolo aparente	Tijolo à vista	Ladrillo visto	Bâtiment en briques	Backsteinbau	Edificio in mattoni	レンガ造りの建物	벽돌 건물	砖砌建筑
+woodenHouse	Wooden house	Casa de madeira	Casa de madeira	Casa de madera	Maison en bois	Holzhaus	Casa di legno	木造の家	목조 주택	木屋
+timberStructure	Timber structure	Estrutura de madeira	Estrutura de madeira	Estructura de madera	Charpente en bois	Holzkonstruktion	Struttura in legno	木造架構	목구조	木结构
+concreteStructure	Concrete structure	Estrutura de concreto	Estrutura de betão	Estructura de hormigón	Structure en béton	Betonkonstruktion	Struttura in cemento	コンクリート構造	콘크리트 구조	混凝土结构
+steelStructure	Steel structure	Estrutura metálica	Estrutura metálica	Estructura metálica	Structure métallique	Stahlkonstruktion	Struttura in acciaio	鉄骨構造	철골 구조	钢结构
+glassFacade	Glass facade	Fachada de vidro	Fachada de vidro	Fachada de vidrio	Façade vitrée	Glasfassade	Facciata in vetro	ガラスのファサード	유리 외벽	玻璃幕墙
+earthBuilding	Earth building	Construção com terra	Construção em terra	Construcción de tierra	Construction en terre	Lehmbau	Costruzione in terra cruda	土の建築	흙 건축	生土建筑
+bambooStructure	Bamboo structure	Estrutura de bambu	Estrutura de bambu	Estructura de bambú	Structure en bambou	Bambuskonstruktion	Struttura in bambù	竹の構造物	대나무 구조물	竹结构
+thatchedRoof	Thatched roof	Telhado de palha	Telhado de colmo	Techo de paja	Toit de chaume	Reetdach	Tetto di paglia	茅葺き屋根	초가지붕	茅草屋顶
+tiles	Decorative tiles	Azulejos	Azulejos	Azulejos	Carreaux décoratifs	Fliesen	Piastrelle decorative	装飾タイル	장식 타일	装饰瓷砖
+breezeBlocks	Breeze blocks	Cobogó	Blocos vazados	Celosía de bloques	Claustra	Lochziegelwand	Blocchi traforati	透かしブロック	장식 블록 벽	镂空砖墙
+stainedGlass	Stained glass	Vitral	Vitral	Vidriera	Vitrail	Buntglasfenster	Vetrata	ステンドグラス	스테인드글라스	彩色玻璃窗
+mosaic	Mosaic	Mosaico	Mosaico	Mosaico	Mosaïque	Mosaik	Mosaico	モザイク	모자이크	马赛克
+arches	Arches	Arcos	Arcos	Arcos	Arcs	Bögen	Archi	アーチ	아치	拱门
+columns	Columns	Colunas	Colunas	Columnas	Colonnes	Säulen	Colonne	列柱	기둥	柱廊
+dome	Dome	Cúpula	Cúpula	Cúpula	Coupole	Kuppel	Cupola	ドーム	돔	穹顶
+vaults	Vaulted ceilings	Abóbadas	Abóbadas	Bóvedas	Voûtes	Gewölbe	Volte	ヴォールト天井	볼트 천장	拱顶
+belltower	Bell tower	Torre sineira	Torre sineira	Campanario	Clocher	Glockenturm	Campanile	鐘楼	종탑	钟楼
+balcony	Balcony	Sacada	Varanda	Balcón	Balcon	Balkon	Balcone	バルコニー	발코니	阳台
+porch	Porch	Varanda	Alpendre	Porche	Porche	Veranda	Portico	ポーチ	현관 포치	门廊
+courtyard	Courtyard	Pátio interno	Pátio interior	Patio interior	Cour intérieure	Innenhof	Cortile interno	中庭	안뜰	庭院
+gate	Gate	Portão	Portão	Portón	Portail	Tor	Cancello	門	대문	大门
+windows	Windows	Janelas	Janelas	Ventanas	Fenêtres	Fenster	Finestre	窓	창문	窗户
+doors	Doors	Portas	Portas	Puertas	Portes	Türen	Porte	ドア	문	门
+spiralStair	Spiral staircase	Escada caracol	Escada em caracol	Escalera de caracol	Escalier en colimaçon	Wendeltreppe	Scala a chiocciola	らせん階段	나선형 계단	旋转楼梯
+roof	Roof	Telhado	Telhado	Tejado	Toit	Dach	Tetto	屋根	지붕	屋顶
+pergola	Pergola	Pergolado	Pérgola	Pérgola	Pergola	Pergola	Pergolato	パーゴラ	퍼걸러	藤架
+ceiling	Ceiling	Teto	Teto	Techo	Plafond	Decke	Soffitto	天井	천장	天花板
+floorTiles	Tiled floor	Piso de ladrilho	Chão de mosaico	Suelo de baldosas	Carrelage au sol	Fliesenboden	Pavimento a piastrelle	タイルの床	타일 바닥	地砖
+house	House	Casa	Casa	Casa	Maison	Haus	Casa	家	주택	房子
+townhouse	Townhouse	Sobrado	Moradia em banda	Casa adosada	Maison de ville	Reihenhaus	Villetta a schiera	タウンハウス	타운하우스	联排别墅
+farmhouse	Farmhouse	Casa de fazenda	Casa de campo	Casa de campo	Ferme	Bauernhaus	Casale	農家	농가	农舍
+chalet	Chalet or cabin	Chalé	Chalé	Cabaña	Chalet	Hütte	Baita	山小屋	산장	小木屋
+beachHouse	Beach house	Casa de praia	Casa de praia	Casa de playa	Maison de plage	Strandhaus	Casa al mare	ビーチハウス	해변 별장	海滨别墅
+mansion	Mansion	Mansão	Mansão	Mansión	Manoir	Villa	Villa	豪邸	저택	豪宅
+apartmentBuilding	Apartment building	Prédio residencial	Prédio de apartamentos	Edificio de viviendas	Immeuble	Wohnhaus	Condominio	マンション	아파트	公寓楼
+skyscraper	Skyscraper	Arranha-céu	Arranha-céus	Rascacielos	Gratte-ciel	Wolkenkratzer	Grattacielo	超高層ビル	마천루	摩天大楼
+officeTower	Office tower	Prédio comercial	Torre de escritórios	Torre de oficinas	Tour de bureaux	Bürohochhaus	Torre per uffici	オフィスビル	오피스 빌딩	写字楼
+barn	Barn	Galpão	Celeiro	Granero	Grange	Scheune	Fienile	納屋	헛간	谷仓
+silo	Silos	Silos	Silos	Silos	Silos	Silos	Silos	サイロ	사일로	筒仓
+windmill	Windmill	Moinho de vento	Moinho de vento	Molino de viento	Moulin à vent	Windmühle	Mulino a vento	風車	풍차	风车
+fortress	Fortress	Fortaleza	Fortaleza	Fortaleza	Forteresse	Festung	Fortezza	要塞	요새	要塞
+aqueduct	Aqueduct	Aqueduto	Aqueduto	Acueducto	Aqueduc	Aquädukt	Acquedotto	水道橋	수로교	渡槽
+tower	Tower	Torre	Torre	Torre	Tour	Turm	Torre	塔	탑	塔
+bandstand	Bandstand	Coreto	Coreto	Quiosco de música	Kiosque à musique	Musikpavillon	Gazebo	あずまや	정자	凉亭
+fountain	Fountain	Chafariz	Fonte	Fuente	Fontaine	Brunnen	Fontana	噴水	분수	喷泉
+historicCemetery	Historic cemetery	Cemitério histórico	Cemitério histórico	Cementerio histórico	Cimetière historique	Historischer Friedhof	Cimitero monumentale	歴史ある墓地	역사적인 묘지	历史墓园
+shoppingMall	Shopping mall	Shopping	Centro comercial	Centro comercial	Centre commercial	Einkaufszentrum	Centro commerciale	ショッピングモール	쇼핑몰	购物中心
+supermarket	Supermarket	Supermercado	Supermercado	Supermercado	Supermarché	Supermarkt	Supermercato	スーパー	슈퍼마켓	超市
+gasStation	Gas station	Posto de gasolina	Bomba de gasolina	Gasolinera	Station-service	Tankstelle	Distributore di benzina	ガソリンスタンド	주유소	加油站
+parking	Parking	Estacionamento	Parque de estacionamento	Aparcamiento	Parking	Parkplatz	Parcheggio	駐車場	주차장	停车场
+historicCenter	Historic center	Centro histórico	Centro histórico	Casco antiguo	Vieille ville	Altstadt	Centro storico	旧市街	구시가지	历史老城
+cobblestone	Cobblestone street	Rua de paralelepípedos	Calçada de pedra	Calle empedrada	Rue pavée	Kopfsteinpflaster	Strada lastricata	石畳の道	자갈길	鹅卵石街道
+alley	Alley	Beco	Beco	Callejón	Ruelle	Gasse	Vicolo	路地	골목	小巷
+avenue	Avenue	Avenida	Avenida	Avenida	Avenue	Allee	Viale	大通り	대로	大道
+waterfront	Waterfront	Orla	Marginal	Paseo marítimo	Front de mer	Uferpromenade	Lungomare	ウォーターフロント	수변 산책로	滨水区
+rooftop	Rooftop	Terraço	Terraço	Azotea	Toit-terrasse	Dachterrasse	Terrazza panoramica	屋上	옥상	屋顶露台
+neighborhood	Neighborhood	Bairro	Bairro	Barrio	Quartier	Wohnviertel	Quartiere	住宅街	동네	街区
+traffic	Traffic	Trânsito	Trânsito	Tráfico	Circulation	Verkehr	Traffico	交通渋滞	교통	交通
+citySquareEvent	Event in a square	Evento na praça	Evento na praça	Evento en la plaza	Événement sur une place	Veranstaltung auf dem Platz	Evento in piazza	広場のイベント	광장 행사	广场活动
+botanicalGarden	Botanical garden	Jardim botânico	Jardim botânico	Jardín botánico	Jardin botanique	Botanischer Garten	Orto botanico	植物園	식물원	植物园
+aquarium	Aquarium	Aquário	Aquário	Acuario	Aquarium	Aquarium	Acquario	水族館	수족관	水族馆
+planetarium	Planetarium	Planetário	Planetário	Planetario	Planétarium	Planetarium	Planetario	プラネタリウム	천문관	天文馆
+craftFair	Craft fair	Feira de artesanato	Feira de artesanato	Feria de artesanía	Marché artisanal	Kunsthandwerkermarkt	Mercatino dell'artigianato	手作り市	공예 장터	手工艺集市
+hotSprings	Hot springs	Termas	Termas	Aguas termales	Sources chaudes	Thermalquellen	Terme	温泉	온천	温泉
+skiResort	Ski resort	Estação de esqui	Estância de esqui	Estación de esquí	Station de ski	Skigebiet	Stazione sciistica	スキー場	스키장	滑雪场
+touristTrain	Tourist train	Trem turístico	Comboio turístico	Tren turístico	Train touristique	Touristenzug	Treno turistico	観光列車	관광 열차	观光火车
+guidedTour	Guided tour	Visita guiada	Visita guiada	Visita guiada	Visite guidée	Führung	Visita guidata	ガイドツアー	가이드 투어	导览游
+souvenirShop	Souvenir shop	Loja de lembranças	Loja de recordações	Tienda de recuerdos	Boutique de souvenirs	Souvenirladen	Negozio di souvenir	お土産屋	기념품 가게	纪念品店
+observationDeck	Observation deck	Mirante panorâmico	Miradouro panorâmico	Mirador panorámico	Plateforme d'observation	Aussichtsplattform	Osservatorio panoramico	展望デッキ	전망 데크	观景平台
+themePark	Theme park	Parque temático	Parque temático	Parque temático	Parc à thème	Themenpark	Parco a tema	テーマパーク	테마파크	主题公园
+heritageSite	World Heritage site	Patrimônio da humanidade	Património da humanidade	Patrimonio de la humanidad	Site du patrimoine mondial	Welterbestätte	Patrimonio dell'umanità	世界遺産	세계 유산	世界遗产
+livingRoom	Living room	Sala de estar	Sala de estar	Salón	Salon	Wohnzimmer	Soggiorno	リビング	거실	客厅
+bedroom	Bedroom	Quarto	Quarto	Dormitorio	Chambre	Schlafzimmer	Camera da letto	寝室	침실	卧室
+diningRoom	Dining room	Sala de jantar	Sala de jantar	Comedor	Salle à manger	Esszimmer	Sala da pranzo	ダイニング	식당	餐厅（家）
+homeOffice	Home office	Escritório em casa	Escritório em casa	Despacho en casa	Bureau à domicile	Arbeitszimmer	Studio in casa	書斎	홈 오피스	家庭办公室
+kidsRoom	Kids' room	Quarto de criança	Quarto de criança	Habitación infantil	Chambre d'enfant	Kinderzimmer	Cameretta	子ども部屋	아이 방	儿童房
+laundry	Laundry room	Lavanderia	Lavandaria	Lavadero	Buanderie	Waschküche	Lavanderia	ランドリールーム	세탁실	洗衣房
+homeGarage	Garage	Garagem	Garagem	Garaje	Garage	Garage	Garage	ガレージ	차고	车库
+closet	Walk-in closet	Closet	Closet	Vestidor	Dressing	Ankleidezimmer	Cabina armadio	ウォークインクローゼット	드레스룸	衣帽间
+sofa	Sofa	Sofá	Sofá	Sofá	Canapé	Sofa	Divano	ソファ	소파	沙发
+designChair	Design chair	Cadeira de design	Cadeira de design	Silla de diseño	Chaise design	Designerstuhl	Sedia di design	デザインチェア	디자인 의자	设计椅
+diningTable	Dining table	Mesa de jantar	Mesa de jantar	Mesa de comedor	Table à manger	Esstisch	Tavolo da pranzo	ダイニングテーブル	식탁	餐桌
+bed	Bed	Cama	Cama	Cama	Lit	Bett	Letto	ベッド	침대	床
+wardrobe	Wardrobe	Guarda-roupa	Roupeiro	Armario	Armoire	Kleiderschrank	Armadio	ワードローブ	옷장	衣柜
+bookshelf	Bookshelf	Estante de livros	Estante	Estantería	Bibliothèque (meuble)	Bücherregal	Libreria	本棚	책장	书架
+antiqueFurniture	Antique furniture	Móveis antigos	Móveis antigos	Muebles antiguos	Meubles anciens	Antike Möbel	Mobili antichi	アンティーク家具	앤티크 가구	古董家具
+woodworking	Woodworking	Marcenaria	Carpintaria	Carpintería	Menuiserie	Tischlerei	Falegnameria	木工	목공	木工
+furnitureDesign	Furniture design	Design de móveis	Design de mobiliário	Diseño de muebles	Design de mobilier	Möbeldesign	Design d'arredo	家具デザイン	가구 디자인	家具设计
+lamps	Lamps	Luminárias	Candeeiros	Lámparas	Luminaires	Lampen	Lampade	照明器具	조명	灯具
+rugs	Rugs	Tapetes	Tapetes	Alfombras	Tapis	Teppiche	Tappeti	ラグ	러그	地毯
+plannedKitchen	Fitted kitchen	Cozinha planejada	Cozinha equipada	Cocina a medida	Cuisine équipée	Einbauküche	Cucina componibile	システムキッチン	붙박이 주방	整体厨房
+outdoorFurniture	Outdoor furniture	Móveis de área externa	Móveis de exterior	Muebles de exterior	Mobilier de jardin	Gartenmöbel	Mobili da esterno	ガーデンファニチャー	야외 가구	户外家具
+furnitureRestoration	Furniture restoration	Restauração de móveis	Restauro de móveis	Restauración de muebles	Restauration de meubles	Möbelrestaurierung	Restauro di mobili	家具の修復	가구 복원	家具修复
+rusticInterior	Rustic interior	Interior rústico	Interior rústico	Interior rústico	Intérieur rustique	Rustikales Interieur	Interno rustico	素朴なインテリア	시골풍 인테리어	乡村风室内
+scandinavianInterior	Scandinavian interior	Interior escandinavo	Interior escandinavo	Interior escandinavo	Intérieur scandinave	Skandinavisches Interieur	Interno scandinavo	北欧風インテリア	북유럽 인테리어	北欧风室内
+industrialLoft	Industrial loft	Loft industrial	Loft industrial	Loft industrial	Loft industriel	Industrieloft	Loft industriale	インダストリアルロフト	인더스트리얼 로프트	工业风阁楼
+fireplace	Fireplace	Lareira	Lareira	Chimenea	Cheminée	Kamin	Camino	暖炉	벽난로	壁炉
+thesisDefense	Thesis defense	Defesa de TCC ou tese	Defesa de tese	Defensa de tesis	Soutenance de thèse	Verteidigung der Abschlussarbeit	Discussione della tesi	論文審査	논문 심사	论文答辩
+posterSession	Poster session	Sessão de pôsteres	Sessão de pósteres	Sesión de pósteres	Session de posters	Postersession	Sessione poster	ポスター発表	포스터 세션	海报展示
+freshmanWelcome	Freshman welcome	Recepção dos calouros	Praxe	Bienvenida a los novatos	Intégration des nouveaux étudiants	Erstsemesterbegrüßung	Accoglienza delle matricole	新入生歓迎	신입생 환영회	迎新活动
+lectureHall	Lecture hall	Auditório	Anfiteatro	Aula magna	Amphithéâtre	Hörsaal	Aula universitaria	大講義室	대강의실	阶梯教室
+technicalVisit	Technical visit	Visita técnica	Visita técnica	Visita técnica	Visite technique	Exkursion	Visita tecnica	現場見学	현장 견학	技术参观
+microscope	Microscope	Microscópio	Microscópio	Microscopio	Microscope	Mikroskop	Microscopio	顕微鏡	현미경	显微镜
+chemistryLab	Chemistry lab	Laboratório de química	Laboratório de química	Laboratorio de química	Laboratoire de chimie	Chemielabor	Laboratorio di chimica	化学実験室	화학 실험실	化学实验室
+physicsExperiment	Physics experiment	Experimento de física	Experiência de física	Experimento de física	Expérience de physique	Physikexperiment	Esperimento di fisica	物理実験	물리 실험	物理实验
+robotics	Robotics	Robótica	Robótica	Robótica	Robotique	Robotik	Robotica	ロボット	로봇	机器人
+electronicsBench	Electronics workbench	Bancada de eletrônica	Bancada de eletrónica	Banco de electrónica	Établi d'électronique	Elektronik-Werkbank	Banco di elettronica	電子工作	전자 작업대	电子工作台
+programming	Programming	Programação	Programação	Programación	Programmation	Programmieren	Programmazione	プログラミング	프로그래밍	编程
+serverRoom	Server room	Sala de servidores	Sala de servidores	Sala de servidores	Salle des serveurs	Serverraum	Sala server	サーバールーム	서버실	机房
+printing3d	3D printing	Impressão 3D	Impressão 3D	Impresión 3D	Impression 3D	3D-Druck	Stampa 3D	3Dプリント	3D 프린팅	3D打印
+prototype	Prototype	Protótipo	Protótipo	Prototipo	Prototype	Prototyp	Prototipo	試作品	시제품	原型
+telescope	Telescope	Telescópio	Telescópio	Telescopio	Télescope	Teleskop	Telescopio	望遠鏡	망원경	望远镜
+weatherStation	Weather station	Estação meteorológica	Estação meteorológica	Estación meteorológica	Station météo	Wetterstation	Stazione meteorologica	気象観測所	기상 관측소	气象站
+surveying	Surveying	Topografia	Topografia	Topografía	Topographie	Vermessung	Rilievo topografico	測量	측량	测绘
+herbarium	Herbarium	Herbário	Herbário	Herbario	Herbier	Herbarium	Erbario	植物標本	식물 표본실	植物标本馆
+archive	Archive	Arquivo	Arquivo	Archivo	Archives	Archiv	Archivio	アーカイブ	기록 보관소	档案室
+oldDocuments	Old documents	Documentos antigos	Documentos antigos	Documentos antiguos	Documents anciens	Alte Dokumente	Documenti antichi	古文書	옛 문서	古籍文献
+kindergarten	Kindergarten	Educação infantil	Jardim de infância	Guardería	École maternelle	Kindergarten	Scuola materna	幼稚園	유치원	幼儿园
+schoolYard	School recess	Recreio	Recreio	Recreo	Récréation	Schulhof	Ricreazione	休み時間の校庭	운동장 쉬는 시간	课间操场
+signLanguage	Sign language	Libras	Língua gestual	Lengua de signos	Langue des signes	Gebärdensprache	Lingua dei segni	手話	수어	手语
+bookFair	Book fair	Feira do livro	Feira do livro	Feria del libro	Salon du livre	Buchmesse	Fiera del libro	ブックフェア	도서전	书展
+debate	Debate	Debate	Debate	Debate	Débat	Podiumsdiskussion	Dibattito	討論会	토론	辩论
+courtroom	Courtroom	Tribunal	Tribunal	Tribunal	Tribunal	Gerichtssaal	Tribunale	法廷	법정	法庭
+newsroom	Newsroom	Redação	Redação	Redacción	Salle de rédaction	Redaktion	Redazione	報道局	뉴스룸	新闻编辑室
+radioStudio	Radio studio	Estúdio de rádio	Estúdio de rádio	Estudio de radio	Studio de radio	Radiostudio	Studio radiofonico	ラジオスタジオ	라디오 스튜디오	广播室
+tvStudio	TV studio	Estúdio de TV	Estúdio de televisão	Plató de televisión	Plateau de télévision	Fernsehstudio	Studio televisivo	テレビスタジオ	TV 스튜디오	电视演播室
+podcast	Podcast	Podcast	Podcast	Pódcast	Podcast	Podcast	Podcast	ポッドキャスト	팟캐스트	播客
+filming	Filming	Filmagem	Filmagem	Rodaje	Tournage	Dreharbeiten	Riprese	撮影現場	촬영	拍摄现场
+recordingStudio	Recording studio	Estúdio de gravação	Estúdio de gravação	Estudio de grabación	Studio d'enregistrement	Tonstudio	Studio di registrazione	レコーディングスタジオ	녹음실	录音室
+musicLesson	Music lesson	Aula de música	Aula de música	Clase de música	Cours de musique	Musikunterricht	Lezione di musica	音楽レッスン	음악 수업	音乐课
+rehearsal	Rehearsal	Ensaio	Ensaio	Ensayo	Répétition	Probe	Prova	リハーサル	리허설	排练
+circus	Circus	Circo	Circo	Circo	Cirque	Zirkus	Circo	サーカス	서커스	马戏
+painting	Painting	Pintura	Pintura	Pintura	Peinture	Gemälde	Dipinto	絵画	그림	绘画
+artStudio	Art studio	Ateliê	Ateliê	Taller de arte	Atelier d'artiste	Atelier	Atelier	アトリエ	화실	画室
+ceramics	Ceramics	Cerâmica	Cerâmica	Cerámica	Céramique	Töpfern	Ceramica	陶芸	도예	陶艺
+sculpting	Sculpting	Escultura	Escultura	Escultura	Sculpture	Bildhauerei	Scultura	彫刻	조각	雕塑
+dentalClinic	Dental clinic	Dentista	Dentista	Dentista	Cabinet dentaire	Zahnarztpraxis	Studio dentistico	歯科医院	치과	牙科诊所
+pharmacy	Pharmacy	Farmácia	Farmácia	Farmacia	Pharmacie	Apotheke	Farmacia	薬局	약국	药店
+physiotherapy	Physiotherapy	Fisioterapia	Fisioterapia	Fisioterapia	Kinésithérapie	Physiotherapie	Fisioterapia	理学療法	물리치료	理疗
+operatingRoom	Operating room	Centro cirúrgico	Bloco operatório	Quirófano	Bloc opératoire	Operationssaal	Sala operatoria	手術室	수술실	手术室
+vaccination	Vaccination	Vacinação	Vacinação	Vacunación	Vaccination	Impfung	Vaccinazione	予防接種	예방 접종	接种疫苗
+ambulance	Ambulance	Ambulância	Ambulância	Ambulancia	Ambulance	Krankenwagen	Ambulanza	救急車	구급차	救护车
+babyUltrasound	Baby ultrasound	Ultrassom do bebê	Ecografia do bebé	Ecografía del bebé	Échographie du bébé	Ultraschallbild vom Baby	Ecografia del bambino	赤ちゃんのエコー写真	아기 초음파	宝宝B超
+bloodDonation	Blood donation	Doação de sangue	Dádiva de sangue	Donación de sangre	Don du sang	Blutspende	Donazione di sangue	献血	헌혈	献血
+vetClinic	Veterinary clinic	Veterinário	Veterinário	Veterinario	Clinique vétérinaire	Tierarztpraxis	Veterinario	動物病院	동물병원	宠物医院
+greenhouse	Greenhouse	Estufa	Estufa	Invernadero	Serre	Gewächshaus	Serra	温室	온실	温室
+cropTrials	Crop trials	Experimento agrícola	Ensaio agrícola	Ensayo de cultivos	Essais agronomiques	Feldversuch	Prova in campo	圃場試験	작물 시험포	作物试验田
+agriculturalFair	Agricultural fair	Exposição agropecuária	Feira agrícola	Feria agropecuaria	Salon agricole	Landwirtschaftsmesse	Fiera agricola	農業祭	농업 박람회	农业展
+dairyFarm	Dairy farm	Fazenda leiteira	Exploração leiteira	Granja lechera	Ferme laitière	Milchviehbetrieb	Azienda lattiero-casearia	酪農場	낙농장	奶牛场
+poultryFarm	Poultry farm	Granja de aves	Aviário	Granja avícola	Élevage de volailles	Geflügelfarm	Allevamento avicolo	養鶏場	양계장	养鸡场
+forestPlantation	Forest plantation	Reflorestamento	Floresta plantada	Plantación forestal	Plantation forestière	Forstplantage	Piantagione forestale	植林地	조림지	人工林
+logging	Logging	Madeira cortada	Exploração florestal	Tala de árboles	Exploitation forestière	Holzernte	Taglio del legname	伐採・木材	벌목	伐木
+treePlanting	Tree planting	Plantio de árvores	Plantação de árvores	Plantación de árboles	Plantation d'arbres	Baumpflanzung	Piantumazione di alberi	植樹	나무 심기	植树
+recycling	Recycling	Reciclagem	Reciclagem	Reciclaje	Recyclage	Recycling	Riciclaggio	リサイクル	재활용	回收利用
+waterTreatment	Water treatment plant	Estação de tratamento	Estação de tratamento	Planta de tratamiento	Station d'épuration	Kläranlage	Impianto di depurazione	浄水場	정수장	水处理厂
+flood	Flood	Enchente	Cheia	Inundación	Inondation	Hochwasser	Alluvione	洪水	홍수	洪水
+wildfire	Wildfire	Incêndio florestal	Incêndio florestal	Incendio forestal	Feu de forêt	Waldbrand	Incendio boschivo	山火事	산불	山火
+solarPanels	Solar panels	Painéis solares	Painéis solares	Paneles solares	Panneaux solaires	Solaranlage	Pannelli solari	ソーラーパネル	태양광 패널	太阳能板
+windTurbines	Wind turbines	Turbinas eólicas	Aerogeradores	Aerogeneradores	Éoliennes	Windräder	Pale eoliche	風力発電機	풍력 발전기	风力发电机
+powerLines	Power lines	Linhas de energia	Linhas elétricas	Tendido eléctrico	Lignes électriques	Stromleitungen	Linee elettriche	送電線	송전선	输电线
+antenna	Telecom tower	Torre de antenas	Torre de telecomunicações	Torre de antenas	Antenne-relais	Funkturm	Torre delle antenne	電波塔	통신탑	通信塔
+welding	Welding	Solda	Soldadura	Soldadura	Soudure	Schweißen	Saldatura	溶接	용접	焊接
+machining	Machining	Usinagem	Maquinagem	Mecanizado	Usinage	Zerspanung	Lavorazione meccanica	機械加工	기계 가공	机械加工
+warehouse	Warehouse	Armazém	Armazém	Almacén	Entrepôt	Lagerhalle	Magazzino	倉庫	창고	仓库
+containerPort	Container port	Porto de contêineres	Porto de contentores	Puerto de contenedores	Port à conteneurs	Containerhafen	Porto container	コンテナ港	컨테이너 항구	集装箱港口
+rocket	Rocket launch	Lançamento de foguete	Lançamento de foguetão	Lanzamiento de cohete	Lancement de fusée	Raketenstart	Lancio di razzo	ロケット打ち上げ	로켓 발사	火箭发射
+volunteering	Volunteering	Voluntariado	Voluntariado	Voluntariado	Bénévolat	Ehrenamt	Volontariato	ボランティア	자원봉사	志愿服务
+donationDrive	Donation drive	Campanha de doação	Campanha de recolha	Campaña de donación	Collecte de dons	Spendensammlung	Raccolta di donazioni	募金・寄付活動	기부 캠페인	募捐活动
+flags	Flags	Bandeiras	Bandeiras	Banderas	Drapeaux	Flaggen	Bandiere	国旗	국기	旗帜
+religiousProcession	Religious procession	Procissão	Procissão	Procesión	Procession	Prozession	Processione	宗教行列	종교 행렬	宗教游行
+blackWhite	Black and white	Preto e branco	Preto e branco	Blanco y negro	Noir et blanc	Schwarzweiß	Bianco e nero	モノクロ	흑백	黑白
+macro	Macro	Macro	Macro	Macro	Macro	Makro	Macro	マクロ	접사	微距
+longExposure	Long exposure	Longa exposição	Longa exposição	Larga exposición	Pose longue	Langzeitbelichtung	Lunga esposizione	長時間露光	장노출	长曝光
+panorama	Panorama	Panorama	Panorama	Panorámica	Panorama	Panorama	Panorama	パノラマ	파노라마	全景
+bokeh	Blurred background	Fundo desfocado	Fundo desfocado	Fondo desenfocado	Arrière-plan flou	Unscharfer Hintergrund	Sfondo sfocato	背景ボケ	배경 흐림	背景虚化
+backlight	Backlight	Contraluz	Contraluz	Contraluz	Contre-jour	Gegenlicht	Controluce	逆光	역광	逆光
+nightPhoto	Night photo	Foto noturna	Fotografia noturna	Foto nocturna	Photo de nuit	Nachtaufnahme	Foto notturna	夜景写真	야간 사진	夜景照片
+aerial	Aerial photo	Foto aérea	Fotografia aérea	Foto aérea	Photo aérienne	Luftaufnahme	Foto aerea	空撮	항공 사진	航拍
+hdr	HDR	HDR	HDR	HDR	HDR	HDR	HDR	HDR	HDR	HDR
+testShot	Test shot	Foto de teste	Fotografia de teste	Foto de prueba	Photo de test	Testaufnahme	Scatto di prova	テスト撮影	테스트 촬영	试拍
+blurry	Blurry	Tremida ou desfocada	Tremida ou desfocada	Movida o desenfocada	Floue	Unscharf	Mossa o sfocata	ぶれ・ピンぼけ	흔들림·초점 나감	模糊
+badExposure	Too dark or too bright	Escura ou clara demais	Demasiado escura ou clara	Demasiado oscura o clara	Trop sombre ou trop claire	Zu dunkel oder zu hell	Troppo scura o chiara	暗すぎ・明るすぎ	너무 어둡거나 밝음	过暗或过亮
+accidental	Accidental shot	Foto sem querer	Fotografia acidental	Foto accidental	Photo accidentelle	Versehentliche Aufnahme	Scatto accidentale	誤って撮った写真	실수로 찍은 사진	误拍

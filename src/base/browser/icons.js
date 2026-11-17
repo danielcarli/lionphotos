@@ -113,6 +113,8 @@ const paths = {
   history: '<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3L4.5 9"/><path d="M4.5 4.5V9H9"/><path d="M12 8v4.5l3 1.8"/>',
   hash: '<path d="M9.5 4l-2 16M16.5 4l-2 16M4.5 9h15M3.5 15h15"/>',
   globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.4 5.2 3.4 8.5s-1.1 6.1-3.4 8.5c-2.3-2.4-3.4-5.2-3.4-8.5s1.1-6.1 3.4-8.5z"/>',
+  // similar photos: one picture in front of another, slightly shifted
+  similar: '<rect x="8" y="3" width="13" height="13" rx="2.5"/><path d="M5 7.5a2.5 2.5 0 0 0-2 2.45V18.5A2.5 2.5 0 0 0 5.5 21H14a2.5 2.5 0 0 0 2.45-2"/><path d="M8 13l3.5-3.5 3 3L17 10l4 4"/>',
   // "To edit": a pencil, drawn alone (rename has lines of text beside it)
   pencil: '<path d="M15.2 4.8a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/><path d="M13.5 6.5l3 3"/>',
   pencilFilled: '<path d="M15.2 4.8a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z" fill="currentColor"/><path d="M13.5 6.5l3 3" style="stroke: var(--pin-cut, #fff)"/>',

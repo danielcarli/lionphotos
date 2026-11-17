@@ -11,7 +11,8 @@ import { h } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { formatBytes, formatDate, formatNumber } from '../../../base/common/format.js';
-import { adjustOf, dateOf, dayOf, editsOf, MARK } from '../../services/library/browser/libraryService.js';
+import { adjustOf, dateOf, dayOf, editsOf, KIND, MARK } from '../../services/library/browser/libraryService.js';
+import { showSimilar } from '../similar/similarView.js';
 import { showLabelsDialog } from '../labels/labelsDialog.js';
 import { addToAlbum, removeFromAlbum } from '../albums/albumDialogs.js';
 import { sphereSection } from '../labels/sphereSection.js';
@@ -101,14 +102,22 @@ export function nameLines(it, d) {
  * "Photos of the day": every photo of the day these were taken, in Photos — out of the album, the person or the
  * viewer they are being seen in (photos of one day only; not for the Limbo's). Null where it would change nothing.
  */
-export function dayLink({ library, layout }, items, { onLeave } = {}) {
+export function dayLink(s, items, { onLeave } = {}) {
+  const { library, layout } = s;
   const day = items.length && items.every((it) => (it.mark || 0) !== MARK.reject && dayOf(it) === dayOf(items[0])) ? dayOf(items[0]) : '';
-  if (!day || (library.filter.day === day && layout.activeView === 'photos' && !onLeave)) return null;
+  if (!day) return null;
+  const here = library.filter.day === day && layout.activeView === 'photos' && !onLeave;
   const others = library.allItems.filter((x) => (x.mark || 0) !== MARK.reject && dayOf(x) === day).length;
-  return h('button.link-button.ip-day', {
+  const all = here ? null : h('button.link-button.ip-day', {
     type: 'button', title: t('info.dayTitle', { day: formatDate(dateOf(items[0])) }),
     onclick: () => { onLeave?.(); library.showDay(items[0].id); layout.openView('photos'); },
   }, h('span', { html: icon('calendar', 12) }), t('info.dayAll'), h('span.ip-day-n', formatNumber(others)));
+  // the similar photos of that day: to keep the best of each sequence
+  const similar = others > 1 && items.every((it) => it.kind === KIND.image) ? h('button.link-button.ip-day.ip-similar', {
+    type: 'button', title: t('similar.linkTitle'),
+    onclick: () => { onLeave?.(); showSimilar(s.services || s, day); },
+  }, h('span', { html: icon('similar', 12) }), t('similar.link')) : null;
+  return all || similar ? h('div.ip-day-row', all, similar) : null;
 }
 
 export function organizeSection(s, items, { title, onLeave } = {}) {

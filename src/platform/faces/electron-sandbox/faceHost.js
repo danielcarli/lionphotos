@@ -19,6 +19,7 @@ import { decodePicture, uprightCanvas } from '../../thumbs/electron-sandbox/deco
 import { fitInside } from '../../thumbs/electron-sandbox/thumbEncode.js';
 import { loadPetModels, findPets } from './petDetector.js';
 import { readScene } from './sceneDetector.js';
+import { loadContentModel, readContent } from './contentModel.js';
 
 const MODE = ({ pet: 'pet', scene: 'scene' })[new URLSearchParams(location.search).get('mode')] || 'face';
 
@@ -33,6 +34,7 @@ const MODELS = new URL('./vendor/face-api/model', import.meta.url).pathname;
 let ready = null;
 let backend = null;
 let webglError = null;
+let content = null;         // the content model (scenes): its id, or why it could not start
 
 /** The graphics card WebGL draws with, as the browser reports it (for the log and the "not supported" detail). */
 function rendererName() {
@@ -54,7 +56,11 @@ function setup() {
         if (b === 'webgl') webglError = 'WebGL backend could not start';
       } catch (err) { if (b === 'webgl') webglError = String(err?.message || err); }
     }
-    if (MODE === 'pet' || MODE === 'scene') {
+    if (MODE === 'scene') {
+      await loadPetModels();
+      // what the photos show, for the search: on the processor, so a problem here never stops the rest
+      content = await loadContentModel().then((m) => (m ? { id: m.manifest.id, threads: self.crossOriginIsolated } : null), (err) => ({ error: String(err?.message || err) }));
+    } else if (MODE === 'pet') {
       await loadPetModels();
     } else {
       await faceapi.nets.ssdMobilenetv1.loadFromUri(MODELS);
@@ -97,7 +103,9 @@ async function facesJob(job) {
     const picture = await decodePicture(job);
     const { canvas } = await uprightCanvas(picture, MODE === 'scene' ? Math.min(MAX, job.max || MAX) : MAX, fitInside);
     if (MODE === 'scene') {
-      host.done({ jobId: job.jobId, ok: true, scene: await readScene(canvas), backend });
+      const scene = job.scene === false ? null : await readScene(canvas);
+      const seen = job.content && content?.id ? await readContent(canvas).catch((err) => ({ error: String(err?.message || err) })) : null;
+      host.done({ jobId: job.jobId, ok: true, scene, content: seen, backend });
       return;
     }
     if (MODE === 'pet') {
@@ -139,4 +147,4 @@ async function facesJob(job) {
 }
 
 host.onJob((job) => facesJob(job));
-setup().then((b) => host.ready({ backend: b, renderer: rendererName(), webglError }), (err) => host.ready({ error: String(err?.message || err), backend, renderer: rendererName(), webglError }));
+setup().then((b) => host.ready({ backend: b, renderer: rendererName(), webglError, content }), (err) => host.ready({ error: String(err?.message || err), backend, renderer: rendererName(), webglError }));

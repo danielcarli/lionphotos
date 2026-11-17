@@ -1,6 +1,6 @@
 {
   "name": "lionphotos",
-  "version": "1.59.0",
+  "version": "1.59.1",
   "description": "LionPhotos — fast photo & video browser and organizer. Browse folders of pictures and videos as small cached thumbnails, regenerated only when a file changes, and organize them safely.",
   "main": "src/code/electron-main/main.js",
   "desktopName": "lionphotos.desktop",
@@ -70,7 +70,17 @@
       "icon": "build/icon.ico",
       "executableName": "LionPhotos",
       "legalTrademarks": "LionPhotos",
-      "artifactName": "LionPhotos-win-${arch}.${ext}"
+      "artifactName": "LionPhotos-win-${arch}.${ext}",
+      "extraFiles": [
+        {
+          "from": "LICENSE",
+          "to": "LICENSE.txt"
+        },
+        {
+          "from": "THIRD-PARTY-NOTICES.md",
+          "to": "THIRD-PARTY-NOTICES.md"
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,
@@ -119,7 +129,17 @@
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "artifactName": "LionPhotos-mac-${arch}.${ext}",
-      "identity": "-"
+      "identity": "-",
+      "extraResources": [
+        {
+          "from": "LICENSE",
+          "to": "LICENSE.txt"
+        },
+        {
+          "from": "THIRD-PARTY-NOTICES.md",
+          "to": "THIRD-PARTY-NOTICES.md"
+        }
+      ]
     },
     "dmg": {
       "title": "LionPhotos ${version}"
@@ -146,7 +166,17 @@
           "StartupWMClass": "LionPhotos"
         }
       },
-      "artifactName": "LionPhotos-${version}-linux-${arch}.${ext}"
+      "artifactName": "LionPhotos-${version}-linux-${arch}.${ext}",
+      "extraFiles": [
+        {
+          "from": "LICENSE",
+          "to": "LICENSE.txt"
+        },
+        {
+          "from": "THIRD-PARTY-NOTICES.md",
+          "to": "THIRD-PARTY-NOTICES.md"
+        }
+      ]
     },
     "deb": {
       "artifactName": "lionphotos_${arch}.${ext}"
@@ -168,16 +198,6 @@
       "zh-CN",
       "ja",
       "ko"
-    ],
-    "extraFiles": [
-      {
-        "from": "LICENSE",
-        "to": "LICENSE.txt"
-      },
-      {
-        "from": "THIRD-PARTY-NOTICES.md",
-        "to": "THIRD-PARTY-NOTICES.md"
-      }
     ]
   },
   "keywords": [

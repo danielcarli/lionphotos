@@ -2,6 +2,11 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.59.1] — 2026-11-17
+
+### Fixed
+- **The macOS package could not be built** (since 1.54.0): the licence and the third-party notices, put beside the program on Windows and Linux, landed inside the Mac app's `Contents/` folder, next to its code, where `codesign` refuses any file ("code object is not signed at all"). On macOS they now go in `Contents/Resources/`; Windows and Linux keep them beside the program.
+
 ## [1.59.0] — 2026-11-17
 
 ### Added

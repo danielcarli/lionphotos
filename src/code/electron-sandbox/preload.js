@@ -19,7 +19,7 @@ function recognizer(ch) {
   const on = (name) => (cb) => { const l = (_e, s) => cb(s); ipcRenderer.on(`${ch}:${name}`, l); return () => ipcRenderer.removeListener(`${ch}:${name}`, l); };
   return {
     state: call('state'), start: call('start'), auto: call('auto'), pending: call('pending'), pause: call('pause'), resume: call('resume'), stop: call('stop'), retry: call('retry'), gpuBoost: call('gpuBoost'),
-    overview: call('overview'), person: call('person'), group: call('group'), ignored: call('ignored'), ofMedia: call('ofMedia'),
+    overview: call('overview'), person: call('person'), group: call('group'), ignored: call('ignored'), ofMedia: call('ofMedia'), of: call('of'), lookAt: call('lookAt'),
     assign: call('assign'), reject: call('reject'), ignore: call('ignore'), unignore: call('unignore'),
     onProgress: on('progress'), onChanged: on('changed'),
   };
@@ -65,6 +65,11 @@ contextBridge.exposeInMainWorld('host', {
     describe: (ids, patch) => ipcRenderer.invoke('library:describe', ids, patch),
     roots: () => ipcRenderer.invoke('library:roots'),
     hideRoot: (rootPath, hidden) => ipcRenderer.invoke('library:hideRoot', rootPath, hidden),
+    similarChoices: () => ipcRenderer.invoke('library:similarChoices'),
+    similarFeatures: (ids) => ipcRenderer.invoke('library:similarFeatures', ids),
+    saveSimilarFeatures: (rows) => ipcRenderer.invoke('library:saveSimilarFeatures', rows),
+    similarApart: (pairs, apart) => ipcRenderer.invoke('library:similarApart', pairs, apart),
+    similarBest: (id, group) => ipcRenderer.invoke('library:similarBest', id, group),
     onProgress: on('library:progress'),
   },
 

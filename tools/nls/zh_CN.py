@@ -537,3 +537,15 @@ _merge(MESSAGES, {'similar': {'button': '相似照片', 'more': {'one': '显示�
 _merge(MESSAGES, {'sidebar': {'forget': '从此列表中移除（相册和标记仍会保留）', 'forgotten': '已将 {folder} 从之前打开的文件夹列表中移除。目录仍保留：再次打开，一切都在。', 'forgetUndone': '{folder} 已回到列表。'}})
 
 _merge(MESSAGES, {'compare': {'onLeft': '左', 'onRight': '右', 'strip': '正在比较的照片', 'stripHint': '点击以在标记的一侧显示', 'count': {'one': '{count} 张照片', 'other': '{count} 张照片中每次显示 2 张'}}})
+
+_merge(MESSAGES, {'similar': {'count': {'one': '{count} 张照片', 'other': '{count} 张照片'}, 'countTitle': '此组的照片数量', 'notOne': '不属于同一组', 'notOneTitle': '这些照片不属于同一组（例如构图相似但人物不同）：之后不会再归为一组', 'photoMenu': '此照片的更多操作', 'setBest': '设为最佳', 'keepOnly': {'one': '只保留这张：另一张移到待删区', 'other': '只保留这张：其余 {count} 张移到待删区'}, 'takeOut': '移出此组', 'compareThis': '并排比较', 'takenOut': '{name} 已移出此组，之后不会再与这些照片归为一组。', 'notOneDone': {'one': '这张照片已不在任何组中。', 'other': '这 {count} 张照片已不再是一组，之后不会再归为一组。'}}})
+
+_merge(MESSAGES, {'similar': {'whoUnknownTitle': '尚未在这张照片中查找人物：正在查找', 'whoUnknown': '正在查找人物…', 'whoNone': '没有人物', 'faceNamed': '{name} — 点击更改', 'faceName': {'person': '这是谁？', 'pet': '这是哪只宠物？'}, 'eyebrowPerson': '人物', 'eyebrowPet': '宠物', 'faceLabel': '名字', 'faceSave': '保存', 'faceSaved': '已保存 {name}：这张脸现在在“人物”中。', 'stack': '将相似照片分组', 'stackTitle': '将每组相似照片显示为一张（最佳的那张），并显示张数（点击数字打开该组）', 'stackReading': '正在读取照片以进行分组', 'stackOpen': {'one': '{count} 张相似照片的组', 'other': '{count} 张相似照片的组'}, 'stackBadge': {'one': '{count} 张相似照片：打开该组', 'other': '{count} 张相似照片：打开该组'}}, 'compare': {'more': '此照片的更多操作', 'keepTitle': '保留，或移到待删区（空格键）', 'stays': '保留', 'goes': '移到待删区', 'hintKeep': '空格：保留或移走 · ← → 组内其他照片 · Tab 切换左右 · 滚轮同时缩放'}, 'carry': {'labels': '相册和人物', 'mark': '标记', 'stays': '保留', 'field': '字段', 'inKept': '保留的照片', 'inGoing': '移走的照片', 'empty': '空', 'from': '来自 {name}', 'apply': '带上并继续', 'skip': '不带上，继续', 'title': {'one': '移走的照片有 {count} 项保留的照片没有的信息', 'other': '移走的照片有 {count} 项保留的照片没有的信息'}, 'message': '勾选要带到保留照片上的内容（写入目录，可撤销）。已预先勾选更完整或更新的内容。'}})
+
+_merge(MESSAGES, {'similar': {'statusReading': '正在读取照片以分组：{done} / {total}', 'statusFaces': '正在查找人脸：{done} / {total} 张 — 人物不同的组会分开', 'statusPaused': '已暂停', 'statusDone': '{groups} · {photos} 张中有 {grouped} 张在组中（每组显示最佳的一张）', 'statusGroups': {'one': '{count} 组相似照片', 'other': '{count} 组相似照片'}, 'statusNone': '所显示的 {photos} 张照片中没有相似照片'}})
+
+_merge(MESSAGES, {'similar': {'statusFromCatalog': {'one': '{count} 张照片的人脸来自目录（已分析）', 'other': '{count} 张照片的人脸来自目录（已分析）'}}})
+
+_merge(MESSAGES, {'similar': {'only': '只看分组的', 'onlyTitle': '只显示相似照片组（每组显示最佳的一张），不显示单独的照片'}})
+
+_merge(MESSAGES, {'photos': {'kind': {'grouped': '分组的照片'}}})

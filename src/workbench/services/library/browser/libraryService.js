@@ -705,8 +705,17 @@ export class LibraryService {
     else if (sort === 'size') list.sort((a, b) => b.size - a.size);
     else if (sort === 'dateAsc') list.sort((a, b) => dateOf(a) - dateOf(b));
     else list.sort((a, b) => dateOf(b) - dateOf(a));
-    this.#views.set(scope, list);
-    return list;
+    this.#views.set(`${scope}:all`, list);
+    // "Group similar photos" (Photos): each group shown as its best photo (similarService.js)
+    const shown = scope === 'main' && this.stacks?.active ? this.stacks.collapse(list) : list;
+    this.#views.set(scope, shown);
+    return shown;
+  }
+
+  /** Every item of a view, those grouped behind another (similar photos) too. */
+  viewAll(scope = 'main') {
+    this.view(scope);
+    return this.#views.get(`${scope}:all`);
   }
 
   /** Personal or professional, as chosen in the title bar (every item when nothing is chosen). */

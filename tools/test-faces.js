@@ -84,5 +84,25 @@ check(biaFaces.every((x) => idx.get(x.id).personId === null), 'deleting a person
   check(more[0].personId === 500 && more[0].status === STATUS.suggested, 'pets: a new photo of a named pet gets a suggestion');
 }
 
+// the other file of the same shot already looked at (raw + JPEG): its faces are taken, not looked for again
+{
+  const os = require('os'), fs = require('fs'), path = require('path');
+  const { LibraryDatabase } = require('../src/platform/library/node/libraryDatabase');
+  const dbf = new LibraryDatabase(path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'lionphotos-twin-')), 'l.sqlite'));
+  const { rootId, seq } = dbf.beginScan('/c');
+  const rec = (name, ext) => ({ path: `/c/2024/${name}`, folder: '2024', name, ext, kind: 1, size: 100, mtime: 5 });
+  dbf.recordBatch(rootId, seq, [rec('IMG_1.JPG', 'jpg'), rec('IMG_1.CR3', 'cr3'), rec('IMG_10.CR3', 'cr3'), rec('IMG_1-Edit.jpg', 'jpg')]);
+  const byName = (n) => dbf.db.prepare('SELECT * FROM media WHERE name = ?').get(n);
+  const isRaw = (ext) => ext === 'cr3';
+  const jpg = byName('IMG_1.JPG');
+  dbf.saveFaces(jpg.id, 100, 5, [{ x: 0.1, y: 0.1, w: 0.2, h: 0.2, score: 0.9, descriptor: blob(faceOf(ana)), crop: null }]);
+  const fromRaw = dbf.facesOfTwin(byName('IMG_1.CR3'), 'face', isRaw);
+  check(fromRaw?.length === 1 && fromRaw[0].w === 0.2, 'the raw file of a JPEG already looked at takes its faces (not looked at again)');
+  check(dbf.facesOfTwin(byName('IMG_10.CR3'), 'face', isRaw) === null && dbf.facesOfTwin(byName('IMG_1-Edit.jpg'), 'face', isRaw) === null, 'another photo, or an edited copy, is looked at on its own');
+  dbf.db.prepare('UPDATE media SET mtime = 6 WHERE id = ?').run(jpg.id);
+  check(dbf.facesOfTwin(byName('IMG_1.CR3'), 'face', isRaw) === null, 'a JPEG changed since it was looked at is not used');
+  dbf.close?.();
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');
 process.exit(failures ? 1 : 0);

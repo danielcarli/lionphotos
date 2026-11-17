@@ -128,8 +128,18 @@ export class SidebarPart {
 
   /** A folder off the list of folders opened before, with an undo. */
   async #forget(folder) {
+    const mark = (hidden) => { const r = this.#roots?.find((x) => x.path === folder); if (r) r.hidden = hidden ? 1 : 0; };
+    mark(true);
     await this.host.library.hideRoot(folder, true).catch(() => false);
-    this.notifications.info(t('sidebar.forgotten', { folder }), 8000, { label: t('ops.undo'), run: () => this.host.library.hideRoot(folder, false).then(() => this.notifications.info(t('sidebar.forgetUndone', { folder }), 3000)) });
+    this.notifications.info(t('sidebar.forgotten', { folder }), 8000, { label: t('ops.undo'), run: () => { mark(false); return this.host.library.hideRoot(folder, false).then(() => this.notifications.info(t('sidebar.forgetUndone', { folder }), 3000)); } });
+  }
+
+  // the folders opened before, as last read: the menu opens at once with them and they are read again behind it
+  #roots = null;
+  #readRoots() {
+    const p = this.host.library.roots().then((rows) => { this.#roots = rows; return rows; });
+    p.catch(() => {});
+    return p;
   }
 
   // where the open collection is (asked once per folder; the button is drawn again when it is known)
@@ -139,7 +149,7 @@ export class SidebarPart {
     if (this.#sourceFor !== root) {
       this.#sourceFor = root;
       this.#source = null;
-      this.host.library.roots().then((rows) => {
+      this.#readRoots().then((rows) => {
         if (this.#sourceFor !== root) return;
         const s = rows.find((x) => x.path === root)?.source || null;
         if (s) { this.#source = s; this.renderHead(); } else this.#sourceFor = ''; // a folder just opened: asked again on the next drawing
@@ -149,10 +159,18 @@ export class SidebarPart {
   }
 
   async #collectionMenu(button) {
+    // a second click while the list is read does not open a second menu
+    if (this.menuOpening) return;
+    this.menuOpening = true;
+    try { await this.#openCollectionMenu(button); } finally { this.menuOpening = false; }
+  }
+
+  async #openCollectionMenu(button) {
     const { library } = this;
     const r = button.getBoundingClientRect();
     // the other folders opened before on this computer: each one a collection of its own, a click away
-    const roots = await this.host.library.roots().catch(() => []);
+    const fresh = this.#readRoots();
+    const roots = this.#roots || await fresh.catch(() => []);
     const others = roots.filter((x) => x.path !== library.root && !x.hidden).slice(0, 8);
     // where each folder is: this computer, an external disk, a cloud drive, the network
     const here = roots.find((x) => x.path === library.root)?.source || null;

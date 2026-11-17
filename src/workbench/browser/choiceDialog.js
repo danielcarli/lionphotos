@@ -47,15 +47,18 @@ export function showChoiceDialog({ icon: iconName = 'info', eyebrow, title, mess
  * A small form: a text field (and optionally a select) — used to name a client or a project.
  * @returns {Promise<{ text:string, choice:string }|null>}
  */
-export function showTextDialog({ icon: iconName = 'rename', eyebrow, title, label, value = '', choiceLabel, choices, choice = '', confirmLabel }) {
+export function showTextDialog({ icon: iconName = 'rename', eyebrow, title, label, value = '', choiceLabel, choices, choice = '', confirmLabel, suggestions = null, image = null }) {
   return new Promise((resolve) => {
-    const input = h('input.text-input', { value, 'aria-label': label });
+    const listId = suggestions?.length ? `td-list-${Date.now()}` : null;
+    const input = h('input.text-input', { value, 'aria-label': label, list: listId || undefined });
     const select = choices ? h('select.select', { 'aria-label': choiceLabel }, choices.map(([v, l]) => h('option', { value: String(v), selected: String(v) === String(choice) }, l))) : null;
     const confirm = h('button.btn.btn-primary', confirmLabel || t('common.confirm'));
     const cancel = h('button.btn.btn-secondary', t('common.cancel'));
     const dialog = h('div.cm-dialog.choice-dialog', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'td-title' },
       h('header.cm-head', h('span.cm-icon', { html: icon(iconName, 20) }), h('div', eyebrow ? h('div.eyebrow', eyebrow) : null, h('h2#td-title', title))),
+      image ? h('img.td-image', { src: image, alt: '' }) : null,
       h('label.form-field', h('span.field-label', label), input),
+      listId ? h('datalist', { id: listId }, suggestions.map((v) => h('option', { value: v }))) : null,
       select ? h('label.form-field', h('span.field-label', choiceLabel), select) : null,
       h('footer.cm-actions', cancel, confirm));
     const overlay = h('div.cm-overlay', dialog);

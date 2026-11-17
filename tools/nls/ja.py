@@ -537,3 +537,15 @@ _merge(MESSAGES, {'similar': {'button': '似た写真', 'more': {'one': 'さら�
 _merge(MESSAGES, {'sidebar': {'forget': 'この一覧から外す（アルバムや印は残ります）', 'forgotten': '{folder} を以前開いたフォルダーの一覧から外しました。カタログは残っているので、もう一度開けばすべてそのままです。', 'forgetUndone': '{folder} を一覧に戻しました。'}})
 
 _merge(MESSAGES, {'compare': {'onLeft': '左', 'onRight': '右', 'strip': '比較中の写真', 'stripHint': 'クリックすると選択中の側に表示します', 'count': {'one': '{count} 枚', 'other': '{count} 枚のうち 2 枚ずつ表示'}}})
+
+_merge(MESSAGES, {'similar': {'count': {'one': '{count} 枚', 'other': '{count} 枚'}, 'countTitle': 'このグループの写真の枚数', 'notOne': '同じグループではない', 'notOneTitle': 'これらの写真は同じグループではありません（似た構図で別の人が写っている場合など）。今後まとめられません', 'photoMenu': 'この写真のその他の操作', 'setBest': 'ベストに選ぶ', 'keepOnly': {'one': 'これだけ残す：もう 1 枚は保留へ', 'other': 'これだけ残す：ほかの {count} 枚は保留へ'}, 'takeOut': 'グループから外す', 'compareThis': '並べて比較', 'takenOut': '{name} をグループから外しました。今後これらの写真とまとめられません。', 'notOneDone': {'one': 'この写真はグループから外れました。', 'other': 'これら {count} 枚はグループではなくなり、今後まとめられません。'}}})
+
+_merge(MESSAGES, {'similar': {'whoUnknownTitle': 'この写真の人物はまだ調べていません。いま調べています', 'whoUnknown': '人物を検索中…', 'whoNone': '人物なし', 'faceNamed': '{name} — クリックで変更', 'faceName': {'person': 'この人は誰ですか？', 'pet': 'このペットは？'}, 'eyebrowPerson': '人物', 'eyebrowPet': 'ペット', 'faceLabel': '名前', 'faceSave': '保存', 'faceSaved': '{name} を保存しました。この顔は「人物」に表示されます。', 'stack': '似た写真をまとめる', 'stackTitle': '似た写真のグループを 1 枚（ベスト）で表示し、枚数を示します（数字をクリックでグループを開く）', 'stackReading': 'まとめるために写真を読み込み中', 'stackOpen': {'one': '似た写真 {count} 枚のグループ', 'other': '似た写真 {count} 枚のグループ'}, 'stackBadge': {'one': '似た写真 {count} 枚：グループを開く', 'other': '似た写真 {count} 枚：グループを開く'}}, 'compare': {'more': 'この写真のその他の操作', 'keepTitle': '残すか保留へ送るか（スペースキー）', 'stays': '残す', 'goes': '保留へ', 'hintKeep': 'スペース：残す/送る · ← → グループの別の写真 · Tab で左右切替 · ホイールで両方を拡大'}, 'carry': {'labels': 'アルバムと人物', 'mark': 'マーク', 'stays': '残す', 'field': '項目', 'inKept': '残す写真', 'inGoing': '送る写真', 'empty': '空', 'from': '{name} から', 'apply': '引き継いで続ける', 'skip': '引き継がずに続ける', 'title': {'one': '送る写真に、残す写真にない情報が {count} 件あります', 'other': '送る写真に、残す写真にない情報が {count} 件あります'}, 'message': '残す写真に引き継ぐものを選んでください（カタログに保存され、元に戻せます）。より完全なもの・より新しいものに最初からチェックが入っています。'}})
+
+_merge(MESSAGES, {'similar': {'statusReading': 'まとめるために写真を読み込み中：{done} / {total}', 'statusFaces': '顔を検索中：{done} / {total} 枚 — 別の人が写ったグループは分かれます', 'statusPaused': '一時停止中', 'statusDone': '{groups} · {photos} 枚中 {grouped} 枚がグループに入っています（各グループはベストを表示）', 'statusGroups': {'one': '似た写真のグループ {count} 件', 'other': '似た写真のグループ {count} 件'}, 'statusNone': '表示中の {photos} 枚に似た写真はありません'}})
+
+_merge(MESSAGES, {'similar': {'statusFromCatalog': {'one': '{count} 枚の顔はカタログから（解析済み）', 'other': '{count} 枚の顔はカタログから（解析済み）'}}})
+
+_merge(MESSAGES, {'similar': {'only': 'グループのみ', 'onlyTitle': '似た写真のグループだけを表示します（各グループはベストの 1 枚）。単独の写真は表示しません'}})
+
+_merge(MESSAGES, {'photos': {'kind': {'grouped': 'グループの写真'}}})

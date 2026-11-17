@@ -114,6 +114,12 @@ const paths = {
   hash: '<path d="M9.5 4l-2 16M16.5 4l-2 16M4.5 9h15M3.5 15h15"/>',
   globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.4 5.2 3.4 8.5s-1.1 6.1-3.4 8.5c-2.3-2.4-3.4-5.2-3.4-8.5s1.1-6.1 3.4-8.5z"/>',
   // similar photos: one picture in front of another, slightly shifted
+  // a little stack of instant photos: a group of similar photos shown as one
+  stack: '<path d="M8 3.5h11a1.5 1.5 0 0 1 1.5 1.5v12"/><rect x="3.5" y="7" width="13" height="14" rx="1.5"/><path d="M6 9.5h8v7H6z"/>',
+  // two pictures pulled apart (a group of similar photos that is not one)
+  ungroup: '<rect x="2.5" y="5" width="8" height="10" rx="2"/><rect x="13.5" y="9" width="8" height="10" rx="2"/><path d="M12 3v3M12 18v3M12 10.5v3"/>',
+  // a picture taken out of its group
+  takeOut: '<path d="M13 5.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-.5"/><path d="M9 12h12M17.5 8.5 21 12l-3.5 3.5"/>',
   similar: '<rect x="8" y="3" width="13" height="13" rx="2.5"/><path d="M5 7.5a2.5 2.5 0 0 0-2 2.45V18.5A2.5 2.5 0 0 0 5.5 21H14a2.5 2.5 0 0 0 2.45-2"/><path d="M8 13l3.5-3.5 3 3L17 10l4 4"/>',
   // "To edit": a pencil, drawn alone (rename has lines of text beside it)
   pencil: '<path d="M15.2 4.8a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/><path d="M13.5 6.5l3 3"/>',

@@ -108,7 +108,7 @@ export class OrganizeView extends ViewPane {
   /** The selection, or everything the grid shows right now. */
   #scope() {
     const sel = this.library.selectedItems();
-    return sel.length ? { items: sel, label: tn('organize.scope.selected', sel.length) } : { items: this.library.view(), label: tn('organize.scope.view', this.library.view().length) };
+    return sel.length ? { items: sel, label: tn('organize.scope.selected', sel.length) } : { items: this.library.viewAll(), label: tn('organize.scope.view', this.library.viewAll().length) };
   }
 
   /** The proposal for the whole collection, from the main process (nothing moves yet). */

@@ -139,15 +139,21 @@ async function macMounts() {
   }));
 }
 
+let asking = null; // the system being asked (one question at a time)
+function ask() {
+  return (asking ||= (async () => {
+    const platform = process.platform;
+    const ctx = { platform, home: os.homedir(), env: process.env };
+    if (platform === 'win32') ctx.drives = await windowsDrives();
+    else if (platform === 'darwin') ctx.mounts = await macMounts();
+    else ctx.mounts = linuxMounts();
+    cache = { at: Date.now(), ctx };
+    return ctx;
+  })().finally(() => { asking = null; }));
+}
 async function context() {
   if (cache && Date.now() - cache.at < KEEP_MS) return cache.ctx;
-  const platform = process.platform;
-  const ctx = { platform, home: os.homedir(), env: process.env };
-  if (platform === 'win32') ctx.drives = await windowsDrives();
-  else if (platform === 'darwin') ctx.mounts = await macMounts();
-  else ctx.mounts = linuxMounts();
-  cache = { at: Date.now(), ctx };
-  return ctx;
+  return ask();
 }
 
 /** Where each folder is. @param {string[]} paths @returns {Promise<Map<string, Source>>} */
@@ -156,4 +162,17 @@ async function sourcesOf(paths) {
   return new Map(paths.map((p) => [p, classify(p, ctx)]));
 }
 
-module.exports = { classify, sourcesOf };
+/**
+ * Where each folder is, without waiting for the system (PowerShell takes a second or two on Windows): from what
+ * was last asked — asked again in the background when older than a minute. null: never asked yet (asked now).
+ * @param {string[]} paths @returns {Map<string, Source>|null}
+ */
+function sourcesNow(paths) {
+  if (!cache || Date.now() - cache.at >= KEEP_MS) ask().catch(() => {});
+  return cache ? new Map(paths.map((p) => [p, classify(p, cache.ctx)])) : null;
+}
+
+/** Asks the system early (at start), so the lists of folders open at once. */
+function warmSources() { ask().catch(() => {}); }
+
+module.exports = { classify, sourcesOf, sourcesNow, warmSources };

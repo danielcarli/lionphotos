@@ -14,6 +14,9 @@
 // are compared in the order they were taken, each with the groups still open within a few minutes: a photo
 // joins the group it is most like if it is like that group's last photo and, a little less, its first — so a
 // slow pan does not chain a whole afternoon into one group.
+// What the person decided goes first: two photos said not to be of the same group (one taken out of a group,
+// or a group of alike pictures of different people) are never grouped together again, and a photo chosen as the
+// best of its group stays the one suggested to keep.
 
 const GRAY = 16;
 const COLOR = 4;
@@ -102,9 +105,10 @@ export function similarity(a, b) {
  * Groups photos taken in sequence that look alike.
  * @param {{ id:number, t:number, f:object }[]} units one per shot (twins together), with their features
  * @param {keyof SENSITIVITY} level
+ * @param {(a: object, b: object) => boolean} [apart] two shots the person said are not of the same group
  * @returns {{ units: object[] }[]} the groups of two or more, in the order they were taken
  */
-export function groupSimilar(units, level = 'similar') {
+export function groupSimilar(units, level = 'similar', apart = null) {
   const { threshold, firstSlack, windowMs } = SENSITIVITY[level] || SENSITIVITY.similar;
   const sorted = [...units].filter((u) => u.f).sort((a, b) => a.t - b.t || a.id - b.id);
   const groups = [];
@@ -113,6 +117,7 @@ export function groupSimilar(units, level = 'similar') {
     for (let k = Math.max(0, groups.length - OPEN_GROUPS); k < groups.length; k++) {
       const g = groups[k];
       if (u.t - g.last.t > windowMs) continue;
+      if (apart && g.units.some((x) => apart(u, x))) continue;
       const toLast = similarity(u.f, g.last.f);
       if (toLast < threshold || toLast <= bestScore) continue;
       if (similarity(u.f, g.first.f) < threshold - firstSlack) continue;
@@ -127,10 +132,14 @@ export function groupSimilar(units, level = 'similar') {
 /**
  * The photo to keep in a group: one already marked with a star (or OK) or adjusted wins; otherwise the
  * sharpest, less what it loses to burnt-out or blocked-up light and to a far too dark or bright exposure.
- * @param {{ units: { f:object, mark?:number, adjusted?:boolean }[] }} group @returns {number} its index
+ * @param {{ units: { f:object, mark?:number, adjusted?:boolean }[] }} group
+ * @param {(u: object) => boolean} [chosen] the shot the person chose as the best (it wins)
+ * @returns {number} its index
  */
-export function bestOf(group) {
+export function bestOf(group, chosen = null) {
   const us = group.units;
+  const pick = chosen ? us.findIndex(chosen) : -1;
+  if (pick >= 0) return pick;
   const marked = (u) => (u.mark === 1 ? 3 : u.mark === 2 ? 2 : 0) + (u.adjusted ? 1 : 0);
   const top = Math.max(...us.map(marked));
   if (top > 0) return us.findIndex((u) => marked(u) === top);

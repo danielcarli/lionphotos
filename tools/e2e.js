@@ -13,7 +13,8 @@ const fs = require('fs');
 const os = require('os');
 
 process.env.LIONPHOTOS_E2E = '1';
-process.env.LIONPHOTOS_FACES_FORCE = '1'; // recognition runs here on the processor (no graphics card): the scene reader is tried on a few photos
+process.env.LIONPHOTOS_FACES_FORCE = '1';
+process.env.LIONPHOTOS_LOOKAT_LIMIT = '0'; // the similar photos do not ask for faces here (each takes seconds on the processor) // recognition runs here on the processor (no graphics card): the scene reader is tried on a few photos
 process.env.LIONPHOTOS_USER_DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'lionphotos-e2e-'));
 const FOLDER = path.resolve(process.env.LIONPHOTOS_FOLDER || '');
 if (!process.env.LIONPHOTOS_FOLDER || !fs.existsSync(FOLDER)) { console.error('Set LIONPHOTOS_FOLDER to a disposable folder.'); process.exit(2); }
@@ -1826,8 +1827,21 @@ app.whenReady().then(async () => {
       // keep only ours: the other groups keep all
       for (const g of document.querySelectorAll('.sim-group')) if (g !== ours) [...g.querySelectorAll('.sim-group-head .btn')].find((b) => b.textContent === 'Keep all').click();
       await wait(100);
+      // the photo that goes has a caption the one that stays has not: offered to it first
+      const nameOf = (t) => t.title.split('\\n')[0].split(' + ')[0];
+      const goer = lib.allItems.find((x) => x.folder === copy.folder && x.name === nameOf(ours.querySelector('.sim-tile.is-out')));
+      const keeper = lib.allItems.find((x) => x.folder === copy.folder && x.name === nameOf(ours.querySelector('.sim-tile.is-best')));
+      const capsBefore = [goer.cap || '', keeper.cap || ''];
+      await lib.describe([goer.id], { caption: 'Pôr do sol visto da varanda, com a família' }, { history: false });
+      if (keeper.cap) await lib.describe([keeper.id], { caption: '' }, { history: false });
       res.send = document.querySelector('.sim-foot .btn-primary').textContent;
-      document.querySelector('.sim-foot .btn-primary').click(); await wait(300);
+      document.querySelector('.sim-foot .btn-primary').click();
+      for (let i = 0; i < 40 && !document.querySelector('.carry-dialog'); i++) await wait(100);
+      const capRow = [...document.querySelectorAll('.carry-dialog .carry-row:not(.carry-head)')].find((r) => r.querySelector('.carry-theirs span')?.textContent === 'Pôr do sol visto da varanda, com a família');
+      res.carry = { field: capRow?.querySelector('.carry-field')?.textContent, title: document.querySelector('.carry-dialog h2')?.textContent, caption: capRow?.querySelector('.carry-theirs span')?.textContent, ticked: capRow?.querySelector('input')?.checked, empty: capRow?.querySelector('.carry-mine')?.textContent };
+      [...document.querySelectorAll('.carry-dialog .btn')].find((b) => b.textContent === 'Take and continue')?.click();
+      for (let i = 0; i < 30 && !document.querySelector('.cm-overlay .choice-dialog'); i++) await wait(100);
+      res.carry.taken = lib.byId.get(keeper.id).cap;
       res.ask = document.querySelector('.cm-overlay .choice-dialog h2')?.textContent;
       const limboBefore = new Set(lib.allItems.filter((x) => x.mark === 3).map((x) => x.id));
       document.querySelector('.cm-overlay .btn-primary').click(); await wait(600);
@@ -1835,6 +1849,8 @@ app.whenReady().then(async () => {
       res.gone = gone.length; res.closed = !document.querySelector('.sim');
       await lib.setMark(lib.allItems.filter((x) => x.mark === 3 && !limboBefore.has(x.id)).map((x) => x.id), 'reject'); // back, twins too
       res.back = [copy, orig].every((x) => !lib.byId.get(x.id).mark);
+      await lib.describe([goer.id], { caption: capsBefore[0] }, { history: false });
+      await lib.describe([keeper.id], { caption: capsBefore[1] }, { history: false });
 
       // a JPEG with its raw twin (IMG_….JPG + IMG_….CR2 in the same folder) to the Limbo, from its menu
       const raw = lib.allItems.find((x) => x.ext === 'cr2' && !x.mark);
@@ -1856,6 +1872,9 @@ app.whenReady().then(async () => {
     check(sim.best === 1 && sim.out === sim.tiles - 1 && sim.tiles >= 2 && /^Similar photos · /.test(sim.title || '') && /^Send \d+ to the Limbo$/.test(sim.send || '') && /similar photos? to the Limbo\?$/.test(sim.ask || '')
       && sim.gone === sim.tiles - 1 && sim.closed && sim.back,
       'Similar photos: a photo and its copy of the same day form a group with one suggested to keep; the others go to the Limbo after asking', JSON.stringify(sim));
+    check(/says? \d+ things? that the one that stays does not$/.test(sim.carry?.title || '') && sim.carry?.caption === 'Pôr do sol visto da varanda, com a família' && !!sim.carry?.field && sim.carry?.ticked
+      && sim.carry?.taken === 'Pôr do sol visto da varanda, com a família',
+      'before the Limbo: what the photo that goes says and the one that stays does not (a caption), side by side and ticked, is taken to the one that stays', JSON.stringify(sim.carry));
     check(sim.twins?.length === 1 && /\.CR2$/i.test(sim.twins[0]) && sim.menuSimilar && /Also send the RAW or JPG/.test(sim.check || '') && sim.checked === true && sim.limbo === '3,3' && sim.after === '0,0',
       'a JPEG sent to the Limbo takes its raw twin along (an option of the dialog, on by default)', JSON.stringify(sim));
     // the same from the Photos bar without a day: the photos shown (the whole collection, here), across days
@@ -1879,13 +1898,103 @@ app.whenReady().then(async () => {
       const tagAt = sides.findIndex((x) => x.querySelector('.cmp-tag'));
       const actAt = sides.findIndex((x) => x.classList.contains('is-active'));
       const strip = document.querySelectorAll('.cmp-thumb').length;
-      res.cmp = { names, b, cn, tagAt, actAt, strip, ok: strip === (tiles.length > 2 ? tiles.length : 0) && sides.length === 2 && names[l].includes(cn[0]) && names[r].includes(cn[1]) && tagAt === (b === l ? 0 : 1) && actAt === 1 - tagAt };
+      res.cmp = { names, b, cn, tagAt, actAt, strip, ok: strip === tiles.length && sides.length === 2 && names[l].includes(cn[0]) && names[r].includes(cn[1]) && tagAt === (b === l ? 0 : 1) && actAt === 1 - tagAt };
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
+      // the group says how many photos it has; a photo's menu: choose it as the best (kept in the catalog)
+      const first = (sel) => [...document.querySelectorAll('.sim-group')].find((x) => x.querySelector('.sim-tile')?.title.split('\\n')[0] === names[0]);
+      const grp = () => first();
+      res.count = grp()?.querySelector('.sim-count')?.textContent;
+      const other = 1 - Math.min(b, 1);
+      grp().querySelectorAll('.sim-menu')[other].click(); await wait(250);
+      res.menu = [...document.querySelectorAll('.ctx-menu .ctx-item')].map((x) => x.textContent.trim());
+      [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Choose as the best')).click(); await wait(400);
+      res.bestNow = [...grp().querySelectorAll('.sim-tile')].findIndex((x) => x.classList.contains('is-best')) === other;
+      const otherId = s.library.items.find((x) => x.name === names[other].split(' + ')[0])?.id;
+      res.bestKept = (await s.host.library.similarChoices()).best.includes(otherId);
+      // "Not the same": the group goes, and stays gone; the notice's undo brings it back
+      const groupsBefore = document.querySelectorAll('.sim-group').length;
+      grp().querySelector('.sim-apart').click(); await wait(500);
+      res.apartGone = !grp() && document.querySelectorAll('.sim-group').length === groupsBefore - 1;
+      res.apartKept = (await s.host.library.similarChoices()).apart.length;
+      const toast = [...document.querySelectorAll('.toast')].find((x) => x.textContent.includes('no longer a group'));
+      res.apartToast = !!toast;
+      document.querySelector('.sim-close')?.click(); await wait(300);
+      btn.click();
+      for (let i = 0; i < 150 && !document.querySelector('.sim-group, .sim-empty'); i++) await wait(100);
+      await wait(200);
+      res.stillGone = !grp();
+      toast?.querySelector('.toast-actions button')?.click(); await wait(400);
+      document.querySelector('.sim-close')?.click(); await wait(300);
+      btn.click();
+      for (let i = 0; i < 150 && !document.querySelector('.sim-group, .sim-empty'); i++) await wait(100);
+      await wait(200);
+      res.undone = !!grp() && (await s.host.library.similarChoices()).apart.length === 0;
       document.querySelector('.sim-close')?.click(); await wait(200);
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
     check(simAll.near && simAll.label === 'Similar photos' && simAll.title === 'Similar photos among those shown' && simAll.groups >= 1 && simAll.prevHidden && /\d{4}/.test(simAll.meta || ''),
       'similar photos from the Photos bar, beside "Photos in no album": the photos shown, across days (dated groups, no day arrows)', JSON.stringify(simAll));
     check(simAll.cmp?.ok, 'comparing a group of similar photos keeps the order of the group, names the best on its side and starts on the other photo', JSON.stringify(simAll.cmp));
+    check(simAll.count === '2 photos' && ['Choose as the best', 'Keep only this one: the other one to the Limbo', 'Take out of the group', 'Compare side by side'].every((x) => simAll.menu?.includes(x)) && simAll.bestNow && simAll.bestKept,
+      'a group of similar photos says how many it has; each photo has a menu (best, keep only it, take it out, compare); the best chosen is kept in the catalog', JSON.stringify({ count: simAll.count, menu: simAll.menu, bestNow: simAll.bestNow, bestKept: simAll.bestKept }));
+    check(simAll.apartGone && simAll.apartKept >= 1 && simAll.apartToast && simAll.stillGone && simAll.undone,
+      '"Not the same" (alike pictures of different people): the group goes and is not formed again; the notice undoes it', JSON.stringify({ apartGone: simAll.apartGone, apartKept: simAll.apartKept, toast: simAll.apartToast, stillGone: simAll.stillGone, undone: simAll.undone }));
+    // "Group similar photos", beside "Similar photos": each group as its best photo, a stack with how many; the
+    // stack opens its group; side by side, the space bar says whether a photo stays or goes
+    const st = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      lib.setFilter({ day: '', year: 0, folder: '', recursive: true }); s.layout.openView('photos'); await wait(300);
+      const allBefore = lib.viewAll('main').length;
+      const sw = () => document.querySelector('.view-photos .stack-switch');
+      const res = { label: sw()?.querySelector('.tb-switch-text')?.textContent, near: sw()?.previousElementSibling?.classList.contains('similar-btn'), allBefore };
+      sw().querySelector('input').click();
+      for (let i = 0; i < 200 && !document.querySelector('.view-photos .tile-stack'); i++) await wait(100);
+      const badge = document.querySelector('.view-photos .tile-stack');
+      res.badge = badge?.textContent; res.title = badge?.title; res.on = sw()?.classList.contains('on');
+      await wait(300);
+      res.status = document.querySelector('.view-photos .stack-status:not([hidden])')?.textContent;
+      res.shown = lib.view('main').length; res.all = lib.viewAll('main').length;
+      res.tileHasBadge = !!badge?.closest('.tile');
+      badge.click();
+      for (let i = 0; i < 100 && !document.querySelector('.sim-group, .sim-empty'); i++) await wait(100);
+      res.groupTitle = document.querySelector('.sim-title')?.textContent; res.groups = document.querySelectorAll('.sim-group').length; res.tiles = document.querySelectorAll('.sim-group .sim-tile').length;
+      res.who = document.querySelector('.sim-who')?.textContent;
+      [...document.querySelectorAll('.sim-group-head .btn')][0].click(); await wait(400);
+      res.keep0 = document.querySelector('.cmp-side.is-active .cmp-keep')?.textContent;
+      res.out0 = document.querySelectorAll('.cmp-thumb.is-out').length;
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true })); await wait(200);
+      res.keep1 = document.querySelector('.cmp-side.is-active .cmp-keep')?.textContent;
+      res.out1 = document.querySelectorAll('.cmp-thumb.is-out').length;
+      res.more = !!document.querySelector('.cmp-side .cmp-more');
+      res.hint = document.querySelector('.cmp-hint')?.textContent;
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
+      res.outAfter = document.querySelectorAll('.sim-group .sim-tile.is-out').length;
+      document.querySelector('.sim-close')?.click(); await wait(200);
+      // only the grouped photos: every photo shown stands for a group
+      const only = () => document.querySelector('.view-photos .stack-status .stack-only');
+      res.onlyLabel = only()?.querySelector('.tb-switch-text')?.textContent;
+      only().querySelector('input').click(); await wait(500);
+      res.onlyShown = lib.view('main').length;
+      res.onlyAll = lib.view('main').every((it) => !!s.similar.stackOf(it.id)) && document.querySelectorAll('.view-photos .tile').length === document.querySelectorAll('.view-photos .tile .tile-stack').length;
+      res.onlyChip = [...document.querySelectorAll('.view-photos .filter-chip')].some((c) => c.textContent.includes('Grouped photos'));
+      only().querySelector('input').click(); await wait(500);
+      res.onlyBack = lib.view('main').length === res.shown;
+      // the same from Filters › Type: "Grouped photos" (and All gives every photo again)
+      document.querySelector('.view-photos .filters-btn').click(); await wait(250);
+      const typeItem = (label) => [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.trim() === label);
+      typeItem('Grouped photos').click(); await wait(500);
+      res.fromMenu = lib.view('main').length === res.onlyShown && s.similar.onlyGrouped;
+      document.querySelector('.view-photos .filters-btn').click(); await wait(250);
+      res.menuChecked = typeItem('Grouped photos')?.getAttribute('aria-checked') === 'true';
+      typeItem('All')?.click(); await wait(500);
+      res.menuBack = !s.similar.onlyGrouped && lib.view('main').length === res.shown;
+      sw().querySelector('input').click(); await wait(500);
+      res.off = !document.querySelector('.view-photos .tile-stack') && lib.view('main').length === allBefore;
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(st.label === 'Group similar photos' && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the group$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /groups? of similar photos · \d+ of \d+ photos are in a group/.test(st.status || ''),
+      '"Group similar photos" beside "Similar photos": each group shown as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
+    check(st.onlyLabel === 'Only the grouped photos' && st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && st.onlyBack && st.onlyChip && st.fromMenu && st.menuChecked && st.menuBack,
+      '"Grouped photos" (on the line under the bar, and in Filters › Type, with its chip): only the groups, each as its best photo; off, or "All", the photos alone again', JSON.stringify({ label: st.onlyLabel, onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, back: st.onlyBack, chip: st.onlyChip, fromMenu: st.fromMenu, menuChecked: st.menuChecked, menuBack: st.menuBack }));
+    check(st.groups === 1 && st.tiles === Number(st.badge) && /^A group of \d+ similar photos$/.test(st.groupTitle || '') && st.keep0 === 'Goes to the Limbo' && st.keep1 === 'Stays' && st.out1 === st.out0 - 1 && st.more && /^Space: stays or goes/.test(st.hint || '') && st.outAfter === st.out0 - 1,
+      'the stack opens its group; side by side, as in a phone\'s burst: the space bar says whether a photo stays or goes (the strip and the group follow), and the photo\'s menu is there', JSON.stringify(st));
     // the viewer's editing panel: the same sections; typing in a field does not reach the viewer's keys; a
     // photo moved to a category the filter does not show stays in view, greyed, with a note naming it
     const vw = await js(`(async () => {

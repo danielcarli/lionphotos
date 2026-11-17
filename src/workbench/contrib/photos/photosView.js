@@ -38,6 +38,7 @@ import { exportPhotos, exportMenuItem } from '../export/exportPhotos.js';
 import { LABEL_ICON } from '../../services/labels/browser/labelsService.js';
 import { applyMark } from '../limbo/sendToLimbo.js';
 import { showSimilar } from '../similar/similarView.js';
+import { etaText } from '../../browser/parts/statusbarPart.js';
 import { sharpenCover } from '../albums/albumCovers.js';
 import { renderPhotoShowcase } from '../labels/showcase.js';
 import { focusImage } from '../../services/thumbs/browser/thumbFocus.js';
@@ -91,6 +92,8 @@ export class PhotosView extends ViewPane {
     this.labelBar = h('div.label-back', { hidden: true });
     this.projectPanel = h('div.project-panel-slot', { hidden: true }); // a project's sheet, progress and albums
     this.toolbar = h('div.photos-toolbar');
+    // "Group similar photos": what is being done (photos read, people looked for) and what came of it
+    this.stackStatus = h('div.stack-status', { role: 'status', 'aria-live': 'polite', hidden: true });
     this.selbar = h('div.selection-bar', { hidden: true });
     this.listHead = h('div.list-head', { hidden: true });
     this.sizer = h('div.vs-sizer');
@@ -115,7 +118,7 @@ export class PhotosView extends ViewPane {
         e.preventDefault(); e.stopPropagation(); this.#stepInfo(e.key === 'ArrowDown' ? 1 : -1);
       }
     }, true);
-    this.element.append(...(this.banner ? [this.banner] : []), this.labelBar, this.projectPanel, this.toolbar, this.selbar,
+    this.element.append(...(this.banner ? [this.banner] : []), this.labelBar, this.projectPanel, this.toolbar, this.stackStatus, this.selbar,
       h('div.photos-body', h('div.photos-main', this.listHead, this.scroller, this.empty, this.spot, this.stamp, this.rail), this.infoGrip, this.info));
 
     this.scroller.addEventListener('scroll', () => { this.thumbs.hold(); this.#schedule(); }, { passive: true });
@@ -138,6 +141,10 @@ export class PhotosView extends ViewPane {
     this.library.onDidChangeDescriptions?.(() => { if (this.visible && this.labels.get(this.library.filter.labelId)?.type === 'project') this.#renderLabelBar(); });
     // labels change in bursts (face and pet indexing, a dialog saving several links): redraw once after them
     this.labels.onDidChange(() => { clearTimeout(this.labelsTimer); this.labelsTimer = setTimeout(() => this.invalidate(), 300); });
+    // "Group similar photos": the groups change as photos are read and people found
+    services.similar?.onDidChange(() => { if (!this.limbo) this.invalidate(); });
+    services.similar?.onDidProgress(() => { if (!this.limbo && this.visible) this.#paintStackStatus(); });
+    services.faces?.onDidChangeState(() => { if (!this.limbo && this.visible && services.similar?.active) this.#paintStackStatus(); });
   }
 
   render() {
@@ -145,6 +152,7 @@ export class PhotosView extends ViewPane {
     this.#renderLabelBar();
     this.#renderToolbar();
     this.list = this.library.view(this.scope);
+    this.#paintStackStatus();
     const shownLabel = this.library.filter.labelId && !this.limbo ? this.labels.get(this.library.filter.labelId) : null;
     this.albumSphere = shownLabel?.type === 'album' ? this.labels.mainSphereOf(shownLabel.id) : null;
     // what an action took off the screen (sent to the Limbo, moved to a category or folder not shown,
@@ -184,7 +192,7 @@ export class PhotosView extends ViewPane {
   #renderToolbar() {
     const { library } = this;
     const f = library.filter;
-    const totals = library.totals(library.view(this.scope));
+    const totals = library.totals(library.viewAll(this.scope));
     const count = `${tn('common.items', totals.images + totals.videos)} · ${formatBytes(totals.bytes)}`;
     // the filters in use, each with its own ×: the year (× = every year again), the type, the mark, the
     // category of the Overview and "this folder only"
@@ -196,6 +204,8 @@ export class PhotosView extends ViewPane {
       f.year && !this.limbo ? chip('calendar', String(f.year), t('home.allYears'), () => library.setFilter({ year: 0 })) : null,
       // "all the photos of the day", asked from a photo's panel
       f.day && !this.limbo ? chip('calendar', formatDate(new Date(`${f.day}T12:00:00`).getTime()), t('photos.clearDay'), () => library.setFilter({ day: '' })) : null,
+      // only the groups of similar photos: a filter as the others, with its ×
+      !this.limbo && this.services.similar?.active && this.services.similar.onlyGrouped ? chip('stack', t('photos.kind.grouped'), t('photos.clearFilters'), () => this.services.similar.setOnlyGrouped(false)) : null,
       f.kind !== 'all' ? chip(f.kind === 'video' ? 'film' : 'image', f.kind === 'video' ? t('photos.kind.videos') : t('photos.kind.images'), t('photos.clearFilters'), () => library.setFilter({ kind: 'all' })) : null,
       f.mark && !this.limbo ? chip(f.mark === 'great' || f.mark === 'picks' ? 'star' : f.mark === 'ok' ? 'okCircle' : null, t(`marks.${f.mark}`), t('marks.all'), () => library.setFilter({ mark: '' })) : null,
       f.category && !this.limbo ? chip(null, t(`category.${f.category}`), t('photos.clearFilters'), () => library.setFilter({ category: '' }), h('span.swatch', { style: { background: categoryColor(f.category) } })) : null,
@@ -215,6 +225,8 @@ export class PhotosView extends ViewPane {
       // similar photos: of the day shown, or of the photos shown (a folder, a year, an album…), to keep the best of each sequence
       !this.limbo ? h('button.btn.btn-secondary.btn-sm.similar-btn', { title: f.day ? t('similar.linkTitle') : t('similar.shownTitle'), onclick: () => this.#similar() },
         h('span', { html: icon('similar', 14) }), t('similar.button')) : null,
+      // "Group similar photos": each group shown as its best photo, with a little stack and how many it holds
+      !this.limbo ? this.#stackSwitch() : null,
       h('button.btn.btn-secondary.btn-sm.filters-btn', { class: `btn btn-secondary btn-sm filters-btn${chips.length ? ' is-active' : ''}`, title: t('photos.filtersTitle'), 'aria-haspopup': 'menu', onclick: (e) => this.#filtersMenu(e.currentTarget) },
         h('span', { html: icon('filter', 14) }), t('photos.filters'), chips.length ? h('span.filters-count', String(chips.length)) : null),
       chips.length ? h('div.filter-chips', chips) : null,
@@ -325,7 +337,7 @@ export class PhotosView extends ViewPane {
     const plg = back === 'plugin' ? this.services.plugins?.tabs.find((x) => x.id === this.services.plugins.opened) : null;
     const backName = back === 'plugin' ? (plg ? textOf(plg.shortName) || textOf(plg.name) : t('plugins.title')) : back === 'photos' ? t('views.photos') : t(`views.${back}`);
     const typeIcon = LABEL_ICON[label.type] || 'tag';
-    const shown = this.library.view(this.scope), count = shown.length;
+    const shown = this.library.viewAll(this.scope), count = shown.length;
     const album = label.type === 'album';
     const svc = label.type === 'person' ? this.services.faces : label.type === 'pet' ? this.services.pets : null;
     const faces = svc?.people().has(label.id) ? { k: label.type === 'pet' ? 'pets' : 'faces' } : null;
@@ -351,7 +363,7 @@ export class PhotosView extends ViewPane {
       album ? h('button.btn.btn-primary.btn-sm', { title: t('slideshow.startTitle'), disabled: !count, onclick: () => this.#slideshow() },
         h('span', { html: icon('play', 13) }), t('slideshow.button')) : null,
       // an album or a project: its photos as files, edited (for delivering, publishing, printing)
-      album || label.type === 'project' ? h('button.btn.btn-secondary.btn-sm', { title: t('export.buttonTitle'), disabled: !count, onclick: () => exportPhotos(this.services, this.library.view(this.scope)) },
+      album || label.type === 'project' ? h('button.btn.btn-secondary.btn-sm', { title: t('export.buttonTitle'), disabled: !count, onclick: () => exportPhotos(this.services, this.library.viewAll(this.scope)) },
         h('span', { html: icon('external', 13) }), t('export.button')) : null,
       // an album or a project: a page of it, made by a plugin
       !label.auto && this.services.plugins?.exportersFor(label.type).length ? h('button.btn.btn-secondary.btn-sm', { title: t('plugins.export.buttonTitle'), onclick: () => showExportDialog(this.services, { labelIds: [label.id], type: label.type }) },
@@ -386,13 +398,22 @@ export class PhotosView extends ViewPane {
     const r = button.getBoundingClientRect();
     const years = library.years();
     const counts = library.markCounts();
-    const pick = (patch) => () => library.setFilter(patch);
+    const sim = this.services.similar;
+    const grouped = !this.limbo && !!sim?.active && sim.onlyGrouped;
+    // a type picked: "Grouped photos" off
+    const pick = (patch) => () => { if ('kind' in patch && grouped) sim.setOnlyGrouped(false); library.setFilter(patch); };
     const items = [
       { label: t('list.type'), disabled: true },
       ...[['all', t('photos.kind.all'), 'grid'], ['image', t('photos.kind.images'), 'image'], ['video', t('photos.kind.videos'), 'film']]
-        .map(([k, label, ic]) => ({ label, icon: ic, checked: f.kind === k, run: pick({ kind: k }) })),
+        .map(([k, label, ic]) => ({ label, icon: ic, checked: !grouped && f.kind === k, run: pick({ kind: k }) })),
+      // only the groups of similar photos, each as its best photo ("Group similar photos" turned on with it)
+      !this.limbo && sim ? { label: t('photos.kind.grouped'), icon: 'stack', title: t('similar.onlyTitle'), checked: grouped, run: () => {
+        if (f.kind !== 'all') library.setFilter({ kind: 'all' });
+        if (!sim.active) sim.setActive(true);
+        sim.setOnlyGrouped(true);
+      } } : null,
       '-',
-    ];
+    ].filter(Boolean);
     if (!this.limbo && years.length > 1) {
       items.push({ label: f.year ? `${t('photos.year')}: ${f.year}` : t('photos.allYears'), icon: 'calendar', submenu: [
         { label: t('photos.allYears'), checked: !f.year, run: pick({ year: 0 }) }, '-',
@@ -404,7 +425,7 @@ export class PhotosView extends ViewPane {
         ...['picks', 'great', 'ok', 'none'].map((m) => ({ label: t('marks.option', { name: t(`marks.${m}`), count: formatNumber(counts[m]) }), checked: f.mark === m, run: pick({ mark: m }) }))] });
     }
     if (!this.limbo) items.push({ label: t('photos.subfolders'), icon: 'folder', title: t('photos.subfoldersHint'), checked: !!f.recursive, run: pick({ recursive: !f.recursive }) });
-    const any = f.kind !== 'all' || (!this.limbo && (f.year || f.day || f.mark || f.category || f.noAlbum || !f.recursive));
+    const any = grouped || f.kind !== 'all' || (!this.limbo && (f.year || f.day || f.mark || f.category || f.noAlbum || !f.recursive));
     if (any) items.push('-', { label: t('photos.clearFilters'), icon: 'close', run: pick({ kind: 'all', year: 0, day: '', mark: '', category: '', noAlbum: false, recursive: true }) });
     showContextMenu(r.left, r.bottom + 4, items);
   }
@@ -849,6 +870,7 @@ export class PhotosView extends ViewPane {
       h('button.tile-check', { 'aria-label': t('photos.select'), html: icon('check', 14), onclick: (e) => { e.stopPropagation(); this.anchorId = it.id; this.picking = true; this.library.toggle(it.id); } }),
       this.#itemActions(it, 'tile-actions'),
       this.#marks([it.id], MARK_NAMES[it.mark || 0], 'tile-marks'),
+      this.#stackBadge(it),
       // bottom right: personal or professional (nothing when not categorized), then the kind of file —
       // by default only what changes a decision: a video's length and RAW (Settings › details: everything)
       h('span.tile-foot',
@@ -862,6 +884,16 @@ export class PhotosView extends ViewPane {
     this.#paintTile(tile, it.id);
     this.tiles.set(it.id, tile);
     return tile;
+  }
+
+  /** A photo that stands for a group of similar ones (Photos grouped): a little stack of photos and how many. */
+  #stackBadge(it) {
+    const stack = !this.limbo && this.services.similar?.stackOf(it.id);
+    if (!stack) return null;
+    return h('button.tile-stack', {
+      type: 'button', title: tn('similar.stackBadge', stack.count), 'aria-label': tn('similar.stackBadge', stack.count),
+      onclick: (e) => { e.stopPropagation(); this.#openStack(stack); }, ondblclick: (e) => e.stopPropagation(),
+    }, h('span', { html: icon('stack', 15) }), String(stack.count));
   }
 
   /** The kind of file at a glance: RAW · CR3, JPG, HEIC, PNG… with the colour of its kind (original, edited, raw). */
@@ -1289,11 +1321,61 @@ export class PhotosView extends ViewPane {
   }
 
   /** Next (or previous) photo, keeping the panel as it is — to describe a series one after the other. */
+  /** The switch "Group similar photos". */
+  #stackSwitch() {
+    const sim = this.services.similar;
+    if (!sim) return null;
+    const on = sim.active;
+    return h(on ? 'label.tb-switch.stack-switch.on' : 'label.tb-switch.stack-switch', { title: t('similar.stackTitle') },
+      h('input', { type: 'checkbox', role: 'switch', checked: on, 'aria-checked': String(on), onchange: (e) => { sim.setActive(e.target.checked); this.#paintStackStatus(); } }),
+      h('span.tb-switch-track', { 'aria-hidden': 'true' }), h('span.tb-switch-text', t('similar.stack')));
+  }
+
+  /**
+   * Under the bar, while "Group similar photos" is on: the photos being read (how many, how long still), the
+   * people being looked for in the photos of the groups, and then what came of it. Drawn on its own: the grid
+   * is not drawn again for it.
+   */
+  #paintStackStatus() {
+    const el = this.stackStatus;
+    const sim = this.services.similar;
+    if (!el || !sim || this.limbo || !sim.active) { if (el) { el.hidden = true; el.replaceChildren(); } return; }
+    const line = (ic, text, done, total, extra) => h('div.stack-line',
+      h('span.stack-line-icon', { html: icon(ic, 14) }), h('span.stack-line-text', text),
+      total ? h('span.stack-bar', { 'aria-hidden': 'true' }, h('span', { style: { width: `${Math.min(100, (100 * done) / total)}%` } })) : null,
+      extra ? h('span.stack-line-extra', extra) : null);
+    const lines = [];
+    const p = sim.progress;
+    if (p) lines.push(line('similar', t('similar.statusReading', { done: formatNumber(p.done), total: formatNumber(p.total) }), p.done, p.total, etaText(p.left)));
+    // the faces: those found before come from the catalog (not looked for again); only the new ones are looked at
+    const f = this.services.faces?.state;
+    const who = sim.whoCounts();
+    const fromCatalog = who.known ? tn('similar.statusFromCatalog', who.known) : null;
+    if (f?.running && f.total) lines.push(line('face', t('similar.statusFaces', { done: formatNumber(f.done), total: formatNumber(f.total) }), f.done, f.total, f.paused ? t('similar.statusPaused') : fromCatalog));
+    if (!p && sim.summary) {
+      const s = sim.summary;
+      lines.push(line('stack', s.groups ? t('similar.statusDone', { groups: tn('similar.statusGroups', s.groups), grouped: formatNumber(s.grouped), photos: formatNumber(s.photos) }) : t('similar.statusNone', { photos: formatNumber(s.photos) }),
+        0, 0, !f?.running ? fromCatalog : null));
+    }
+    // only the groups: a switch at the end of the line (the photos alone out of the way)
+    const only = sim.onlyGrouped;
+    const onlySwitch = h(only ? 'label.tb-switch.stack-only.on' : 'label.tb-switch.stack-only', { title: t('similar.onlyTitle') },
+      h('input', { type: 'checkbox', role: 'switch', checked: only, 'aria-checked': String(only), onchange: (e) => sim.setOnlyGrouped(e.target.checked) }),
+      h('span.tb-switch-track', { 'aria-hidden': 'true' }), h('span.tb-switch-text', t('similar.only')));
+    el.hidden = false;
+    el.replaceChildren(h('div.stack-lines', lines), onlySwitch);
+  }
+
+  /** A group of similar photos (Photos grouped): it opens on its own, to choose what stays. */
+  #openStack(stack) {
+    showSimilar(this.services, { items: stack.units.flatMap((u) => u.files) }, { title: tn('similar.stackOpen', stack.count) });
+  }
+
   /** Similar photos: of the day shown, or among the photos shown. */
   #similar() {
     const f = this.library.filter;
     if (f.day) return showSimilar(this.services, f.day);
-    const items = this.library.view('main').filter((it) => it.kind === KIND.image);
+    const items = this.library.viewAll('main').filter((it) => it.kind === KIND.image);
     if (items.length < 2) return this.notifications.info(t('similar.fewShown'));
     showSimilar(this.services, { items });
   }

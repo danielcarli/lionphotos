@@ -152,6 +152,23 @@ CREATE TABLE IF NOT EXISTS content_scans (
   cats TEXT
 );
 
+-- similar photos, as the person decided them: two photos that are not of the same group (taken out of a group,
+-- or a group said not to be one — alike pictures of different people), and the photo chosen as the best of its
+-- group (kept first and suggested to keep)
+CREATE TABLE IF NOT EXISTS similar_apart (
+  a INTEGER NOT NULL REFERENCES media(id) ON DELETE CASCADE,
+  b INTEGER NOT NULL REFERENCES media(id) ON DELETE CASCADE,
+  PRIMARY KEY (a, b)
+) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS similar_best (id INTEGER PRIMARY KEY REFERENCES media(id) ON DELETE CASCADE);
+-- what each photo looks like, for the similar photos (light and shade, colours, sharpness, exposure: 320
+-- bytes, read from its thumbnail), so a collection is not read again at each start
+CREATE TABLE IF NOT EXISTS similar_features (
+  media_id INTEGER PRIMARY KEY REFERENCES media(id) ON DELETE CASCADE,
+  size INTEGER NOT NULL, mtime INTEGER NOT NULL,
+  data BLOB NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS operations (
   id INTEGER PRIMARY KEY,
   at INTEGER NOT NULL,
@@ -406,6 +423,11 @@ class LibraryDatabase {
                 moveBlobPreview.run(n.id, s.id);
                 adoptPreview.run(n.id);
               }
+              // the decisions on similar photos follow the photo
+              this.db.prepare('UPDATE OR IGNORE similar_apart SET a = ? WHERE a = ?').run(n.id, s.id);
+              this.db.prepare('UPDATE OR IGNORE similar_apart SET b = ? WHERE b = ?').run(n.id, s.id);
+              this.db.prepare('UPDATE OR IGNORE similar_best SET id = ? WHERE id = ?').run(n.id, s.id);
+              this.db.prepare('UPDATE OR IGNORE similar_features SET media_id = ? WHERE media_id = ?').run(n.id, s.id);
               out.reused++;
               out.reusedIds.push(n.id);
             }
@@ -637,15 +659,75 @@ class LibraryDatabase {
     return this.listByIds(ids);
   }
 
-  /** The folders opened before (collections), with their counts, most recent first. */
   /** Takes a folder off the list of folders opened before (or puts it back); its catalog is kept. */
   hideRoot(rootPath, hidden = true) {
     return this.db.prepare('UPDATE roots SET hidden = ? WHERE path = ?').run(hidden ? 1 : 0, rootPath).changes > 0;
   }
 
+  /** The folders opened before (collections), with their counts, most recent first. */
   roots() {
     return this.db.prepare(`SELECT r.path, r.last_scan_at AS lastScanAt, r.hidden AS hidden, count(m.id) AS count, coalesce(sum(m.kind = 2), 0) AS videos,
       coalesce(sum(m.size), 0) AS bytes FROM roots r LEFT JOIN media m ON m.root_id = r.id GROUP BY r.id ORDER BY r.last_scan_at DESC`).all();
+  }
+
+  /**
+   * What the person decided about similar photos in a collection: the pairs that are not of the same group and
+   * the photos chosen as the best of theirs. @returns {{ apart: number[][], best: number[] }}
+   */
+  similarChoices(rootId) {
+    const apart = this.db.prepare('SELECT s.a, s.b FROM similar_apart s JOIN media m ON m.id = s.a WHERE m.root_id = ?').all(rootId).map((r) => [r.a, r.b]);
+    const best = this.db.prepare('SELECT s.id FROM similar_best s JOIN media m ON m.id = s.id WHERE m.root_id = ?').all(rootId).map((r) => r.id);
+    return { apart, best };
+  }
+
+  /** What these photos look like (read before, the photo unchanged since). @returns {{ id:number, data:Uint8Array }[]} */
+  similarFeatures(mediaIds) {
+    const out = [];
+    for (let i = 0; i < mediaIds.length; i += 500) {
+      const part = mediaIds.slice(i, i + 500);
+      out.push(...this.db.prepare(`SELECT f.media_id AS id, f.data FROM similar_features f JOIN media m ON m.id = f.media_id
+        WHERE f.media_id IN (${part.map(() => '?').join(',')}) AND f.size = m.size AND f.mtime = m.mtime`).all(...part));
+    }
+    return out;
+  }
+
+  /** Keeps what photos look like. @param {{ id:number, data:Uint8Array }[]} rows */
+  saveSimilarFeatures(rows) {
+    const ins = this.db.prepare('INSERT OR REPLACE INTO similar_features(media_id, size, mtime, data) SELECT id, size, mtime, ? FROM media WHERE id = ?');
+    this.db.exec('BEGIN');
+    try {
+      for (const r of rows) if (Number.isInteger(r.id) && r.data?.length) ins.run(Buffer.from(r.data), r.id);
+      this.db.exec('COMMIT');
+    } catch (err) { this.db.exec('ROLLBACK'); throw err; }
+    return true;
+  }
+
+  /** Says that photos are not (or are again) of the same group of similar photos. @param {number[][]} pairs */
+  setSimilarApart(pairs, apart = true) {
+    const add = this.db.prepare('INSERT OR IGNORE INTO similar_apart(a, b) SELECT ?, ? WHERE EXISTS (SELECT 1 FROM media WHERE id = ?) AND EXISTS (SELECT 1 FROM media WHERE id = ?)');
+    const del = this.db.prepare('DELETE FROM similar_apart WHERE a = ? AND b = ?');
+    this.db.exec('BEGIN');
+    try {
+      for (const [x, y] of pairs) {
+        const a = Math.min(x, y), b = Math.max(x, y);
+        if (!Number.isInteger(a) || !Number.isInteger(b) || a === b) continue;
+        if (apart) add.run(a, b, a, b); else del.run(a, b);
+      }
+      this.db.exec('COMMIT');
+    } catch (err) { this.db.exec('ROLLBACK'); throw err; }
+    return true;
+  }
+
+  /** The best photo of a group (`id`, or none), the others of the group (`group`) no longer. */
+  setSimilarBest(id, group = []) {
+    this.db.exec('BEGIN');
+    try {
+      const del = this.db.prepare('DELETE FROM similar_best WHERE id = ?');
+      for (const x of group) if (Number.isInteger(x)) del.run(x);
+      if (Number.isInteger(id)) this.db.prepare('INSERT OR IGNORE INTO similar_best(id) SELECT id FROM media WHERE id = ?').run(id);
+      this.db.exec('COMMIT');
+    } catch (err) { this.db.exec('ROLLBACK'); throw err; }
+    return true;
   }
 
   /** Updates the size and date of a file that changed after the last scan (seen when its thumbnail is made). */
@@ -882,7 +964,7 @@ class LibraryDatabase {
       const vals = cols.map((k) => (k === 'path' ? dst : k === 'name' ? path.basename(dst) : row[k]));
       const id = this.db.prepare(`INSERT INTO media(${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')}) RETURNING id`).get(...vals).id;
       // the tables keyed by the photo: the same rows for the copy
-      for (const table of ['thumbs', 'adjusted_thumbs', 'previews', 'face_scans', 'pet_scans', 'scene_scans', 'content_scans', 'faces']) {
+      for (const table of ['thumbs', 'adjusted_thumbs', 'previews', 'face_scans', 'pet_scans', 'scene_scans', 'content_scans', 'similar_features', 'faces']) {
         const all = columnsOf(table).filter((c) => c !== 'id' && c !== 'media_id');
         this.db.prepare(`INSERT OR IGNORE INTO ${table}(media_id${all.length ? ', ' + all.join(', ') : ''}) SELECT ?${all.length ? ', ' + all.join(', ') : ''} FROM ${table} WHERE media_id = ?`).run(id, row.id);
       }
@@ -1083,6 +1165,23 @@ class LibraryDatabase {
     }
   }
 
+  /**
+   * The faces (or pets) already found in the other file of the same shot — the raw file and the camera's JPEG
+   * beside it (same folder and name, one raw) — when that one was looked at as it is now: the same picture, so
+   * it is not looked at again. @param {(ext: string) => boolean} isRaw @returns {object[]|null} null: none
+   */
+  facesOfTwin(row, kind, isRaw) {
+    if (!row?.name) return null;
+    const dot = row.name.lastIndexOf('.');
+    const stem = dot > 0 ? row.name.slice(0, dot) : row.name;
+    const like = `${stem.replace(/[\\%_]/g, (c) => `\\${c}`)}.%`;
+    const twins = this.db.prepare(`SELECT m.id, m.name, m.ext FROM media m JOIN ${scanTable(kind)} s ON s.media_id = m.id AND s.size = m.size AND s.mtime = m.mtime AND s.faces >= 0
+      WHERE m.root_id = ? AND m.folder = ? AND m.id != ? AND m.kind = 1 AND m.name LIKE ? ESCAPE '\\'`).all(row.root_id, row.folder, row.id, like);
+    const twin = twins.find((r) => r.name.slice(0, r.name.lastIndexOf('.')).toLowerCase() === stem.toLowerCase() && isRaw(r.ext) !== isRaw(row.ext));
+    if (!twin) return null;
+    return this.db.prepare('SELECT x, y, w, h, score, descriptor, crop, species FROM faces WHERE media_id = ? AND kind = ? ORDER BY id').all(twin.id, kind);
+  }
+
   /** What a photo shows (scenes): replaces what was read before. @param {string|null} data null: unreadable */
   saveScene(mediaId, size, mtime, data, count) {
     this.db.prepare('INSERT OR REPLACE INTO scene_scans(media_id, size, mtime, faces, data) VALUES (?, ?, ?, ?, ?)').run(mediaId, size, mtime, data == null ? -1 : count, data);
@@ -1122,6 +1221,28 @@ class LibraryDatabase {
   /** Every face (or pet), all collections: what matching and grouping need. */
   allFaces(kind = 'face') {
     return this.db.prepare('SELECT f.id, f.media_id AS mediaId, f.descriptor, f.person_id AS personId, f.status, f.cluster, f.rejected, f.species, m.root_id AS rootId FROM faces f JOIN media m ON m.id = f.media_id WHERE f.kind = ?').all(kind);
+  }
+
+  /** Which of these photos a recognizer looked at as they are now. @returns {Set<number>} */
+  scannedOf(mediaIds, kind = 'face') {
+    const out = new Set();
+    for (let i = 0; i < mediaIds.length; i += 500) {
+      const part = mediaIds.slice(i, i + 500);
+      const rows = this.db.prepare(`SELECT s.media_id AS id FROM ${scanTable(kind)} s JOIN media m ON m.id = s.media_id
+        WHERE s.media_id IN (${part.map(() => '?').join(',')}) AND s.size = m.size AND s.mtime = m.mtime`).all(...part);
+      for (const r of rows) out.add(r.id);
+    }
+    return out;
+  }
+
+  /** The faces (or pets) found in these photos, with their size (0..1 of the picture). */
+  faceBoxesOf(mediaIds, kind = 'face') {
+    const out = [];
+    for (let i = 0; i < mediaIds.length; i += 500) {
+      const part = mediaIds.slice(i, i + 500);
+      out.push(...this.db.prepare(`SELECT id, media_id AS mediaId, w, h FROM faces WHERE kind = ? AND media_id IN (${part.map(() => '?').join(',')})`).all(kind, ...part));
+    }
+    return out;
   }
 
   facesOfMedia(mediaId) {

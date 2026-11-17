@@ -36,6 +36,7 @@ import { TodoView } from '../contrib/todo/todoView.js';
 import { BrandService } from '../services/brand/browser/brandService.js';
 import { PeopleView } from '../contrib/faces/peopleView.js';
 import { FacesService } from '../services/faces/browser/facesService.js';
+import { SimilarService } from '../contrib/similar/similarService.js';
 import { BackupView } from '../contrib/backup/backupView.js';
 import { PluginsService, textOf } from '../services/plugins/browser/pluginsService.js';
 import { UpdateService } from '../services/update/browser/updateService.js';
@@ -71,6 +72,7 @@ services.labels = new LabelsService(services);
 services.content = new ContentService(services); // what the photos show (after the labels: their names are searched together)
 services.faces = new FacesService(services, { api: 'faces' });
 services.pets = new FacesService(services, { api: 'pets' });
+services.similar = new SimilarService(services); // similar photos: the window, and Photos grouped
 services.backup = new BackupService(services);
 services.portable = new PortableService(services);
 services.plugins = new PluginsService(services);

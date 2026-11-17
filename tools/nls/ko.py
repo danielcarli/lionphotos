@@ -537,3 +537,15 @@ _merge(MESSAGES, {'similar': {'button': '비슷한 사진', 'more': {'one': '더
 _merge(MESSAGES, {'sidebar': {'forget': '이 목록에서 빼기(앨범과 표시는 그대로 남음)', 'forgotten': '{folder}을(를) 이전에 연 폴더 목록에서 뺐습니다. 카탈로그는 남아 있어 다시 열면 모두 그대로입니다.', 'forgetUndone': '{folder}이(가) 목록에 다시 돌아왔습니다.'}})
 
 _merge(MESSAGES, {'compare': {'onLeft': '왼쪽', 'onRight': '오른쪽', 'strip': '비교 중인 사진', 'stripHint': '클릭하면 표시된 쪽에 보여 줍니다', 'count': {'one': '사진 {count}장', 'other': '사진 {count}장 중 2장씩'}}})
+
+_merge(MESSAGES, {'similar': {'count': {'one': '사진 {count}장', 'other': '사진 {count}장'}, 'countTitle': '이 그룹의 사진 수', 'notOne': '같은 그룹 아님', 'notOneTitle': '이 사진들은 같은 그룹이 아닙니다(구도는 비슷하지만 다른 사람이 찍힌 경우 등). 다시 함께 묶이지 않습니다', 'photoMenu': '이 사진에 대한 추가 작업', 'setBest': '베스트로 선택', 'keepOnly': {'one': '이것만 남기기: 다른 1장은 보류함으로', 'other': '이것만 남기기: 다른 {count}장은 보류함으로'}, 'takeOut': '그룹에서 빼기', 'compareThis': '나란히 비교', 'takenOut': '{name}을(를) 그룹에서 뺐습니다. 이 사진들과 다시 묶이지 않습니다.', 'notOneDone': {'one': '이 사진은 더 이상 그룹에 없습니다.', 'other': '이 사진 {count}장은 더 이상 그룹이 아니며 다시 함께 묶이지 않습니다.'}}})
+
+_merge(MESSAGES, {'similar': {'whoUnknownTitle': '이 사진에서 아직 사람을 찾지 않았습니다. 지금 찾는 중입니다', 'whoUnknown': '사람 찾는 중…', 'whoNone': '사람 없음', 'faceNamed': '{name} — 클릭하여 변경', 'faceName': {'person': '이 사람은 누구인가요?', 'pet': '어떤 반려동물인가요?'}, 'eyebrowPerson': '인물', 'eyebrowPet': '반려동물', 'faceLabel': '이름', 'faceSave': '저장', 'faceSaved': '{name} 저장됨: 이 얼굴은 이제 인물에 있습니다.', 'stack': '비슷한 사진 묶기', 'stackTitle': '비슷한 사진 그룹을 가장 좋은 사진 한 장으로 보여 주고 장수를 표시합니다(숫자를 클릭하면 그룹이 열림)', 'stackReading': '묶기 위해 사진을 읽는 중', 'stackOpen': {'one': '비슷한 사진 {count}장 그룹', 'other': '비슷한 사진 {count}장 그룹'}, 'stackBadge': {'one': '비슷한 사진 {count}장: 그룹 열기', 'other': '비슷한 사진 {count}장: 그룹 열기'}}, 'compare': {'more': '이 사진에 대한 추가 작업', 'keepTitle': '남기거나 보류함으로 보내기(스페이스 바)', 'stays': '남김', 'goes': '보류함으로', 'hintKeep': '스페이스: 남김/보냄 · ← → 그룹의 다른 사진 · Tab으로 쪽 바꾸기 · 휠로 둘 다 확대'}, 'carry': {'labels': '앨범과 인물', 'mark': '표시', 'stays': '남김', 'field': '항목', 'inKept': '남는 사진', 'inGoing': '보내는 사진', 'empty': '비어 있음', 'from': '{name}에서', 'apply': '가져오고 계속', 'skip': '가져오지 않고 계속', 'title': {'one': '보내는 사진에 남는 사진에 없는 정보가 {count}개 있습니다', 'other': '보내는 사진에 남는 사진에 없는 정보가 {count}개 있습니다'}, 'message': '남는 사진으로 가져올 항목을 선택하세요(카탈로그에 기록되며 되돌릴 수 있음). 더 완전하거나 더 최근인 항목이 미리 선택되어 있습니다.'}})
+
+_merge(MESSAGES, {'similar': {'statusReading': '묶기 위해 사진을 읽는 중: {total}장 중 {done}장', 'statusFaces': '얼굴 찾는 중: {total}장 중 {done}장 — 다른 사람이 있는 그룹은 나뉩니다', 'statusPaused': '일시 중지됨', 'statusDone': '{groups} · {photos}장 중 {grouped}장이 그룹에 있습니다(각 그룹은 가장 좋은 사진을 표시)', 'statusGroups': {'one': '비슷한 사진 그룹 {count}개', 'other': '비슷한 사진 그룹 {count}개'}, 'statusNone': '표시된 사진 {photos}장 중 비슷한 사진이 없습니다'}})
+
+_merge(MESSAGES, {'similar': {'statusFromCatalog': {'one': '사진 {count}장의 얼굴은 카탈로그에서(이미 분석됨)', 'other': '사진 {count}장의 얼굴은 카탈로그에서(이미 분석됨)'}}})
+
+_merge(MESSAGES, {'similar': {'only': '묶인 사진만', 'onlyTitle': '비슷한 사진 그룹만 보여 줍니다(각 그룹은 가장 좋은 사진으로). 혼자인 사진은 빠집니다'}})
+
+_merge(MESSAGES, {'photos': {'kind': {'grouped': '묶인 사진'}}})

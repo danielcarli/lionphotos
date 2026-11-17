@@ -6,7 +6,7 @@
 // The library in the main process: opens a folder, shows what the catalog already knows about it at
 // once (with its thumbnails), and then refreshes it with a scan that only reads file metadata.
 const { app } = require('electron');
-const { sourcesOf } = require('../node/sourceKind');
+const { sourcesOf, sourcesNow, warmSources } = require('../node/sourceKind');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -81,15 +81,25 @@ class LibraryMainService {
     ipc.handle('library:items', (e, ids) => this.db.listByIds((ids || []).map(Number).filter(Number.isInteger)));
     ipc.handle('library:details', (e, id) => this.db.details(Number(id)));
     // the folders opened before, each with where it is (this computer's disk, an external one, a cloud drive, the network)
+    // (what the system says of its disks is asked in the background: the menu of folders never waits for it —
+    // on Windows it takes a PowerShell call of a second or two — except, briefly, the very first time)
     ipc.handle('library:roots', async () => {
       const rows = await this.reader.roots().catch(() => this.db.roots());
-      const where = await sourcesOf(rows.map((r) => r.path)).catch(() => new Map());
+      const paths = rows.map((r) => r.path);
+      const where = sourcesNow(paths)
+        || await Promise.race([sourcesOf(paths), new Promise((r) => setTimeout(() => r(null), 300))]).catch(() => null)
+        || new Map();
       return rows.map((r) => ({ ...r, source: where.get(r.path) || null }));
     });
+    ipc.handle('library:similarFeatures', (_e, mediaIds) => this.db.similarFeatures(Array.isArray(mediaIds) ? mediaIds.map(Number).filter(Number.isInteger) : []));
+    ipc.handle('library:saveSimilarFeatures', (_e, rows) => this.db.saveSimilarFeatures(Array.isArray(rows) ? rows.map((r) => ({ id: Number(r?.id), data: r?.data })) : []));
+    ipc.handle('library:similarChoices', () => (this.rootId ? this.db.similarChoices(this.rootId) : { apart: [], best: [] }));
+    ipc.handle('library:similarApart', (_e, pairs, apart) => this.db.setSimilarApart(Array.isArray(pairs) ? pairs.filter(Array.isArray).map((p) => p.map(Number)) : [], apart !== false));
+    ipc.handle('library:similarBest', (_e, id, group) => this.db.setSimilarBest(id == null ? null : Number(id), Array.isArray(group) ? group.map(Number) : []));
     // a folder off the list of folders opened before (its catalog kept), or back on it
     ipc.handle('library:hideRoot', (_e, rootPath, hidden) => (typeof rootPath === 'string' ? this.db.hideRoot(rootPath, hidden !== false) : false));
-    // asked once a little after start, so the first list opens at once (Windows: one PowerShell call)
-    setTimeout(() => sourcesOf([]).catch(() => {}), 5000).unref?.();
+    // asked at start (in the background), so the first list opens at once (Windows: one PowerShell call)
+    warmSources();
     // marks (great / OK / candidate to delete) change only the catalog, never a file: no confirmation code
     ipc.handle('library:mark', (e, ids, mark) => {
       const list = (Array.isArray(ids) ? ids : []).map(Number).filter((id) => Number.isInteger(id) && id > 0).slice(0, 200000);

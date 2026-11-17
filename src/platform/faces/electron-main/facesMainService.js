@@ -192,6 +192,9 @@ class FacesMainService {
     // what each photo shows (the content model): "id category:percent,…" per line
     if (this.kind === 'scene') ipc.handle(`${this.channel}:content`, () => (this.library.rootId && this.content ? this.library.reader.content(this.library.rootId, this.content.id).catch(() => '') : ''));
     ipc.handle(`${this.channel}:ignored`, () => this.index.ignoredFaces(this.library.rootId));
+    // the similar photos (grouped by who is in them): the faces of some photos, and those photos looked at first
+    ipc.handle(`${this.channel}:of`, (_e, mediaIds) => this.peopleOf(ids(mediaIds)));
+    ipc.handle(`${this.channel}:lookAt`, (_e, mediaIds) => this.lookAt(ids(mediaIds)));
     ipc.handle(`${this.channel}:ofMedia`, (_e, mediaId) => this.db.facesOfMedia(Number(mediaId)));
     ipc.handle(`${this.channel}:assign`, (_e, op) => this.assign(op || {}));
     ipc.handle(`${this.channel}:reject`, (_e, faceIds) => this.#change(() => this.index.reject(this.#mine(ids(faceIds)).map((f) => f.id))));
@@ -277,6 +280,48 @@ class FacesMainService {
     this.paused = false;
     this.error = null;
     this.#fill();
+    return this.state();
+  }
+
+  /**
+   * Who is in some photos, for the similar photos: per photo, whether it was looked at (as it is now) and its
+   * faces (not those set aside as "ignore"), with their 128 numbers, size and person.
+   * @returns {Record<number, { scanned: boolean, faces: { id:number, personId:number|null, w:number, h:number, v:number[] }[] }>}
+   */
+  peopleOf(mediaIds) {
+    const out = {};
+    if (this.kind === 'scene' || !mediaIds.length) return out;
+    this.index.load();
+    const scanned = this.db.scannedOf(mediaIds, this.kind);
+    const boxes = this.db.faceBoxesOf(mediaIds, this.kind);
+    for (const id of mediaIds) out[id] = { scanned: scanned.has(id), faces: [] };
+    for (const b of boxes) {
+      const f = this.index.get(b.id);
+      if (!f || f.status === 3) continue;
+      out[b.mediaId]?.faces.push({ id: f.id, personId: f.personId || null, w: b.w, h: b.h, v: Array.from(f.v) });
+    }
+    return out;
+  }
+
+  /** These photos first (those not looked at yet): the similar photos are being grouped by who is in them. */
+  lookAt(mediaIds) {
+    if (this.kind === 'scene' || !this.library.rootId || this.support?.supported === false || !mediaIds.length) return this.state();
+    const scanned = this.db.scannedOf(mediaIds, this.kind);
+    let todo = mediaIds.filter((id) => !scanned.has(id) && id !== this.current);
+    // the app's own checks (recognition on the processor, slow): none, or a few
+    if (process.env.LIONPHOTOS_LOOKAT_LIMIT !== undefined) todo = todo.slice(0, Number(process.env.LIONPHOTOS_LOOKAT_LIMIT) || 0);
+    if (!todo.length) return this.state();
+    const first = new Set(todo);
+    const queued = new Set(this.queue);
+    const running = this.busy || this.queue.length;
+    this.queue = [...todo, ...this.queue.filter((id) => !first.has(id))];
+    this.queueRoot = this.library.rootId;
+    if (running) this.counts.total += todo.filter((id) => !queued.has(id)).length;
+    else this.counts = { total: todo.length, done: 0 };
+    this.paused = false;
+    this.error = null;
+    this.#emitProgress();
+    this.#pump();
     return this.state();
   }
 
@@ -370,6 +415,9 @@ class FacesMainService {
     const size = st.size;
     const mtime = Math.round(st.mtimeMs);
     const how = thumbDecoder(row.ext);
+    // the other file of the same shot (raw + JPEG) already looked at: its faces, without looking again
+    const known = this.db.facesOfTwin(row, this.kind, (ext) => thumbDecoder(ext) === 'raw');
+    if (known) { this.reused = (this.reused || 0) + 1; return this.#keep(id, row, size, mtime, known); }
     const job = { url: `lionmedia://f/${row.id}` };
     let res = null;
     if (how === 'raw') {
@@ -394,6 +442,11 @@ class FacesMainService {
     if (res && !res.ok) console.warn(`faces ${row.path}: ${res.error}`);
     if (res?.backend) this.backend = res.backend;
     const faces = res?.ok ? res.faces.map((f) => ({ ...f, descriptor: Buffer.from(f.descriptor), crop: f.crop ? Buffer.from(f.crop) : null })) : null;
+    this.#keep(id, row, size, mtime, faces);
+  }
+
+  /** The faces of a photo into the catalog and the index (people suggested at once). */
+  #keep(id, row, size, mtime, faces) {
     this.index.dropMedia(id);
     const newIds = this.db.saveFaces(id, size, mtime, faces, this.kind); // null: this photo could not be read (-1)
     if (newIds.length) {

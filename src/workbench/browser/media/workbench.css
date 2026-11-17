@@ -3447,6 +3447,15 @@ button.vw-chip:hover { filter: brightness(1.2); }
 .sim-group-title { font-weight: 700; font-size: 13.5px; }
 .sim-group-meta { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .sim-tiles { display: flex; flex-wrap: wrap; gap: 8px; }
+/* how many photos a group has, and each photo's menu (1.61.0) */
+.sim-count { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 9px 0 7px; border-radius: 999px; background: var(--accent-soft, var(--bg-subtle)); color: var(--accent); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sim-count span { line-height: 0; }
+.sim-cell { position: relative; }
+.sim-menu { position: absolute; right: 6px; top: 30px; display: grid; place-items: center; width: 26px; height: 22px; padding: 0; border: 0; border-radius: 6px; background: rgba(0, 0, 0, 0.55); color: #fff; cursor: pointer; line-height: 0; opacity: 0; }
+.sim-cell:hover .sim-menu, .sim-menu:focus-visible, .sim-menu[aria-expanded='true'] { opacity: 1; }
+.sim-menu:hover { background: rgba(0, 0, 0, 0.75); }
+.sim-menu:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+@media (hover: none) { .sim-menu { opacity: 1; } }
 .sim-tile { position: relative; width: 168px; height: 118px; padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: var(--tile); cursor: pointer; box-shadow: 0 0 0 2px transparent; transition: opacity 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease; }
 .sim-tile img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .sim-tile:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
@@ -3468,3 +3477,63 @@ button.vw-chip:hover { filter: brightness(1.2); }
 .sim-progress-bar { height: 100%; width: 0; background: var(--accent); transition: width 0.2s linear; }
 .sim-empty { margin-top: 10vh; }
 @media (prefers-reduced-motion: reduce) { .sim-tile, .sim-progress-bar { transition: none; } }
+
+/* ---------- similar photos grouped in Photos: the stack on the photo that stands for its group (1.62.0) */
+.tile-stack { position: absolute; top: 6px; right: 6px; z-index: 3; display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px 0 7px; border: 0; border-radius: 99px;
+  background: rgba(14, 11, 13, 0.66); color: #fff; font: 700 11.5px/1 var(--font-ui, inherit); font-variant-numeric: tabular-nums; backdrop-filter: blur(4px); cursor: pointer; }
+.tile-stack span { line-height: 0; }
+.tile-stack:hover { background: rgba(14, 11, 13, 0.85); }
+.tile-stack:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+/* the photo's actions take the corner on hover: the stack steps down */
+.tile:hover .tile-stack { top: 38px; }
+@media (prefers-reduced-motion: no-preference) { .tile-stack { transition: top 0.12s ease; } }
+/* what "Group similar photos" is doing, under the bar */
+.stack-status { display: flex; align-items: center; gap: 12px; padding: 6px 20px 7px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); }
+.stack-lines { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.stack-only { flex: none; }
+.stack-status[hidden] { display: none; }
+.stack-line { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.stack-line-icon { color: var(--accent); line-height: 0; flex: none; }
+.stack-line-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stack-bar { flex: 0 1 220px; min-width: 60px; height: 5px; border-radius: 99px; background: var(--track, var(--border)); overflow: hidden; }
+.stack-bar span { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+@media (prefers-reduced-motion: no-preference) { .stack-bar span { transition: width 0.25s linear; } }
+.stack-line-extra { color: var(--text-muted); white-space: nowrap; }
+
+/* who is in each similar photo (faces and pets: a click names one) */
+.sim-who { display: flex; flex-wrap: wrap; gap: 4px; width: 168px; margin-top: 5px; min-height: 22px; }
+.sim-who-wait, .sim-who-none { font-size: 11px; color: var(--text-muted); line-height: 22px; }
+.sim-face { display: inline-flex; align-items: center; gap: 4px; height: 22px; max-width: 100%; padding: 0 7px 0 2px; border: 1px solid var(--border); border-radius: 99px; background: var(--bg-elevated); color: var(--text-secondary); font-size: 11px; cursor: pointer; }
+.sim-face img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; flex: none; }
+.sim-face span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sim-face.is-new { border-style: dashed; color: var(--text-muted); }
+.sim-face:hover { border-color: var(--accent); color: var(--text-primary); }
+.sim-face:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.td-image { display: block; width: 72px; height: 72px; margin: 0 0 12px; border-radius: 50%; object-fit: cover; }
+
+/* side by side, a group of similar photos: stays or goes, and the photo's menu */
+.cmp-keep { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px 0 9px; border: 0; border-radius: 99px; background: #e9f6ec; color: #145c2c; font: 600 12.5px var(--font-ui, inherit); cursor: pointer; white-space: nowrap; }
+.cmp-keep span { line-height: 0; }
+.cmp-keep.is-out { background: var(--danger, #c4314b); color: #fff; }
+.cmp-thumb.is-out img { opacity: 0.4; filter: grayscale(0.7); }
+.cmp-thumb-state { position: absolute; right: 3px; bottom: 3px; display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: #fff; color: #145c2c; line-height: 0; }
+.cmp-thumb.is-out .cmp-thumb-state { background: var(--danger, #c4314b); color: #fff; }
+
+/* before the Limbo: what the photos that go say and the one that stays does not */
+.carry-dialog { width: min(860px, 100%); max-height: calc(100vh - 48px); display: flex; flex-direction: column; }
+.carry-body { overflow: auto; min-height: 0; margin: 0 -4px; padding: 0 4px; }
+.carry-group { padding: 12px 0; border-top: 1px solid var(--border); }
+.carry-keep { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.carry-keep img { width: 56px; height: 42px; object-fit: cover; border-radius: 6px; background: var(--tile); }
+.carry-keep-label { color: var(--text-muted); }
+.carry-keep-name { font-size: 13px; }
+.carry-row { display: grid; grid-template-columns: 22px minmax(90px, 0.7fr) 1fr 1fr; gap: 10px; align-items: start; padding: 6px 4px; border-radius: 6px; font-size: 12.5px; cursor: pointer; }
+.carry-row:hover { background: var(--hover); }
+.carry-row input { margin-top: 2px; }
+.carry-head { cursor: default; color: var(--text-muted); padding-bottom: 2px; }
+.carry-head:hover { background: none; }
+.carry-field { font-weight: 600; }
+.carry-mine, .carry-theirs { overflow-wrap: anywhere; }
+.carry-theirs { display: flex; flex-direction: column; gap: 2px; }
+.carry-from { color: var(--text-muted); }
+@media (max-width: 640px) { .carry-row { grid-template-columns: 22px 1fr; } .carry-mine, .carry-theirs { grid-column: 2; } .carry-head span:nth-child(n+3) { display: none; } }

@@ -15,6 +15,7 @@ import { formatDate } from '../../../base/common/format.js';
 import { adjustOf, dateOf, KIND, MARK_NAMES } from '../../services/library/browser/libraryService.js';
 import { pictureUrl } from '../photos/adjustSection.js';
 import { applyMark } from '../limbo/sendToLimbo.js';
+import { showContextMenu } from '../../browser/contextMenu.js';
 
 const MAX_ZOOM = 8;
 const SIZE = 2400; // the long side an adjusted photo is drawn at
@@ -26,8 +27,11 @@ export const comparable = (services, items) => items.filter((it) => it.kind === 
  * @param {object} services
  * @param {object[]} items the photos to go through (two or more)
  * @param {number} left @param {number} right where each side starts in `items`
- * @param {{ active?: 0|1, tag?: (it: object) => string }} [opts] active: the side ← → step (the right one by
- *   default); tag: a word shown beside a photo's name ("Best", "Keep"), as in the list it was opened from
+ * @param {{ active?: 0|1, tag?: (it: object) => string, keep?: { is: (it: object) => boolean, toggle: (it: object) => void },
+ *   actions?: (it: object) => object[], onClose?: () => void }} [opts] active: the side ← → step (the right one by
+ *   default); tag: a word shown beside a photo's name ("Best", "Keep"), as in the list it was opened from;
+ *   keep: whether each photo stays or goes to the Limbo (a group of similar photos: a click, or the space bar,
+ *   changes it, as in a phone's burst); actions: a photo's menu (items of a context menu; `close`: closes here)
  */
 export function showCompare(services, items, left = 0, right = 1, opts = {}) {
   const { library, thumbs } = services;
@@ -43,19 +47,21 @@ export function showCompare(services, items, left = 0, right = 1, opts = {}) {
   const feet = [0, 1].map(() => h('div.cmp-foot'));
   const sides = [0, 1].map((i) => h('section.cmp-side', { 'aria-label': t(i ? 'compare.right' : 'compare.left'), onpointerdown: () => setActive(i) }, frames.at(i), feet.at(i)));
 
-  const strip = list.length > 2 ? h('div.cmp-strip', { role: 'group', 'aria-label': t('compare.strip') }) : null;
+  const strip = list.length > 2 || opts.keep ? h('div.cmp-strip', { role: 'group', 'aria-label': t('compare.strip') }) : null;
   const paintStrip = () => {
     if (!strip) return;
     setChildren(strip, list.map((it, n) => {
       const side = at[0] === n ? 0 : at[1] === n ? 1 : -1;
       const tag = opts.tag?.(it) || '';
-      return h(`button.cmp-thumb${side >= 0 ? '.is-shown' : ''}${side === active ? '.is-active' : ''}`, {
+      const out = opts.keep && !opts.keep.is(it);
+      return h(`button.cmp-thumb${side >= 0 ? '.is-shown' : ''}${side === active ? '.is-active' : ''}${out ? '.is-out' : ''}`, {
         type: 'button', title: `${it.name}${tag ? ` · ${tag}` : ''}\n${t('compare.stripHint')}`, 'aria-pressed': String(side >= 0),
         onclick: () => show(n),
       },
       thumbs.shown(h('img', { alt: '', draggable: false, decoding: 'async', loading: 'lazy' }), library.byId.get(it.id) || it),
       side >= 0 ? h('span.cmp-thumb-side', t(side ? 'compare.onRight' : 'compare.onLeft')) : null,
-      tag ? h('span.cmp-thumb-tag', tag) : null);
+      tag ? h('span.cmp-thumb-tag', tag) : null,
+      opts.keep ? h('span.cmp-thumb-state', { html: icon(out ? 'binQuestion' : 'check', 11) }) : null);
     }));
     strip.querySelector('.cmp-thumb.is-active')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   };
@@ -92,8 +98,20 @@ export function showCompare(services, items, left = 0, right = 1, opts = {}) {
       h('span.cmp-marks', [['great', 'star', '1'], ['ok', 'okCircle', '2'], ['reject', 'binQuestion', '3']].map(([name, ic, key]) =>
         h('button', { type: 'button', class: `vw-btn mark-btn mark-${name}${mark === name ? ' on' : ''}`, title: t(`marks.${name}Title`, { key }), 'aria-pressed': String(mark === name), onclick: () => setMark(i, name) },
           h('span.mark-icon', { html: icon(ic, 16) })))),
+      opts.keep ? keepButton(i, it) : null,
+      opts.actions ? h('button.vw-btn.cmp-more', { type: 'button', title: t('compare.more'), 'aria-label': t('compare.more'), 'aria-haspopup': 'menu', html: icon('more', 16),
+        onclick: (e) => { setActive(i); const r = e.currentTarget.getBoundingClientRect(); showContextMenu(r.left, r.top - 4, opts.actions(it).map((a) => ({ ...a, run: () => act(a) }))); } }) : null,
       h('button.cmp-step', { type: 'button', title: t('compare.next'), 'aria-label': t('compare.next'), html: icon('chevronRight', 16), onclick: () => step(i, 1) }));
   };
+  // stays or goes to the Limbo (a group of similar photos)
+  const keepButton = (i, it) => {
+    const stays = opts.keep.is(it);
+    return h(`button.cmp-keep${stays ? '' : '.is-out'}`, { type: 'button', 'aria-pressed': String(stays), title: t('compare.keepTitle'), onclick: () => toggleKeep(i) },
+      h('span', { html: icon(stays ? 'check' : 'binQuestion', 14) }), t(stays ? 'compare.stays' : 'compare.goes'));
+  };
+  const toggleKeep = (i) => { setActive(i); opts.keep.toggle(list.at(at.at(i))); paintFoot(0); paintFoot(1); paintStrip(); };
+  const repaint = () => { if (el.isConnected) { paintFoot(0); paintFoot(1); paintStrip(); } };
+  const act = (a) => { if (a.close) close(); Promise.resolve(a.run()).then(repaint, repaint); };
   // the next photo that is not on the other side
   const step = (i, by) => {
     let n = at.at(i);
@@ -118,12 +136,13 @@ export function showCompare(services, items, left = 0, right = 1, opts = {}) {
   };
   const zoom = (f) => { view.s = Math.max(1, Math.min(MAX_ZOOM, view.s * f)); clamp(); place(); };
 
-  const close = () => { document.removeEventListener('keydown', onKey, true); sub.dispose(); el.remove(); };
+  const close = () => { document.removeEventListener('keydown', onKey, true); sub.dispose(); el.remove(); opts.onClose?.(); };
   const onKey = (e) => {
     if (document.querySelector('.cm-overlay')) return; // a confirmation is asking
     const k = e.key;
     if (k === 'Escape') close();
     else if (k === 'Tab') setActive(1 - active);
+    else if (k === ' ' && opts.keep) toggleKeep(active);
     else if (k === 'ArrowRight') step(active, 1);
     else if (k === 'ArrowLeft') step(active, -1);
     else if (/^[0-3]$/.test(k) && !e.ctrlKey && !e.metaKey && !e.altKey) setMark(active, k === '0' ? 0 : MARK_NAMES[Number(k)]);
@@ -134,7 +153,7 @@ export function showCompare(services, items, left = 0, right = 1, opts = {}) {
     e.preventDefault(); e.stopPropagation();
   };
   const el = h('div.cmp', { role: 'dialog', 'aria-modal': 'true', 'aria-label': t('compare.title') },
-    h('header.cmp-bar', h('span.cmp-icon', { html: icon('columns', 16) }), h('strong', t('compare.title')), strip ? h('span.cmp-count', tn('compare.count', list.length)) : null, h('span.cmp-hint', t('compare.hint')), h('span.cmp-sp'),
+    h('header.cmp-bar', h('span.cmp-icon', { html: icon('columns', 16) }), h('strong', t('compare.title')), list.length > 2 ? h('span.cmp-count', tn('compare.count', list.length)) : null, h('span.cmp-hint', opts.keep ? t('compare.hintKeep') : t('compare.hint')), h('span.cmp-sp'),
       h('button.vw-btn', { type: 'button', title: `${t('common.close')} (Esc)`, 'aria-label': t('common.close'), html: icon('close', 18), onclick: close })),
     h('div.cmp-body', { onwheel: (e) => { e.preventDefault(); zoom(e.deltaY < 0 ? 1.15 : 1 / 1.15); } }, sides), strip);
   const sub = library.onDidChangeMarks(() => { paintFoot(0); paintFoot(1); });

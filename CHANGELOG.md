@@ -2,6 +2,51 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.62.3] — 2026-11-17
+
+### Added
+- **Grouped photos: only the groups of similar photos**, each as its best photo with its stack, the photos alone left out — in *Filters › Type* (beside All, Photos and Videos; it turns *Group similar photos* on with it), as a switch at the end of the line under the bar, and as a filter chip with its ×. Picking another type, or clearing the filters, gives every photo again.
+
+### Changed
+- The stack on a photo that stands for a group is a little larger, easier to see on a busy picture.
+
+## [1.62.2] — 2026-11-17
+
+### Changed
+- **Faces and pets already found are never looked for again.** Grouping similar photos takes the faces and pets of the photos already looked at from the catalog (as before); the line under the bar now says how many came from there ("faces of 2 054 photos from the catalog"), and only the photos never looked at, or changed since, are looked at.
+- **The raw file and the camera's JPEG of the same shot are looked at once.** When one of the two (same folder and name) was already looked at, the other takes its faces and pets from the catalog instead of being decoded and looked at again — half the work for collections shot in RAW+JPEG, by "Index now" too.
+
+## [1.62.1] — 2026-11-17
+
+### Added
+- **"Group similar photos" says what it is doing**, in a line under the bar of Photos: the photos being read to group them (how many of how many, a bar and the time left), the faces being looked for in the photos of the groups, and then what came of it ("312 groups of similar photos · 1 204 of 14 648 photos are in a group").
+
+### Fixed
+- **With "Group similar photos" on, a large collection seemed to work without grouping, its thumbnails flashing.** Photos was drawn again every few seconds while the photos were read and every time faces were found, and grouped only at the very end. Now the newest photos are read first and the top of the grid is grouped as soon as they are (then again at the end); faces found meanwhile are read again at most every 15 seconds, and Photos is drawn again only when its groups changed. What each photo looks like is worked out in the background (a worker), so the window stays smooth while thousands are read.
+
+## [1.62.0] — 2026-11-17
+
+### Added
+- **Group similar photos, in Photos** — a switch beside *Similar photos*, as *Only photos in no album*. Each group of similar photos shows as one photo, its best, with a little stack of photos and how many it holds in its top right corner; a click on it opens the group, to choose what stays. The count of Photos stays the count of every photo, and exporting or organizing what is shown takes the whole groups. While the photos are read the switch says how far it is; what each photo looks like is kept in the catalog (320 bytes a photo), so a collection is read once.
+- **Similar photos know who is in them.** Two alike pictures with different people (or pets) are not of the same group — the same place and framing with other people make groups of their own, each with the same people. The faces and pets already found are used; the photos of the groups not looked at yet are looked at first (even with recognition not turned on), and they join People and Pets as any other. Under each photo of a group, its faces: a click names one (a new person, or one already known).
+- **Side by side, as in a phone's burst.** Opened from a group of similar photos, each side says whether its photo stays or goes to the Limbo (a click, or the space bar), the strip shows it on every photo, and the photo's menu is there (*Choose as the best*, *Keep only this one*, *Take out of the group*). Back in the group, what was decided shows.
+- **Before similar photos go to the Limbo, their metadata.** When the photos that go say something the one that stays does not — a title, a caption, the audio description, the author, the place, keywords, an album or a person, a star — the two are shown side by side, what is more complete (or more recent) ticked, to take to the photo that stays (written in the catalog, undone as any description). When the photo that stays has the most complete and most recent metadata, nothing is asked.
+
+### Fixed
+- **The folder menu of the side bar could take a second or two to open, or seem not to answer** (Windows): it waited for the system to say where each folder is (a PowerShell call), every minute. That is now asked at start and in the background, and the menu opens with what was last known; a second click while it opens no longer opens another.
+
+## [1.61.0] — 2026-11-17
+
+### Added
+- **Similar photos, as the stacks of the phones' photo apps** (Google Photos' *photo stacks*, the iPhone's bursts and duplicates):
+  - each group says how many photos it has;
+  - each photo has a menu (its ⋯, or the right button): *Choose as the best*, *Keep only this one* (the others of the group go to the Limbo now, after asking, with an undo), *Take out of the group*, *Compare side by side*;
+  - *Not the same*, on a group: alike pictures that are not one group (the same place and framing with different people, say) are pulled apart.
+  - These decisions are kept in the catalog (and follow a photo renamed or moved by the app): a photo taken out of a group, or a group said not to be one, is not grouped together again, and the photo chosen as the best stays the one suggested to keep. Taking out and pulling apart have an undo.
+
+### Fixed
+- Similar photos: after a mark changed while the window was open, the groups could vanish (the photos were grouped again without what had been read of them).
+
 ## [1.60.0] — 2026-11-17
 
 ### Added

@@ -2,6 +2,14 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.58.0] — 2026-11-17
+
+### Added
+- **A plugin can give the app its name and logo**, as *Settings › Name and logo* does by hand: `"brand": { "name": …, "logo": "assets/…" }` in its `plugin.json` (the name up to 40 characters, one per language if it wants; the logo a PNG, JPEG, WebP or SVG of its own, fitted whole in a square). While the plugin is on, the title bar, the welcome page and the window's title show them, with "Powered by LionPhotos" beside the name.
+  - One's own name and logo, set in *Settings › Name and logo*, go before the plugin's; that dialog says which plugin gives them and has *Use the plugin's* to go back to it. *Back to LionPhotos* leaves the plugin's too.
+  - Turning the plugin off or removing it gives LionPhotos's name and logo back. The last plugin's are remembered, so the title bar does not flash LionPhotos at each start.
+  - Settings › Plugins says which plugin gives the app its name and logo. Documented in [docs/PLUGINS.md](docs/PLUGINS.md).
+
 ## [1.57.4] — 2026-11-17
 
 ### Fixed

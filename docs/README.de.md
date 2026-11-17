@@ -26,7 +26,7 @@ Riesige Foto- und Videosammlungen dort durchsuchen und ordnen, wo sie schon lieg
 
 **Kein Import** · **Nichts verlässt Ihren Computer** · **100.000 Fotos scrollen wie 100** · **Kostenlos und Open Source**
 
-![Version 1.57.4](https://img.shields.io/badge/version-1.57.4-161214)
+![Version 1.58.0](https://img.shields.io/badge/version-1.58.0-161214)
 ![Status: Betatest](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Lizenz: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plattformen: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -185,7 +185,7 @@ LionPhotos ist in der **Beta**. Das bedeutet:
 | **Alben** | Titelbild, Beschreibung und Zeitraum; *Zu Album hinzufügen…* für jede Auswahl, *Aus Album entfernen*, *Als Titelbild verwenden*; **Alben aus den Ordnern** (die erste Ebene, die Ordner mit Fotos oder eine eigene Auswahl), mit dem ganzen Ordner verbunden; Diashow im Vollbild. **Alben vorschlagen**: die Fotos so gruppiert, wie sie aufgenommen wurden, und nach ihrem Inhalt benannt — der Ordner, was die Fotos zeigen (auf diesem Computer aus den Miniaturen gelesen: Strand, Berge, Torte, Brautkleid, Essen…), Feiertage nach Datum, der Ort, die Person — dazu Alben eines Themas über die Jahre, zum Prüfen vor dem Erstellen. **Zwei Alben zusammenführen** (die Fotos beider, unter dem gewählten Namen; nur der Katalog ändert sich, rückgängig machbar). Als Mosaik, gleichmäßiges Raster (alle Titelbilder gleich groß), Liste oder Auswahl. |
 | **Projekte, Personen, Haustiere, Orte** | Jeweils im eigenen Tab, als Raster oder als Liste nach Jahren. Beim Öffnen erscheinen die Fotos unter dem eigenen Tab; ein Foto lässt sich mit einem Klick herausnehmen. Das Etikett eines Ordners gilt für alles darin. Ein Projekt fasst Alben zusammen und hat ein Datenblatt (Status, für wen, Ort, Team, Termin) und eine Übersicht zum Stand: sortiert, bearbeitet, in Alben ausgewählt, Audiodeskriptionen. Orte füllen sich aus den Fotos selbst (GPS-Position oder eingetragener Ort) und erscheinen auf einer **Weltkarte**, die auf dem Computer gezeichnet wird. |
 | **Zu bearbeiten** | Der Stift auf dem Cover eines Albums oder Projekts setzt es in den Tab **Zu bearbeiten** (Strg+Umschalt+E), eine Liste in der Reihenfolge, in der die Dinge zu erledigen sind: Zeilen ziehen oder die Pfeile bzw. Alt+↑ ↓ nutzen, um nach vorn zu stellen, was zuerst kommt. Der Platz in der Liste steht auf dem Cover, ein Projekt zeigt sein Fälligkeitsdatum (rot, wenn überfällig), und *Erledigt* nimmt den Stift weg. Nur der Katalog ändert sich, und die Liste reist mit der Sammlung. |
-| **Name und Logo** | *Einstellungen › Name und Logo* setzt Ihren eigenen Namen und Ihr Logo (einer Agentur, eines Studios, eines Kurses) in die Titelleiste, auf die Startseite und in den Fenstertitel, mit Vorschau. Ein eigener Name zeigt immer **Powered by LionPhotos** daneben; Über behält die Angaben. Das Logo (PNG, JPG, WebP, SVG) wird vollständig in ein Quadrat gesetzt; *Zurück zu LionPhotos* macht es rückgängig. Wird auf diesem Computer gespeichert. |
+| **Name und Logo** | *Einstellungen › Name und Logo* setzt Ihren eigenen Namen und Ihr Logo (einer Agentur, eines Studios, eines Kurses) in die Titelleiste, auf die Startseite und in den Fenstertitel, mit Vorschau. Ein eigener Name zeigt immer **Powered by LionPhotos** daneben; Über behält die Angaben. Das Logo (PNG, JPG, WebP, SVG) wird vollständig in ein Quadrat gesetzt; *Zurück zu LionPhotos* macht es rückgängig. Wird auf diesem Computer gespeichert. Auch ein Plugin kann sie festlegen, solange es eingeschaltet ist (`brand` in seiner `plugin.json`); Ihre eigenen gehen vor. |
 | **Gesichter und Haustiere** | face-api (TensorFlow.js) für Gesichter, COCO-SSD und MobileNet für Tiere, auf der Grafikkarte (WebGL). Gruppen ähnlicher Gesichter, Vorschläge zum Bestätigen oder Ablehnen, „nicht diese Person“ wird gemerkt. Standardmäßig aus; *Jetzt indizieren* oder nach jedem Scan. |
 | **Markierungen und Limbus** | Sehr gut, OK, zum Löschen vorgemerkt – am Vorschaubild, in der Liste, im Betrachter und im Infobereich; Tasten `1` `2` `3` `0`. Der Limbus zeigt alle Vorgemerkten und ihren Platzbedarf und schickt sie in einem Schritt in den Papierkorb. **Auswahl**: Alben, Personen, Haustiere und Projekte nur mit ihren mit Stern oder OK markierten Fotos, eines pro Zeile – der Name groß, ein ausgewähltes Foto groß – wie eine Portfolioseite. Auch Orte; und in jedem davon die ausgewählten Fotos groß, eines pro Zeile. |
 | **Öffnen mit** | Die Foto- und Videoprogramme des Computers für die ausgewählten Dateien (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), zuletzt verwendete zuerst; unter Windows auch alle für den Dateityp registrierten Programme. |
@@ -327,7 +327,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\fotos-kopie"; npm run test:e2e
 
 ## Änderungsprotokoll
 
-Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.57.4**.
+Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.58.0**.
 
 ## Mitwirkende
 

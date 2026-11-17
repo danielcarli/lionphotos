@@ -1242,6 +1242,42 @@ app.whenReady().then(async () => {
         'Name and logo: one’s own in the title bar with “Powered by LionPhotos” beside it (and in the window title); the logo fitted whole; About keeps the credits', JSON.stringify(brand));
       check(brand.back === 'LionPhotos' && brand.backLogo === 'media/logo.svg' && brand.cleared === null && !/Powered/.test(brand.title2), 'Name and logo: “Back to LionPhotos” gives the name and logo back', JSON.stringify(brand));
       check(rm.res.ok && after === 0, 'a plugin is removed (Recycle Bin)', JSON.stringify({ ok: rm.res.ok, error: rm.res.error, after }));
+      // a plugin can give the app its name and logo (plugin.json "brand"): shown while it is on and one's own is
+      // empty; one's own goes before it; "Back to LionPhotos" leaves it; turning the plugin off takes it away
+      {
+        const bfiles = files.map((f) => (f.name === 'plugin.json' ? { name: f.name, data: JSON.stringify({ ...JSON.parse(f.data), id: 'brand-test', brand: { name: { en: 'Studio Plugin', 'pt-BR': 'Estúdio Plugin' }, logo: 'assets/icon.svg' } }) } : f));
+        if (!bfiles.some((f) => f.name === 'assets/icon.svg')) bfiles.push({ name: 'assets/icon.svg', data: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20" fill="#2a6"/></svg>' });
+        const bpkg = path.join(OW, 'brand-test.lionplugin');
+        fs.writeFileSync(bpkg, writeZip(bfiles));
+        const saved = dlg.showOpenDialog;
+        dlg.showOpenDialog = async () => ({ canceled: false, filePaths: [bpkg] });
+        const bpick = await js(`${S}.host.plugins.pickPackage()`);
+        dlg.showOpenDialog = saved;
+        const bins = await op('installPlugin', { token: bpick.token });
+        const pb = await js(`(async () => { try { const s = ${S}, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+          await s.plugins.refresh(); await wait(600);
+          const bar = () => document.querySelector('.titlebar-left').textContent;
+          const res = { on: bar(), source: s.brand.source, logo: document.querySelector('.titlebar-left img').src.startsWith('data:image/png') };
+          // the dialog says where it comes from; one's own name goes before it
+          document.querySelector('.activitybar .activity-small').click(); await wait(300);
+          [...document.querySelectorAll('.settings-dialog .set-row')].find((r) => r.textContent.includes('Name and logo')).querySelector('button').click(); await wait(300);
+          let d = document.querySelector('.brand-dialog');
+          res.note = !!d.querySelector('.brand-plugin') && /Studio Plugin|Simple gallery|gallery/i.test(d.querySelector('.brand-plugin').textContent);
+          const n = d.querySelector('#brand-name'); n.value = 'Meu Estúdio'; n.dispatchEvent(new Event('input'));
+          [...d.querySelectorAll('.cm-actions .btn')].find((b) => b.textContent === 'Save').click(); await wait(300);
+          res.own = bar(); res.ownSource = s.brand.source;
+          // back to LionPhotos: not the plugin's either
+          s.brand.reset(); await wait(100); res.reset = bar(); res.resetSource = s.brand.source;
+          s.brand.usePlugin(); await wait(100); res.again = bar();
+          // the plugin turned off: LionPhotos
+          await s.plugins.setEnabled('brand-test', false); await wait(600); res.off = bar(); res.offSource = s.brand.source;
+          return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+        const brm = await op('removePlugin', { id: 'brand-test' });
+        check(bins.res.ok && /^Studio PluginPowered by LionPhotos$/.test(pb.on) && pb.source === 'plugin' && pb.logo && pb.note
+          && /^Meu EstúdioPowered by LionPhotos$/.test(pb.own) && pb.ownSource === 'own' && pb.reset === 'LionPhotos' && pb.resetSource === 'default'
+          && /^Studio Plugin/.test(pb.again) && pb.off === 'LionPhotos' && pb.offSource === 'default' && brm.res.ok,
+          'a plugin gives the app its name and logo while it is on; one’s own goes before it; Back to LionPhotos and turning it off take it away', JSON.stringify({ ins: bins.res.ok, ...pb }));
+      }
       fs.rmSync(expDir, { recursive: true, force: true });
     }
 

@@ -34,6 +34,12 @@ check(refused(base.filter((f) => f.name !== 'plugin.json'), 'noManifest'), 'no p
 check(refused([{ name: 'plugin.json', data: JSON.stringify({ ...manifest, id: '../x' }) }, ...base.slice(1)], 'manifest'), 'a bad id in plugin.json is refused');
 check(refused([base[0], base[3]], 'noEntry'), 'no page: refused');
 check((() => { try { readPackage(Buffer.from('not a zip at all, sorry')); return false; } catch (e) { return e.code === 'notZip'; } })(), 'not a ZIP: refused');
+// the name and logo a plugin may give the app (plugin.json "brand")
+const branded = (brand) => readPackage(writeZip([{ name: 'plugin.json', data: JSON.stringify({ ...manifest, brand }) }, ...base.slice(1)])).manifest.brand;
+check(JSON.stringify(branded({ name: { en: 'Studio', 'pt-BR': 'Estúdio' }, logo: 'assets/logo.svg' })) === JSON.stringify({ name: { en: 'Studio', 'pt-BR': 'Estúdio' }, logo: 'assets/logo.svg' })
+  && ok.manifest.brand === null, 'a plugin can give the app a name (per language) and a logo from its assets; none by default');
+check(branded({ name: 'x'.repeat(80), logo: '../../secret.png' }).name.length === 40 && branded({ logo: '../../secret.png' }) === null && branded({ logo: 'assets/run.exe' }) === null,
+  'the name is cut at 40 characters; a logo outside assets/ or not a picture is ignored');
 
 (async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'lionphotos-plugins-'));

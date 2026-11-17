@@ -117,12 +117,22 @@ function parseManifest(json) {
     entry: /^[\w.-]+\.html?$/.test(m.entry || '') ? m.entry : 'index.html',
     folderName: text(m.folderName, 40).replace(/[^\p{L}\p{N} _.-]/gu, '') || '',
     icon: typeof m.icon === 'string' && /^assets\/[\w./-]+\.(png|svg)$/i.test(m.icon) && !m.icon.includes('..') ? m.icon : '',
+    // the app's name and logo while the plugin is on, as Settings › Name and logo does (null: it sets none)
+    brand: brandOf(m.brand),
     photo: {
       sizes: sizes.length ? sizes : [1600, 2048], thumb: Math.min(1200, Math.max(240, Number(m.photo?.thumb) || 480)),
       // a smaller JPEG for the web as well, besides the size chosen (0: none)
       web: Number.isInteger(Number(m.photo?.web)) && Number(m.photo?.web) >= 320 && Number(m.photo?.web) <= 4000 ? Number(m.photo.web) : 0,
     },
   };
+}
+
+/** "brand": { "name": "…" or { "en": "…", … }, "logo": "assets/logo.png" } — a name (up to 40 characters), a logo, or both. */
+function brandOf(b) {
+  if (!b || typeof b !== 'object') return null;
+  const name = localized(b.name, 40);
+  const logo = typeof b.logo === 'string' && /^assets\/[\w./-]+\.(png|svg|jpe?g|webp)$/i.test(b.logo) && !b.logo.includes('..') ? b.logo : '';
+  return name || logo ? { name, logo } : null;
 }
 
 /** A whole package: { manifest, files: [{ name, data }] }, or a PackageError. */

@@ -43,6 +43,7 @@ It runs the same checks as installing.
   "entry": "index.html",
   "folderName": "Gallery",
   "icon": "assets/icon.svg",
+  "brand": { "name": { "en": "My Studio", "pt-BR": "Meu Estúdio" }, "logo": "assets/logo.svg" },
   "photo": { "sizes": [1600, 2048], "thumb": 480, "web": 1200 },
   "options": [
     { "id": "theme", "type": "choice", "label": { "en": "Theme" }, "default": "light",
@@ -57,6 +58,12 @@ It runs the same checks as installing.
 - `shortName`: the name under the plugin's icon in the activity bar (up to 24 characters; the full `name`
   when there is none). Every plugin turned on has its tab there, after Projects and To edit, with its own page: what it
   is, and the albums and projects to pick and export. `icon` (a PNG or SVG in `assets/`) is its picture.
+- `brand` (optional): the name and logo the app shows while the plugin is on — in the title bar, on the welcome
+  page and in the window's title, as *Settings › Name and logo* does, with "Powered by LionPhotos" beside the
+  name. `name` is up to 40 characters (a string or one per language); `logo` is a PNG, JPEG, WebP or SVG in
+  `assets/`, fitted whole in a square. A name and logo the person sets in *Settings › Name and logo* go before
+  the plugin's; *Back to LionPhotos* there leaves the plugin's too; turning the plugin off or removing it takes
+  them away. When several plugins on give one, the first by id is used.
 - Texts can be a string or one per language (`en`, `pt-BR`, `pt-PT`, `es`, `fr`, `de`, `it`, `zh-CN`, `ja`, `ko`).
 - `photo.sizes`: the sizes offered for the photos (longer side, px); "original size" is always offered too.
 - `photo.web` (optional): also make a smaller JPEG of each photo, this size, for a page to show and offer as a

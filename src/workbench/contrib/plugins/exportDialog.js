@@ -136,7 +136,9 @@ export function pluginsSettings(s) {
         ? h('ul.set-plugin-list', plugins.plugins.map((p) => h('li.set-plugin',
           p.icon ? h('img.exp-plugin-icon', { src: p.icon, alt: '' }) : h('span.exp-plugin-icon', { html: icon('package', 18) }),
           h('span.set-plugin-text', h('strong', textOf(p.name)), h('span.muted.small', `${p.version}${p.author ? ' · ' + p.author : ''}`),
-            textOf(p.description) ? h('span.small.muted', textOf(p.description)) : null),
+            textOf(p.description) ? h('span.small.muted', textOf(p.description)) : null,
+            // it gives the app its name and logo while it is on (Settings › Name and logo can put one's own over it)
+            p.brand ? h('span.small.muted', textOf(p.brand.name) ? t('plugins.givesBrand', { name: textOf(p.brand.name) }) : t('plugins.givesLogo')) : null),
           h('label.switch-label', { title: p.enabled ? t('plugins.disable') : t('plugins.enable') },
             h('input', { type: 'checkbox', checked: p.enabled, 'aria-label': textOf(p.name), onchange: (e) => plugins.setEnabled(p.id, e.target.checked).then(draw) })),
           h('button.icon-button.danger', { title: t('plugins.remove'), 'aria-label': t('plugins.remove'), html: icon('trash', 14), onclick: () => plugins.remove(p.id).then(draw) }))))

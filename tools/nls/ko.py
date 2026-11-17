@@ -525,3 +525,5 @@ _merge(MESSAGES, {'statusbar': {'slowSource': '이 폴더는 읽기가 느립니
 _merge(MESSAGES, {'gs': {'group': {'content': '사진에 담긴 것'}, 'content': {'analyse': '사진에 담긴 것으로 검색', 'analyseSub': '이 컴퓨터에서 사진을 한 장씩 백그라운드로 읽습니다(진행 상황은 앨범 › 추천에 표시)', 'started': '사진을 읽는 중입니다. 읽은 사진부터 담긴 것으로 검색할 수 있습니다.', 'unsupported': '사진에 담긴 것을 읽으려면 그래픽 카드(WebGL)가 필요하지만 여기서는 사용할 수 없습니다.'}}, 'content': {'shows': '담긴 것', 'searchTitle': '사진에서 “{name}” 검색'}})
 
 _merge(MESSAGES, {'source': {'local': '이 컴퓨터의 디스크', 'external': '외장 디스크(USB, 메모리 카드)', 'cloud': '클라우드 드라이브', 'cloudNamed': '클라우드: {service}', 'network': '네트워크', 'externalShort': '외장', 'networkShort': '네트워크', 'cloudShort': '클라우드'}})
+
+_merge(MESSAGES, {'brand': {'pluginNote': '켜져 있는 플러그인 “{plugin}”이 앱의 이름과 로고를 정합니다. 여기 칸이 비어 있는 동안 그것이 쓰이며, 직접 입력하면 그쪽이 우선합니다.', 'usePlugin': '플러그인 것 사용'}, 'plugins': {'givesBrand': '켜져 있는 동안 앱 이름을 “{name}”(으)로, 로고도 바꿉니다.', 'givesLogo': '켜져 있는 동안 앱 로고를 바꿉니다.'}})

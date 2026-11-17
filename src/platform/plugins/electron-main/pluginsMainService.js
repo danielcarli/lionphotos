@@ -62,7 +62,7 @@ class PluginsMainService {
 
   #saveState(s) { fs.writeFileSync(this.stateFile, JSON.stringify(s, null, 2)); }
 
-  /** The plugins installed: { id, version, name, description, author, accepts, options, photo, enabled, icon }. */
+  /** The plugins installed: { id, version, name, description, author, accepts, options, photo, enabled, icon, brand }. */
   async list() {
     const out = [];
     const disabled = new Set(this.#state().disabled);
@@ -79,7 +79,19 @@ class PluginsMainService {
           const buf = await fs.promises.readFile(path.join(dir, ...manifest.icon.split('/'))).catch(() => null);
           if (buf && buf.length < 400 * 1024) icon = `data:${manifest.icon.endsWith('.svg') ? 'image/svg+xml' : 'image/png'};base64,${buf.toString('base64')}`;
         }
-        out.push({ ...manifest, enabled: !disabled.has(manifest.id), icon });
+        // the name and logo it gives the app: the logo as a data URL (the window fits it in a square)
+        let brand = null;
+        if (manifest.brand) {
+          let logo = '';
+          if (manifest.brand.logo) {
+            const buf = await fs.promises.readFile(path.join(dir, ...manifest.brand.logo.split('/'))).catch(() => null);
+            const ext = manifest.brand.logo.split('.').pop().toLowerCase();
+            const type = { svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' }[ext];
+            if (buf && buf.length < 2 * 1024 * 1024) logo = `data:${type};base64,${buf.toString('base64')}`;
+          }
+          brand = { name: manifest.brand.name, logo };
+        }
+        out.push({ ...manifest, enabled: !disabled.has(manifest.id), icon, brand });
       } catch (err) {
         console.warn('[plugins] skipped', e.name, err?.message || err);
       }

@@ -26,7 +26,7 @@ Explore, pesquise e organize coleções enormes de fotografias e vídeos onde j�
 
 **Sem importar nada** · **Nada sai do seu computador** · **100 mil fotografias deslizam como 100** · **Gratuito e de código aberto**
 
-![Versão 1.57.4](https://img.shields.io/badge/version-1.57.4-161214)
+![Versão 1.58.0](https://img.shields.io/badge/version-1.58.0-161214)
 ![Estado: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -185,7 +185,7 @@ O LionPhotos está em **beta**. Isso quer dizer:
 | **Álbuns** | Capa, descrição e período; *Adicionar a álbum…* em qualquer seleção, *Retirar do álbum*, *Usar como capa*; **álbuns a partir das pastas** (o primeiro nível, as pastas com fotografias ou as que escolher), ligados à pasta inteira; apresentação em ecrã inteiro. **Sugerir álbuns**: as fotografias agrupadas como foram tiradas e com nomes pelo que são — a pasta, o que as fotografias mostram (lido neste computador a partir das miniaturas: praia, montanha, bolo, vestido de noiva, comida…), feriados pela data, o local, a pessoa — e álbuns de um assunto ao longo dos anos, para rever antes de criar. **Juntar dois álbuns** num só (as fotografias dos dois, com o nome que escolher; só o catálogo muda, e pode anular). Mostrados em mosaico, grelha uniforme (todas as capas do mesmo tamanho), lista ou destaques. |
 | **Projetos, pessoas, animais, locais** | Cada um no seu separador, em grelha ou lista agrupada por ano. Abrir um mostra as respetivas fotografias, no seu separador; uma fotografia pode ser retirada com um clique. A etiqueta de uma pasta aplica-se a tudo o que está dentro dela. Um projeto agrupa álbuns e tem uma ficha (estado, para quem, local, equipa, prazo) e um painel com o andamento: triadas, editadas, escolhidas nos álbuns, audiodescrições. Os locais preenchem-se sozinhos a partir das fotografias (a posição de GPS ou o local escrito nelas) e aparecem num **mapa-múndi**, desenhado no próprio computador. |
 | **Por editar** | O lápis na capa de um álbum ou projeto coloca-o no separador **Por editar** (Ctrl+Shift+E), uma lista pela ordem em que as coisas devem ser feitas: arraste as linhas, ou use as setas ou Alt+↑ ↓, para pôr primeiro o que vem primeiro. A posição na lista aparece na capa, um projeto mostra a data de entrega (a vermelho quando atrasado) e *Pronto* tira o lápis. Só o catálogo muda, e a lista acompanha a coleção. |
-| **Nome e logótipo** | *Definições › Nome e logótipo* coloca o seu próprio nome e logótipo (de uma agência, um estúdio, um curso) na barra de título, na página inicial e no título da janela, com pré-visualização. Um nome seu mostra sempre **Powered by LionPhotos** ao lado; Acerca de mantém os créditos. O logótipo (PNG, JPG, WebP, SVG) fica inteiro num quadrado; *Voltar ao LionPhotos* desfaz. Fica guardado neste computador. |
+| **Nome e logótipo** | *Definições › Nome e logótipo* coloca o seu próprio nome e logótipo (de uma agência, um estúdio, um curso) na barra de título, na página inicial e no título da janela, com pré-visualização. Um nome seu mostra sempre **Powered by LionPhotos** ao lado; Acerca de mantém os créditos. O logótipo (PNG, JPG, WebP, SVG) fica inteiro num quadrado; *Voltar ao LionPhotos* desfaz. Fica guardado neste computador. Um plugin também os pode definir enquanto estiver ligado (`brand` no seu `plugin.json`); os seus passam à frente. |
 | **Rostos e animais** | face-api (TensorFlow.js) para rostos, COCO-SSD e MobileNet para animais, na placa gráfica (WebGL). Grupos de rostos semelhantes, sugestões que confirma ou recusa, "não é" memorizado. Desligado por predefinição; *Indexar agora* ou após cada análise. |
 | **Marcações e Limbo** | Ótima, OK, candidata a eliminar — na miniatura, na lista, no visualizador e no painel de informações; teclas `1` `2` `3` `0`. O Limbo mostra todas as candidatas e o espaço que ocupam, e envia-as para a Reciclagem de uma vez. **Destaques**: álbuns, pessoas, animais e projetos só com as fotografias marcadas com estrela ou OK, um por linha — o nome grande, uma fotografia escolhida em destaque — como uma página de portefólio. Locais também; e dentro de cada um, as fotografias escolhidas em grande, uma por linha. |
 | **Abrir com** | Os programas de fotografia e vídeo do computador para os ficheiros selecionados (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), os últimos usados primeiro; no Windows, também todos os programas registados para o tipo de ficheiro. |
@@ -327,7 +327,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotografias"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.57.4**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.58.0**.
 
 ## Créditos
 

@@ -37,7 +37,7 @@ import { BrandService } from '../services/brand/browser/brandService.js';
 import { PeopleView } from '../contrib/faces/peopleView.js';
 import { FacesService } from '../services/faces/browser/facesService.js';
 import { BackupView } from '../contrib/backup/backupView.js';
-import { PluginsService } from '../services/plugins/browser/pluginsService.js';
+import { PluginsService, textOf } from '../services/plugins/browser/pluginsService.js';
 import { UpdateService } from '../services/update/browser/updateService.js';
 import { PluginView } from '../contrib/plugins/pluginView.js';
 import { BackupService } from '../services/backup/browser/backupService.js';
@@ -74,6 +74,12 @@ services.pets = new FacesService(services, { api: 'pets' });
 services.backup = new BackupService(services);
 services.portable = new PortableService(services);
 services.plugins = new PluginsService(services);
+// a plugin turned on can give the app its name and logo (plugin.json "brand"): the first one that does
+const pluginBrand = () => {
+  const p = services.plugins.plugins.find((x) => x.enabled && x.brand);
+  services.brand.setPlugin(p ? { id: p.id, title: textOf(p.name), name: textOf(p.brand.name), logo: p.brand.logo } : null);
+};
+services.plugins.onDidChange(pluginBrand);
 services.update = new UpdateService(services);
 services.viewer = new Viewer(services);
 

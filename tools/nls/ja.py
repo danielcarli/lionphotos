@@ -525,3 +525,5 @@ _merge(MESSAGES, {'statusbar': {'slowSource': 'このフォルダーは読み込
 _merge(MESSAGES, {'gs': {'group': {'content': '写真に写っているもの'}, 'content': {'analyse': '写っているもので検索', 'analyseSub': 'このコンピューターで写真を1枚ずつバックグラウンドで読み取ります（進行状況は［アルバム］›［提案］に表示）', 'started': '写真を読み取っています。読み取りが済んだ写真から、写っているもので検索できます。', 'unsupported': '写っているものの読み取りにはグラフィックカード（WebGL）が必要ですが、ここでは使えません。'}}, 'content': {'shows': '写っているもの', 'searchTitle': '［写真］で「{name}」を検索'}})
 
 _merge(MESSAGES, {'source': {'local': 'このコンピューターのディスク', 'external': '外付けディスク（USB、メモリーカード）', 'cloud': 'クラウドドライブ', 'cloudNamed': 'クラウド：{service}', 'network': 'ネットワーク上', 'externalShort': '外付け', 'networkShort': 'ネットワーク', 'cloudShort': 'クラウド'}})
+
+_merge(MESSAGES, {'brand': {'pluginNote': '有効なプラグイン「{plugin}」がアプリの名前とロゴを設定しています。ここの欄が空のあいだはそれが使われ、自分で入力すればそちらが優先されます。', 'usePlugin': 'プラグインのものを使う'}, 'plugins': {'givesBrand': '有効なあいだ、アプリの名前を「{name}」にし、ロゴを設定します。', 'givesLogo': '有効なあいだ、アプリのロゴを設定します。'}})

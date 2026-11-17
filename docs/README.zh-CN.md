@@ -20,13 +20,15 @@
   <a href="https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-x86_64.AppImage"><img src="https://img.shields.io/badge/Linux-%E4%B8%8B%E8%BD%BD%20AppImage-0194b2?style=for-the-badge&labelColor=161214" alt="Linux AppImage"></a>
 </p>
 
+<a href="https://github.com/danielcarli/lionphotos/releases/latest"><img src="https://img.shields.io/github/v/release/danielcarli/lionphotos?label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC&color=e5307a&labelColor=161214" alt="最新版本"></a>
+
 <sub><a href="https://github.com/danielcarli/lionphotos/releases">所有版本</a> · <a href="#下载">如何安装</a></sub>
 
 <img src="screenshots/photos-grid.webp" alt="LionPhotos：带文件夹树和信息面板的照片网格" width="900">
 
 **无需导入** · **数据不出本机** · **10 万张照片如 100 张般流畅** · **免费开源**
 
-![版本 1.58.0](https://img.shields.io/badge/version-1.58.0-161214)
+![版本 1.59.0](https://img.shields.io/badge/version-1.59.0-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -192,8 +194,8 @@ LionPhotos 处于 **Beta** 阶段。这意味着：
 | **插件** | 安装 `.lionplugin` 软件包，将相册和项目导出为网页（HTML、CSS 和 JavaScript），包含文件名、描述和口述影像；它们不会在 LionPhotos 内运行。参见 [PLUGINS.md](PLUGINS.md)（英文）。 每个已启用的插件在“待编辑”之后都有自己的标签页：选择相册和项目即可导出。 |
 | **概览** | 项目数、照片、视频、大小和时间段；按种类、按年份、格式、相机、编解码器统计文件；缩略图缓存。 |
 | **整理** | 日期文件夹（`2024/2024-07`、`2024-07`、`2024`、`2024/2024-07-14` 或 `2024-07-14-主题`），按相册的文件夹（`2024/2024-07-14-相册`），可在其中分出 `Raw/` 和 `Img/`；*移动到文件夹*（按种类分子文件夹）；同一次拍摄的文件一起移动；最近操作可撤销。 文件会在磁盘上真正移动，也可以**重命名**（默认 `{data}-{álbum}-{fotógrafo}-{nº}`，按日期编号；同一张照片的 RAW、JPEG 和 `.xmp` 保持同名），或只在原处重命名。 “重新整理收藏”会读取现有文件夹并在磁盘上提出统一结构——`2025/2025-12-24-圣诞`、长期主题放在 `主题/`、待整理放在 `_待整理/`、相机测试放在 `_器材/`——先检查（可重命名或排除任何文件夹，预览整理后的目录树），再整体移动文件夹，并可撤消。**遗留的关联文件**（照片移动后单独留下的 `.xmp` 或 `.dop`）会回到照片旁，并使用照片的名称。 **复制一份**（Ctrl+D）：在照片旁创建副本，带上调整、裁剪、标记和相册（需输入确认码，可撤销）。 |
-| **重复文件** | 分三步计算 SHA-256（大小 → 开头/结尾 64 KB → 整个文件），与缩略图并排显示。 |
-| **相似照片** | 按天将实际上是同一张图的照片（连拍、同一姿势拍了几次）根据缩略图在本机分组，并建议保留最清晰、曝光最好的一张。单击可切换每张照片保留或送出；其余的一起送入待删区，RAW 和 JPG 算作一张。三个级别：几乎相同、相似、同一场景。 |
+| **重复文件** | 分三步计算 SHA-256（大小 → 开头/结尾 64 KB → 整个文件），与缩略图并排显示。 每个副本都会显示保存所在的文件夹，可在 LionPhotos 或电脑的程序中打开、在文件夹中显示或复制路径；“并排比较”把保留的副本与另一个并排（视频在电脑的程序中打开）。选择另一个副本只移动标记，不改变副本顺序。 |
+| **相似照片** | 按天将实际上是同一张图的照片（连拍、同一姿势拍了几次）根据缩略图在本机分组，并建议保留最清晰、曝光最好的一张。单击可切换每张照片保留或送出；其余的一起送入待删区，RAW 和 JPG 算作一张。三个级别：几乎相同、相似、同一场景。 也可以从“照片”栏中“仅显示不在相册中的照片”旁边使用：针对显示的照片（文件夹、年份、相册），跨越多天分组。 |
 | **按照片内容搜索** | 输入“海滩”“狗”“生日派对”或“日落”，就能找到拍到这些的照片，无论文件名是什么。一个小模型（TinyCLIP，MIT）在分析“照片里有什么”时，于本机用处理器读取每张缩略图，并与 605 种场景、活动、物品和地点比对，这些名称涵盖应用的十种语言。信息面板显示照片里有什么；点击名称即可按它搜索。不下载也不发送任何内容。 |
 | **备份** | 按内容比较主文件夹和备份文件夹；把缺少的内容经校验后复制到相同的子文件夹或日期文件夹中。 |
 | **转换** | HEIC/HEIF → 全分辨率 JPG 或 PNG，保留 EXIF 和色彩配置文件，保存在原文件旁边。 |
@@ -327,7 +329,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.58.0**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.59.0**。
 
 ## 致谢
 

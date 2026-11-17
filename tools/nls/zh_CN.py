@@ -527,3 +527,9 @@ _merge(MESSAGES, {'gs': {'group': {'content': '照片里有什么'}, 'content': 
 _merge(MESSAGES, {'source': {'local': '在本机磁盘上', 'external': '在外置磁盘上（USB、存储卡）', 'cloud': '在云盘上', 'cloudNamed': '在云端：{service}', 'network': '在网络上', 'externalShort': '外置', 'networkShort': '网络', 'cloudShort': '云端'}})
 
 _merge(MESSAGES, {'brand': {'pluginNote': '已启用的插件“{plugin}”为应用设置了名称和标志：此处字段为空时使用它们；你填写的自己的名称和标志优先。', 'usePlugin': '使用插件的'}, 'plugins': {'givesBrand': '启用时将应用名称设为“{name}”并设置标志。', 'givesLogo': '启用时设置应用标志。'}})
+
+_merge(MESSAGES, {'dupes': {'compare': '并排比较', 'compareTitle': '保留的副本在左，另一个在右，确认两者相同', 'compareExternal': '在电脑的程序中各开一个窗口，以便并排查看', 'open': '在 LionPhotos 中打开', 'keeping': '保留此副本', 'keepThis': '保留此副本（其他移到回收站）'}})
+
+_merge(MESSAGES, {'similar': {'titleShown': '在显示的照片中找相似照片', 'shownTitle': '将显示的照片（此文件夹、年份或相册，含筛选）中实际上相同的照片分组，以便选择保留哪些', 'fewShown': '请至少显示两张照片再查找相似照片。', 'more': {'other': '显示更多（还剩 {count} 组）'}}})
+
+_merge(MESSAGES, {'similar': {'button': '相似照片', 'more': {'one': '显示更多（还剩 {count} 组）', 'other': '显示更多（还剩 {count} 组）'}}})

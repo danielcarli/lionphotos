@@ -527,3 +527,9 @@ _merge(MESSAGES, {'gs': {'group': {'content': '写真に写っているもの'},
 _merge(MESSAGES, {'source': {'local': 'このコンピューターのディスク', 'external': '外付けディスク（USB、メモリーカード）', 'cloud': 'クラウドドライブ', 'cloudNamed': 'クラウド：{service}', 'network': 'ネットワーク上', 'externalShort': '外付け', 'networkShort': 'ネットワーク', 'cloudShort': 'クラウド'}})
 
 _merge(MESSAGES, {'brand': {'pluginNote': '有効なプラグイン「{plugin}」がアプリの名前とロゴを設定しています。ここの欄が空のあいだはそれが使われ、自分で入力すればそちらが優先されます。', 'usePlugin': 'プラグインのものを使う'}, 'plugins': {'givesBrand': '有効なあいだ、アプリの名前を「{name}」にし、ロゴを設定します。', 'givesLogo': '有効なあいだ、アプリのロゴを設定します。'}})
+
+_merge(MESSAGES, {'dupes': {'compare': '並べて比較', 'compareTitle': '残すコピーを左に、別のコピーを右に表示して同じであることを確認します', 'compareExternal': 'コンピューターのアプリでそれぞれ別のウィンドウで開き、並べて比較します', 'open': 'LionPhotos で開く', 'keeping': 'このコピーを残します', 'keepThis': 'このコピーを残す（ほかはごみ箱へ）'}})
+
+_merge(MESSAGES, {'similar': {'titleShown': '表示中の写真から似た写真', 'shownTitle': '表示中の写真（このフォルダー・年・アルバム、フィルター込み）のうち、実質的に同じ写真をまとめ、残すものを選びます', 'fewShown': '似た写真を探すには、写真を2枚以上表示してください。', 'more': {'other': 'さらに表示（残り {count} グループ）'}}})
+
+_merge(MESSAGES, {'similar': {'button': '似た写真', 'more': {'one': 'さらに表示（残り {count} グループ）', 'other': 'さらに表示（残り {count} グループ）'}}})

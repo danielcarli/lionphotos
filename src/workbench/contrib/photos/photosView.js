@@ -212,12 +212,12 @@ export class PhotosView extends ViewPane {
       !this.limbo && !f.labelId ? h(f.noAlbum ? 'label.tb-switch.on' : 'label.tb-switch', { title: t('photos.noAlbumTitle') },
         h('input', { type: 'checkbox', role: 'switch', checked: !!f.noAlbum, 'aria-checked': String(!!f.noAlbum), onchange: (e) => library.setFilter({ noAlbum: e.target.checked }) }),
         h('span.tb-switch-track', { 'aria-hidden': 'true' }), h('span.tb-switch-text', t('photos.noAlbum'))) : null,
+      // similar photos: of the day shown, or of the photos shown (a folder, a year, an album…), to keep the best of each sequence
+      !this.limbo ? h('button.btn.btn-secondary.btn-sm.similar-btn', { title: f.day ? t('similar.linkTitle') : t('similar.shownTitle'), onclick: () => this.#similar() },
+        h('span', { html: icon('similar', 14) }), t('similar.button')) : null,
       h('button.btn.btn-secondary.btn-sm.filters-btn', { class: `btn btn-secondary btn-sm filters-btn${chips.length ? ' is-active' : ''}`, title: t('photos.filtersTitle'), 'aria-haspopup': 'menu', onclick: (e) => this.#filtersMenu(e.currentTarget) },
         h('span', { html: icon('filter', 14) }), t('photos.filters'), chips.length ? h('span.filters-count', String(chips.length)) : null),
       chips.length ? h('div.filter-chips', chips) : null,
-      // the photos of one day: their similar shots, to keep the best of each sequence
-      f.day && !this.limbo ? h('button.btn.btn-secondary.btn-sm.similar-btn', { title: t('similar.linkTitle'), onclick: () => showSimilar(this.services, f.day) },
-        h('span', { html: icon('similar', 14) }), t('similar.link')) : null,
       this.#viewControls(false),
       // how the photos are shown: at the end of the row, as on every page (left: where and what to do; right: how it is seen) — the info panel's switch after it, beside the panel
       h('div.view-mode', { role: 'radiogroup', 'aria-label': t('photos.modeLabel') },
@@ -1289,6 +1289,15 @@ export class PhotosView extends ViewPane {
   }
 
   /** Next (or previous) photo, keeping the panel as it is — to describe a series one after the other. */
+  /** Similar photos: of the day shown, or among the photos shown. */
+  #similar() {
+    const f = this.library.filter;
+    if (f.day) return showSimilar(this.services, f.day);
+    const items = this.library.view('main').filter((it) => it.kind === KIND.image);
+    if (items.length < 2) return this.notifications.info(t('similar.fewShown'));
+    showSimilar(this.services, { items });
+  }
+
   /** What the photo shows (the content model): each name searches Photos for it. */
   #shows(it) {
     const c = this.services.content;

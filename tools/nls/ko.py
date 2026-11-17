@@ -527,3 +527,9 @@ _merge(MESSAGES, {'gs': {'group': {'content': '사진에 담긴 것'}, 'content'
 _merge(MESSAGES, {'source': {'local': '이 컴퓨터의 디스크', 'external': '외장 디스크(USB, 메모리 카드)', 'cloud': '클라우드 드라이브', 'cloudNamed': '클라우드: {service}', 'network': '네트워크', 'externalShort': '외장', 'networkShort': '네트워크', 'cloudShort': '클라우드'}})
 
 _merge(MESSAGES, {'brand': {'pluginNote': '켜져 있는 플러그인 “{plugin}”이 앱의 이름과 로고를 정합니다. 여기 칸이 비어 있는 동안 그것이 쓰이며, 직접 입력하면 그쪽이 우선합니다.', 'usePlugin': '플러그인 것 사용'}, 'plugins': {'givesBrand': '켜져 있는 동안 앱 이름을 “{name}”(으)로, 로고도 바꿉니다.', 'givesLogo': '켜져 있는 동안 앱 로고를 바꿉니다.'}})
+
+_merge(MESSAGES, {'dupes': {'compare': '나란히 비교', 'compareTitle': '남길 사본을 왼쪽에, 다른 사본을 오른쪽에 두고 같은지 확인합니다', 'compareExternal': '컴퓨터의 프로그램에서 각각 창으로 열어 나란히 놓습니다', 'open': 'LionPhotos에서 열기', 'keeping': '이 사본을 남깁니다', 'keepThis': '이 사본 남기기(나머지는 휴지통으로)'}})
+
+_merge(MESSAGES, {'similar': {'titleShown': '표시된 사진 중 비슷한 사진', 'shownTitle': '표시된 사진(이 폴더, 연도 또는 앨범, 필터 포함) 중 사실상 같은 사진을 묶어 남길 것을 고릅니다', 'fewShown': '비슷한 사진을 찾으려면 사진을 두 장 이상 표시하세요.', 'more': {'other': '더 보기({count}개 그룹 남음)'}}})
+
+_merge(MESSAGES, {'similar': {'button': '비슷한 사진', 'more': {'one': '더 보기({count}개 그룹 남음)', 'other': '더 보기({count}개 그룹 남음)'}}})

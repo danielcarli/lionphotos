@@ -530,3 +530,9 @@ _merge(MESSAGES, {'gs': {'group': {'content': 'Lo que muestran las fotos'}, 'con
 _merge(MESSAGES, {'source': {'local': 'En el disco de este ordenador', 'external': 'En un disco externo (USB, tarjeta de memoria)', 'cloud': 'En una unidad en la nube', 'cloudNamed': 'En la nube: {service}', 'network': 'En la red', 'externalShort': 'Externo', 'networkShort': 'Red', 'cloudShort': 'Nube'}})
 
 _merge(MESSAGES, {'brand': {'pluginNote': 'Un plugin activado, «{plugin}», da a la app un nombre y un logotipo: se usan mientras los campos de aquí estén vacíos. Los tuyos, si los rellenas, van primero.', 'usePlugin': 'Usar los del plugin'}, 'plugins': {'givesBrand': 'Da a la app el nombre «{name}» y el logotipo mientras está activado.', 'givesLogo': 'Da el logotipo a la app mientras está activado.'}})
+
+_merge(MESSAGES, {'dupes': {'compare': 'Comparar lado a lado', 'compareTitle': 'La copia que se mantiene a la izquierda y otra a la derecha, para ver que son iguales', 'compareExternal': 'Abrirlas en el programa del ordenador, una ventana cada una, para ponerlas lado a lado', 'open': 'Abrir en LionPhotos', 'keeping': 'Esta copia se mantiene', 'keepThis': 'Mantener esta copia (las demás van a la Papelera)'}})
+
+_merge(MESSAGES, {'similar': {'titleShown': 'Fotos parecidas entre las mostradas', 'shownTitle': 'Agrupa las fotos mostradas (esta carpeta, año o álbum, con sus filtros) que en la práctica son la misma, para elegir cuáles se quedan', 'fewShown': 'Muestra al menos dos fotos para buscar las parecidas.', 'more': {'one': 'Mostrar más (queda {count} grupo)', 'other': 'Mostrar más (quedan {count} grupos)'}}})
+
+_merge(MESSAGES, {'similar': {'button': 'Fotos parecidas'}})

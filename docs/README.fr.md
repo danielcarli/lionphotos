@@ -20,13 +20,15 @@ Parcourez, recherchez et organisez d’immenses collections de photos et de vid�
   <a href="https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-x86_64.AppImage"><img src="https://img.shields.io/badge/Linux-T%C3%A9l%C3%A9charger%20AppImage-0194b2?style=for-the-badge&labelColor=161214" alt="Linux AppImage"></a>
 </p>
 
+<a href="https://github.com/danielcarli/lionphotos/releases/latest"><img src="https://img.shields.io/github/v/release/danielcarli/lionphotos?label=derni%C3%A8re%20version&color=e5307a&labelColor=161214" alt="dernière version"></a>
+
 <sub><a href="https://github.com/danielcarli/lionphotos/releases">Toutes les versions</a> · <a href="#télécharger">Comment installer</a></sub>
 
 <img src="screenshots/photos-grid.webp" alt="LionPhotos : la grille de photos avec l'arborescence des dossiers et le panneau d'informations" width="900">
 
 **Aucune importation** · **Rien ne quitte votre ordinateur** · **100 000 photos défilent comme 100** · **Gratuit et open source**
 
-![Version 1.58.0](https://img.shields.io/badge/version-1.58.0-161214)
+![Version 1.59.0](https://img.shields.io/badge/version-1.59.0-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -192,8 +194,8 @@ LionPhotos est en **bêta**. Cela signifie :
 | **Extensions** | Installez des paquets `.lionplugin` qui exportent albums et projets sous forme de page (HTML, CSS et JavaScript), avec les noms de fichiers, les descriptions et les audiodescriptions ; rien ne s’y exécute dans LionPhotos. Voir [PLUGINS.md](PLUGINS.md) (en anglais). Chaque extension activée a son onglet après À traiter, avec sa page : choisissez les albums et projets et exportez. |
 | **Vue d'ensemble** | Éléments, photos, vidéos, taille et période ; fichiers par genre, par année, formats, appareils, codecs ; le cache des miniatures. |
 | **Ranger** | Dossiers par date (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` ou `2024-07-14-thème`), dossiers par album (`2024/2024-07-14-album`), avec `Raw/` et `Img/` dedans si souhaité ; *Déplacer vers un dossier* avec sous-dossiers par genre ; les fichiers de la même prise suivent ; opérations récentes avec annulation. Les fichiers sont vraiment déplacés sur le disque et peuvent aussi être **renommés** (`{data}-{álbum}-{fotógrafo}-{nº}` par défaut, numérotés par date ; le RAW, le JPEG et le `.xmp` d'une vue gardent le même nom), ou seulement renommés sur place. **Réorganiser la collection** lit les dossiers tels qu'ils sont et propose une structure unique sur le disque — `2025/2025-12-24-Noel`, thèmes longs dans `Thèmes/`, ce qui attend le tri dans `_A-trier/`, essais de matériel dans `_Materiel/` — à vérifier (renommer ou écarter un dossier, voir l'arbre final) avant de déplacer des dossiers entiers, avec annulation. **Fichiers associés laissés seuls** (un `.xmp` ou `.dop` resté seul après le déplacement de sa photo) retournent à côté de leur photo, sous son nom. **Dupliquer** (Ctrl+D) : une copie à côté de la photo, avec ses réglages, son recadrage, ses marques et ses albums, avec le code saisi et l’annulation. |
-| **Fichiers en double** | SHA-256 en trois étapes (taille → premiers/derniers 64 Ko → fichier entier), côte à côte avec leurs miniatures. |
-| **Photos similaires** | Pour chaque jour, les prises qui sont en pratique la même image (une rafale, la même pose plusieurs fois) sont regroupées à partir des miniatures, sur l’ordinateur, la plus nette et la mieux exposée étant suggérée. Un clic garde ou laisse partir chaque photo ; les autres vont ensemble dans les Limbes, le RAW et son JPG comme une seule. Trois niveaux : presque identiques, similaires, même scène. |
+| **Fichiers en double** | SHA-256 en trois étapes (taille → premiers/derniers 64 Ko → fichier entier), côte à côte avec leurs miniatures. Chaque copie montre le dossier où elle est enregistrée, s’ouvre dans LionPhotos ou dans le logiciel de l’ordinateur, se montre dans son dossier ou copie son chemin ; *Comparer côte à côte* place la copie gardée à côté d’une autre (les vidéos s’ouvrent dans le logiciel de l’ordinateur). Choisir une autre copie déplace la marque, pas les copies. |
+| **Photos similaires** | Pour chaque jour, les prises qui sont en pratique la même image (une rafale, la même pose plusieurs fois) sont regroupées à partir des miniatures, sur l’ordinateur, la plus nette et la mieux exposée étant suggérée. Un clic garde ou laisse partir chaque photo ; les autres vont ensemble dans les Limbes, le RAW et son JPG comme une seule. Trois niveaux : presque identiques, similaires, même scène. Aussi depuis la barre de Photos, à côté de *Seulement les photos sans album* : les photos affichées — un dossier, une année, un album — sur plusieurs jours. |
 | **Recherche par ce que montre la photo** | Tapez *plage*, *chien*, *anniversaire* ou *coucher de soleil* et trouvez les photos qui le montrent, quel que soit leur nom. Un petit modèle (TinyCLIP, MIT) lit chaque miniature sur l’ordinateur, avec le processeur, pendant l’analyse de « ce que montrent les photos », et la compare à 605 types de scènes, d’événements, d’objets et de lieux, nommés dans les dix langues de l’application. Le panneau d’informations montre ce que montre la photo ; chaque nom le recherche. Rien n’est téléchargé ni envoyé. |
 | **Sauvegarde** | Un dossier maître et un dossier de sauvegarde comparés par leur contenu ; copies vérifiées de ce qui manque, dans les mêmes sous-dossiers ou dans des dossiers par date. |
 | **Convertir** | HEIC/HEIF → JPG ou PNG en pleine résolution, EXIF et profil de couleur conservés, à côté de l'original. |
@@ -327,7 +329,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.58.0**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.59.0**.
 
 ## Crédits
 

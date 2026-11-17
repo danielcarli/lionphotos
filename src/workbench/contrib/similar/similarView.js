@@ -22,6 +22,7 @@ import { featuresOf, groupSimilar, bestOf, SENSITIVITY } from './similarFinder.j
 const LEVEL_KEY = 'lionphotos.similar.level';
 const TWINS_KEY = 'lionphotos.limbo.twins';
 const WORKERS = 6;
+const PAGE = 40; // groups drawn at once
 const cache = new Map(); // `${id}:${mtime}` → features, for this session
 
 const readPref = (key, def) => { try { return localStorage.getItem(key) ?? def; } catch { return def; } };
@@ -34,9 +35,13 @@ function daysWithPhotos(library) {
   return [...n].filter(([, c]) => c > 1).map(([d]) => d).sort();
 }
 
-/** The shots of a day: one per photo, the raw file and its JPEG together, shown by the JPEG. */
-function shotsOf(library, day) {
-  const items = library.allItems.filter((it) => it.kind === KIND.image && (it.mark || 0) !== MARK.reject && dayOf(it) === day)
+/**
+ * The shots of a day (or of the photos shown, `ids`): one per photo, the raw file and its JPEG together,
+ * shown by the JPEG. @param {string|Set<number>} scope a day 'YYYY-MM-DD' or the ids of the photos shown
+ */
+function shotsOf(library, scope) {
+  const inScope = typeof scope === 'string' ? (it) => dayOf(it) === scope : (it) => scope.has(it.id);
+  const items = library.allItems.filter((it) => it.kind === KIND.image && (it.mark || 0) !== MARK.reject && inScope(it))
     .sort((a, b) => dateOf(a) - dateOf(b) || a.id - b.id);
   const inDay = new Set(items.map((it) => it.id));
   const twins = library.twinsOf(items);
@@ -78,9 +83,13 @@ async function readFeatures(thumbs, shots, onProgress, isCancelled) {
 
 /**
  * @param {object} services
- * @param {string} day 'YYYY-MM-DD'
+ * @param {string|{ items: object[] }} scope a day 'YYYY-MM-DD' (with the days before and after a click away),
+ *   or the photos shown in Photos (a folder, a year, an album…): their similar shots, across days
  */
-export function showSimilar(services, day) {
+export function showSimilar(services, scope) {
+  let day = typeof scope === 'string' ? scope : null;
+  const shown = day ? null : new Set(scope.items.map((it) => it.id));
+  const where = () => day || shown;
   const { library, thumbs, notifications } = services;
   if (document.querySelector('.sim')) return;
   let level = SENSITIVITY[readPref(LEVEL_KEY, 'similar')] ? readPref(LEVEL_KEY, 'similar') : 'similar';
@@ -89,6 +98,7 @@ export function showSimilar(services, day) {
   const goes = new Set(); // ids (rep) of the shots that go to the Limbo
   let reading = 0;       // a token: a newer read cancels an older one
   let busy = false;
+  let more = PAGE;       // groups drawn
 
   const days = daysWithPhotos(library);
   const title = h('h2.sim-title');
@@ -113,11 +123,12 @@ export function showSimilar(services, day) {
     if (document.querySelector('.cmp, .cm-overlay')) return; // the compare view or a dialog has the keys
     if (e.key === 'Escape') { e.preventDefault(); close(); }
   };
-  const sub = library.onDidChangeMarks(() => { if (!busy && data) { data = shotsOf(library, day); regroup(true); } });
+  const sub = library.onDidChangeMarks(() => { if (!busy && data) { data = shotsOf(library, where()); regroup(true); } });
   const close = () => { reading++; sub.dispose(); document.removeEventListener('keydown', onKey, true); overlay.remove(); };
 
   // the day before or after with two or more photos
   const go = (step) => {
+    if (!day) return;
     const next = step > 0 ? days.find((d) => d > day) : [...days].reverse().find((d) => d < day);
     if (next) { day = next; load(); }
   };
@@ -142,10 +153,12 @@ export function showSimilar(services, day) {
 
   const load = async () => {
     const token = ++reading;
-    prevDay.disabled = !days.some((d) => d < day);
-    nextDay.disabled = !days.some((d) => d > day);
-    title.textContent = t('similar.title', { day: formatDate(new Date(`${day}T12:00:00`).getTime()) });
-    data = shotsOf(library, day);
+    prevDay.hidden = nextDay.hidden = !day;
+    prevDay.disabled = !day || !days.some((d) => d < day);
+    nextDay.disabled = !day || !days.some((d) => d > day);
+    title.textContent = day ? t('similar.title', { day: formatDate(new Date(`${day}T12:00:00`).getTime()) }) : t('similar.titleShown');
+    data = shotsOf(library, where());
+    more = PAGE;
     groups = [];
     goes.clear();
     const eta = new Eta();
@@ -185,13 +198,16 @@ export function showSimilar(services, day) {
       return;
     }
     const top = body.scrollTop;
-    setChildren(body, h('p.sim-lead.small.muted', t('similar.lead')), groups.map((g, n) => group(g, n)));
+    // many groups (a whole year): the first ones, and the rest a click away
+    setChildren(body, h('p.sim-lead.small.muted', t('similar.lead')), groups.slice(0, more).map((g, n) => group(g, n)),
+      groups.length > more ? h('button.btn.btn-secondary.sim-more', { onclick: () => { more += PAGE; render(); } }, tn('similar.more', groups.length - more)) : null);
     body.scrollTop = top;
   };
 
   const group = (g, n) => {
     const keeps = g.units.filter((u) => !goes.has(u.id)).length;
-    const when = new Intl.DateTimeFormat(getLocale(), { hour: '2-digit', minute: '2-digit' }).format(g.units[0].t);
+    // across days: the date too
+    const when = new Intl.DateTimeFormat(getLocale(), day ? { hour: '2-digit', minute: '2-digit' } : { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(g.units[0].t);
     return h('section.sim-group', { 'aria-label': t('similar.groupLabel', { n: n + 1, count: g.units.length }) },
       h('div.sim-group-head',
         h('span.sim-group-title', t('similar.group', { n: n + 1 })),

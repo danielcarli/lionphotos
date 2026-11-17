@@ -4,7 +4,8 @@
  *  Licensed under the MIT License. See LICENSE in the project root.
  *--------------------------------------------------------------------------------------------*/
 // "Repeated files": identical copies (same content, SHA-256) shown side by side with their thumbnails;
-// the person picks the copy to keep and the others go to the Recycle Bin with a typed code.
+// the person picks the copy to keep and the others go to the Recycle Bin with a typed code. Each copy shows
+// where it is saved and can be opened, shown in its folder or compared with the others side by side.
 import { pageIntro } from '../../browser/pageIntro.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
@@ -14,6 +15,7 @@ import { ViewPane } from '../../browser/viewPane.js';
 import { Eta } from '../../../base/common/eta.js';
 import { etaText } from '../../browser/parts/statusbarPart.js';
 import { dateOf } from '../../services/library/browser/libraryService.js';
+import { showCompare, comparable } from '../compare/compareView.js';
 
 const PAGE = 60;
 const COPIES = 8;
@@ -88,26 +90,59 @@ export class DuplicatesView extends ViewPane {
 
   #group(g) {
     const items = g.ids.map((id) => this.library.byId.get(id)).filter(Boolean);
+    // the copies stay where they are when another is chosen to keep (only the marks change); with many copies,
+    // the first ones — and the one kept, if it is further on
+    let shown = items;
+    if (!g.open && items.length > COPIES) {
+      shown = items.slice(0, COPIES);
+      const kept = items.find((it) => it.id === g.keep);
+      if (kept && !shown.includes(kept)) shown = [...shown.slice(0, COPIES - 1), kept];
+    }
+    const images = comparable(this.services, items);
     return h('div.card.dup-group',
       h('div.dup-group-head',
         h('strong', tn('dupes.copies', items.length)),
         h('span.muted', `${formatBytes(g.size)} ${t('dupes.each')}`),
         h('code.hash', { title: g.hash }, g.hash.slice(0, 12)),
         h('span.toolbar-spacer'),
+        // side by side: photos in LionPhotos's comparison; videos (and what it cannot draw) in the computer's program
+        h('button.btn.btn-secondary.btn-sm', { title: images.length >= 2 ? t('dupes.compareTitle') : t('dupes.compareExternal'), onclick: () => this.#compare(g, items, images) },
+          h('span', { html: icon('columns', 13) }), t('dupes.compare')),
         h('button.btn.btn-danger-outline.btn-sm', { onclick: () => this.duplicates.trashCopies([g]) }, h('span', { html: icon('trash', 13) }), tn('dupes.trashCopies', items.length - 1))),
-      // the copy kept first, so it is among those shown
-      h('div.dup-copies', (g.open ? items : [...items].sort((a, b) => (b.id === g.keep) - (a.id === g.keep)).slice(0, COPIES)).map((it) => {
-        const keep = it.id === g.keep;
-        const url = this.thumbs.thumbUrl(it);
-        return h('button.dup-copy', { class: `dup-copy${keep ? ' keep' : ''}`, onclick: () => this.duplicates.setKeep(g, it.id), title: it.path },
-          url ? h('img.dup-thumb', { src: url, alt: '' }) : h('div.dup-thumb.thumb-ph'),
-          h('span.dup-keep-tag', keep ? t('dupes.keep') : t('dupes.toTrash')),
-          h('span.dup-name', it.name),
-          h('span.dup-folder', it.folder || t('common.rootFolder')),
-          h('span.dup-date', formatDate(dateOf(it))));
-      }), !g.open && items.length > COPIES
+      h('div.dup-copies', shown.map((it) => this.#copy(g, items, it)), !g.open && items.length > COPIES
         // a file copied dozens of times: the first copies, and the rest a click away (thousands of pictures at once held the page)
         ? h('button.dup-copy.dup-rest', { onclick: () => { g.open = true; this.render(); } }, h('span.dup-rest-n', `+${formatNumber(items.length - COPIES)}`), h('span.dup-name', t('dupes.showAll')))
         : null));
+  }
+
+  /** One copy: a click chooses it to keep; under it, where it is saved and what can be done with it. */
+  #copy(g, items, it) {
+    const keep = it.id === g.keep;
+    const url = this.thumbs.thumbUrl(it);
+    const folder = it.path.slice(0, Math.max(0, it.path.length - it.name.length - 1)) || it.path;
+    const tool = (name, label, run) => h('button.icon-button', { type: 'button', title: label, 'aria-label': `${label} — ${it.name}`, html: icon(name, 14), onclick: run });
+    return h('div.dup-copy', { class: `dup-copy${keep ? ' keep' : ''}` },
+      h('button.dup-pick', { type: 'button', 'aria-pressed': String(keep), title: keep ? t('dupes.keeping') : t('dupes.keepThis'), onclick: () => this.duplicates.setKeep(g, it.id) },
+        url ? h('img.dup-thumb', { src: url, alt: '' }) : h('div.dup-thumb.thumb-ph'),
+        h('span.dup-keep-tag', keep ? t('dupes.keep') : t('dupes.toTrash')),
+        h('span.dup-name', { title: it.name }, it.name),
+        h('span.dup-date', formatDate(dateOf(it)))),
+      // where it is saved: the whole folder, to tell two copies of the same name apart
+      h('span.dup-path', { title: it.path }, `\u200e${folder}\u200e`),
+      h('div.dup-tools',
+        tool('fullscreen', t('dupes.open'), () => this.services.viewer.open(items, items.indexOf(it))),
+        tool('external', t('info.openDefault'), () => this.actions.openExternal(it)),
+        tool('reveal', t('common.showIn', { explorer: this.actions.explorerName }), () => this.actions.reveal(it)),
+        tool('copy', t('info.copyPath'), () => this.actions.copyPath(it))));
+  }
+
+  #compare(g, items, images) {
+    // the copy kept on the left, the next one on the right
+    if (images.length >= 2) {
+      const at = Math.max(0, images.findIndex((it) => it.id === g.keep));
+      return showCompare(this.services, images, at, at === 0 ? 1 : 0);
+    }
+    // videos: each in the computer's program (two windows to put side by side), at most four
+    for (const it of items.slice(0, 4)) this.actions.openExternal(it);
   }
 }

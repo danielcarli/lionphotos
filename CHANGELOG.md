@@ -2,6 +2,16 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.59.0] — 2026-11-17
+
+### Added
+- **Repeated files: each copy says where it is and can be opened.** Under each copy, the whole folder where it is saved (to tell two copies of the same name apart), and four buttons: open it in LionPhotos, open it in the computer's program, show it in its folder, copy its path. Each group has **Compare side by side**: the copy kept on the left and another on the right, in LionPhotos's comparison; videos (and files it cannot draw) open in the computer's program, one window each, to put side by side.
+- **Similar photos from the Photos bar**, beside *Only photos in no album*: the photos shown — a folder, a year, an album, with its filters — grouped across days (each group with its date), the best of each suggested, the rest to the Limbo after a choice. With a day shown, it is that day's, with the days before and after a click away, as before. Many groups are drawn 40 at a time.
+- **README: the latest version published**, as a badge under the download buttons (in the ten languages): the buttons always give the latest release that was published, which may be older than the version of the README while a new one is being built.
+
+### Fixed
+- **Repeated files: choosing the copy on the right swapped the copies.** The copy kept was always moved first, so a click on the right one moved the names and pictures instead of the mark. The copies now stay where they are and only the mark moves (with many copies, the one kept is still among those shown).
+
 ## [1.58.0] — 2026-11-17
 
 ### Added

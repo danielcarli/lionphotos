@@ -104,6 +104,41 @@ app.whenReady().then(async () => {
       check(here?.source?.kind === 'local' && menu.svg > 0 && menu.title && (await js(`!!document.querySelector('.side-collection-source svg')`)),
         'where the folder is: on this computer (an icon in the sidebar and in the folder menu, the words in its tooltip)', JSON.stringify({ source: here?.source, menu }));
     }
+    // Repeated files: choosing the copy on the right moves the mark, not the copies; each copy says where it is
+    // saved and can be opened, shown in its folder, its path copied; the group compares its copies side by side
+    {
+      const dup = await js(`(async () => { try { const s = ${S}, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        s.layout.openView('duplicates'); await wait(200);
+        await s.duplicates.find(); for (let i = 0; i < 100 && s.duplicates.status !== 'done'; i++) await wait(100);
+        await wait(300);
+        const group = document.querySelector('.dup-group'); if (!group) return { none: true };
+        const names = () => [...group.querySelectorAll('.dup-copy:not(.dup-rest) .dup-name')].map((e) => e.textContent);
+        const kept = () => [...group.querySelectorAll('.dup-copy:not(.dup-rest)')].findIndex((e) => e.classList.contains('keep'));
+        const res = { before: names(), keptBefore: kept() };
+        const other = res.keptBefore === 0 ? 1 : 0;
+        group.querySelectorAll('.dup-copy:not(.dup-rest) .dup-pick')[other].click(); await wait(300);
+        const g2 = document.querySelector('.dup-group');
+        res.after = [...g2.querySelectorAll('.dup-copy:not(.dup-rest) .dup-name')].map((e) => e.textContent);
+        res.keptAfter = [...g2.querySelectorAll('.dup-copy:not(.dup-rest)')].findIndex((e) => e.classList.contains('keep'));
+        res.other = other;
+        res.tools = g2.querySelector('.dup-copy .dup-tools').querySelectorAll('button').length;
+        res.path = g2.querySelector('.dup-copy .dup-path').textContent.replace(/\u200e/g, '');
+        // open in LionPhotos: the viewer, on that copy
+        g2.querySelector('.dup-copy .dup-tools button').click(); await wait(500);
+        res.viewer = !!document.querySelector('.viewer') && s.viewer.current?.id === s.duplicates.groups[0]?.ids?.[0];
+        s.viewer.close(); await wait(300);
+        // compare side by side
+        const cmpBtn = [...g2.querySelectorAll('.dup-group-head button')].find((b) => b.querySelector('svg') && !b.classList.contains('btn-danger-outline'));
+        cmpBtn.click(); await wait(500);
+        res.compare = !!document.querySelector('.cmp');
+        document.querySelector('.cmp') && document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
+        res.compareClosed = !document.querySelector('.cmp');
+        s.layout.openView('photos');
+        return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+      check(!dup.error && !dup.none && JSON.stringify(dup.before) === JSON.stringify(dup.after) && dup.keptAfter === dup.other && dup.tools === 4
+        && dup.path.startsWith(FOLDER) && dup.viewer && dup.compare,
+        'repeated files: choosing another copy moves the mark, not the copies; each copy shows its folder and opens, shows in its folder or copies its path; the group compares side by side', JSON.stringify(dup));
+    }
 
     // 3) a changed file gets a new thumbnail, and only it
     const victim = (await js(`${S}.library.items.find((x) => x.ext === 'png')?.path`));
@@ -1781,6 +1816,19 @@ app.whenReady().then(async () => {
       'Similar photos: a photo and its copy of the same day form a group with one suggested to keep; the others go to the Limbo after asking', JSON.stringify(sim));
     check(sim.twins?.length === 1 && /\.CR2$/i.test(sim.twins[0]) && sim.menuSimilar && /Also send the RAW or JPG/.test(sim.check || '') && sim.checked === true && sim.limbo === '3,3' && sim.after === '0,0',
       'a JPEG sent to the Limbo takes its raw twin along (an option of the dialog, on by default)', JSON.stringify(sim));
+    // the same from the Photos bar without a day: the photos shown (the whole collection, here), across days
+    const simAll = await js(`(async () => { try { const s = ${S}, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      s.library.setFilter({ day: '', year: 0, folder: '', recursive: true }); s.layout.openView('photos'); await wait(400);
+      const btn = document.querySelector('.view-photos .similar-btn');
+      const near = btn?.previousElementSibling?.classList.contains('tb-switch');
+      btn.click();
+      for (let i = 0; i < 150 && !document.querySelector('.sim-group, .sim-empty'); i++) await wait(100);
+      const res = { near, label: btn.textContent, title: document.querySelector('.sim-title')?.textContent, groups: document.querySelectorAll('.sim-group').length,
+        prevHidden: document.querySelector('.sim-title-row .icon-button')?.hidden, meta: document.querySelector('.sim-group-meta')?.textContent };
+      document.querySelector('.sim-close').click(); await wait(200);
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(simAll.near && simAll.label === 'Similar photos' && simAll.title === 'Similar photos among those shown' && simAll.groups >= 1 && simAll.prevHidden && /\d{4}/.test(simAll.meta || ''),
+      'similar photos from the Photos bar, beside "Photos in no album": the photos shown, across days (dated groups, no day arrows)', JSON.stringify(simAll));
     // the viewer's editing panel: the same sections; typing in a field does not reach the viewer's keys; a
     // photo moved to a category the filter does not show stays in view, greyed, with a note naming it
     const vw = await js(`(async () => {

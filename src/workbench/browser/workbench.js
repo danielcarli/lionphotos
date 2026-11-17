@@ -32,6 +32,7 @@ import { Viewer } from '../contrib/viewer/viewer.js';
 import { LabelsView } from '../contrib/labels/labelsView.js';
 import { AlbumsView } from '../contrib/albums/albumsView.js';
 import { TodoView } from '../contrib/todo/todoView.js';
+import { BrandService } from '../services/brand/browser/brandService.js';
 import { PeopleView } from '../contrib/faces/peopleView.js';
 import { FacesService } from '../services/faces/browser/facesService.js';
 import { BackupView } from '../contrib/backup/backupView.js';
@@ -55,6 +56,7 @@ document.documentElement.dataset.platform = host.platform;
 const services = {};
 services.host = host;
 services.layout = new LayoutService(host);
+services.brand = new BrandService(); // the name and logo of the title bar (LionPhotos, or the person's own)
 services.notifications = new NotificationService();
 services.confirmation = new ConfirmationService();
 services.library = new LibraryService(host);

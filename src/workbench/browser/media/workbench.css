@@ -404,6 +404,9 @@ input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px;
 
 .editor-content { flex: 1; min-height: 0; position: relative; }
 .view { position: absolute; inset: 0; overflow: auto; padding: 20px 24px 32px; }
+/* the pages are drawn again whole when something changes (a pencil, a mark, a name): the browser's scroll
+   anchoring then picked another element to hold still and the page jumped; it stays where the person left it */
+.view { overflow-anchor: none; }
 .view-files { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
 
 /* ---------- buttons ---------- */
@@ -3364,3 +3367,23 @@ button.vw-chip:hover { filter: brightness(1.2); }
   .todo-n { font-size: 24px; }
   .todo-actions { grid-column: 3 / -1; flex-wrap: wrap; }
 }
+
+/* ---------- the name and logo: LionPhotos's, or the person's own with "Powered by LionPhotos" ---------- */
+.brand-mark { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.brand-mark .app-glyph { object-fit: contain; flex: none; }
+.app-name.is-custom { font-weight: 750; color: var(--text-primary); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.powered-by { flex: none; font-size: 10.5px; font-weight: 500; color: var(--text-muted); padding-left: 8px; border-left: 1px solid var(--border-strong); line-height: 14px; white-space: nowrap; }
+.welcome h1.welcome-own { font-weight: 800; overflow-wrap: anywhere; }
+.welcome-powered { margin: -2px 0 6px; font-size: 12px; color: var(--text-muted); }
+.welcome-mark { object-fit: contain; }
+.set-brand { display: inline-flex; margin-top: 4px; font-size: 12px; }
+.brand-dialog { width: min(560px, calc(100vw - 32px)); }
+.brand-lead { margin: 4px 0 0; }
+.brand-preview { margin-top: 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-subtle); padding: 10px 14px; font-size: 12px; color: var(--text-secondary); overflow: hidden; }
+.brand-preview-bar { display: flex; align-items: center; min-height: 20px; }
+.brand-fields { display: grid; gap: 4px; }
+.brand-logo-row { display: flex; align-items: center; gap: 14px; }
+.brand-logo-big { width: 64px; height: 64px; border-radius: 14px; object-fit: contain; background: var(--tile); border: 1px solid var(--border); flex: none; }
+.brand-logo-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.brand-logo-actions .small { flex-basis: 100%; }
+.brand-note { margin: 14px 0 0; }

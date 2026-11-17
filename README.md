@@ -11,7 +11,7 @@ Works on your folders as they are: small thumbnails made once, the metadata that
 
 **English** · [Português (Brasil)](docs/README.pt-BR.md) · [Português (Portugal)](docs/README.pt-PT.md) · [Español](docs/README.es.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Italiano](docs/README.it.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md)
 
-![Version 1.52.0](https://img.shields.io/badge/version-1.52.0-161214)
+![Version 1.53.1](https://img.shields.io/badge/version-1.53.1-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -121,6 +121,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Albums** | Cover, description and period; *Add to album…* on any selection, *Remove from album*, *Use as cover*; **albums from the folders** (the first level, the folders with photos, or the ones you pick), tied to the whole folder; full-screen slideshow. **Suggest albums**: the photos grouped as they were taken and named by what they are about — the folder, what the photos show (read on this computer from the thumbnails: beach, mountains, a cake, a wedding gown, food…), holidays by their date, the place, the person — plus albums of a subject across the years, for review before they are made. **Merge two albums** into one (the photos of both, under the name you choose; only the catalog changes, with undo). Shown as a mosaic, an even grid (every cover the same size), a list or highlights. |
 | **Projects, people, pets, places** | Each in its own tab, as a grid or a list grouped by year. Opening one shows its photos, under its tab; a photo can be taken out of it with one click. A folder's label covers everything inside it. A project groups albums and has a sheet (status, for whom, place, team, due date) and a panel showing where the work stands: sorted, edited, chosen into albums, audio descriptions. Places fill in by themselves from the photos (the GPS position or the place written in them) and are shown on a **world map**, drawn on this computer. |
 | **To edit** | The pencil on the cover of an album or a project puts it in the **To edit** tab (Ctrl+Shift+E), a list in the order things are to be done: drag the rows, or use the arrows or Alt+↑ ↓, to put first what comes first. Its place in the list shows on the cover, a project shows its due date (in red when late), and *Done* takes the pencil off. Only the catalog changes, and the list goes with the collection. |
+| **Name and logo** | *Settings › Name and logo* puts your own name and logo (an agency’s, a studio’s, a course’s) in the title bar, on the welcome page and in the window title, with a preview. A name of your own always shows **Powered by LionPhotos** beside it; About keeps the credits. The logo (PNG, JPG, WebP, SVG) is fitted whole in a square; *Back to LionPhotos* undoes it. Kept on this computer. |
 | **Faces and pets** | face-api (TensorFlow.js) for faces, COCO-SSD and MobileNet for animals, on the graphics card (WebGL). Groups of similar faces, suggestions you confirm or reject, "not them" remembered. Off by default; *Index now* or after each scan. |
 | **Marks and Limbo** | Great, OK, candidate to delete — on the tile, the list, the viewer and the info panel; keys `1` `2` `3` `0`. The Limbo shows every candidate and how much space they take, and sends them to the Recycle Bin in one step. **Highlights**: albums, people, pets and projects with only their great and OK photos, one row each — the name large, one chosen photo big — like a portfolio page. Places too; and inside any of them, its chosen photos large, one per row. |
 | **Open with** | The photo and video programs of the computer for the selected files (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), the last ones used first; on Windows also every program registered for the file type. |
@@ -275,7 +276,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.52.0**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.53.1**.
 
 ## Credits
 

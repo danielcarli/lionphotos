@@ -2230,5 +2230,22 @@
   "todo.pinTitle": "Mark to edit (pencil)",
   "todo.pinOnTitle": "To edit — number {n} in the list. Click to take the pencil off",
   "todo.menuOn": "Mark to edit",
-  "todo.menuOff": "Take off To edit"
+  "todo.menuOff": "Take off To edit",
+  "brand.title": "Name and logo",
+  "brand.lead": "Show your own name and logo in the title bar and on the welcome page — an agency’s, a studio’s, a course’s. Kept on this computer.",
+  "brand.preview": "Preview of the title bar",
+  "brand.name": "Name",
+  "brand.logo": "Logo",
+  "brand.logoPreview": "The logo",
+  "brand.logoPick": "Choose an image…",
+  "brand.logoDefault": "Use LionPhotos’s",
+  "brand.logoHint": "PNG, JPG, WebP or SVG. It is fitted whole in a square, transparent around it.",
+  "brand.poweredNote": "With a name of your own, “Powered by LionPhotos” goes beside it, in the title bar and in the window’s title. About keeps LionPhotos’s credits.",
+  "brand.defaultNote": "Leave the name empty (or LionPhotos) to keep LionPhotos; the logo can change alone.",
+  "brand.save": "Save",
+  "brand.reset": "Back to LionPhotos",
+  "brand.change": "Change…",
+  "brand.saved": "Now shown as “{name}”.",
+  "brand.restored": "LionPhotos’s name and logo are back.",
+  "brand.badFile": "This file is not an image that can be a logo (PNG, JPG, WebP, GIF or SVG, up to 15 MB)."
 }

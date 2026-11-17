@@ -2230,5 +2230,22 @@
   "todo.pinTitle": "Marquer à traiter (crayon)",
   "todo.pinOnTitle": "À traiter — n° {n} de la liste. Cliquez pour retirer le crayon",
   "todo.menuOn": "Marquer à traiter",
-  "todo.menuOff": "Retirer de À traiter"
+  "todo.menuOff": "Retirer de À traiter",
+  "brand.title": "Nom et logo",
+  "brand.lead": "Affichez votre propre nom et logo dans la barre de titre et sur la page d’accueil — ceux d’une agence, d’un studio, d’un cours. Conservé sur cet ordinateur.",
+  "brand.preview": "Aperçu de la barre de titre",
+  "brand.name": "Nom",
+  "brand.logo": "Logo",
+  "brand.logoPreview": "Le logo",
+  "brand.logoPick": "Choisir une image…",
+  "brand.logoDefault": "Utiliser celui de LionPhotos",
+  "brand.logoHint": "PNG, JPG, WebP ou SVG. Il est placé entier dans un carré, sur fond transparent.",
+  "brand.poweredNote": "Avec un nom à vous, « Powered by LionPhotos » s’affiche à côté, dans la barre de titre et dans le titre de la fenêtre. À propos garde les crédits de LionPhotos.",
+  "brand.defaultNote": "Laissez le nom vide (ou LionPhotos) pour garder LionPhotos ; le logo peut changer seul.",
+  "brand.save": "Enregistrer",
+  "brand.reset": "Revenir à LionPhotos",
+  "brand.change": "Modifier…",
+  "brand.saved": "Affiché maintenant comme « {name} ».",
+  "brand.restored": "Le nom et le logo de LionPhotos sont de retour.",
+  "brand.badFile": "Ce fichier n’est pas une image utilisable comme logo (PNG, JPG, WebP, GIF ou SVG, jusqu’à 15 Mo)."
 }

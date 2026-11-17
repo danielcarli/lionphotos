@@ -2230,5 +2230,22 @@
   "todo.pinTitle": "편집 대기로 표시(연필)",
   "todo.pinOnTitle": "편집 대기 — 목록의 {n}번째. 누르면 연필을 뗍니다",
   "todo.menuOn": "편집 대기로 표시",
-  "todo.menuOff": "편집 대기에서 빼기"
+  "todo.menuOff": "편집 대기에서 빼기",
+  "brand.title": "이름과 로고",
+  "brand.lead": "제목 표시줄과 시작 화면에 자신의 이름과 로고(기관, 스튜디오, 강좌 등)를 표시합니다. 이 컴퓨터에 저장됩니다.",
+  "brand.preview": "제목 표시줄 미리 보기",
+  "brand.name": "이름",
+  "brand.logo": "로고",
+  "brand.logoPreview": "로고",
+  "brand.logoPick": "이미지 선택…",
+  "brand.logoDefault": "LionPhotos 로고 사용",
+  "brand.logoHint": "PNG, JPG, WebP 또는 SVG. 정사각형 안에 전체가 들어가고 주변은 투명해집니다.",
+  "brand.poweredNote": "자신의 이름을 쓰면 제목 표시줄과 창 제목에 “Powered by LionPhotos”가 함께 표시됩니다. ‘정보’에는 LionPhotos의 크레딧이 그대로 남습니다.",
+  "brand.defaultNote": "이름을 비워 두면(또는 LionPhotos) LionPhotos가 유지됩니다. 로고만 바꿀 수도 있습니다.",
+  "brand.save": "저장",
+  "brand.reset": "LionPhotos로 되돌리기",
+  "brand.change": "변경…",
+  "brand.saved": "이제 “{name}”(으)로 표시됩니다.",
+  "brand.restored": "LionPhotos의 이름과 로고로 돌아왔습니다.",
+  "brand.badFile": "이 파일은 로고로 쓸 수 있는 이미지가 아닙니다(PNG, JPG, WebP, GIF 또는 SVG, 최대 15MB)."
 }

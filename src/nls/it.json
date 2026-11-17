@@ -2230,5 +2230,22 @@
   "todo.pinTitle": "Segna da modificare (matita)",
   "todo.pinOnTitle": "Da modificare — n. {n} dell’elenco. Fai clic per togliere la matita",
   "todo.menuOn": "Segna da modificare",
-  "todo.menuOff": "Togli da Da modificare"
+  "todo.menuOff": "Togli da Da modificare",
+  "brand.title": "Nome e logo",
+  "brand.lead": "Mostra il tuo nome e il tuo logo nella barra del titolo e nella pagina iniziale: di un’agenzia, uno studio, un corso. Resta su questo computer.",
+  "brand.preview": "Anteprima della barra del titolo",
+  "brand.name": "Nome",
+  "brand.logo": "Logo",
+  "brand.logoPreview": "Il logo",
+  "brand.logoPick": "Scegli un’immagine…",
+  "brand.logoDefault": "Usa quello di LionPhotos",
+  "brand.logoHint": "PNG, JPG, WebP o SVG. Viene messo intero in un quadrato, con sfondo trasparente intorno.",
+  "brand.poweredNote": "Con un nome tuo, «Powered by LionPhotos» compare accanto, nella barra del titolo e nel titolo della finestra. Informazioni mantiene i crediti di LionPhotos.",
+  "brand.defaultNote": "Lascia il nome vuoto (o LionPhotos) per tenere LionPhotos; il logo può cambiare da solo.",
+  "brand.save": "Salva",
+  "brand.reset": "Torna a LionPhotos",
+  "brand.change": "Cambia…",
+  "brand.saved": "Ora appare come «{name}».",
+  "brand.restored": "Il nome e il logo di LionPhotos sono tornati.",
+  "brand.badFile": "Questo file non è un’immagine utilizzabile come logo (PNG, JPG, WebP, GIF o SVG, fino a 15 MB)."
 }

@@ -11,6 +11,7 @@ import { t } from '../../../base/common/nls.js';
 import { showAboutDialog } from '../about/aboutDialog.js';
 import { formatBytes } from '../../../base/common/format.js';
 import { pluginsSettings } from '../plugins/exportDialog.js';
+import { showBrandDialog, brandMark } from '../brand/brandDialog.js';
 
 export function showSettingsDialog(services) {
   const { layout, host } = services;
@@ -27,6 +28,9 @@ export function showSettingsDialog(services) {
   const overlay = h('div.cm-overlay', { onmousedown: (e) => { if (e.target === overlay) close(); } },
     h('div.cm-dialog.settings-dialog', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'set-title' },
       h('header.cm-head', h('span.cm-icon', { html: icon('gear', 20) }), h('h2#set-title', t('settings.title'))),
+      // the name and logo of the title bar: LionPhotos's, or one's own (with "Powered by LionPhotos")
+      services.brand ? row(t('brand.title'), h('span.set-brand', brandMark({ name: services.brand.name, logo: services.brand.logo })),
+        h('button.btn.btn-secondary.btn-sm', { type: 'button', onclick: () => { close(); showBrandDialog(services); } }, t('brand.change'))) : null,
       row(t('settings.tileDetails'), t('settings.tileDetailsHint'), h('label.switch-label', details)),
       row(t('settings.focus'), t('settings.focusHint'), h('kbd', '\\')),
       // the space LionPhotos uses (thumbnails, previews, the catalog): the details are in Tools › Overview

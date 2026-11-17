@@ -2230,5 +2230,22 @@
   "todo.pinTitle": "Zum Bearbeiten markieren (Stift)",
   "todo.pinOnTitle": "Zu bearbeiten — Nr. {n} der Liste. Klicken, um den Stift wegzunehmen",
   "todo.menuOn": "Zum Bearbeiten markieren",
-  "todo.menuOff": "Aus Zu bearbeiten nehmen"
+  "todo.menuOff": "Aus Zu bearbeiten nehmen",
+  "brand.title": "Name und Logo",
+  "brand.lead": "Zeigen Sie Ihren eigenen Namen und Ihr Logo in der Titelleiste und auf der Startseite – einer Agentur, eines Studios, eines Kurses. Wird auf diesem Computer gespeichert.",
+  "brand.preview": "Vorschau der Titelleiste",
+  "brand.name": "Name",
+  "brand.logo": "Logo",
+  "brand.logoPreview": "Das Logo",
+  "brand.logoPick": "Bild wählen…",
+  "brand.logoDefault": "Das von LionPhotos verwenden",
+  "brand.logoHint": "PNG, JPG, WebP oder SVG. Es wird vollständig in ein Quadrat gesetzt, mit transparentem Rand.",
+  "brand.poweredNote": "Mit einem eigenen Namen steht „Powered by LionPhotos“ daneben, in der Titelleiste und im Fenstertitel. Über behält die Angaben zu LionPhotos.",
+  "brand.defaultNote": "Lassen Sie den Namen leer (oder LionPhotos), um LionPhotos zu behalten; das Logo kann sich allein ändern.",
+  "brand.save": "Speichern",
+  "brand.reset": "Zurück zu LionPhotos",
+  "brand.change": "Ändern…",
+  "brand.saved": "Jetzt angezeigt als „{name}“.",
+  "brand.restored": "Name und Logo von LionPhotos sind zurück.",
+  "brand.badFile": "Diese Datei ist kein Bild, das als Logo dienen kann (PNG, JPG, WebP, GIF oder SVG, bis 15 MB)."
 }

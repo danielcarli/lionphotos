@@ -1187,6 +1187,47 @@ app.whenReady().then(async () => {
         d?.querySelector('.cm-actions .btn')?.click(); await wait(100); res.closed = !document.querySelector('.about-dialog');
         return res; })()`);
       check(about.label === 'About' && /Daniel Michelon De Carli/.test(about.credit) && about.closed, 'About, by name in the activity bar, shows the credits', JSON.stringify(about));
+      // Settings › Name and logo: one's own name and logo in the title bar, with "Powered by LionPhotos" beside
+      // the name (and in the window's title); About keeps LionPhotos's credits; "Back to LionPhotos" undoes it
+      const brand = await js(`(async () => { try { const s = ${S}, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        document.querySelector('.activitybar .activity-small').click(); await wait(300);
+        const row = [...document.querySelectorAll('.settings-dialog .set-row')].find((r) => r.textContent.includes('Name and logo'));
+        const res = { row: !!row, rowNow: row?.querySelector('.app-name')?.textContent };
+        row.querySelector('button').click(); await wait(300);
+        const d = document.querySelector('.brand-dialog');
+        const name = d.querySelector('#brand-name'); name.value = 'Estúdio Lumen'; name.dispatchEvent(new Event('input'));
+        res.preview = d.querySelector('.brand-preview')?.textContent;
+        // a logo from an image file: fitted in a square PNG
+        const c = document.createElement('canvas'); c.width = 300; c.height = 100; const g = c.getContext('2d'); g.fillStyle = '#e33'; g.fillRect(0, 0, 300, 100);
+        const blob = await new Promise((r) => c.toBlob(r, 'image/png'));
+        const input = d.querySelector('input[type=file]'); const dt = new DataTransfer(); dt.items.add(new File([blob], 'logo.png', { type: 'image/png' })); input.files = dt.files;
+        input.dispatchEvent(new Event('change')); await wait(500);
+        res.square = d.querySelector('.brand-logo-big').src.startsWith('data:image/png');
+        [...d.querySelectorAll('.cm-actions .btn')].find((b) => b.textContent === 'Save').click(); await wait(300);
+        const bar = document.querySelector('.titlebar-left');
+        res.bar = bar.textContent; res.logo = bar.querySelector('img').src.startsWith('data:image/png'); res.title = document.title;
+        const img = bar.querySelector('img'); await img.decode(); const cv = document.createElement('canvas'); cv.width = cv.height = 160; cv.getContext('2d').drawImage(img, 0, 0);
+        const px = (x, y) => [...cv.getContext('2d').getImageData(x, y, 1, 1).data];
+        res.fitted = px(80, 80)[0] > 200 && px(80, 10)[3] === 0; // whole, centred, transparent around
+        res.kept = JSON.parse(localStorage.getItem('lionphotos.brand') || '{}').name;
+        document.querySelector('.activitybar .activity-about').click(); await wait(300);
+        res.about = /LionPhotos/.test(document.querySelector('.about-dialog')?.textContent || '') && !/Estúdio Lumen/.test(document.querySelector('.about-dialog')?.textContent || '');
+        document.querySelector('.about-dialog .cm-actions .btn')?.click(); await wait(100);
+        // the name LionPhotos itself is not a name of one's own
+        s.brand.set({ name: 'lionphotos' }); res.same = s.brand.custom === false && !document.querySelector('.titlebar-left .powered-by');
+        s.brand.set({ name: 'Estúdio Lumen' });
+        document.querySelector('.activitybar .activity-small').click(); await wait(300);
+        [...document.querySelectorAll('.settings-dialog .set-row')].find((r) => r.textContent.includes('Name and logo')).querySelector('button').click(); await wait(300);
+        const d2 = document.querySelector('.brand-dialog');
+        [...d2.querySelectorAll('.cm-actions .btn')].find((b) => b.textContent === 'Back to LionPhotos').click();
+        [...d2.querySelectorAll('.cm-actions .btn')].find((b) => b.textContent === 'Save').click(); await wait(300);
+        res.back = document.querySelector('.titlebar-left').textContent; res.backLogo = document.querySelector('.titlebar-left img').getAttribute('src');
+        res.cleared = localStorage.getItem('lionphotos.brand'); res.title2 = document.title;
+        return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+      check(brand.row && brand.rowNow === 'LionPhotos' && /Estúdio Lumen\s*Powered by LionPhotos/.test(brand.preview) && brand.square && /^Estúdio LumenPowered by LionPhotos$/.test(brand.bar) && brand.logo && brand.fitted
+        && /Estúdio Lumen · Powered by LionPhotos/.test(brand.title) && brand.kept === 'Estúdio Lumen' && brand.about && brand.same,
+        'Name and logo: one’s own in the title bar with “Powered by LionPhotos” beside it (and in the window title); the logo fitted whole; About keeps the credits', JSON.stringify(brand));
+      check(brand.back === 'LionPhotos' && brand.backLogo === 'media/logo.svg' && brand.cleared === null && !/Powered/.test(brand.title2), 'Name and logo: “Back to LionPhotos” gives the name and logo back', JSON.stringify(brand));
       check(rm.res.ok && after === 0, 'a plugin is removed (Recycle Bin)', JSON.stringify({ ok: rm.res.ok, error: rm.res.error, after }));
       fs.rmSync(expDir, { recursive: true, force: true });
     }
@@ -1618,6 +1659,30 @@ app.whenReady().then(async () => {
       'To edit: reordered by "to the top", Alt+↓ and dragging (a line shows where), and the order is kept in the catalog', JSON.stringify(todo));
     check(/To edit/.test(todo.back) && todo.tab === 'todo' && todo.barPin && todo.backView === 'todo' && todo.done === 'Projeto Lápis|Férias 2024' && todo.badge2 === '2' && todo.empty,
       'To edit: an album opened from it goes back to it; Done takes the pencil off', JSON.stringify(todo));
+    // a real click on the pencil, down the page, keeps the page where it is (the redraw used to move it:
+    // the browser's scroll anchoring, with the whole page drawn again)
+    const pinPage = await js(`(async () => { try { const s = ${S}, L = s.labels, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const its = lib.items.filter((x) => x.kind === 1 && x.thumb === 1 && !x.mark);
+      const made = [];
+      for (let i = 0; i < 14; i++) { const id = await L.save({ type: 'album', name: 'Rolagem ' + i }); made.push(id); await L.link({ ids: [its[i % its.length].id], add: [id] }); }
+      s.layout.openView('album'); await wait(600);
+      const el = document.querySelector('.view-albums');
+      el.scrollTop = Math.min(900, el.scrollHeight - el.clientHeight - 50); await wait(300);
+      const pin = [...el.querySelectorAll('.todo-pin')].find((p) => { const r = p.getBoundingClientRect(); return r.top > 120 && r.bottom < innerHeight - 60; });
+      const r = pin.getBoundingClientRect();
+      window.__pinPage = { made, top: el.scrollTop };
+      return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2), top: el.scrollTop }; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    if (!pinPage.error) {
+      win.webContents.sendInputEvent({ type: 'mouseMove', x: pinPage.x, y: pinPage.y }); await wait(200);
+      win.webContents.sendInputEvent({ type: 'mouseDown', x: pinPage.x, y: pinPage.y, button: 'left', clickCount: 1 });
+      win.webContents.sendInputEvent({ type: 'mouseUp', x: pinPage.x, y: pinPage.y, button: 'left', clickCount: 1 });
+      await wait(900);
+    }
+    const pinAfter = await js(`(async () => { const s = ${S}, el = document.querySelector('.view-albums'); const res = { top: el.scrollTop, marked: s.labels.toEdit().length };
+      for (const l of s.labels.toEdit()) await s.labels.setTodo(l.id, false);
+      for (const id of window.__pinPage?.made || []) await s.labels.remove(id);
+      return res; })()`);
+    check(!pinPage.error && pinPage.top > 100 && pinAfter.marked === 1 && Math.abs(pinAfter.top - pinPage.top) < 2, 'a real click on the pencil, down the page, does not move the page', JSON.stringify({ pinPage, pinAfter }));
     // the viewer's editing panel: the same sections; typing in a field does not reach the viewer's keys; a
     // photo moved to a category the filter does not show stays in view, greyed, with a note naming it
     const vw = await js(`(async () => {

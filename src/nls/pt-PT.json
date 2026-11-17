@@ -2230,5 +2230,22 @@
   "todo.pinTitle": "Marcar para editar (lápis)",
   "todo.pinOnTitle": "Por editar — {n}.º da lista. Clique para tirar o lápis",
   "todo.menuOn": "Marcar para editar",
-  "todo.menuOff": "Tirar de Por editar"
+  "todo.menuOff": "Tirar de Por editar",
+  "brand.title": "Nome e logótipo",
+  "brand.lead": "Mostre o seu próprio nome e logótipo na barra de título e na página inicial — de uma agência, um estúdio, um curso. Fica guardado neste computador.",
+  "brand.preview": "Pré-visualização da barra de título",
+  "brand.name": "Nome",
+  "brand.logo": "Logótipo",
+  "brand.logoPreview": "O logótipo",
+  "brand.logoPick": "Escolher imagem…",
+  "brand.logoDefault": "Usar o do LionPhotos",
+  "brand.logoHint": "PNG, JPG, WebP ou SVG. Fica inteiro dentro de um quadrado, com fundo transparente à volta.",
+  "brand.poweredNote": "Com um nome seu, “Powered by LionPhotos” aparece ao lado, na barra de título e no título da janela. Acerca de mantém os créditos do LionPhotos.",
+  "brand.defaultNote": "Deixe o nome vazio (ou LionPhotos) para manter LionPhotos; o logótipo pode mudar sozinho.",
+  "brand.save": "Guardar",
+  "brand.reset": "Voltar ao LionPhotos",
+  "brand.change": "Alterar…",
+  "brand.saved": "Agora aparece como “{name}”.",
+  "brand.restored": "O nome e o logótipo do LionPhotos voltaram.",
+  "brand.badFile": "Este ficheiro não é uma imagem que possa ser logótipo (PNG, JPG, WebP, GIF ou SVG, até 15 MB)."
 }

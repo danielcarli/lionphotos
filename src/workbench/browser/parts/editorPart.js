@@ -11,6 +11,7 @@ import { icon } from '../../../base/browser/icons.js';
 import { formatDateTime, baseName } from '../../../base/common/format.js';
 import { VIEWS, TOOLS } from '../../services/layout/browser/layoutService.js';
 import { t, tn } from '../../../base/common/nls.js';
+import { POWERED_BY } from '../../services/brand/browser/brandService.js';
 
 export class EditorPart {
   constructor(services, views) {
@@ -27,6 +28,7 @@ export class EditorPart {
     this.library.onDidChangeData(() => this.render());
     this.duplicates.onDidChange(() => this.#renderTools());
     this.library.onDidChangeState(() => { if (!this.library.hasData) this.#renderWelcome(); });
+    this.brand?.onDidChange(() => { if (!this.library.hasData) this.#renderWelcome(); });
     this.render();
   }
 
@@ -67,8 +69,9 @@ export class EditorPart {
     if (library.hasData) return;
     setChildren(this.welcome,
       h('div.welcome-inner',
-        h('img.welcome-mark', { src: 'media/logo.svg', alt: t('welcome.logoAlt', { app: t('app.name') }) }),
-        h('h1', 'Lion', h('span', 'Photos')),
+        h('img.welcome-mark', { src: this.brand?.logoUrl || 'media/logo.svg', alt: t('welcome.logoAlt', { app: this.brand?.displayName || t('app.name') }) }),
+        this.brand?.custom ? h('h1.welcome-own', this.brand.name) : h('h1', 'Lion', h('span', 'Photos')),
+        this.brand?.custom ? h('p.welcome-powered', POWERED_BY) : null,
         h('p.welcome-tagline', t('app.tagline')),
         h('p.welcome-lead', t('welcome.lead')),
         h('div.welcome-actions',

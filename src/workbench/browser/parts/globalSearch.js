@@ -14,6 +14,7 @@ import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { baseName, formatNumber } from '../../../base/common/format.js';
 import { dateOf, editsOf, fold, matches } from '../../services/library/browser/libraryService.js';
+import { POWERED_BY } from '../../services/brand/browser/brandService.js';
 
 const PER_GROUP = { label: 4, people: 4, author: 4, camera: 3, keyword: 5, folder: 4, photo: 5 };
 const TYPES = [['album', 'album'], ['project', 'layers'], ['person', 'users'], ['pet', 'paw'], ['place', 'pin']];
@@ -43,6 +44,7 @@ export class GlobalSearch {
     library.onDidUpdateItems?.(() => { this.index = null; });
     library.onDidChangeState(() => this.render());
     labels.onDidChange(() => { this.index = null; });
+    services.brand?.onDidChange(() => this.render());
     this.render();
   }
 
@@ -53,7 +55,10 @@ export class GlobalSearch {
     this.input.placeholder = folder ? t('gs.placeholder', { folder: baseName(folder) }) : t('titlebar.placeholder');
     this.icon.innerHTML = icon(library.busy ? 'refresh' : 'search', 14);
     this.element.classList.toggle('busy', !!library.busy);
-    document.title = folder ? `${baseName(folder)} — ${t('app.name')}` : `${t('app.name')} — ${t('app.tagline')}`;
+    // a name of one's own goes with "Powered by LionPhotos" here too (the taskbar shows this title)
+    const brand = this.services.brand;
+    const app = brand?.custom ? `${brand.name} · ${POWERED_BY}` : t('app.name');
+    document.title = folder ? `${baseName(folder)} — ${app}` : brand?.custom ? app : `${app} — ${t('app.tagline')}`;
   }
 
   focus() {

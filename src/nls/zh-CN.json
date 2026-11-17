@@ -2230,5 +2230,22 @@
   "todo.pinTitle": "标记为待编辑（铅笔）",
   "todo.pinOnTitle": "待编辑 — 列表第 {n} 个。点击取下铅笔",
   "todo.menuOn": "标记为待编辑",
-  "todo.menuOff": "移出待编辑"
+  "todo.menuOff": "移出待编辑",
+  "brand.title": "名称和标志",
+  "brand.lead": "在标题栏和欢迎页显示你自己的名称和标志——机构、工作室或课程的。保存在这台电脑上。",
+  "brand.preview": "标题栏预览",
+  "brand.name": "名称",
+  "brand.logo": "标志",
+  "brand.logoPreview": "标志",
+  "brand.logoPick": "选择图片…",
+  "brand.logoDefault": "使用 LionPhotos 的标志",
+  "brand.logoHint": "PNG、JPG、WebP 或 SVG。会完整放入一个正方形，周围透明。",
+  "brand.poweredNote": "使用自己的名称时，标题栏和窗口标题中会在旁边显示“Powered by LionPhotos”。“关于”中保留 LionPhotos 的署名。",
+  "brand.defaultNote": "名称留空（或填 LionPhotos）即保持 LionPhotos；也可以只更换标志。",
+  "brand.save": "保存",
+  "brand.reset": "恢复为 LionPhotos",
+  "brand.change": "更改…",
+  "brand.saved": "现在显示为“{name}”。",
+  "brand.restored": "已恢复 LionPhotos 的名称和标志。",
+  "brand.badFile": "此文件不是可用作标志的图片（PNG、JPG、WebP、GIF 或 SVG，最大 15 MB）。"
 }

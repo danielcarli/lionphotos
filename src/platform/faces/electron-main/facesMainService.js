@@ -36,8 +36,20 @@ const FORCE = process.env.LIONPHOTOS_FACES_FORCE === '1';
  * graphics card: on the processor alone each photo takes many seconds) and 4 GB of memory.
  * @returns {Promise<{ supported: boolean, reason?: 'gpu'|'memory', detail?: string }>}
  */
-/** Every feature off or in software: what Electron answers before the graphics process has reported. */
-const provisional = (status) => !Object.values(status || {}).some((v) => /^enabled/.test(String(v)));
+/**
+ * Neither compositing nor WebGL on: what Electron answers before the graphics process has reported. (Not
+ * "every feature off": multiple_raster_threads says enabled from the start, and a laptop with an RTX was read
+ * too early — everything else "disabled" — so a page had to try WebGL to find it.)
+ */
+const provisional = (status) => !/^enabled/.test(String(status?.gpu_compositing || '')) && !/^enabled/.test(String(status?.webgl2 || status?.webgl || ''));
+
+// one check for the three recognizers (faces, pets, what the photos show): one wait, one page trying WebGL,
+// one line in the log — it was done three times
+let shared = null;
+const supportOnce = () => (shared ||= checkSupport().then((s) => {
+  console.log(`[faces] recognition ${s.supported ? 'available' : `not available (${s.reason}${s.detail ? `: ${s.detail}` : ''})`}`);
+  return s;
+}));
 
 async function checkSupport() {
   if (FORCE) return { supported: true };
@@ -133,7 +145,7 @@ class FacesMainService {
     this.jobSeq = 0;
     this.timers = {};
     this.support = null; // null while checking
-    checkSupport().then((s) => { this.support = s; this.#emitProgress(); });
+    supportOnce().then((s) => { this.support = s; this.#emitProgress(); });
 
     const can = () => this.support?.supported !== false;
     library.onDidOpen(({ rootId }) => { this.queue = []; this.queueRoot = null; this.run = false; this.counts = { total: 0, done: 0 }; if (this.#auto(rootId) && can()) this.#fill(); else this.#emitProgress(); });

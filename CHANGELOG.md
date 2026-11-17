@@ -2,6 +2,21 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.53.1] — 2026-11-17
+
+### Fixed
+- **The graphics card was checked three times at start-up.** Faces, pets and what the photos show each asked whether this computer can do recognition: three hidden pages trying WebGL and the same lines three times in the log. Now one check serves the three, and the log ends with one line saying whether recognition is available.
+- **The graphics status was read too early.** It was taken as final as soon as any feature said "enabled" — and one always does (multiple raster threads) — so on a laptop with an RTX it still said WebGL and compositing were off, and a page had to try WebGL to find the card. Now it waits until compositing or WebGL says something (or 15 s), as meant.
+
+## [1.53.0] — 2026-11-17
+
+### Added
+- **Name and logo.** *Settings › Name and logo* shows a name and a logo of one's own — an agency's, a studio's, a course's — in the title bar, on the welcome page and in the window's title (the one the taskbar shows), with a preview of the title bar while they are chosen. A name of one's own always comes with **Powered by LionPhotos** beside it; typing LionPhotos itself, or leaving it empty, keeps LionPhotos. About keeps LionPhotos's credits.
+- The logo is any image (PNG, JPG, WebP, GIF or SVG, up to 15 MB), fitted whole in a square with a transparent margin, kept as a 160 px PNG; it can change alone, with the name left as LionPhotos. *Use LionPhotos's* puts the logo back, *Back to LionPhotos* both. Kept on this computer only; the collection's files and catalog do not change.
+
+### Fixed
+- **A click on the pencil moved the page.** Clicking the pencil on a cover down the page of Albums or Projects threw the page up. Every page is drawn again when something changes, and the browser's scroll anchoring then held another element still; it is off for the pages, so they stay where they were — after a pencil, a mark, a new name or a cover too.
+
 ## [1.52.0] — 2026-11-17
 
 ### Added

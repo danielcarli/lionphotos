@@ -10,6 +10,7 @@ import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t } from '../../../base/common/nls.js';
 import { GlobalSearch } from './globalSearch.js';
+import { brandMark } from '../../contrib/brand/brandDialog.js';
 
 const SPHERE_OPTIONS = ['', 'personal', 'professional', 'none'];
 
@@ -23,9 +24,14 @@ export class TitlebarPart {
     services.globalSearch = this.search;
     this.center = this.search.element;
     this.element = h('header.part.titlebar',
-      h('div.titlebar-left', h('img.app-glyph', { src: 'media/logo.svg', alt: '' }), h('span.app-name', 'Lion', h('b', 'Photos'))),
+      // the name and logo: LionPhotos's, or the person's own with "Powered by LionPhotos" (Settings › Name and logo)
+      this.brandSlot = h('div.titlebar-left'),
       h('div.titlebar-center', this.center),
       h('div.titlebar-right', this.sphere));
+    const brand = services.brand;
+    const paintBrand = () => setChildren(this.brandSlot, brandMark({ name: brand?.name, logo: brand?.logo }));
+    brand?.onDidChange(paintBrand);
+    paintBrand();
     library.onDidChangeData(() => this.#later());
     library.onDidChangeFilter(() => this.renderSphere());
     labels.onDidChange(() => this.#later());

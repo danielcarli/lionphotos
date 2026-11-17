@@ -2230,5 +2230,22 @@
   "todo.pinTitle": "編集待ちにする（鉛筆）",
   "todo.pinOnTitle": "編集待ち — リストの {n} 番目。クリックで鉛筆を外す",
   "todo.menuOn": "編集待ちにする",
-  "todo.menuOff": "編集待ちから外す"
+  "todo.menuOff": "編集待ちから外す",
+  "brand.title": "名前とロゴ",
+  "brand.lead": "タイトルバーとスタート画面に、独自の名前とロゴ（事務所、スタジオ、講座など）を表示します。このコンピューターに保存されます。",
+  "brand.preview": "タイトルバーのプレビュー",
+  "brand.name": "名前",
+  "brand.logo": "ロゴ",
+  "brand.logoPreview": "ロゴ",
+  "brand.logoPick": "画像を選択…",
+  "brand.logoDefault": "LionPhotos のロゴを使う",
+  "brand.logoHint": "PNG、JPG、WebP、SVG。正方形の中に全体が収まり、周りは透明になります。",
+  "brand.poweredNote": "独自の名前にすると、タイトルバーとウィンドウのタイトルに「Powered by LionPhotos」が並んで表示されます。「情報」には LionPhotos のクレジットがそのまま残ります。",
+  "brand.defaultNote": "名前を空欄（または LionPhotos）にすると LionPhotos のままです。ロゴだけを変えることもできます。",
+  "brand.save": "保存",
+  "brand.reset": "LionPhotos に戻す",
+  "brand.change": "変更…",
+  "brand.saved": "「{name}」として表示されます。",
+  "brand.restored": "LionPhotos の名前とロゴに戻しました。",
+  "brand.badFile": "このファイルはロゴに使える画像ではありません（PNG、JPG、WebP、GIF、SVG、15 MB まで）。"
 }

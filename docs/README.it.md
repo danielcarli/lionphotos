@@ -11,7 +11,7 @@ Lavora sulle tue cartelle così come sono: miniature piccole create una volta so
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · **Italiano** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versione 1.52.0](https://img.shields.io/badge/version-1.52.0-161214)
+![Versione 1.53.1](https://img.shields.io/badge/version-1.53.1-161214)
 ![Stato: versione beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licenza: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Piattaforme: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -121,6 +121,7 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Album** | Copertina, descrizione e periodo; *Aggiungi all'album…* su qualsiasi selezione, *Togli dall'album*, *Usa come copertina*; **album dalle cartelle** (il primo livello, le cartelle con foto o quelle che scegli), legati all'intera cartella; presentazione a schermo intero. **Suggerisci album**: le foto raggruppate come sono state scattate e chiamate in base al soggetto — la cartella, ciò che mostrano le foto (letto su questo computer dalle miniature: spiaggia, montagna, torta, abito da sposa, cibo…), le feste dalla data, il luogo, la persona — e album di un soggetto negli anni, da rivedere prima di crearli. **Unire due album** in uno (le foto di entrambi, con il nome scelto; cambia solo il catalogo, ed è annullabile). Mostrati a mosaico, griglia uniforme (tutte le copertine della stessa misura), elenco o in evidenza. |
 | **Progetti, persone, animali, luoghi** | Ognuno nella sua scheda, a griglia o in elenco raggruppato per anno. Aprirne uno mostra le sue foto, nella sua scheda; una foto si può togliere con un clic. L'etichetta di una cartella vale per tutto ciò che contiene. Un progetto raggruppa album e ha una scheda (stato, per chi, luogo, squadra, scadenza) e un pannello con l'avanzamento: smistate, modificate, scelte negli album, audiodescrizioni. I luoghi si compilano da soli dalle foto (la posizione GPS o il luogo scritto) e compaiono su una **mappa del mondo** disegnata sul computer. |
 | **Da modificare** | La matita sulla copertina di un album o di un progetto lo mette nella scheda **Da modificare** (Ctrl+Shift+E), un elenco nell’ordine in cui vanno fatte le cose: trascina le righe, o usa le frecce o Alt+↑ ↓, per mettere per primo ciò che viene prima. Il posto nell’elenco si vede sulla copertina, un progetto mostra la sua scadenza (in rosso se in ritardo) e *Fatto* toglie la matita. Cambia solo il catalogo, e l’elenco segue la collezione. |
+| **Nome e logo** | *Impostazioni › Nome e logo* mette il tuo nome e il tuo logo (di un’agenzia, uno studio, un corso) nella barra del titolo, nella pagina iniziale e nel titolo della finestra, con anteprima. Un nome tuo mostra sempre **Powered by LionPhotos** accanto; Informazioni mantiene i crediti. Il logo (PNG, JPG, WebP, SVG) viene messo intero in un quadrato; *Torna a LionPhotos* annulla. Resta su questo computer. |
 | **Volti e animali** | face-api (TensorFlow.js) per i volti, COCO-SSD e MobileNet per gli animali, sulla scheda grafica (WebGL). Gruppi di volti simili, suggerimenti da confermare o rifiutare, "non è lui" ricordato. Disattivato per impostazione predefinita; *Indicizza ora* o dopo ogni scansione. |
 | **Segni e Limbo** | Ottima, OK, da eliminare — sulla miniatura, nell'elenco, nel visualizzatore e nel pannello informazioni; tasti `1` `2` `3` `0`. Il Limbo mostra tutte le candidate e lo spazio che occupano, e le manda nel Cestino in un colpo solo. **In evidenza**: album, persone, animali e progetti con le sole foto segnate con stella o OK, uno per riga — il nome in grande, una foto scelta in grande — come una pagina di portfolio. Anche i luoghi; e dentro ciascuno, le foto scelte in grande, una per riga. |
 | **Apri con** | I programmi per foto e video del computer per i file selezionati (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), prima gli ultimi usati; su Windows anche tutti i programmi registrati per il tipo di file. |
@@ -275,7 +276,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-foto"; npm run test:e2e
 
 ## Registro delle modifiche
 
-Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.52.0**.
+Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.53.1**.
 
 ## Riconoscimenti
 

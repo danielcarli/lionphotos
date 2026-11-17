@@ -126,6 +126,12 @@ export class SidebarPart {
       }))) : null, this.hideBtn);
   }
 
+  /** A folder off the list of folders opened before, with an undo. */
+  async #forget(folder) {
+    await this.host.library.hideRoot(folder, true).catch(() => false);
+    this.notifications.info(t('sidebar.forgotten', { folder }), 8000, { label: t('ops.undo'), run: () => this.host.library.hideRoot(folder, false).then(() => this.notifications.info(t('sidebar.forgetUndone', { folder }), 3000)) });
+  }
+
   // where the open collection is (asked once per folder; the button is drawn again when it is known)
   #source = null;
   #sourceFor = '';
@@ -147,7 +153,7 @@ export class SidebarPart {
     const r = button.getBoundingClientRect();
     // the other folders opened before on this computer: each one a collection of its own, a click away
     const roots = await this.host.library.roots().catch(() => []);
-    const others = roots.filter((x) => x.path !== library.root).slice(0, 8);
+    const others = roots.filter((x) => x.path !== library.root && !x.hidden).slice(0, 8);
     // where each folder is: this computer, an external disk, a cloud drive, the network
     const here = roots.find((x) => x.path === library.root)?.source || null;
     if (here && !this.#source) { this.#source = here; this.#sourceFor = library.root; this.renderHead(); }
@@ -164,8 +170,10 @@ export class SidebarPart {
       { label: library.filter.folder ? t('sidebar.refreshFolder') : t('sidebar.refresh'), icon: 'refresh', hint: 'F5', disabled: busy, run: () => library.refresh() },
       { label: t('sidebar.changeFolder'), icon: 'folderOpen', hint: 'Ctrl+O', disabled: busy, run: () => this.actions.openFolder() },
       { label: t('sidebar.depthLabel'), icon: 'layers', disabled: busy, submenu: levels },
-      ...(others.length ? ['-', { label: t('sidebar.otherFolders'), disabled: true },
-        ...others.map((x) => ({ label: x.path, icon: sourceIcon(x.source), tag: sourceTag(x.source), title: sourceTitle(x.source), hint: formatNumber(x.count), disabled: busy, run: () => library.open(x.path) }))] : []),
+      ...(others.length ? ['-', { label: t('sidebar.otherFolders'), disabled: true, listHead: true },
+        ...others.map((x) => ({ label: x.path, icon: sourceIcon(x.source), tag: sourceTag(x.source), title: sourceTitle(x.source), hint: formatNumber(x.count), disabled: busy, run: () => library.open(x.path),
+          // the × takes it off the list (its catalog stays: opened again, it comes back with everything)
+          remove: { title: t('sidebar.forget'), run: () => this.#forget(x.path) } }))] : []),
       '-',
       { label: t('common.showIn', { explorer: this.actions.explorerName }), icon: 'reveal', run: () => this.actions.revealFolder('') },
     ]);

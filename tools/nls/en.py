@@ -536,3 +536,7 @@ _merge(MESSAGES, {'dupes': {'compare': 'Compare side by side', 'compareTitle': '
 _merge(MESSAGES, {'similar': {'titleShown': 'Similar photos among those shown', 'shownTitle': 'Group the photos shown (this folder, year or album, with its filters) that are in practice the same picture, and choose which to keep', 'fewShown': 'Show at least two photos to look for similar ones.', 'more': {'one': 'Show more ({count} group left)', 'other': 'Show more ({count} groups left)'}}})
 
 _merge(MESSAGES, {'similar': {'button': 'Similar photos'}})
+
+_merge(MESSAGES, {'sidebar': {'forget': 'Remove from this list (its albums and marks are kept)', 'forgotten': '{folder} is off the list of folders opened before. Its catalog is kept: open it again and everything is there.', 'forgetUndone': '{folder} is back on the list.'}})
+
+_merge(MESSAGES, {'compare': {'onLeft': 'Left', 'onRight': 'Right', 'strip': 'The photos being compared', 'stripHint': 'Click to show it on the marked side', 'count': {'one': '{count} photo', 'other': 'Two of {count} photos at a time'}}})

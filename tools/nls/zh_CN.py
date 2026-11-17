@@ -533,3 +533,7 @@ _merge(MESSAGES, {'dupes': {'compare': '并排比较', 'compareTitle': '保留�
 _merge(MESSAGES, {'similar': {'titleShown': '在显示的照片中找相似照片', 'shownTitle': '将显示的照片（此文件夹、年份或相册，含筛选）中实际上相同的照片分组，以便选择保留哪些', 'fewShown': '请至少显示两张照片再查找相似照片。', 'more': {'other': '显示更多（还剩 {count} 组）'}}})
 
 _merge(MESSAGES, {'similar': {'button': '相似照片', 'more': {'one': '显示更多（还剩 {count} 组）', 'other': '显示更多（还剩 {count} 组）'}}})
+
+_merge(MESSAGES, {'sidebar': {'forget': '从此列表中移除（相册和标记仍会保留）', 'forgotten': '已将 {folder} 从之前打开的文件夹列表中移除。目录仍保留：再次打开，一切都在。', 'forgetUndone': '{folder} 已回到列表。'}})
+
+_merge(MESSAGES, {'compare': {'onLeft': '左', 'onRight': '右', 'strip': '正在比较的照片', 'stripHint': '点击以在标记的一侧显示', 'count': {'one': '{count} 张照片', 'other': '{count} 张照片中每次显示 2 张'}}})

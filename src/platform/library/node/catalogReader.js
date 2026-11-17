@@ -19,7 +19,7 @@ if (!isMainThread && workerData?.catalogReader) {
     list: db.prepare(`SELECT json_group_array(${LIST_JSON}) AS j FROM media WHERE root_id = ?`),
     pendingThumbs: db.prepare(`SELECT id FROM media WHERE root_id = ? AND NOT (${THUMB_VALID}) AND NOT (${THUMB_FAILED})
       ORDER BY coalesce(taken_at, mtime) DESC`),
-    roots: db.prepare(`SELECT r.path, r.last_scan_at AS lastScanAt, count(m.id) AS count, coalesce(sum(m.kind = 2), 0) AS videos,
+    roots: db.prepare(`SELECT r.path, r.last_scan_at AS lastScanAt, r.hidden AS hidden, count(m.id) AS count, coalesce(sum(m.kind = 2), 0) AS videos,
       coalesce(sum(m.size), 0) AS bytes FROM roots r LEFT JOIN media m ON m.root_id = r.id GROUP BY r.id ORDER BY r.last_scan_at DESC`),
     faceCandidates: Object.fromEntries(['face', 'pet', 'scene'].map((k) => [k, db.prepare(candidatesSql(k))])),
     // what a photo says of where it was taken: the place written in LionPhotos, the one in the file, its GPS

@@ -86,6 +86,8 @@ class LibraryMainService {
       const where = await sourcesOf(rows.map((r) => r.path)).catch(() => new Map());
       return rows.map((r) => ({ ...r, source: where.get(r.path) || null }));
     });
+    // a folder off the list of folders opened before (its catalog kept), or back on it
+    ipc.handle('library:hideRoot', (_e, rootPath, hidden) => (typeof rootPath === 'string' ? this.db.hideRoot(rootPath, hidden !== false) : false));
     // asked once a little after start, so the first list opens at once (Windows: one PowerShell call)
     setTimeout(() => sourcesOf([]).catch(() => {}), 5000).unref?.();
     // marks (great / OK / candidate to delete) change only the catalog, never a file: no confirmation code

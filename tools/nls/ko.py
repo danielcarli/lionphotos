@@ -533,3 +533,7 @@ _merge(MESSAGES, {'dupes': {'compare': '나란히 비교', 'compareTitle': '남�
 _merge(MESSAGES, {'similar': {'titleShown': '표시된 사진 중 비슷한 사진', 'shownTitle': '표시된 사진(이 폴더, 연도 또는 앨범, 필터 포함) 중 사실상 같은 사진을 묶어 남길 것을 고릅니다', 'fewShown': '비슷한 사진을 찾으려면 사진을 두 장 이상 표시하세요.', 'more': {'other': '더 보기({count}개 그룹 남음)'}}})
 
 _merge(MESSAGES, {'similar': {'button': '비슷한 사진', 'more': {'one': '더 보기({count}개 그룹 남음)', 'other': '더 보기({count}개 그룹 남음)'}}})
+
+_merge(MESSAGES, {'sidebar': {'forget': '이 목록에서 빼기(앨범과 표시는 그대로 남음)', 'forgotten': '{folder}을(를) 이전에 연 폴더 목록에서 뺐습니다. 카탈로그는 남아 있어 다시 열면 모두 그대로입니다.', 'forgetUndone': '{folder}이(가) 목록에 다시 돌아왔습니다.'}})
+
+_merge(MESSAGES, {'compare': {'onLeft': '왼쪽', 'onRight': '오른쪽', 'strip': '비교 중인 사진', 'stripHint': '클릭하면 표시된 쪽에 보여 줍니다', 'count': {'one': '사진 {count}장', 'other': '사진 {count}장 중 2장씩'}}})

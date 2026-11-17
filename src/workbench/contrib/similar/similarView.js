@@ -238,10 +238,14 @@ export function showSimilar(services, scope) {
       h('span.sim-state', { html: icon(out ? 'binQuestion' : 'check', 13) }));
   };
 
+  // side by side in the order of the group (the one on the left here is on the left there), the best named;
+  // ← → step the photo that is not the best
   const compare = (g, at) => {
     const items = g.units.map((u) => u.rep);
     const other = at === g.best ? (at + 1) % items.length : g.best;
-    showCompare(services, items, at, other);
+    const [l, r] = at < other ? [at, other] : [other, at];
+    const best = items[g.best];
+    showCompare(services, items, l, r, { active: l === g.best ? 1 : 0, tag: (it) => (it.id === best.id ? t('similar.best') : '') });
   };
 
   const sendToLimbo = async () => {

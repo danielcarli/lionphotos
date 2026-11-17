@@ -533,3 +533,7 @@ _merge(MESSAGES, {'dupes': {'compare': '並べて比較', 'compareTitle': '残�
 _merge(MESSAGES, {'similar': {'titleShown': '表示中の写真から似た写真', 'shownTitle': '表示中の写真（このフォルダー・年・アルバム、フィルター込み）のうち、実質的に同じ写真をまとめ、残すものを選びます', 'fewShown': '似た写真を探すには、写真を2枚以上表示してください。', 'more': {'other': 'さらに表示（残り {count} グループ）'}}})
 
 _merge(MESSAGES, {'similar': {'button': '似た写真', 'more': {'one': 'さらに表示（残り {count} グループ）', 'other': 'さらに表示（残り {count} グループ）'}}})
+
+_merge(MESSAGES, {'sidebar': {'forget': 'この一覧から外す（アルバムや印は残ります）', 'forgotten': '{folder} を以前開いたフォルダーの一覧から外しました。カタログは残っているので、もう一度開けばすべてそのままです。', 'forgetUndone': '{folder} を一覧に戻しました。'}})
+
+_merge(MESSAGES, {'compare': {'onLeft': '左', 'onRight': '右', 'strip': '比較中の写真', 'stripHint': 'クリックすると選択中の側に表示します', 'count': {'one': '{count} 枚', 'other': '{count} 枚のうち 2 枚ずつ表示'}}})

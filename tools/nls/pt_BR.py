@@ -536,3 +536,7 @@ _merge(MESSAGES, {'dupes': {'compare': 'Comparar lado a lado', 'compareTitle': '
 _merge(MESSAGES, {'similar': {'titleShown': 'Fotos parecidas entre as mostradas', 'shownTitle': 'Agrupa as fotos mostradas (esta pasta, ano ou álbum, com os filtros) que na prática são a mesma foto, para escolher quais ficam', 'fewShown': 'Mostre pelo menos duas fotos para procurar as parecidas.', 'more': {'one': 'Mostrar mais (falta {count} grupo)', 'other': 'Mostrar mais (faltam {count} grupos)'}}})
 
 _merge(MESSAGES, {'similar': {'button': 'Fotos parecidas'}})
+
+_merge(MESSAGES, {'sidebar': {'forget': 'Tirar desta lista (os álbuns e marcações dela continuam guardados)', 'forgotten': '{folder} saiu da lista de pastas abertas antes. O catálogo dela continua guardado: abra de novo e está tudo lá.', 'forgetUndone': '{folder} voltou para a lista.'}})
+
+_merge(MESSAGES, {'compare': {'onLeft': 'Esquerda', 'onRight': 'Direita', 'strip': 'As fotos sendo comparadas', 'stripHint': 'Clique para mostrá-la no lado marcado', 'count': {'one': '{count} foto', 'other': 'Duas de {count} fotos por vez'}}})

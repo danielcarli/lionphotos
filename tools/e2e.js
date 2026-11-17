@@ -104,6 +104,40 @@ app.whenReady().then(async () => {
       check(here?.source?.kind === 'local' && menu.svg > 0 && menu.title && (await js(`!!document.querySelector('.side-collection-source svg')`)),
         'where the folder is: on this computer (an icon in the sidebar and in the folder menu, the words in its tooltip)', JSON.stringify({ source: here?.source, menu }));
     }
+    // the × of a folder opened before: off the list (its catalog kept; opened again, back on it), with an undo
+    {
+      const { LibraryDatabase } = require('../src/platform/library/node/libraryDatabase');
+      const tmpDb = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'lionphotos-db-')), 'library.sqlite');
+      const db = new LibraryDatabase(tmpDb);
+      db.beginScan('/somewhere/Fotos'); db.hideRoot('/somewhere/Fotos', true);
+      const hiddenNow = db.roots().find((r) => r.path === '/somewhere/Fotos')?.hidden;
+      db.beginScan('/somewhere/Fotos');
+      const back = db.roots().find((r) => r.path === '/somewhere/Fotos')?.hidden;
+      db.close?.();
+      // another collection opened before (an empty folder), then this one again (without reading it again)
+      const other = fs.mkdtempSync(path.join(os.tmpdir(), 'Outra coleção '));
+      await js(`${S}.library.open(${JSON.stringify(other)}).then(() => true)`);
+      await js(`${S}.library.open(${JSON.stringify(FOLDER)}, { scan: false }).then(() => true)`);
+      await js(`${S}.library.scan().then(() => true)`);
+      await idle();
+      const fr = await js(`(async () => { try { const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        const items = () => [...document.querySelectorAll('.ctx-menu .ctx-item')].map((b) => b.textContent);
+        document.querySelector('.side-collection').click(); await wait(300);
+        const res = { before: items().some((x) => x.includes(${JSON.stringify(other)})) };
+        const row = [...document.querySelectorAll('.ctx-menu .ctx-item')].find((b) => b.textContent.includes(${JSON.stringify(other)}));
+        row.querySelector('.ctx-remove').click(); await wait(300);
+        res.menuOpen = !!document.querySelector('.ctx-menu'); res.gone = !items().some((x) => x.includes(${JSON.stringify(other)}));
+        res.toast = [...document.querySelectorAll('.toast, .notification, [role=status], [role=alert]')].map((e) => e.textContent).find((x) => x.includes('off the list')) || '';
+        document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
+        res.hidden = (await ${S}.host.library.roots()).find((r) => r.path === ${JSON.stringify(other)})?.hidden;
+        document.querySelector('.side-collection').click(); await wait(300);
+        res.still = items().some((x) => x.includes(${JSON.stringify(other)}));
+        document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
+        return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+      const wasHidden = fr.hidden === 1;
+      check(hiddenNow === 1 && back === 0 && fr.before && fr.menuOpen && fr.gone && /off the list/.test(fr.toast) && !fr.still && wasHidden,
+        'a folder opened before comes off the list with its ×, the menu staying open (its catalog is kept, and it comes back when opened again)', JSON.stringify({ hiddenNow, back, ...fr }));
+    }
     // Repeated files: choosing the copy on the right moves the mark, not the copies; each copy says where it is
     // saved and can be opened, shown in its folder, its path copied; the group compares its copies side by side
     {
@@ -677,6 +711,13 @@ app.whenReady().then(async () => {
       const rightName = out.cmp.next[1], rightId = lib.items.find((x) => x.name === rightName)?.id;
       key('1'); await wait(400); out.cmp.marked = lib.byId.get(rightId)?.mark;
       key('0'); await wait(300); out.cmp.cleared = lib.byId.get(rightId)?.mark || 0;
+      // the strip: every photo of the list, the two shown saying their side; a click puts one on the marked side
+      const th = [...document.querySelectorAll('.cmp .cmp-thumb')];
+      out.cmp.strip = th.length; out.cmp.shownTh = document.querySelectorAll('.cmp .cmp-thumb.is-shown').length;
+      out.cmp.count = document.querySelector('.cmp .cmp-count')?.textContent;
+      out.cmp.labels = [...document.querySelectorAll('.cmp .cmp-thumb-side')].map((x) => x.textContent).sort().join();
+      const pick = th.find((x) => !x.classList.contains('is-shown')), pickName = pick?.title.split('\\n')[0];
+      pick?.click(); await wait(300); out.cmp.picked = names()[1] === pickName && names()[0] === out.cmp.first[0];
       key('+'); await wait(100); out.cmp.zoom = [...document.querySelectorAll('.cmp .cmp-img')].map((x) => x.style.transform).join('|');
       key('Escape'); await wait(200); out.cmp.closed = !document.querySelector('.cmp');
       lib.clearSelection();
@@ -691,8 +732,9 @@ app.whenReady().then(async () => {
       'a page\'s explanation: shown the first time, folded after "Got it" (it stays folded), back with the "?" beside the title', JSON.stringify({ first: v141.introFirst, after: v141.introAfter, stays: v141.introStays, help: v141.introHelp, eyebrow: v141.eyebrow }));
     check(v141.keys >= 30 && v141.keysButton && v141.keysClosed, 'the ? key opens the keyboard shortcuts (a button in the status bar too); Esc closes', JSON.stringify({ keys: v141.keys, button: v141.keysButton, closed: v141.keysClosed }));
     check(v141.cmp.open && v141.cmp.imgs === 2 && v141.cmp.first[0] !== v141.cmp.first[1] && v141.cmp.next[1] !== v141.cmp.first[1] && v141.cmp.next[0] === v141.cmp.first[0]
-      && v141.cmp.marked === 1 && v141.cmp.cleared === 0 && /scale\(1\.25\)\|.*scale\(1\.25\)/.test(v141.cmp.zoom) && v141.cmp.closed,
-      'V: two photos side by side — → changes the active side\'s photo, 1 and 0 mark it, both zoom together, Esc closes', JSON.stringify(v141.cmp));
+      && v141.cmp.marked === 1 && v141.cmp.cleared === 0 && v141.cmp.strip > 2 && v141.cmp.shownTh === 2 && v141.cmp.labels === 'Left,Right' && v141.cmp.picked
+      && /^Two of \d+ photos at a time$/.test(v141.cmp.count || '') && /scale\(1\.25\)\|.*scale\(1\.25\)/.test(v141.cmp.zoom) && v141.cmp.closed,
+      'V: two photos side by side — → changes the active side\'s photo, 1 and 0 mark it, a strip shows every photo with the side of the two shown (a click puts one on the marked side), both zoom together, Esc closes', JSON.stringify(v141.cmp));
     // the lens: the group in Adjustments (the profile's switch, the corrections by hand), the values checked by the
     // main process, the profile chosen among all of Lensfun's (searched), what the photo's key says
     const ln = await js(`(async () => {
@@ -1825,10 +1867,25 @@ app.whenReady().then(async () => {
       for (let i = 0; i < 150 && !document.querySelector('.sim-group, .sim-empty'); i++) await wait(100);
       const res = { near, label: btn.textContent, title: document.querySelector('.sim-title')?.textContent, groups: document.querySelectorAll('.sim-group').length,
         prevHidden: document.querySelector('.sim-title-row .icon-button')?.hidden, meta: document.querySelector('.sim-group-meta')?.textContent };
-      document.querySelector('.sim-close').click(); await wait(200);
+      // compare: in the order of the group (the earlier of the two on the left), the best named on its side, the other one active
+      const g = document.querySelector('.sim-group');
+      const tiles = [...g.querySelectorAll('.sim-tile')];
+      const names = tiles.map((x) => x.title.split('\\n')[0]);
+      const b = tiles.findIndex((x) => x.classList.contains('is-best'));
+      const o = (b + 1) % tiles.length, l = Math.min(b, o), r = Math.max(b, o);
+      [...g.querySelectorAll('.sim-group-head .btn')][0].click(); await wait(500);
+      const sides = [...document.querySelectorAll('.cmp-side')];
+      const cn = sides.map((x) => x.querySelector('.cmp-name')?.textContent || '?');
+      const tagAt = sides.findIndex((x) => x.querySelector('.cmp-tag'));
+      const actAt = sides.findIndex((x) => x.classList.contains('is-active'));
+      const strip = document.querySelectorAll('.cmp-thumb').length;
+      res.cmp = { names, b, cn, tagAt, actAt, strip, ok: strip === (tiles.length > 2 ? tiles.length : 0) && sides.length === 2 && names[l].includes(cn[0]) && names[r].includes(cn[1]) && tagAt === (b === l ? 0 : 1) && actAt === 1 - tagAt };
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
+      document.querySelector('.sim-close')?.click(); await wait(200);
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
     check(simAll.near && simAll.label === 'Similar photos' && simAll.title === 'Similar photos among those shown' && simAll.groups >= 1 && simAll.prevHidden && /\d{4}/.test(simAll.meta || ''),
       'similar photos from the Photos bar, beside "Photos in no album": the photos shown, across days (dated groups, no day arrows)', JSON.stringify(simAll));
+    check(simAll.cmp?.ok, 'comparing a group of similar photos keeps the order of the group, names the best on its side and starts on the other photo', JSON.stringify(simAll.cmp));
     // the viewer's editing panel: the same sections; typing in a field does not reach the viewer's keys; a
     // photo moved to a category the filter does not show stays in view, greyed, with a note naming it
     const vw = await js(`(async () => {

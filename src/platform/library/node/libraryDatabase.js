@@ -262,6 +262,10 @@ class LibraryDatabase {
     if (!this.db.prepare('PRAGMA table_info(media)').all().some((c) => c.name === 'meta_edit')) {
       this.db.exec('ALTER TABLE media ADD COLUMN meta_edit TEXT');
     }
+    // a folder taken off the list of folders opened before (1.60.0): its catalog stays, until it is opened again
+    if (!this.db.prepare('PRAGMA table_info(roots)').all().some((c) => c.name === 'hidden')) {
+      this.db.exec('ALTER TABLE roots ADD COLUMN hidden INTEGER NOT NULL DEFAULT 0');
+    }
     // nor a cover for albums before 0.7.0
     if (!this.db.prepare('PRAGMA table_info(labels)').all().some((c) => c.name === 'cover')) {
       this.db.exec('ALTER TABLE labels ADD COLUMN cover TEXT');
@@ -325,6 +329,7 @@ class LibraryDatabase {
   beginScan(rootPath) {
     let root = this.q.rootByPath.get(rootPath);
     if (!root) { this.q.insertRoot.run(rootPath); root = this.q.rootByPath.get(rootPath); }
+    this.db.prepare('UPDATE roots SET hidden = 0 WHERE id = ? AND hidden != 0').run(root.id); // opened again: back on the list
     const { scan_seq: seq } = this.q.bumpSeq.get(root.id);
     return { rootId: root.id, seq };
   }
@@ -633,8 +638,13 @@ class LibraryDatabase {
   }
 
   /** The folders opened before (collections), with their counts, most recent first. */
+  /** Takes a folder off the list of folders opened before (or puts it back); its catalog is kept. */
+  hideRoot(rootPath, hidden = true) {
+    return this.db.prepare('UPDATE roots SET hidden = ? WHERE path = ?').run(hidden ? 1 : 0, rootPath).changes > 0;
+  }
+
   roots() {
-    return this.db.prepare(`SELECT r.path, r.last_scan_at AS lastScanAt, count(m.id) AS count, coalesce(sum(m.kind = 2), 0) AS videos,
+    return this.db.prepare(`SELECT r.path, r.last_scan_at AS lastScanAt, r.hidden AS hidden, count(m.id) AS count, coalesce(sum(m.kind = 2), 0) AS videos,
       coalesce(sum(m.size), 0) AS bytes FROM roots r LEFT JOIN media m ON m.root_id = r.id GROUP BY r.id ORDER BY r.last_scan_at DESC`).all();
   }
 

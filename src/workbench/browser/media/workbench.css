@@ -910,6 +910,10 @@ code.hash { font: 500 11px var(--font-mono); color: var(--text-secondary); paddi
 .collection { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-elevated); text-align: left; }
 .collection:hover:not(:disabled) { border-color: var(--border-strong); background: var(--hover); }
 .collection-icon { color: var(--brand-magenta); }
+.collection-row { position: relative; display: flex; }
+.collection-row .collection { flex: 1; min-width: 0; padding-right: 44px; }
+.collection-forget { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
+.collection-row:hover .collection-forget, .collection-forget:focus-visible { opacity: 1; }
 .collection-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .collection-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .collection-source { margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--text-secondary); background: var(--bg-subtle); border-radius: 999px; padding: 1px 7px; }
@@ -1866,7 +1870,7 @@ button.person-pending { border: 0; cursor: pointer; z-index: 1; }
 
 /* ---------- context menu (right mouse button) ---------- */
 .ctx-menu { position: fixed; z-index: 400; min-width: 230px; padding: 5px; border-radius: 10px; background: var(--bg-elevated, #fff); border: 1px solid var(--border-strong); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.12); animation: fade-in 0.08s ease-out; }
-.ctx-item { display: grid; grid-template-columns: 16px 18px 1fr auto auto auto; align-items: center; gap: 6px; width: 100%; height: 30px; padding: 0 8px 0 6px; border-radius: 6px; font-size: 13px; color: var(--text-primary); text-align: left; outline: none; }
+.ctx-item { display: grid; grid-template-columns: 16px 18px 1fr auto auto auto auto; align-items: center; gap: 6px; width: 100%; height: 30px; padding: 0 8px 0 6px; border-radius: 6px; font-size: 13px; color: var(--text-primary); text-align: left; outline: none; }
 .ctx-item:hover:not(:disabled), .ctx-item:focus-visible:not(:disabled), .ctx-item:focus:not(:disabled) { background: var(--accent-soft); }
 .ctx-item:disabled { color: var(--text-muted); cursor: default; }
 .ctx-item:first-child:disabled { font: 600 11px var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; }
@@ -1879,6 +1883,10 @@ button.person-pending { border: 0; cursor: pointer; z-index: 1; }
 /* a short word after the label: where a folder is (Google Drive, External, Network) */
 .ctx-tag { font: 500 11px var(--font-ui, inherit); letter-spacing: 0; text-transform: none; color: var(--text-secondary); background: var(--bg-subtle); border-radius: 999px; padding: 1px 7px; white-space: nowrap; }
 .ctx-arrow { display: grid; place-items: center; color: var(--text-muted); }
+/* an × that takes the item off its list (folders opened before) */
+.ctx-remove { display: grid; place-items: center; width: 20px; height: 20px; margin-left: 2px; border-radius: 5px; color: var(--text-muted); cursor: pointer; opacity: 0.55; }
+.ctx-item:hover .ctx-remove, .ctx-item:focus .ctx-remove { opacity: 1; }
+.ctx-remove:hover { background: var(--hover); color: var(--danger); }
 .ctx-sep { height: 1px; margin: 4px 6px; background: var(--border); }
 
 /* ---------- Photos toolbar (1.0.0): one row — view mode, Filters ▾, sort, the filters in use as chips ---------- */
@@ -3287,10 +3295,24 @@ button.vw-chip:hover { filter: brightness(1.2); }
 .cmp-foot { flex: none; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-top: 1px solid #2c2529; }
 .cmp-what { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .cmp-name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmp-name-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cmp-tag { flex: none; padding: 1px 8px; border-radius: 99px; font: 600 11px var(--font-ui, inherit); background: var(--accent); color: #fff; }
 .cmp-meta { font: 11.5px var(--font-mono); color: #a59a90; }
 .cmp-step { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 6px; background: #1d181b; color: inherit; cursor: pointer; }
 .cmp-step:hover { background: #2c2529; }
 .cmp-marks { display: inline-flex; gap: 2px; }
+/* all the photos being compared, in the order of their list: two are shown, each saying its side (1.60.0) */
+.cmp-count { font-size: 12px; color: #d8cfc4; white-space: nowrap; padding: 2px 8px; border-radius: 99px; background: #2c2529; }
+.cmp-strip { flex: none; display: flex; gap: 6px; padding: 8px 12px; overflow-x: auto; border-top: 1px solid #2c2529; background: #151114; }
+.cmp-thumb { position: relative; flex: none; width: 92px; height: 68px; padding: 0; border: 2px solid transparent; border-radius: 6px; overflow: hidden; background: #1d181b; cursor: pointer; opacity: 0.55; }
+.cmp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cmp-thumb:hover, .cmp-thumb:focus-visible { opacity: 0.9; }
+.cmp-thumb.is-shown { opacity: 1; border-color: #6f6369; }
+.cmp-thumb.is-active { border-color: #f06b5f; }
+.cmp-thumb-side { position: absolute; left: 3px; bottom: 3px; padding: 0 6px; border-radius: 4px; font: 600 10.5px/16px var(--font-ui, inherit); background: rgba(14, 11, 13, 0.85); color: #f3ece2; }
+.cmp-thumb.is-active .cmp-thumb-side { background: #f06b5f; color: #fff; }
+.cmp-thumb-tag { position: absolute; right: 3px; top: 3px; padding: 0 6px; border-radius: 99px; font: 600 10px/15px var(--font-ui, inherit); background: var(--accent); color: #fff; }
+@media (prefers-reduced-motion: no-preference) { .cmp-thumb { transition: opacity 0.12s, border-color 0.12s; } }
 /* ---------- keyboard shortcuts (the ? key) */
 .keys-dialog { width: min(760px, calc(100vw - 48px)); }
 .keys-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 28px; max-height: min(64vh, 620px); overflow: auto; padding-right: 4px; }

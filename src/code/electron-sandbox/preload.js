@@ -64,6 +64,7 @@ contextBridge.exposeInMainWorld('host', {
     mark: (ids, mark) => ipcRenderer.invoke('library:mark', ids, mark),
     describe: (ids, patch) => ipcRenderer.invoke('library:describe', ids, patch),
     roots: () => ipcRenderer.invoke('library:roots'),
+    hideRoot: (rootPath, hidden) => ipcRenderer.invoke('library:hideRoot', rootPath, hidden),
     onProgress: on('library:progress'),
   },
 

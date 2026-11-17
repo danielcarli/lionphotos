@@ -137,10 +137,12 @@ export class DuplicatesView extends ViewPane {
   }
 
   #compare(g, items, images) {
-    // the copy kept on the left, the next one on the right
+    // in the order of the group (as the copies are shown), the copy kept named "Keep"; ← → step the others
     if (images.length >= 2) {
       const at = Math.max(0, images.findIndex((it) => it.id === g.keep));
-      return showCompare(this.services, images, at, at === 0 ? 1 : 0);
+      const other = at === 0 ? 1 : 0;
+      const [l, r] = at < other ? [at, other] : [other, at];
+      return showCompare(this.services, images, l, r, { active: l === at ? 1 : 0, tag: (it) => (it.id === g.keep ? t('dupes.keep') : '') });
     }
     // videos: each in the computer's program (two windows to put side by side), at most four
     for (const it of items.slice(0, 4)) this.actions.openExternal(it);

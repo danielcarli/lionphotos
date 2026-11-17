@@ -2,6 +2,15 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.60.0] — 2026-11-17
+
+### Added
+- **A folder opened before can come off the list** with the × beside it, in the folder menu of the side bar and on the welcome page. Only the line goes: the folder's catalog (albums, marks, captions, people) is kept, and opening the folder again puts it back on the list as it was. The notice that follows has *Undo*. In the menu, the Delete key does the same on the folder in focus, and the menu stays open to take off others.
+- **Side by side: a strip with every photo being compared.** With more than two photos (a group of similar photos, the photos of a list), the strip under the two sides shows them all, in the order of the list they came from, the two shown saying *Left* and *Right*; a click puts a photo on the marked side. The bar says how many there are ("Two of 4 photos at a time"), so it is plain that two of them are shown at a time.
+
+### Fixed
+- **Comparing similar photos or repeated files looked like another order.** The best photo (or the copy kept) was always put on the left, whatever its place in the group, and the marked side was the right one. The two photos now keep the order of the group (the first of the two on the left); the best one, or the copy kept, says so beside its name (*Best*, *Keep*), and the marked side, which ← → change, is the other photo.
+
 ## [1.59.1] — 2026-11-17
 
 ### Fixed

@@ -16,6 +16,7 @@ export function closeContextMenu() { open?.close(); }
  * @param {number} x @param {number} y where the mouse is
  * @param {({ label:string, icon?:string, img?:string, checked?:boolean, disabled?:boolean, hint?:string, tag?:string, danger?:boolean, run?:()=>void, submenu?:object[] }|'-')[]} items
  *   tag: a short word after the label (where a folder is: "Google Drive", "External")
+ *   remove: { title, run } — an × at the end of the item (also Delete on it): takes the item off a list, and off the menu
  */
 export function showContextMenu(x, y, items) {
   closeContextMenu();
@@ -44,7 +45,12 @@ export function showContextMenu(x, y, items) {
         h('span.ctx-label', it.label),
         it.tag ? h('span.ctx-tag', it.tag) : null,
         it.hint ? h('span.ctx-hint', it.hint) : null,
-        it.submenu ? h('span.ctx-arrow', { html: icon('chevronRight', 12) }) : null);
+        it.submenu ? h('span.ctx-arrow', { html: icon('chevronRight', 12) }) : null,
+        it.remove ? h('span.ctx-remove', { role: 'button', title: it.remove.title, 'aria-label': `${it.remove.title} — ${it.label}`, html: icon('close', 12),
+          onclick: (e) => { e.stopPropagation(); removeItem(btn, it); } }) : null);
+      if (it.remove) btn.dataset.removable = '1';
+      if (it.listHead) btn.dataset.listHead = '1'; // the heading of a list whose items can be removed
+      btn._item = it;
       const openSub = () => {
         const r = btn.getBoundingClientRect();
         build(it.submenu, r.right - 4, r.top - 5, level + 1);
@@ -68,6 +74,18 @@ export function showContextMenu(x, y, items) {
     menu.style.top = `${top}px`;
     return menu;
   };
+  // an item taken off its list: off the menu too (and the line naming the list, when it was the last one)
+  const removeItem = (btn, it) => {
+    const menu = btn.parentElement;
+    const next = btn.nextElementSibling?.matches('.ctx-item:not(:disabled)') ? btn.nextElementSibling : btn.previousElementSibling;
+    it.remove.run();
+    btn.remove();
+    if (next?.matches?.('.ctx-item')) next.focus({ preventScroll: true });
+    if (!menu.querySelector('.ctx-item[data-removable]')) {
+      // the list is empty: its heading (a disabled item) and the separator before it go too
+      for (const el of [...menu.children]) if (el.dataset.listHead) { el.previousElementSibling?.classList.contains('ctx-sep') && el.previousElementSibling.remove(); el.remove(); }
+    }
+  };
   const outside = (e) => { if (!layers.some((l) => l.contains(e.target))) close(); };
   const onKey = (e) => {
     const cur = document.activeElement?.closest('.ctx-menu');
@@ -75,7 +93,8 @@ export function showContextMenu(x, y, items) {
     const menu = layers[level];
     const btns = [...menu.querySelectorAll('.ctx-item:not(:disabled)')];
     const i = btns.indexOf(document.activeElement);
-    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (level > 0) { layers.pop().remove(); layers[level - 1].querySelector('.ctx-item')?.focus(); } else close(); }
+    if (e.key === 'Delete' && document.activeElement?._item?.remove) { e.preventDefault(); e.stopPropagation(); removeItem(document.activeElement, document.activeElement._item); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (level > 0) { layers.pop().remove(); layers[level - 1].querySelector('.ctx-item')?.focus(); } else close(); }
     else if (e.key === 'ArrowDown') { e.preventDefault(); e.stopPropagation(); btns[(i + 1) % btns.length]?.focus(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); btns[(i - 1 + btns.length) % btns.length]?.focus(); }
     else if (e.key === 'ArrowRight' && document.activeElement?.classList.contains('has-sub')) { e.preventDefault(); e.stopPropagation(); document.activeElement.click(); }

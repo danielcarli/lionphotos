@@ -11,6 +11,7 @@ import { icon } from '../../../base/browser/icons.js';
 import { formatDateTime, baseName } from '../../../base/common/format.js';
 import { VIEWS, TOOLS } from '../../services/layout/browser/layoutService.js';
 import { t, tn } from '../../../base/common/nls.js';
+import { sourceIcon, sourceTag, sourceTitle } from '../folderSource.js';
 import { POWERED_BY } from '../../services/brand/browser/brandService.js';
 
 export class EditorPart {
@@ -78,9 +79,10 @@ export class EditorPart {
           h('button.btn.btn-primary.btn-lg', { disabled: opening, onclick: () => this.actions.openFolder() }, h('span', { html: icon('folderOpen', 16) }), t('welcome.openFolder'))),
         recent.length ? h('div.collections',
           h('div.eyebrow', t('welcome.collections')),
-          recent.slice(0, 6).map((r) => h('button.collection', { disabled: opening, title: r.path, onclick: () => library.open(r.path) },
-            h('span.collection-icon', { html: icon('image', 18) }),
-            h('span.collection-text', h('span.collection-name', baseName(r.path)), h('span.collection-path', r.path)),
+          recent.slice(0, 6).map((r) => h('button.collection', { disabled: opening, title: [r.path, sourceTitle(r.source)].filter(Boolean).join('\n'), onclick: () => library.open(r.path) },
+            // where it is: this computer, an external disk, a cloud drive, the network
+            h('span.collection-icon', { html: icon(sourceIcon(r.source), 18) }),
+            h('span.collection-text', h('span.collection-name', baseName(r.path), sourceTag(r.source) ? h('span.collection-source', sourceTag(r.source)) : null), h('span.collection-path', r.path)),
             h('span.collection-meta', tn('common.items', r.count), h('br'), r.lastScanAt ? formatDateTime(r.lastScanAt) : '')))) : null,
         h('dl.shortcuts',
           ...[['Ctrl+O', t('welcome.shortcuts.openFolder')], ['F5', t('welcome.shortcuts.refresh')], ['Ctrl+1 … 9', VIEWS.map((v) => v.label).join(' · ')], ['Ctrl+F', t('welcome.shortcuts.search')]]

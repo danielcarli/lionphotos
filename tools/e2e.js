@@ -91,6 +91,19 @@ app.whenReady().then(async () => {
     await js(`${S}.library.scan().then(() => true)`);
     await wait(400);
     check((await js(`${S}.thumbs.status`)).thumbTotal === 0, 'refresh without changes makes no thumbnail');
+    // where each collection's folder is (this computer, an external disk, a cloud drive, the network): an icon in
+    // front of it in the folder's menu and in the sidebar
+    {
+      const roots = await js(`${S}.host.library.roots()`);
+      const here = roots.find((r) => r.path === FOLDER);
+      for (let i = 0; i < 30 && !(await js(`!!document.querySelector('.side-collection-source svg')`)); i++) await wait(100);
+      const menu = await js(`(async () => { document.querySelector('.side-collection').click(); await new Promise((r) => setTimeout(r, 300));
+        const first = document.querySelector('.ctx-menu .ctx-item'); const svg = first?.querySelector('.ctx-icon svg')?.innerHTML || '';
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); window.dispatchEvent(new MouseEvent('mousedown'));
+        return { svg: svg.length, title: first?.title || '' }; })()`);
+      check(here?.source?.kind === 'local' && menu.svg > 0 && menu.title && (await js(`!!document.querySelector('.side-collection-source svg')`)),
+        'where the folder is: on this computer (an icon in the sidebar and in the folder menu, the words in its tooltip)', JSON.stringify({ source: here?.source, menu }));
+    }
 
     // 3) a changed file gets a new thumbnail, and only it
     const victim = (await js(`${S}.library.items.find((x) => x.ext === 'png')?.path`));

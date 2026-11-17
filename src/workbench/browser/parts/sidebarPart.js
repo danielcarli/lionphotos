@@ -12,6 +12,7 @@ import { icon } from '../../../base/browser/icons.js';
 import { formatNumber, baseName } from '../../../base/common/format.js';
 import { MAX_DEPTH } from '../../services/library/browser/libraryService.js';
 import { t, tn } from '../../../base/common/nls.js';
+import { sourceIcon, sourceTag, sourceTitle } from '../folderSource.js';
 import { showLabelsDialog } from '../../contrib/labels/labelsDialog.js';
 import { createAlbumsFromFolders } from '../../contrib/albums/folderAlbums.js';
 import { showContextMenu } from '../contextMenu.js';
@@ -115,7 +116,8 @@ export class SidebarPart {
     }
     setChildren(this.head,
       library.root
-        ? h('button.side-collection', { title: library.root, 'aria-haspopup': 'menu', onclick: (e) => this.#collectionMenu(e.currentTarget) },
+        ? h('button.side-collection', { title: [library.root, sourceTitle(this.#sourceOf(library.root))].filter(Boolean).join('\n'), 'aria-haspopup': 'menu', onclick: (e) => this.#collectionMenu(e.currentTarget) },
+            h('span.side-collection-source', { html: icon(sourceIcon(this.#sourceOf(library.root)), 14) }),
             h('span.side-collection-name', baseName(library.root)), h('span.side-caret', { html: icon('chevronDown', 13) }))
         : h('button.btn.btn-primary.btn-sm', { onclick: () => this.actions.openFolder() }, h('span', { html: icon('folderOpen', 14) }), t('sidebar.openFolder')),
       library.root ? h('div.side-panes', { role: 'tablist' }, PANELS.map((p) => h('button', {
@@ -124,11 +126,31 @@ export class SidebarPart {
       }))) : null, this.hideBtn);
   }
 
+  // where the open collection is (asked once per folder; the button is drawn again when it is known)
+  #source = null;
+  #sourceFor = '';
+  #sourceOf(root) {
+    if (this.#sourceFor !== root) {
+      this.#sourceFor = root;
+      this.#source = null;
+      this.host.library.roots().then((rows) => {
+        if (this.#sourceFor !== root) return;
+        const s = rows.find((x) => x.path === root)?.source || null;
+        if (s) { this.#source = s; this.renderHead(); } else this.#sourceFor = ''; // a folder just opened: asked again on the next drawing
+      }).catch(() => { this.#sourceFor = ''; });
+    }
+    return this.#source;
+  }
+
   async #collectionMenu(button) {
     const { library } = this;
     const r = button.getBoundingClientRect();
     // the other folders opened before on this computer: each one a collection of its own, a click away
-    const others = (await this.host.library.roots().catch(() => [])).filter((x) => x.path !== library.root).slice(0, 8);
+    const roots = await this.host.library.roots().catch(() => []);
+    const others = roots.filter((x) => x.path !== library.root).slice(0, 8);
+    // where each folder is: this computer, an external disk, a cloud drive, the network
+    const here = roots.find((x) => x.path === library.root)?.source || null;
+    if (here && !this.#source) { this.#source = here; this.#sourceFor = library.root; this.renderHead(); }
     const { depth, unlimited } = library.settings;
     const busy = library.busy;
     const levels = [{ label: t('sidebar.unlimited'), checked: unlimited, run: () => library.setSetting('unlimited', true) }, '-',
@@ -137,13 +159,13 @@ export class SidebarPart {
         run: async () => { await library.setSetting('depth', d); if (unlimited) library.setSetting('unlimited', false); },
       }))];
     showContextMenu(r.left, r.bottom + 4, [
-      { label: library.root, disabled: true },
+      { label: library.root, icon: sourceIcon(here), tag: sourceTag(here), title: sourceTitle(here), disabled: true },
       '-',
       { label: library.filter.folder ? t('sidebar.refreshFolder') : t('sidebar.refresh'), icon: 'refresh', hint: 'F5', disabled: busy, run: () => library.refresh() },
       { label: t('sidebar.changeFolder'), icon: 'folderOpen', hint: 'Ctrl+O', disabled: busy, run: () => this.actions.openFolder() },
       { label: t('sidebar.depthLabel'), icon: 'layers', disabled: busy, submenu: levels },
       ...(others.length ? ['-', { label: t('sidebar.otherFolders'), disabled: true },
-        ...others.map((x) => ({ label: x.path, icon: 'folder', hint: formatNumber(x.count), disabled: busy, run: () => library.open(x.path) }))] : []),
+        ...others.map((x) => ({ label: x.path, icon: sourceIcon(x.source), tag: sourceTag(x.source), title: sourceTitle(x.source), hint: formatNumber(x.count), disabled: busy, run: () => library.open(x.path) }))] : []),
       '-',
       { label: t('common.showIn', { explorer: this.actions.explorerName }), icon: 'reveal', run: () => this.actions.revealFolder('') },
     ]);

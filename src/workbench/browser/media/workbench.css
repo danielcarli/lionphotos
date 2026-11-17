@@ -912,6 +912,7 @@ code.hash { font: 500 11px var(--font-mono); color: var(--text-secondary); paddi
 .collection-icon { color: var(--brand-magenta); }
 .collection-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .collection-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.collection-source { margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--text-secondary); background: var(--bg-subtle); border-radius: 999px; padding: 1px 7px; }
 .collection-path { font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; }
 .collection-meta { font: 11px var(--font-mono); color: var(--text-muted); text-align: right; white-space: nowrap; }
 
@@ -1859,7 +1860,7 @@ button.person-pending { border: 0; cursor: pointer; z-index: 1; }
 
 /* ---------- context menu (right mouse button) ---------- */
 .ctx-menu { position: fixed; z-index: 400; min-width: 230px; padding: 5px; border-radius: 10px; background: var(--bg-elevated, #fff); border: 1px solid var(--border-strong); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.12); animation: fade-in 0.08s ease-out; }
-.ctx-item { display: grid; grid-template-columns: 16px 18px 1fr auto auto; align-items: center; gap: 6px; width: 100%; height: 30px; padding: 0 8px 0 6px; border-radius: 6px; font-size: 13px; color: var(--text-primary); text-align: left; outline: none; }
+.ctx-item { display: grid; grid-template-columns: 16px 18px 1fr auto auto auto; align-items: center; gap: 6px; width: 100%; height: 30px; padding: 0 8px 0 6px; border-radius: 6px; font-size: 13px; color: var(--text-primary); text-align: left; outline: none; }
 .ctx-item:hover:not(:disabled), .ctx-item:focus-visible:not(:disabled), .ctx-item:focus:not(:disabled) { background: var(--accent-soft); }
 .ctx-item:disabled { color: var(--text-muted); cursor: default; }
 .ctx-item:first-child:disabled { font: 600 11px var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; }
@@ -1869,6 +1870,8 @@ button.person-pending { border: 0; cursor: pointer; z-index: 1; }
 .ctx-icon { display: grid; place-items: center; color: var(--text-secondary); }
 .ctx-item.danger .ctx-icon { color: inherit; }
 .ctx-hint { font: 11px var(--font-mono); color: var(--text-muted); }
+/* a short word after the label: where a folder is (Google Drive, External, Network) */
+.ctx-tag { font: 500 11px var(--font-ui, inherit); letter-spacing: 0; text-transform: none; color: var(--text-secondary); background: var(--bg-subtle); border-radius: 999px; padding: 1px 7px; white-space: nowrap; }
 .ctx-arrow { display: grid; place-items: center; color: var(--text-muted); }
 .ctx-sep { height: 1px; margin: 4px 6px; background: var(--border); }
 
@@ -1980,6 +1983,7 @@ button.person-pending { border: 0; cursor: pointer; z-index: 1; }
 .side-collection:hover { background: var(--hover); }
 .side-collection-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .side-caret { display: inline-flex; color: var(--text-muted); flex: none; }
+.side-collection-source { display: inline-flex; color: var(--text-muted); flex: none; }
 .side-panes { display: inline-flex; padding: 2px; gap: 2px; border-radius: 8px; background: var(--bg-subtle); flex: none; }
 .side-pane { width: 28px; height: 26px; display: grid; place-items: center; border-radius: 6px; color: var(--text-muted); }
 .side-pane:hover { color: var(--text-primary); }

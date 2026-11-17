@@ -138,6 +138,8 @@ jobs:
         run: npm run test:similar
       - name: What the photos show (content categories)
         run: npm run test:content
+      - name: Where a folder is (disk, external, cloud, network)
+        run: npm run test:source
       - name: End-to-end (a generated collection of photos, RAW files and videos)
         timeout-minutes: 12
         run: |

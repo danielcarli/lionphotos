@@ -526,3 +526,5 @@ _merge(MESSAGES, {'similar': {'link': 'Similar photos', 'linkTitle': 'Group the 
 _merge(MESSAGES, {'statusbar': {'slowSource': "This folder is slow to read (a cloud drive such as Google Drive?): the next files are brought ahead while the thumbnails are made. Marking the folder “Available offline” in the drive's app makes it much faster."}})
 
 _merge(MESSAGES, {'gs': {'group': {'content': 'What the photos show'}, 'content': {'analyse': 'Search by what the photos show', 'analyseSub': 'Reads each photo on this computer, in the background (Albums › Suggestions shows the progress)', 'started': 'The photos are being read: the search will find what they show as they are done.', 'unsupported': 'Reading what the photos show needs the graphics card (WebGL), which is not available here.'}}, 'content': {'shows': 'Shows', 'searchTitle': 'Search Photos for “{name}”'}})
+
+_merge(MESSAGES, {'source': {'local': "On this computer's disk", 'external': 'On an external disk (USB, memory card)', 'cloud': 'On a cloud drive', 'cloudNamed': 'On a cloud drive: {service}', 'network': 'On the network', 'externalShort': 'External', 'networkShort': 'Network', 'cloudShort': 'Cloud'}})

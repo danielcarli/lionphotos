@@ -523,3 +523,5 @@ _merge(MESSAGES, {'similar': {'link': '相似照片', 'linkTitle': '将这一天
 _merge(MESSAGES, {'statusbar': {'slowSource': '此文件夹读取较慢（Google 云端硬盘之类的云盘？）：制作缩略图时会提前取回后面的文件。在云盘应用中将该文件夹设为“可离线使用”会快很多。'}})
 
 _merge(MESSAGES, {'gs': {'group': {'content': '照片里有什么'}, 'content': {'analyse': '按照片内容搜索', 'analyseSub': '在这台电脑上于后台逐张读取照片（进度显示在“相册 › 建议”中）', 'started': '正在读取照片：读取完成的照片即可按内容搜索。', 'unsupported': '读取照片内容需要显卡（WebGL），此处不可用。'}}, 'content': {'shows': '内容', 'searchTitle': '在“照片”中搜索“{name}”'}})
+
+_merge(MESSAGES, {'source': {'local': '在本机磁盘上', 'external': '在外置磁盘上（USB、存储卡）', 'cloud': '在云盘上', 'cloudNamed': '在云端：{service}', 'network': '在网络上', 'externalShort': '外置', 'networkShort': '网络', 'cloudShort': '云端'}})

@@ -6,6 +6,7 @@
 // The library in the main process: opens a folder, shows what the catalog already knows about it at
 // once (with its thumbnails), and then refreshes it with a scan that only reads file metadata.
 const { app } = require('electron');
+const { sourcesOf } = require('../node/sourceKind');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -79,7 +80,14 @@ class LibraryMainService {
     ipc.handle('library:places', () => (this.rootId ? this.reader.places(this.rootId).catch(() => '') : ''));
     ipc.handle('library:items', (e, ids) => this.db.listByIds((ids || []).map(Number).filter(Number.isInteger)));
     ipc.handle('library:details', (e, id) => this.db.details(Number(id)));
-    ipc.handle('library:roots', () => this.reader.roots().catch(() => this.db.roots()));
+    // the folders opened before, each with where it is (this computer's disk, an external one, a cloud drive, the network)
+    ipc.handle('library:roots', async () => {
+      const rows = await this.reader.roots().catch(() => this.db.roots());
+      const where = await sourcesOf(rows.map((r) => r.path)).catch(() => new Map());
+      return rows.map((r) => ({ ...r, source: where.get(r.path) || null }));
+    });
+    // asked once a little after start, so the first list opens at once (Windows: one PowerShell call)
+    setTimeout(() => sourcesOf([]).catch(() => {}), 5000).unref?.();
     // marks (great / OK / candidate to delete) change only the catalog, never a file: no confirmation code
     ipc.handle('library:mark', (e, ids, mark) => {
       const list = (Array.isArray(ids) ? ids : []).map(Number).filter((id) => Number.isInteger(id) && id > 0).slice(0, 200000);

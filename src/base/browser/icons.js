@@ -121,6 +121,10 @@ const paths = {
   grip: '<circle cx="9" cy="6.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="6.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="17.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="17.5" r="1.2" fill="currentColor" stroke="none"/>',
   toTop: '<path d="M5 4.5h14"/><path d="M12 20V9M7 13.5l5-5 5 5"/>',
   disk: '<rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 14h17M17 16.5h.01"/>',
+  // where a folder is: an external disk (with its cable), a cloud drive, the network
+  diskExternal: '<rect x="2.5" y="6" width="14" height="12" rx="2"/><path d="M2.5 14h14M13.5 16.2h.01M16.5 10h2.5a2 2 0 0 1 2 2v7.5"/>',
+  cloud: '<path d="M7.4 19h10a4 4 0 0 0 .6-7.95 6 6 0 0 0-11.5-1.3A4.7 4.7 0 0 0 7.4 19z"/>',
+  network: '<rect x="8" y="3" width="8" height="6" rx="1.2"/><path d="M12 9v4M5 13h14M5 13v3M19 13v3"/><rect x="2.5" y="16" width="5" height="4.5" rx="1"/><rect x="16.5" y="16" width="5" height="4.5" rx="1"/>',
 };
 
 export function icon(name, size) {

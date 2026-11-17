@@ -523,3 +523,5 @@ _merge(MESSAGES, {'similar': {'link': '비슷한 사진', 'linkTitle': '이 날�
 _merge(MESSAGES, {'statusbar': {'slowSource': '이 폴더는 읽기가 느립니다(Google 드라이브 같은 클라우드 드라이브?). 썸네일을 만드는 동안 다음 파일을 미리 가져옵니다. 드라이브 앱에서 폴더를 ‘오프라인 사용 가능’으로 표시하면 훨씬 빨라집니다.'}})
 
 _merge(MESSAGES, {'gs': {'group': {'content': '사진에 담긴 것'}, 'content': {'analyse': '사진에 담긴 것으로 검색', 'analyseSub': '이 컴퓨터에서 사진을 한 장씩 백그라운드로 읽습니다(진행 상황은 앨범 › 추천에 표시)', 'started': '사진을 읽는 중입니다. 읽은 사진부터 담긴 것으로 검색할 수 있습니다.', 'unsupported': '사진에 담긴 것을 읽으려면 그래픽 카드(WebGL)가 필요하지만 여기서는 사용할 수 없습니다.'}}, 'content': {'shows': '담긴 것', 'searchTitle': '사진에서 “{name}” 검색'}})
+
+_merge(MESSAGES, {'source': {'local': '이 컴퓨터의 디스크', 'external': '외장 디스크(USB, 메모리 카드)', 'cloud': '클라우드 드라이브', 'cloudNamed': '클라우드: {service}', 'network': '네트워크', 'externalShort': '외장', 'networkShort': '네트워크', 'cloudShort': '클라우드'}})

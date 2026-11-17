@@ -2,6 +2,12 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.57.0] — 2026-11-17
+
+### Added
+- **Where each folder is.** An icon in front of each collection's folder — in the sidebar, in its menu ("Other folders opened before") and on the welcome page — says where it is: on this computer's disk, on an external disk (USB, memory card), on a cloud drive or on the network. A cloud folder also shows the service (Google Drive, OneDrive, Dropbox, iCloud Drive, Box, MEGA, pCloud, Nextcloud…), an external or network one a short word; the tooltip says it in full.
+  - Worked out on the computer only: on Windows from what the system says of each drive (one PowerShell call, kept a minute: a USB disk counts as external even when Windows calls it fixed; Google Drive for desktop's drive by its name; mapped drives and `\\server\share` as the network); on macOS from `mount` (disks in /Volumes, SMB/NFS/AFP shares, ~/Library/CloudStorage); on Linux from /proc/mounts and /sys (USB disks, /media, NFS/SMB/SSHFS, rclone); and from the folders the cloud apps make, in several languages ("Meu Drive", "My Drive", "OneDrive - …", "Dropbox"…).
+
 ## [1.56.0] — 2026-11-17
 
 ### Added

@@ -14,7 +14,8 @@ export function closeContextMenu() { open?.close(); }
 
 /**
  * @param {number} x @param {number} y where the mouse is
- * @param {({ label:string, icon?:string, img?:string, checked?:boolean, disabled?:boolean, hint?:string, danger?:boolean, run?:()=>void, submenu?:object[] }|'-')[]} items
+ * @param {({ label:string, icon?:string, img?:string, checked?:boolean, disabled?:boolean, hint?:string, tag?:string, danger?:boolean, run?:()=>void, submenu?:object[] }|'-')[]} items
+ *   tag: a short word after the label (where a folder is: "Google Drive", "External")
  */
 export function showContextMenu(x, y, items) {
   closeContextMenu();
@@ -41,6 +42,7 @@ export function showContextMenu(x, y, items) {
         h('span.ctx-check', { html: it.checked ? icon('check', 13) : '' }),
         it.img ? h('span.ctx-icon', h('img.ctx-img', { src: it.img, alt: '', draggable: false })) : it.icon ? h('span.ctx-icon', { html: icon(it.icon, 14) }) : h('span.ctx-icon'),
         h('span.ctx-label', it.label),
+        it.tag ? h('span.ctx-tag', it.tag) : null,
         it.hint ? h('span.ctx-hint', it.hint) : null,
         it.submenu ? h('span.ctx-arrow', { html: icon('chevronRight', 12) }) : null);
       const openSub = () => {

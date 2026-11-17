@@ -11,7 +11,7 @@ import { t } from '../../../base/common/nls.js';
 const mac = /Mac/i.test(navigator.platform || '');
 const GROUPS = [
   ['everywhere', [
-    [['Ctrl+K', 'Ctrl+F'], 'search'], [['Ctrl+O'], 'open'], [['F5'], 'refresh'], [['Ctrl+1', 'Ctrl+Shift+A', 'Ctrl+L'], 'views'],
+    [['Ctrl+K', 'Ctrl+F'], 'search'], [['Ctrl+O'], 'open'], [['F5'], 'refresh'], [['Ctrl+1', 'Ctrl+Shift+A', 'Ctrl+L'], 'views'], [['Ctrl+Shift+E'], 'todo'],
     [['Ctrl+B', '\\'], 'sidebar'], [['Ctrl+Z', 'Ctrl+Y'], 'undo'], [['Alt+←', 'Alt+Home'], 'back'], [['?'], 'this'],
   ]],
   ['photos', [

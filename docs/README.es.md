@@ -11,7 +11,7 @@ Trabaja con sus carpetas tal como están: miniaturas pequeñas hechas una sola v
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · **Español** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versión 1.51.1](https://img.shields.io/badge/version-1.51.1-161214)
+![Versión 1.52.0](https://img.shields.io/badge/version-1.52.0-161214)
 ![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -120,10 +120,11 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Descripción y metadatos** | Titular, descripción, audiodescripción, autor y cargo, lugar (sublugar, ciudad, estado, país), palabras clave e instrucciones, para una foto o varias a la vez — solo cambia el catálogo. Lo que ya dice el archivo (EXIF, IPTC, XMP, el `.xmp` de un RAW) aparece como pista y lo usan las exportaciones. *Guardar en los archivos* (con el código escrito) lo graba dentro del propio JPEG, con la versión anterior a la Papelera, o en un `.xmp` junto a cualquier otro archivo. El JPEG también recibe el mismo `.xmp` al lado: los datos viajan con la foto al enviarla y quedan legibles junto a ella. Todo cambio se puede deshacer (Ctrl+Z) y rehacer (Ctrl+Shift+Z); la escritura en los archivos se deshace desde el aviso o las operaciones recientes, y los archivos vuelven byte a byte. |
 | **Álbumes** | Portada, descripción y período; *Añadir a un álbum…* en cualquier selección, *Quitar del álbum*, *Usar como portada*; **álbumes a partir de las carpetas** (el primer nivel, las carpetas con fotos o las que elija), ligados a toda la carpeta; presentación a pantalla completa. **Sugerir álbumes**: las fotos agrupadas como se tomaron y nombradas por lo que son — la carpeta, lo que muestran las fotos (leído en este equipo a partir de las miniaturas: playa, montaña, una tarta, un vestido de novia, comida…), las fiestas por su fecha, el lugar, la persona — y álbumes de un tema a lo largo de los años, para revisar antes de crearlos. **Unir dos álbumes** en uno (las fotos de ambos, con el nombre que elija; solo cambia el catálogo, y se puede deshacer). Se ven en mosaico, cuadrícula uniforme (todas las portadas del mismo tamaño), lista o destacados. |
 | **Proyectos, personas, mascotas, lugares** | Cada uno en su pestaña, en cuadrícula o lista agrupada por año. Al abrir uno se ven sus fotos, en su pestaña; una foto se puede quitar con un clic. La etiqueta de una carpeta vale para todo lo que contiene. Un proyecto agrupa álbumes y tiene una ficha (estado, para quién, lugar, equipo, plazo) y un panel con el avance: clasificadas, editadas, elegidas en álbumes, audiodescripciones. Los lugares se completan solos a partir de las fotos (la posición GPS o el lugar escrito en ellas) y aparecen en un **mapamundi** dibujado en el propio ordenador. |
+| **Por editar** | El lápiz en la portada de un álbum o proyecto lo pone en la pestaña **Por editar** (Ctrl+Shift+E), una lista en el orden en que hay que hacer las cosas: arrastre las filas, o use las flechas o Alt+↑ ↓, para poner primero lo que va primero. Su puesto en la lista se ve en la portada, un proyecto muestra su fecha de entrega (en rojo si va atrasado) y *Listo* quita el lápiz. Solo cambia el catálogo, y la lista va con la colección. |
 | **Caras y mascotas** | face-api (TensorFlow.js) para caras, COCO-SSD y MobileNet para animales, en la tarjeta gráfica (WebGL). Grupos de caras parecidas, sugerencias que usted confirma o rechaza, "no es" recordado. Desactivado por defecto; *Indexar ahora* o tras cada análisis. |
 | **Marcas y Limbo** | Excelente, bien, candidata a borrar: en la miniatura, la lista, el visor y el panel de información; teclas `1` `2` `3` `0`. El Limbo muestra todas las candidatas y cuánto espacio ocupan, y las envía a la Papelera de una vez. **Destacados**: álbumes, personas, mascotas y proyectos solo con sus fotos marcadas con estrella u OK, uno por fila — el nombre grande, una foto elegida en grande — como una página de portafolio. También los lugares; y dentro de cada uno, sus fotos elegidas en grande, una por fila. |
 | **Abrir con** | Los programas de fotos y vídeo del equipo para los archivos seleccionados (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), primero los últimos usados; en Windows, también todos los programas registrados para el tipo de archivo. |
-| **Complementos** | Instale paquetes `.lionplugin` que exportan álbumes y proyectos como una página (HTML, CSS y JavaScript), con los nombres de archivo, las descripciones y las audiodescripciones; nada de ellos se ejecuta dentro de LionPhotos. Consulte [PLUGINS.md](PLUGINS.md) (en inglés). Cada complemento activo tiene su pestaña después de Proyectos, con su página: elija los álbumes y proyectos y exporte. |
+| **Complementos** | Instale paquetes `.lionplugin` que exportan álbumes y proyectos como una página (HTML, CSS y JavaScript), con los nombres de archivo, las descripciones y las audiodescripciones; nada de ellos se ejecuta dentro de LionPhotos. Consulte [PLUGINS.md](PLUGINS.md) (en inglés). Cada complemento activo tiene su pestaña después de Por editar, con su página: elija los álbumes y proyectos y exporte. |
 | **Resumen** | Elementos, fotos, vídeos, tamaño y período; archivos por tipo, por año, formatos, cámaras, códecs; la caché de miniaturas. |
 | **Organizar** | Carpetas por fecha (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` o `2024-07-14-tema`), carpetas por álbum (`2024/2024-07-14-álbum`), con `Raw/` e `Img/` dentro si se desea; *Mover a carpeta* con subcarpetas por tipo; los archivos de la misma toma van juntos; operaciones recientes con deshacer. Los archivos se mueven de verdad en el disco y también se pueden **renombrar** (`{data}-{álbum}-{fotógrafo}-{nº}` por defecto, numerados por fecha; el RAW, el JPEG y el `.xmp` de una toma quedan con el mismo nombre), o solo renombrar donde están. **Reorganizar la colección** lee las carpetas como están y propone una estructura única en el disco — `2025/2025-12-24-Navidad`, temas largos en `Temas/`, lo pendiente en `_Entrada/`, pruebas de cámara en `_Equipo/` — para revisar (renombrar o dejar fuera cualquier carpeta, ver el árbol final) antes de mover carpetas enteras, con deshacer. **Archivos relacionados sueltos** (un `.xmp` o `.dop` que quedó solo después de mover su foto) vuelven junto a su foto, con su nombre. **Duplicar** (Ctrl+D): una copia junto a la foto, con sus ajustes, recorte, marcas y álbumes, con código escrito y deshacer. |
 | **Archivos repetidos** | SHA-256 en tres etapas (tamaño → primeros/últimos 64 KB → archivo entero), lado a lado con sus miniaturas. |
@@ -184,6 +185,7 @@ Haga doble clic en **`build-installer.bat`** (o ejecute `npm run dist`). Los ins
 | `F5` | Buscar archivos nuevos y modificados |
 | `Ctrl+K` · `Ctrl+F` | Buscar en toda la colección (barra de título) |
 | `Ctrl+1` · `Ctrl+Shift+A` | Fotos · Álbumes |
+| `Ctrl+Shift+E` | Por editar |
 | `Ctrl+6` … `Ctrl+9` | Proyectos · Personas · Mascotas · Lugares |
 | `Ctrl+L` | Limbo |
 | `Ctrl+2` · `Ctrl+3` · `Ctrl+4` · `Ctrl+0` | Resumen · Archivos repetidos · Organizar · Copia de seguridad |
@@ -237,7 +239,7 @@ Las mismas capas que [LionOrganizer](https://github.com/danielcarli/lionorganize
 src/
   base/            eventos, formato, i18n, utilidades DOM, iconos, gráficos
   platform/
-    library/       catálogo SQLite, análisis de carpetas, lectores de metadatos (EXIF, PNG, MP4/MOV, Matroska)
+    library/       catálogo SQLite, análisis de carpetas, lectores de metadatos (EXIF: JPEG, raw, HEIC, AVIF; PNG, MP4/MOV, Matroska)
     thumbs/        motor de miniaturas y previsualizaciones + la página oculta (workers, muxer WebM)
     media/         lionthumb:// y lionmedia:// (por id de biblioteca, con rangos de bytes)
     faces/         reconocimiento de caras y mascotas (página oculta en la tarjeta gráfica, quién-es-quién en el principal)
@@ -273,7 +275,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Historial de cambios
 
-Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.51.1**.
+Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.52.0**.
 
 ## Créditos
 

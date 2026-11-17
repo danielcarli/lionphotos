@@ -23,6 +23,7 @@ import { STATUSES } from './projectPanel.js';
 import { PlacesMap } from './placesMap.js';
 import { showcaseMode, renderShowcase, projectEyebrow } from './showcase.js';
 import { showExportDialog } from '../plugins/exportDialog.js';
+import { todoPin } from '../todo/todoPin.js';
 
 const MAP = ['map'];
 const SHOW = ['showcase'];
@@ -207,7 +208,9 @@ export class LabelsView extends ViewPane {
     const { labels, type } = this;
     const folders = labels.foldersOf(l.id);
     const open = () => { this.library.openLabel(l.id, this.type); this.layout.openView('photos'); };
-    return h('div.card.lbl-card',
+    return h(`div.card.lbl-card${type === 'project' ? '.has-pin' : ''}`,
+      // a project: the pencil of "to edit" on its pictures
+      type === 'project' ? todoPin(this.services, l) : null,
       h('button.lbl-thumbs', { onclick: open, title: t('labels.open'), disabled: !s?.count },
         s?.sample.length
           ? s.sample.map((it) => focusImage(this.thumbs.shown(h('img', { alt: '', draggable: false }), it), it))
@@ -249,6 +252,7 @@ export class LabelsView extends ViewPane {
       actions: [
         h('button.btn.btn-secondary.btn-sm', { onclick: open, disabled: !s?.count }, t('labels.open')),
         ...(l.auto ? [] : [
+          this.type === 'project' ? todoPin(this.services, l, 'row') : null,
           h('button.icon-button', { title: t('labels.editTitle'), html: icon('rename', 15), onclick: () => this.#rename(l) }),
           h('button.icon-button.danger', { title: t('labels.delete'), html: icon('trash', 15), onclick: () => this.#delete(l, s) })])],
     });

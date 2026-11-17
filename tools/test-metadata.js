@@ -103,6 +103,32 @@ const xmp = (inner) => `<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?><x:
   check(copy.subarray(cs.sos).equals(rendered.subarray(jpegSegments(rendered).sos)) && !cs.segs.some((g) => g.marker === 0xe0) && cs.segs.some((g) => g.marker === 0xdb)
     && m6.author === 'Bruno Lima' && cs.segs.filter((g) => g.marker === 0xed).length === 1,
     'edited copy: its picture data as drawn, with the original’s EXIF, XMP and IPTC (no JFIF header)', JSON.stringify({ a: m6.author }));
+  // a HEIC (iPhone): its EXIF is an item of the 'meta' box, here past the first 256 KB of the file
+  {
+    const box = (type, ...parts) => { const body = Buffer.concat(parts); const h = Buffer.alloc(8); h.writeUInt32BE(body.length + 8); h.write(type, 4, 'latin1'); return Buffer.concat([h, body]); };
+    const full = (type, v, ...parts) => box(type, Buffer.from([v, 0, 0, 0]), ...parts);
+    const u16 = (n) => { const b = Buffer.alloc(2); b.writeUInt16BE(n); return b; };
+    const u32 = (n) => { const b = Buffer.alloc(4); b.writeUInt32BE(n); return b; };
+    // TIFF (big-endian): IFD0 → Make, Model, ExifIFD → DateTimeOriginal
+    const date = Buffer.from('2021:11:14 19:32:05\0', 'latin1');
+    const make = Buffer.from('Apple\0', 'latin1'), model = Buffer.from('iPhone 11\0', 'latin1');
+    const ifd0 = 8, exifIfd = ifd0 + 2 + 3 * 12 + 4, data = exifIfd + 2 + 12 + 4;
+    const entry = (tag, type, count, value) => Buffer.concat([u16(tag), u16(type), u32(count), u32(value)]);
+    const tiff = Buffer.concat([Buffer.from('MM\0*', 'latin1'), u32(ifd0),
+      u16(3), entry(0x010f, 2, make.length, data), entry(0x0110, 2, model.length, data + make.length), entry(0x8769, 4, 1, exifIfd), u32(0),
+      u16(1), entry(0x9003, 2, date.length, data + make.length + model.length), u32(0), make, model, date]);
+    const exifItem = Buffer.concat([u32(6), Buffer.from('Exif\0\0', 'latin1'), tiff]);
+    const at = 300 * 1024;
+    const meta = (offset) => full('meta', 0, full('hdlr', 0, u32(0), Buffer.from('pict'), Buffer.alloc(13)), full('pitm', 0, u16(1)),
+      full('iinf', 0, u16(2), full('infe', 2, u16(1), u16(0), Buffer.from('hvc1'), Buffer.from('\0')), full('infe', 2, u16(2), u16(0), Buffer.from('Exif'), Buffer.from('\0'))),
+      full('iloc', 0, Buffer.from([0x44, 0x00]), u16(1), u16(2), u16(0), u16(1), u32(offset), u32(exifItem.length)));
+    const head = Buffer.concat([box('ftyp', Buffer.from('heic'), u32(0), Buffer.from('mif1heic')), meta(at)]);
+    const file = path.join(tmp, 'IMG_0001.HEIC');
+    fs.writeFileSync(file, Buffer.concat([head, Buffer.alloc(at - head.length), exifItem]));
+    const mh = await readMetadata(file, 'heic', 1, at + exifItem.length);
+    check(mh.camera === 'Apple iPhone 11' && mh.takenAt === new Date(2021, 10, 14, 19, 32, 5).getTime() && mh.v === META_VERSION,
+      'HEIC: camera and date taken read from its Exif item, even past the first 256 KB', JSON.stringify({ c: mh.camera, t: mh.takenAt && new Date(mh.takenAt).toString() }));
+  }
   fs.rmSync(tmp, { recursive: true, force: true });
   console.log(failures ? `\n${failures} failed` : '\nall checks passed');
   process.exit(failures ? 1 : 0);

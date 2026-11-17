@@ -511,3 +511,5 @@ _merge(MESSAGES, {'places': {'noCity': {'one': '{count} 项没有城市', 'other
 _merge(MESSAGES, {'dupes': {'showAll': '显示所有副本'}})
 
 _merge(MESSAGES, {'albumSuggest': {'scanning': {'one': '文件夹仍在读取：这些建议来自目前已读取的 {count} 个文件。读取完成后再次建议即可使用全部文件。', 'other': '文件夹仍在读取：这些建议来自目前已读取的 {count} 个文件（以及此电脑已了解的信息）。读取完成后再次建议即可使用全部文件。'}}})
+
+_merge(MESSAGES, {'views': {'todo': '待编辑'}, 'keys': {'todo': '待编辑'}, 'todo': {'lead': '封面上标了铅笔的相册和项目，按要做的先后排列：最上面的先做。拖动（或用箭头）改变顺序；“完成”会取下铅笔。只更改目录。', 'listLabel': '待编辑（按顺序）', 'count': {'one': '{count} 个待编辑', 'other': '{count} 个待编辑'}, 'keys': '拖动可重新排序 · 在某行按 Alt+↑ ↓ 移动', 'empty': '没有待编辑的内容', 'howTo': '点击相册或项目封面上的铅笔（或 ⋯ 菜单中的“标记为待编辑”）即可放到这里。然后把最先要做的放在最前面。', 'rowLabel': '第 {n} 个，共 {total} 个：{type} {name}', 'toTop': '移到最上', 'up': '上移', 'down': '下移', 'toBottom': '移到最下', 'done': '完成', 'doneTitle': '完成：取下铅笔（离开此列表）', 'dragTitle': '拖动以改变顺序', 'moved': '{name} 现在是第 {n} 个', 'due': '截止 {date}', 'dueLate': '自 {date} 起逾期', 'added': '“{name}”已加入待编辑，第 {n} 个。', 'see': '查看列表', 'removed': '“{name}”已移出待编辑。', 'undo': '撤销', 'pinTitle': '标记为待编辑（铅笔）', 'pinOnTitle': '待编辑 — 列表第 {n} 个。点击取下铅笔', 'menuOn': '标记为待编辑', 'menuOff': '移出待编辑'}})

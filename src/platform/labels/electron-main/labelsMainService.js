@@ -21,6 +21,8 @@ const cleanText = (s, max) => String(s ?? '').replace(/\r\n?/g, '\n').replace(/[
 const ids = (a) => (Array.isArray(a) ? a.map(Number).filter((n) => Number.isInteger(n) && n > 0) : []);
 
 const STATUSES = ['active', 'selecting', 'delivered', 'archived'];
+// what can be marked "to edit" (the pencil): albums and projects
+const TODO_TYPES = ['album', 'project'];
 
 /** A project's sheet, checked: { status, client, placeId, team } as JSON (or null when empty). */
 function projectInfo(info, labels) {
@@ -105,6 +107,23 @@ class LabelsMainService {
       return { state: this.state(), id };
     });
     ipc.handle('labels:cover', (_e, labelId, itemId) => this.cover(Number(labelId), itemId ? Number(itemId) : null));
+    // "To edit": the pencil on an album's or a project's cover, and the order of the list (catalog only)
+    ipc.handle('labels:todo', (_e, labelId, on) => this.todo(Number(labelId), !!on));
+    ipc.handle('labels:todoOrder', (_e, list) => this.todoOrder(list));
+  }
+
+  todo(labelId, on) {
+    const label = this.db.labels().find((l) => l.id === labelId);
+    if (!label || !TODO_TYPES.includes(label.type)) throw new Error(t('main.ops.errors.unknownOperation'));
+    this.db.setLabelTodo(labelId, on);
+    return this.state();
+  }
+
+  /** @param {number[]} list the albums and projects marked to edit, the first to be done first */
+  todoOrder(list) {
+    const marked = new Set(this.db.labels().filter((l) => l.todo != null && TODO_TYPES.includes(l.type)).map((l) => l.id));
+    this.db.orderLabelTodo([...new Set(ids(list))].filter((id) => marked.has(id)));
+    return this.state();
   }
 
   /** An album's cover photo (an item of the opened collection), or null for the first photo. */

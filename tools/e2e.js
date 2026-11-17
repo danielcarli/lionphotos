@@ -1132,8 +1132,8 @@ app.whenReady().then(async () => {
       check(ins.res.ok && listed.includes('simple-gallery@1.0.0'), 'a plugin package installs with the typed code', JSON.stringify({ ok: ins.res.ok, listed }));
       check(ex.res.ok && out && page.cards === ids.length && page.loaded === page.withImage && page.withImage >= ids.length - 1 && page.jpeg && page.zip && page.dark && page.hasCaption && page.alt.includes('Audiodescrição exportada'),
         'export: a new folder with the page, the photos as JPEG, file names, descriptions and audio descriptions, and a .zip of it all', JSON.stringify({ n: ids.length, ...page, files: (page.files || []).slice(0, 2) }));
-      check(tab.order.indexOf('plugin:simple-gallery') === tab.order.indexOf('project') + 1 && !!tab.title && tab.cards >= 1 && /1/.test(tab.btn) && tab.active && tab.gone && tab.view === 'project',
-        'an installed plugin has its tab after Projects, with its page; turned off, the tab goes', JSON.stringify(tab));
+      check(tab.order.indexOf('plugin:simple-gallery') === tab.order.indexOf('todo') + 1 && tab.order.indexOf('todo') === tab.order.indexOf('project') + 1 && !!tab.title && tab.cards >= 1 && /1/.test(tab.btn) && tab.active && tab.gone && tab.view === 'project',
+        'an installed plugin has its tab after Projects and To edit, with its page; turned off, the tab goes', JSON.stringify(tab));
       check(tab.stay.at > 0 && tab.stay.after === tab.stay.at && tab.stay.same && tab.stay.off && tab.stay.on, 'in a plugin page, checking a collection keeps the page where it was scrolled', JSON.stringify(tab.stay));
       check(tab.pv.all === tab.pv.total && tab.pv.good === 2 && tab.pv.goodIds === 2 && /2/.test(tab.pv.goodText) && tab.pv.great === 1 && tab.pv.kept && tab.pv.dialog && tab.pv.opened && tab.pv.back && tab.pv.allAgain,
         'a plugin page: which photos go (all, great and OK, great), a preview with the cover, open the album and come back', JSON.stringify(tab.pv));
@@ -1566,6 +1566,58 @@ app.whenReady().then(async () => {
     await idle();
     const show = await js(`(async () => { const v = ${S}.viewer; v.seconds = 0.4; window.__lionphotos.views.album.slideshow(${albumId}); const first = v.index; const playing = v.playing; await new Promise((r) => setTimeout(r, 600)); const moved = v.index !== first || v.list.length < 2; const n = v.list.length; v.close(); return { playing, moved, n }; })()`);
     check(show.playing && show.moved && show.n === 2, 'an album plays as a slideshow that advances by itself', JSON.stringify(show));
+    // To edit: the pencil on an album's cover puts it at the end of the list, with its place on the cover; the
+    // list is reordered by its buttons, Alt+↑ and dragging; Done takes the pencil off; an album opened from it
+    // goes Back to it, and the order is in the catalog
+    const todo = await js(`(async () => { try { const s = ${S}, L = s.labels, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const proj = await L.save({ type: 'project', name: 'Projeto Lápis' });
+      const empty = await L.save({ type: 'album', name: 'Álbum Lápis' });
+      s.layout.openView('album'); await wait(300);
+      const pin = document.querySelector('.view-albums .alb-card[data-album="${albumId}"] .todo-pin');
+      const hidden = !!pin && !pin.classList.contains('is-on') && !pin.textContent.trim();
+      pin.click(); await wait(400);
+      const pinOn = document.querySelector('.view-albums .alb-card[data-album="${albumId}"] .todo-pin.is-on')?.textContent;
+      await L.setTodo(proj, true); await L.setTodo(empty, true);
+      s.layout.openView('todo'); await wait(300);
+      const names = () => [...document.querySelectorAll('.view-todo .todo-item .todo-name')].map((b) => b.textContent);
+      const res = { hidden, pinOn, first: names().join('|'), badge: document.querySelector('.activity-todo .activity-badge')?.textContent };
+      // the last to the top (its button)
+      document.querySelectorAll('.view-todo .todo-item')[2].querySelector('.todo-actions .icon-button').click(); await wait(400);
+      res.top = names().join('|');
+      // Alt+↓ on the first row
+      const r0 = document.querySelector('.view-todo .todo-item'), movedId = r0.dataset.id; r0.focus();
+      r0.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', altKey: true, bubbles: true })); await wait(400);
+      res.alt = names().join('|'); res.focused = document.activeElement?.dataset?.id === movedId;
+      // dragging the last one onto the first one's top half
+      const rows = () => [...document.querySelectorAll('.view-todo .todo-item')];
+      const dt = new DataTransfer(), last = rows()[2], firstRow = rows()[0], box = firstRow.getBoundingClientRect();
+      last.dispatchEvent(new DragEvent('dragstart', { bubbles: true, dataTransfer: dt }));
+      firstRow.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: dt, clientY: box.top + 4 }));
+      res.line = firstRow.classList.contains('drop-before');
+      firstRow.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt, clientY: box.top + 4 })); await wait(400);
+      res.drag = names().join('|');
+      const state = await s.host.labels.state();
+      res.saved = state.labels.filter((l) => l.todo != null).sort((a, b) => a.todo - b.todo).map((l) => l.name).join('|');
+      // an album opened from the list: Back says To edit, the tab lit is To edit
+      const albumRow = rows().find((r) => r.dataset.id === '${albumId}');
+      albumRow.querySelector('.todo-open').click(); await wait(500);
+      res.back = document.querySelector('.label-back-btn')?.textContent || '';
+      res.tab = document.querySelector('.activity-item.active')?.dataset.view;
+      res.barPin = !!document.querySelector('.label-back .todo-row-pin.is-on');
+      document.querySelector('.label-back-btn').click(); await wait(400);
+      res.backView = s.layout.activeView;
+      // Done
+      rows().find((r) => r.dataset.id === String(empty)).querySelector('.todo-done').click(); await wait(400);
+      res.done = names().join('|'); res.badge2 = document.querySelector('.activity-todo .activity-badge')?.textContent;
+      for (const id of [${albumId}, proj]) await L.setTodo(id, false);
+      await L.remove(proj); await L.remove(empty);
+      res.empty = !!document.querySelector('.view-todo .empty-state');
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(todo.hidden && todo.pinOn === '1' && todo.first === 'Férias 2024|Projeto Lápis|Álbum Lápis' && todo.badge === '3', 'To edit: the pencil on an album cover (seen on hover) puts it first, numbered; the others follow; the tab counts them', JSON.stringify(todo));
+    check(todo.top === 'Álbum Lápis|Férias 2024|Projeto Lápis' && todo.alt === 'Férias 2024|Álbum Lápis|Projeto Lápis' && todo.line && todo.drag === 'Projeto Lápis|Férias 2024|Álbum Lápis' && todo.saved === todo.drag,
+      'To edit: reordered by "to the top", Alt+↓ and dragging (a line shows where), and the order is kept in the catalog', JSON.stringify(todo));
+    check(/To edit/.test(todo.back) && todo.tab === 'todo' && todo.barPin && todo.backView === 'todo' && todo.done === 'Projeto Lápis|Férias 2024' && todo.badge2 === '2' && todo.empty,
+      'To edit: an album opened from it goes back to it; Done takes the pencil off', JSON.stringify(todo));
     // the viewer's editing panel: the same sections; typing in a field does not reach the viewer's keys; a
     // photo moved to a category the filter does not show stays in view, greyed, with a note naming it
     const vw = await js(`(async () => {
@@ -1902,7 +1954,7 @@ app.whenReady().then(async () => {
     })()`);
     check(mg.merged.gone && mg.merged.card && mg.merged.name === 'Junta AB' && mg.merged.count === mg.na + mg.nb - 1 && mg.prefilled === 'Junta B'
       && /1 item already in both/.test(mg.summary) && mg.undone.a === mg.na && mg.undone.b === mg.nb && mg.undone.name === 'Junta B'
-      && mg.look.name === 'Junta A' && mg.look.meta === mg.na + ' items' && /^[A-Z][a-z]{2} /.test(mg.look.when) && !/[.]/.test(mg.look.when) && Number(mg.look.cols) >= 1 && mg.look.h > 100 && mg.look.play && mg.look.buttons === 3 && mg.look.menu.length === 7,
+      && mg.look.name === 'Junta A' && mg.look.meta === mg.na + ' items' && /^[A-Z][a-z]{2} /.test(mg.look.when) && !/[.]/.test(mg.look.when) && Number(mg.look.cols) >= 1 && mg.look.h > 100 && mg.look.play && mg.look.buttons === 4 && mg.look.menu.length === 8 && mg.look.menu.includes('Mark to edit'),
       'album cards: a mosaic, the period, the name and the count on the cover, the slideshow and a ⋯ menu; albums merged from it: the union under the name given, the other one gone; undo gives both back', JSON.stringify(mg));
     // Highlights: only the albums with photos marked great or OK, one row each, the chosen photos one after the
     // other; opening one shows its chosen photos only, and the mark filter goes back when it is closed

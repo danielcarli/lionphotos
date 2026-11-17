@@ -3,7 +3,7 @@
  *  Created and conceived by Daniel Michelon De Carli.
  *  Licensed under the MIT License. See LICENSE in the project root.
  *--------------------------------------------------------------------------------------------*/
-// A plugin's own page, opened from its tab in the activity bar (after Projects): what it is, the albums and
+// A plugin's own page, opened from its tab in the activity bar (after Projects and To edit): what it is, the albums and
 // projects (and the rest it takes) that have photos, to pick, and "Export…" with them already checked. The
 // export itself is the same as anywhere else: the dialog, the folder, the typed code.
 import { h, setChildren } from '../../../base/browser/dom.js';

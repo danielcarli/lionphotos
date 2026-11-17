@@ -53,7 +53,7 @@ const inside = (root, p) => p === root || p.startsWith(root + path.sep);
  * @returns {{ catalog: object, faces: object }}
  */
 function exportCatalog(db, root, rootId) {
-  const labels = db.prepare('SELECT id, uid, type, name, parent_id, notes, created_at, info, cover FROM labels').all();
+  const labels = db.prepare('SELECT id, uid, type, name, parent_id, notes, created_at, info, cover, todo FROM labels').all();
   const uidOf = new Map(labels.map((l) => [l.id, l.uid]));
   const links = db.prepare('SELECT label_id, kind, path FROM label_links').all();
   // the labels of this collection: those with links or faces in it, the projects of its albums, the categories
@@ -79,6 +79,7 @@ function exportCatalog(db, root, rootId) {
       uid: l.uid, type: l.type, name: l.name, parent: l.parent_id ? uidOf.get(l.parent_id) || null : null,
       notes: l.notes || null, created: l.created_at, info: info || null,
       cover: l.cover && inside(root, l.cover) ? relOf(root, l.cover) : null,
+      ...(l.todo != null ? { todo: l.todo } : {}), // "to edit", and in which place
     };
   });
   // each photo's own data (only those that have some)
@@ -137,15 +138,16 @@ function importCatalog(db, root, rootId, catalog, facesFile = null) {
   db.exec('BEGIN');
   try {
     // labels: the same ones updated, new ones made (parents after, once every label has its id)
-    const insert = db.prepare('INSERT INTO labels(uid, type, name, parent_id, notes, created_at, info, cover) VALUES (?, ?, ?, NULL, ?, ?, ?, ?) RETURNING id');
-    const update = db.prepare('UPDATE labels SET type = ?, name = ?, notes = ?, info = ?, cover = ? WHERE id = ?');
+    const insert = db.prepare('INSERT INTO labels(uid, type, name, parent_id, notes, created_at, info, cover, todo) VALUES (?, ?, ?, NULL, ?, ?, ?, ?, ?) RETURNING id');
+    const update = db.prepare('UPDATE labels SET type = ?, name = ?, notes = ?, info = ?, cover = ?, todo = ? WHERE id = ?');
     for (const l of catalog.labels || []) {
       if (!l || !l.uid || !l.type || !l.name) continue;
       const cover = l.cover ? absOf(root, l.cover) : null;
+      const todo = Number.isInteger(l.todo) && l.todo > 0 && ['album', 'project'].includes(l.type) ? l.todo : null;
       const id = idOfUid.get(l.uid);
-      if (l.type === 'sphere') { if (!id) idOfUid.set(l.uid, insert.get(l.uid, l.type, l.name, null, l.created || Date.now(), null, null).id); continue; }
-      if (id) update.run(l.type, l.name, l.notes || null, null, cover, id);
-      else idOfUid.set(l.uid, insert.get(l.uid, l.type, l.name, l.notes || null, l.created || Date.now(), null, cover).id);
+      if (l.type === 'sphere') { if (!id) idOfUid.set(l.uid, insert.get(l.uid, l.type, l.name, null, l.created || Date.now(), null, null, null).id); continue; }
+      if (id) update.run(l.type, l.name, l.notes || null, null, cover, todo, id);
+      else idOfUid.set(l.uid, insert.get(l.uid, l.type, l.name, l.notes || null, l.created || Date.now(), null, cover, todo).id);
       out.labels++;
     }
     const setParent = db.prepare('UPDATE labels SET parent_id = ?, info = ? WHERE id = ?');

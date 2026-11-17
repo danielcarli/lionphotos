@@ -17,6 +17,8 @@ export const VIEWS = [
   { id: 'pet', icon: 'paw', shortcut: 'Ctrl+8', group: 'library' },
   { id: 'place', icon: 'pin', shortcut: 'Ctrl+9', group: 'library' },
   { id: 'project', icon: 'layers', shortcut: 'Ctrl+6', group: 'library' },
+  // the albums and projects marked with the pencil, in the order they are to be done
+  { id: 'todo', icon: 'pencil', shortcut: 'Ctrl+Shift+E', group: 'library' },
   { id: 'limbo', icon: 'binQuestion', shortcut: 'Ctrl+L', group: 'limbo' },
   { id: 'overview', icon: 'pie', shortcut: 'Ctrl+2', group: 'tools' },
   { id: 'duplicates', icon: 'copy', shortcut: 'Ctrl+3', group: 'tools' },

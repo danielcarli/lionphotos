@@ -2,6 +2,19 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.52.0] — 2026-11-17
+
+### Added
+- **To edit.** A new tab, after Projects (Ctrl+Shift+E), for the albums and projects still to be worked on. The pencil on the cover of an album or a project — or *Mark to edit* in its ⋯ menu, in the lists, and in the bar of an open album or project — puts it at the end of the list; the cover then keeps the pencil with its place in the list (1, 2, 3…), and the tab shows how many wait.
+- The list is in the order things are to be done, the first at the top: drag the rows (a line shows where they go), use the buttons (to the top, up, down) or Alt+↑ ↓ on a row; the right button has *to the bottom* too. Each row shows the cover, what it is (an album and its project, or a project with its status and client), how many photos, the period, and a project's due date — in red when late. *Done* (or Delete on the row) takes the pencil off, with Undo in the notice. An album or project opened from the list goes Back to it.
+- Only the catalog changes. The list and its order go with the collection (the `.lionphotos` folder) to another computer; merging two albums keeps the pencil.
+
+## [1.51.2] — 2026-11-16
+
+### Fixed
+- **HEIC and AVIF photos had no date, camera or place.** Their EXIF was never read: it is an item inside the file's `meta` box, often past the first 256 KB, not a block at the start as in a JPEG. It is now — date taken, camera, lens, exposure and GPS, so iPhone photos show on the map and sort by when they were taken. The HEIC/AVIF photos already in the catalog are read again in the background, a few at a time (not every photo: only these).
+- **Photos dated 1 January 1980.** A file without the date the camera wrote (not read yet, or a HEIC that cannot be decoded) took its file date — and files downloaded zipped from Google Drive, or copied off some memory cards, all carry 1 January 1980, the "no date" of ZIP and FAT. Such a date is no longer used: the date in the file's name or folder is (`2021-11-14 - Planetário…`, `IMG_20211114_…`), when there is one.
+
 ## [1.51.1] — 2026-11-16
 
 ### Fixed

@@ -15,7 +15,9 @@ const fs = require('fs');
 
 const HEAD = 256 * 1024;
 // 2: XMP (in the file or a sidecar) and IPTC — author, caption, place, people, accessibility texts (1.11.0)
-const META_VERSION = 3;
+const META_VERSION = 4;
+// HEIF/AVIF photos got their EXIF in version 4: before it, only they are read again (see staleMeta)
+const HEIF_EXTS = ['heic', 'heif', 'hif', 'avif'];
 const MAX_MOOV = 48 * 1024 * 1024;
 const MAC_EPOCH = Date.UTC(1904, 0, 1);
 const MKV_EPOCH = Date.UTC(2001, 0, 1);
@@ -167,6 +169,99 @@ function metaFromIfds(ifd0, exif, gps) {
   return meta;
 }
 
+
+// ============================================================================================ HEIF / AVIF
+// The EXIF of a HEIC (iPhone, Samsung, Canon HIF…) or AVIF photo is an item of type 'Exif' listed in the
+// 'meta' box: 'iinf' says which item it is, 'iloc' where its bytes are (often past the first 256 KB).
+// Its bytes start with a 4-byte offset to the TIFF header (after an "Exif\0\0" most of the time).
+function heifBoxes(b, start, end) {
+  const out = [];
+  for (let o = start; o + 8 <= end;) {
+    let size = b.readUInt32BE(o);
+    let header = 8;
+    if (size === 1) { size = Number(b.readBigUInt64BE(o + 8)); header = 16; } else if (size === 0) size = end - o;
+    if (size < header || o + size > end) break;
+    out.push({ type: b.toString('latin1', o + 4, o + 8), start: o + header, end: o + size });
+    o += size;
+  }
+  return out;
+}
+
+/** Where the EXIF item of a HEIF file is: [{ at, len }] in the file, or { data } when it sits in 'idat'. */
+function heifExifPlace(b) {
+  const meta = heifBoxes(b, 0, b.length).find((x) => x.type === 'meta');
+  if (!meta) return null;
+  const kids = heifBoxes(b, meta.start + 4, meta.end);
+  const box = (t) => kids.find((x) => x.type === t);
+  const iinf = box('iinf');
+  const iloc = box('iloc');
+  if (!iinf || !iloc) return null;
+  let exifId = null;
+  for (const e of heifBoxes(b, iinf.start + 4 + (b[iinf.start] === 0 ? 2 : 4), iinf.end)) {
+    const v = b[e.start];
+    if (e.type !== 'infe' || v < 2) continue;
+    const at = e.start + 4 + (v === 2 ? 2 : 4) + 2;
+    if (b.toString('latin1', at, at + 4) === 'Exif') { exifId = v === 2 ? b.readUInt16BE(e.start + 4) : b.readUInt32BE(e.start + 4); break; }
+  }
+  if (exifId === null) return null;
+  const uint = (o, n) => (n === 1 ? b[o] : n === 2 ? b.readUInt16BE(o) : n === 4 ? b.readUInt32BE(o) : n === 8 ? Number(b.readBigUInt64BE(o)) : 0);
+  const v = b[iloc.start];
+  let o = iloc.start + 4;
+  const offsetSize = b[o] >> 4, lengthSize = b[o] & 15, baseSize = b[o + 1] >> 4;
+  const indexSize = v === 1 || v === 2 ? b[o + 1] & 15 : 0;
+  o += 2;
+  const count = v < 2 ? b.readUInt16BE(o) : b.readUInt32BE(o);
+  o += v < 2 ? 2 : 4;
+  for (let i = 0; i < count && o < iloc.end; i++) {
+    const id = v < 2 ? b.readUInt16BE(o) : b.readUInt32BE(o);
+    o += v < 2 ? 2 : 4;
+    let method = 0;
+    if (v === 1 || v === 2) { method = b.readUInt16BE(o) & 15; o += 2; }
+    o += 2; // data reference index
+    const base = uint(o, baseSize); o += baseSize;
+    const n = b.readUInt16BE(o); o += 2;
+    const extents = [];
+    for (let k = 0; k < n; k++) {
+      o += indexSize;
+      const off = uint(o, offsetSize); o += offsetSize;
+      const len = uint(o, lengthSize); o += lengthSize;
+      extents.push({ at: base + off, len });
+    }
+    if (id !== exifId) continue;
+    if (method === 1) {
+      const idat = box('idat');
+      return idat ? { data: Buffer.concat(extents.map((x) => b.subarray(idat.start + x.at, idat.start + x.at + x.len))) } : null;
+    }
+    return method === 0 ? { extents } : null;
+  }
+  return null;
+}
+
+async function heifMeta(file, head) {
+  const place = heifExifPlace(head);
+  if (!place) return {};
+  let data = place.data;
+  if (!data) {
+    const total = place.extents.reduce((s, x) => s + x.len, 0);
+    if (!total || total > 1024 * 1024) return {};
+    const parts = [];
+    const fh = await fs.promises.open(file, 'r');
+    try {
+      for (const { at, len } of place.extents) {
+        if (at + len <= head.length) { parts.push(head.subarray(at, at + len)); continue; }
+        const part = Buffer.allocUnsafe(len);
+        const { bytesRead } = await fh.read(part, 0, len, at);
+        parts.push(part.subarray(0, bytesRead));
+      }
+    } finally {
+      await fh.close();
+    }
+    data = Buffer.concat(parts);
+  }
+  if (data.length < 12) return {};
+  const skip = data.readUInt32BE(0);
+  return readTiff(data, 4 + skip) || {};
+}
 
 // ============================================================================================ XMP / IPTC
 // What photographers and agencies write (Photo Mechanic, Lightroom, Bridge…): the author, the caption, the
@@ -666,6 +761,7 @@ async function readMetadata(file, ext, kind, size) {
       else if (ext === 'png') Object.assign(meta, pngMeta(b));
       else if (['tif', 'tiff', 'dng', 'nef', 'arw', 'cr2', 'orf', 'pef', 'srw', 'rw2', 'nrw', 'sr2', 'srf', 'erf', '3fr', 'iiq', 'rwl'].includes(ext)) Object.assign(meta, readTiff(b, 0) || {});
       else if (ext === 'cr3') Object.assign(meta, cr3Meta(b));
+      else if (HEIF_EXTS.includes(ext)) Object.assign(meta, await heifMeta(file, b));
       else if (ext === 'raf' && b.toString('latin1', 0, 8) === 'FUJIFILM' && b.length > 92) {
         // the embedded JPEG carries the EXIF of a RAF
         const at = b.readUInt32BE(84);
@@ -693,4 +789,4 @@ function searchTags(meta) {
     .filter(Boolean).join(' | ').toLowerCase().slice(0, 600);
 }
 
-module.exports = { readMetadata, searchTags, parseExifDate, xmpMeta, iptcMeta, META_VERSION, IMAGE_FORMATS, VIDEO_FORMATS };
+module.exports = { readMetadata, searchTags, parseExifDate, xmpMeta, iptcMeta, META_VERSION, HEIF_EXTS, IMAGE_FORMATS, VIDEO_FORMATS };

@@ -2278,7 +2278,7 @@ input.desc-input { min-height: 32px; resize: none; }
 .seg-count { margin-left: 6px; font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 @container (max-width: 760px) { .pp-sheet { grid-template-columns: 1fr 1fr; } }
 
-/* ---- plugins: a tab each in the activity bar (after Projects) and the plugin's own page ---- */
+/* ---- plugins: a tab each in the activity bar (after Projects and To edit) and the plugin's own page ---- */
 .activity-plugins { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .activity-plugins[hidden] { display: none; }
 .activity-plugin-icon { width: 22px; height: 22px; border-radius: 6px; object-fit: contain; }
@@ -3299,3 +3299,68 @@ button.vw-chip:hover { filter: brightness(1.2); }
 .bk-catalog { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12.5px; color: var(--text-secondary); }
 .bk-catalog.is-behind { border-color: var(--warning, #c98a00); color: var(--text-primary); }
 .bk-catalog-text { flex: 1; min-width: 0; }
+
+/* ---------- To edit: the pencil on covers, and the list in the order things are to be done ---------- */
+:root { --pencil: #f5c542; --pencil-ink: #241c07; }
+.activity-item .activity-badge.activity-badge-todo { background: var(--pencil); color: var(--pencil-ink); }
+/* on a cover: a round button seen on hover; once on, a yellow tag with its place in the list, always seen */
+.todo-pin { --pin-cut: rgba(20, 22, 26, 0.35); height: 30px; min-width: 30px; padding: 0 7px; border: 0; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+  cursor: pointer; color: #fff; background: rgba(20, 22, 26, 0.35); backdrop-filter: blur(6px); opacity: 0; transition: opacity 0.15s ease, background 0.15s ease; font: 700 13px/1 var(--font-ui); font-variant-numeric: tabular-nums; }
+.todo-pin-ic { display: grid; place-items: center; line-height: 0; }
+.alb-tile:hover .todo-pin, .alb-tile:focus-within .todo-pin, .lbl-card:hover .todo-pin, .lbl-card:focus-within .todo-pin, .todo-pin:focus-visible { opacity: 1; }
+.todo-pin:hover { background: rgba(20, 22, 26, 0.6); }
+.todo-pin:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.todo-pin.is-on { --pin-cut: var(--pencil); opacity: 1; background: var(--pencil); color: var(--pencil-ink); padding: 0 9px 0 7px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28); }
+.todo-pin.is-on:hover { background: #ffd65e; }
+.lbl-card.has-pin { position: relative; }
+.lbl-card .todo-pin { position: absolute; top: 8px; right: 8px; z-index: 2; }
+/* in a list row and in the bar of an open album or project */
+.todo-row-pin.is-on { --pin-cut: var(--pencil); background: var(--pencil); color: var(--pencil-ink); }
+.todo-row-pin.is-on:hover { background: #ffd65e; color: var(--pencil-ink); }
+@media (prefers-reduced-motion: reduce) { .todo-pin { transition: none; } }
+
+.view-todo { container-type: inline-size; }
+.todo-count { margin: 0 0 12px; }
+.todo-keys { margin-left: 6px; }
+.todo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-width: 1100px; }
+.todo-item { position: relative; display: grid; grid-template-columns: 18px 40px 92px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 10px 14px 10px 8px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-elevated); }
+.todo-item:hover { border-color: var(--border-strong); }
+.todo-item:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* the first one: what is to be done now */
+.todo-item.is-first { box-shadow: inset 4px 0 0 var(--pencil); }
+.todo-item.is-dragging { opacity: 0.35; }
+.todo-item.drop-before::before, .todo-item.drop-after::after { content: ""; position: absolute; left: 6px; right: 6px; height: 3px; border-radius: 2px; background: var(--accent); pointer-events: none; }
+.todo-item.drop-before::before { top: -6px; }
+.todo-item.drop-after::after { bottom: -6px; }
+.todo-grip { color: var(--text-muted); cursor: grab; display: grid; place-items: center; line-height: 0; }
+.todo-item:active .todo-grip { cursor: grabbing; }
+.todo-n { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; text-align: center; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.todo-item.is-first .todo-n { color: var(--text-primary); }
+.todo-cover { width: 92px; height: 68px; padding: 0; border: 0; border-radius: 8px; overflow: hidden; background: var(--tile); display: grid; place-items: center; cursor: pointer; }
+.todo-cover:disabled { cursor: default; }
+.todo-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.todo-cover-empty { color: var(--text-muted); line-height: 0; }
+.todo-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.todo-kind { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; }
+.todo-kind-ic { line-height: 0; color: var(--text-muted); }
+.todo-of { opacity: 0.6; }
+.todo-of-name { overflow: hidden; text-overflow: ellipsis; }
+.todo-kind .pp-pill { margin-left: 4px; }
+.todo-name { all: unset; cursor: pointer; font-size: 16px; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.todo-name:hover { color: var(--accent); }
+.todo-name:disabled { cursor: default; color: inherit; }
+.todo-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.todo-due { display: inline-flex; align-items: center; gap: 4px; }
+.todo-due span { line-height: 0; }
+.todo-due.is-late { color: var(--danger); font-weight: 600; }
+.todo-actions { display: inline-flex; align-items: center; gap: 2px; }
+.todo-actions .todo-open { margin-left: 8px; }
+.todo-actions .todo-done { margin-left: 4px; }
+.todo-empty-go { display: flex; gap: 8px; margin-top: 8px; }
+@container (max-width: 720px) {
+  .todo-item { grid-template-columns: 18px 32px 72px minmax(0, 1fr); }
+  .todo-cover { width: 72px; height: 54px; }
+  .todo-n { font-size: 24px; }
+  .todo-actions { grid-column: 3 / -1; flex-wrap: wrap; }
+}

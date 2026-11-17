@@ -27,6 +27,7 @@ import { modeOf, setMode, modeToggle, byYear, renderGroups, listRow, periodOf } 
 import { focusImage } from '../../services/thumbs/browser/thumbFocus.js';
 import { sharpenCover } from './albumCovers.js';
 import { showcaseMode, renderShowcase, albumEyebrow } from '../labels/showcase.js';
+import { todoPin, todoMenuItem } from '../todo/todoPin.js';
 
 export class AlbumsView extends ViewPane {
   constructor(services) {
@@ -173,6 +174,8 @@ export class AlbumsView extends ViewPane {
       h('button.alb-open', { onclick: open, disabled: !list.length, title: size, 'aria-label': `${t('albums.open')}: ${a.name}` }),
       h('div.alb-tile-top',
         list.length ? h('button.alb-play', { title: t('slideshow.startTitle'), 'aria-label': `${t('slideshow.button')}: ${a.name}`, html: icon('play', 15), onclick: () => this.slideshow(a.id) }) : null,
+        // the pencil: "to edit" (in the To edit list, with its place there)
+        todoPin(this.services, a),
         h('span.alb-tile-gap'),
         list.length ? h('span.alb-sph', sphereIcons(this.labels, a.id)) : null,
         more),
@@ -194,6 +197,7 @@ export class AlbumsView extends ViewPane {
       { label: t('slideshow.button'), icon: 'play', disabled: !list.length, run: () => this.slideshow(a.id) },
       { label: t('albums.open'), icon: 'album', disabled: !list.length, run: () => { this.library.openLabel(a.id, 'album'); this.layout.openView('photos'); } },
       '-',
+      todoMenuItem(this.services, a),
       { label: t('albums.editMenu'), icon: 'rename', run: () => this.#edit(a) },
       { label: t('albums.cover.menu'), icon: 'image', disabled: !list.length, run: () => chooseCover(this.services, a, list) },
       { label: t('albums.merge.button'), icon: 'merge', run: () => mergeAlbums(this.services, a) },
@@ -215,6 +219,7 @@ export class AlbumsView extends ViewPane {
       actions: [
         h('button.btn.btn-primary.btn-sm', { onclick: () => this.slideshow(a.id), disabled: !list.length, title: t('slideshow.startTitle') }, h('span', { html: icon('play', 13) }), t('slideshow.button')),
         h('button.btn.btn-secondary.btn-sm', { onclick: open, disabled: !list.length }, t('albums.open')),
+        todoPin(this.services, a, 'row'),
         h('button.icon-button', { title: t('albums.edit'), html: icon('rename', 15), onclick: () => this.#edit(a) }),
         h('button.icon-button.alb-cover-pick', { title: t('albums.cover.menu'), html: icon('image', 15), disabled: !list.length, onclick: () => chooseCover(this.services, a, list) }),
         h('button.icon-button.alb-merge', { title: t('albums.merge.button'), html: icon('merge', 15), onclick: () => mergeAlbums(this.services, a) }),

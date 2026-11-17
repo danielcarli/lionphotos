@@ -11,7 +11,7 @@ Arbeitet direkt mit Ihren Ordnern: kleine, einmal erstellte Vorschaubilder, die 
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · **Deutsch** · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Version 1.51.1](https://img.shields.io/badge/version-1.51.1-161214)
+![Version 1.52.0](https://img.shields.io/badge/version-1.52.0-161214)
 ![Status: Betatest](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Lizenz: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plattformen: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -120,10 +120,11 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Beschreibung und Metadaten** | Überschrift, Bildunterschrift, Bildbeschreibung, Urheber und Funktion, Ort (Ortsdetail, Stadt, Bundesland, Land), Stichwörter und Anweisungen, für ein Foto oder mehrere zugleich – nur der Katalog ändert sich. Was die Datei schon enthält (EXIF, IPTC, XMP, die `.xmp` einer RAW-Datei), erscheint als Hinweis und wird beim Export genutzt. *In die Dateien schreiben* (mit dem eingetippten Code) schreibt es ins JPEG selbst – die vorige Fassung geht in den Papierkorb – oder in eine `.xmp` neben jeder anderen Datei. Das JPEG bekommt zusätzlich dieselbe `.xmp` daneben: Die Daten reisen beim Versenden mit dem Foto und bleiben daneben lesbar. Jede Änderung lässt sich rückgängig machen (Strg+Z) und wiederholen (Strg+Umschalt+Z); das Schreiben in die Dateien wird über die Meldung oder die letzten Vorgänge rückgängig gemacht, Byte für Byte. |
 | **Alben** | Titelbild, Beschreibung und Zeitraum; *Zu Album hinzufügen…* für jede Auswahl, *Aus Album entfernen*, *Als Titelbild verwenden*; **Alben aus den Ordnern** (die erste Ebene, die Ordner mit Fotos oder eine eigene Auswahl), mit dem ganzen Ordner verbunden; Diashow im Vollbild. **Alben vorschlagen**: die Fotos so gruppiert, wie sie aufgenommen wurden, und nach ihrem Inhalt benannt — der Ordner, was die Fotos zeigen (auf diesem Computer aus den Miniaturen gelesen: Strand, Berge, Torte, Brautkleid, Essen…), Feiertage nach Datum, der Ort, die Person — dazu Alben eines Themas über die Jahre, zum Prüfen vor dem Erstellen. **Zwei Alben zusammenführen** (die Fotos beider, unter dem gewählten Namen; nur der Katalog ändert sich, rückgängig machbar). Als Mosaik, gleichmäßiges Raster (alle Titelbilder gleich groß), Liste oder Auswahl. |
 | **Projekte, Personen, Haustiere, Orte** | Jeweils im eigenen Tab, als Raster oder als Liste nach Jahren. Beim Öffnen erscheinen die Fotos unter dem eigenen Tab; ein Foto lässt sich mit einem Klick herausnehmen. Das Etikett eines Ordners gilt für alles darin. Ein Projekt fasst Alben zusammen und hat ein Datenblatt (Status, für wen, Ort, Team, Termin) und eine Übersicht zum Stand: sortiert, bearbeitet, in Alben ausgewählt, Audiodeskriptionen. Orte füllen sich aus den Fotos selbst (GPS-Position oder eingetragener Ort) und erscheinen auf einer **Weltkarte**, die auf dem Computer gezeichnet wird. |
+| **Zu bearbeiten** | Der Stift auf dem Cover eines Albums oder Projekts setzt es in den Tab **Zu bearbeiten** (Strg+Umschalt+E), eine Liste in der Reihenfolge, in der die Dinge zu erledigen sind: Zeilen ziehen oder die Pfeile bzw. Alt+↑ ↓ nutzen, um nach vorn zu stellen, was zuerst kommt. Der Platz in der Liste steht auf dem Cover, ein Projekt zeigt sein Fälligkeitsdatum (rot, wenn überfällig), und *Erledigt* nimmt den Stift weg. Nur der Katalog ändert sich, und die Liste reist mit der Sammlung. |
 | **Gesichter und Haustiere** | face-api (TensorFlow.js) für Gesichter, COCO-SSD und MobileNet für Tiere, auf der Grafikkarte (WebGL). Gruppen ähnlicher Gesichter, Vorschläge zum Bestätigen oder Ablehnen, „nicht diese Person“ wird gemerkt. Standardmäßig aus; *Jetzt indizieren* oder nach jedem Scan. |
 | **Markierungen und Limbus** | Sehr gut, OK, zum Löschen vorgemerkt – am Vorschaubild, in der Liste, im Betrachter und im Infobereich; Tasten `1` `2` `3` `0`. Der Limbus zeigt alle Vorgemerkten und ihren Platzbedarf und schickt sie in einem Schritt in den Papierkorb. **Auswahl**: Alben, Personen, Haustiere und Projekte nur mit ihren mit Stern oder OK markierten Fotos, eines pro Zeile – der Name groß, ein ausgewähltes Foto groß – wie eine Portfolioseite. Auch Orte; und in jedem davon die ausgewählten Fotos groß, eines pro Zeile. |
 | **Öffnen mit** | Die Foto- und Videoprogramme des Computers für die ausgewählten Dateien (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), zuletzt verwendete zuerst; unter Windows auch alle für den Dateityp registrierten Programme. |
-| **Erweiterungen** | `.lionplugin`-Pakete installieren, die Alben und Projekte als Seite exportieren (HTML, CSS und JavaScript), mit Dateinamen, Beschreibungen und Audiodeskriptionen; in LionPhotos wird davon nichts ausgeführt. Siehe [PLUGINS.md](PLUGINS.md) (Englisch). Jede eingeschaltete Erweiterung hat ihren eigenen Tab nach Projekte, mit ihrer Seite: Alben und Projekte wählen und exportieren. |
+| **Erweiterungen** | `.lionplugin`-Pakete installieren, die Alben und Projekte als Seite exportieren (HTML, CSS und JavaScript), mit Dateinamen, Beschreibungen und Audiodeskriptionen; in LionPhotos wird davon nichts ausgeführt. Siehe [PLUGINS.md](PLUGINS.md) (Englisch). Jede eingeschaltete Erweiterung hat ihren eigenen Tab nach Zu bearbeiten, mit ihrer Seite: Alben und Projekte wählen und exportieren. |
 | **Übersicht** | Elemente, Fotos, Videos, Größe und Zeitraum; Dateien nach Art, nach Jahr, Formate, Kameras, Codecs; der Vorschaubild-Cache. |
 | **Ordnen** | Datumsordner (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` oder `2024-07-14-thema`), Ordner nach Album (`2024/2024-07-14-album`), auf Wunsch mit `Raw/` und `Img/` darin; *In Ordner verschieben* mit Unterordnern nach Art; die Dateien derselben Aufnahme gehen mit; letzte Vorgänge mit Rückgängig. Die Dateien werden wirklich auf dem Datenträger verschoben und können auch **umbenannt** werden (`{data}-{álbum}-{fotógrafo}-{nº}` als Standard, nach Datum nummeriert; RAW, JPEG und `.xmp` einer Aufnahme behalten denselben Namen), oder nur an Ort und Stelle umbenannt. **Sammlung neu ordnen** liest die Ordner, wie sie sind, und schlägt eine einheitliche Struktur auf dem Datenträger vor — `2025/2025-12-24-Weihnachten`, lange Themen in `Themen/`, Unsortiertes in `_Eingang/`, Kameratests in `_Ausruestung/` — zur Prüfung (jeden Ordner umbenennen oder auslassen, den Baum danach sehen), bevor ganze Ordner verschoben werden, mit Rückgängig. **Zurückgelassene Begleitdateien** (eine `.xmp` oder `.dop`, die allein blieb, nachdem ihr Foto verschoben wurde) kommen wieder neben ihr Foto, mit dessen Namen. **Duplizieren** (Strg+D): eine Kopie neben dem Foto, mit Anpassungen, Zuschnitt, Markierungen und Alben, mit eingetipptem Code und rückgängig machbar. |
 | **Doppelte Dateien** | SHA-256 in drei Stufen (Größe → erste/letzte 64 KB → ganze Datei), nebeneinander mit ihren Vorschaubildern. |
@@ -184,6 +185,7 @@ Doppelklick auf **`build-installer.bat`** (oder `npm run dist`). Die Installatio
 | `F5` | Nach neuen und geänderten Dateien suchen |
 | `Strg+K` · `Strg+F` | Die ganze Sammlung durchsuchen (Titelleiste) |
 | `Strg+1` · `Strg+Umschalt+A` | Fotos · Alben |
+| `Strg+Umschalt+E` | Zu bearbeiten |
 | `Strg+6` … `Strg+9` | Projekte · Personen · Haustiere · Orte |
 | `Strg+L` | Limbus |
 | `Strg+2` · `Strg+3` · `Strg+4` · `Strg+0` | Übersicht · Doppelte Dateien · Ordnen · Sicherung |
@@ -237,7 +239,7 @@ Dieselben Schichten wie bei [LionOrganizer](https://github.com/danielcarli/liono
 src/
   base/            Ereignisse, Formatierung, i18n, DOM-Hilfen, Symbole, Diagramme
   platform/
-    library/       SQLite-Katalog, Ordner-Scan, Metadaten-Leser (EXIF, PNG, MP4/MOV, Matroska)
+    library/       SQLite-Katalog, Ordner-Scan, Metadaten-Leser (EXIF: JPEG, raw, HEIC, AVIF; PNG, MP4/MOV, Matroska)
     thumbs/        Engine für Vorschaubilder und -videos + die versteckte Seite (Worker, WebM-Muxer)
     media/         lionthumb:// und lionmedia:// (per Bibliotheks-ID, mit Byte-Bereichen)
     faces/         Gesichts- und Tiererkennung (versteckte Seite auf der Grafikkarte, Wer-ist-wer im Hauptprozess)
@@ -273,7 +275,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\fotos-kopie"; npm run test:e2e
 
 ## Änderungsprotokoll
 
-Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.51.1**.
+Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.52.0**.
 
 ## Mitwirkende
 

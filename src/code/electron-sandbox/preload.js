@@ -104,6 +104,8 @@ contextBridge.exposeInMainWorld('host', {
     merge: (sourceId, targetId, name) => ipcRenderer.invoke('labels:merge', sourceId, targetId, name),
     unmerge: (undo) => ipcRenderer.invoke('labels:unmerge', undo),
     cover: (labelId, itemId) => ipcRenderer.invoke('labels:cover', labelId, itemId),
+    todo: (labelId, on) => ipcRenderer.invoke('labels:todo', labelId, on),
+    todoOrder: (ids) => ipcRenderer.invoke('labels:todoOrder', ids),
   },
 
   // recognition of people's faces and of pets (on this computer only)

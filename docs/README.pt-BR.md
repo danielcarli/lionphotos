@@ -11,7 +11,7 @@ Trabalha com as suas pastas como elas são: miniaturas pequenas feitas uma vez, 
 
 [English](../README.md) · **Português (Brasil)** · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versão 1.51.1](https://img.shields.io/badge/version-1.51.1-161214)
+![Versão 1.52.0](https://img.shields.io/badge/version-1.52.0-161214)
 ![Status: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -120,10 +120,11 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Descrição e metadados** | Título, descrição, audiodescrição, autor e cargo, local (sublocal, cidade, estado, país), palavras-chave e instruções, para uma foto ou várias de uma vez — só o catálogo muda. O que o arquivo já diz (EXIF, IPTC, XMP, o `.xmp` de um RAW) aparece como dica e é usado nas exportações. *Gravar nos arquivos* (com o código digitado) grava dentro do próprio JPEG, com a versão anterior indo para a Lixeira, ou num `.xmp` ao lado dos outros arquivos. O JPEG também ganha o mesmo `.xmp` ao lado: os dados seguem com a foto quando ela é enviada e ficam legíveis ao lado dela. Toda alteração pode ser desfeita (Ctrl+Z) e refeita (Ctrl+Shift+Z); a gravação nos arquivos se desfaz pelo aviso ou pelas operações recentes, e os arquivos voltam byte a byte. |
 | **Álbuns** | Capa, descrição e período; *Adicionar a álbum…* em qualquer seleção, *Tirar do álbum*, *Usar como capa*; **álbuns a partir das pastas** (o primeiro nível, as pastas com fotos ou as que você escolher), ligados à pasta inteira; apresentação em tela cheia. **Sugerir álbuns**: as fotos agrupadas como foram tiradas e nomeadas pelo que são — a pasta, o que as fotos mostram (lido neste computador a partir das miniaturas: praia, montanha, bolo, vestido de noiva, comida…), feriados pela data, o lugar, a pessoa — e álbuns de um assunto ao longo dos anos, para revisar antes de criar. **Juntar dois álbuns** em um (as fotos dos dois, com o nome que escolher; só o catálogo muda, e dá para desfazer). Exibidos em mosaico, grade uniforme (todas as capas do mesmo tamanho), lista ou destaques. |
 | **Projetos, pessoas, pets, lugares** | Cada um na sua aba, em grade ou lista agrupada por ano. Abrir um mostra as fotos dele, na aba dele; uma foto pode ser tirada dele com um clique. O marcador de uma pasta vale para tudo dentro dela. Um projeto agrupa álbuns e tem uma ficha (situação, para quem, lugar, equipe, prazo) e um painel com o andamento: triadas, editadas, escolhidas nos álbuns, audiodescrições. Os lugares se preenchem sozinhos a partir das fotos (a posição do GPS ou o lugar escrito nelas) e aparecem num **mapa-múndi**, desenhado no próprio computador. |
+| **Por editar** | O lápis na capa de um álbum ou projeto o coloca na aba **Por editar** (Ctrl+Shift+E), uma lista na ordem em que as coisas devem ser feitas: arraste as linhas, ou use as setas ou Alt+↑ ↓, para deixar primeiro o que vem primeiro. A posição na lista aparece na capa, um projeto mostra a data de entrega (em vermelho quando atrasado) e *Pronto* tira o lápis. Só o catálogo muda, e a lista vai junto com a coleção. |
 | **Rostos e pets** | face-api (TensorFlow.js) para rostos, COCO-SSD e MobileNet para animais, na placa de vídeo (WebGL). Grupos de rostos parecidos, sugestões que você confirma ou recusa, "não é" lembrado. Desligado por padrão; *Indexar agora* ou depois de cada varredura. |
 | **Marcações e Limbo** | Ótima, OK, candidata a apagar — na miniatura, na lista, no visualizador e no painel de informações; teclas `1` `2` `3` `0`. O Limbo mostra todas as candidatas e quanto espaço ocupam, e as manda para a Lixeira de uma vez. **Destaques**: álbuns, pessoas, pets e projetos só com as fotos marcadas com estrela ou OK, um por linha — o nome grande, uma foto escolhida em destaque — como uma página de portfólio. Lugares também; e dentro de cada um, as fotos escolhidas em tamanho grande, uma por linha. |
 | **Abrir com** | Os programas de fotos e vídeos do computador para os arquivos selecionados (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), os usados por último primeiro; no Windows, também todo programa registrado para o tipo de arquivo. |
-| **Plugins** | Instale pacotes `.lionplugin` que exportam álbuns e projetos como uma página (HTML, CSS e JavaScript), com os nomes dos arquivos, as descrições e as audiodescrições; nada deles roda dentro do LionPhotos. Veja [PLUGINS.md](PLUGINS.md) (em inglês). Cada plugin ligado ganha uma aba depois de Projetos, com a página dele: escolha os álbuns e projetos e exporte. |
+| **Plugins** | Instale pacotes `.lionplugin` que exportam álbuns e projetos como uma página (HTML, CSS e JavaScript), com os nomes dos arquivos, as descrições e as audiodescrições; nada deles roda dentro do LionPhotos. Veja [PLUGINS.md](PLUGINS.md) (em inglês). Cada plugin ligado ganha uma aba depois de Por editar, com a página dele: escolha os álbuns e projetos e exporte. |
 | **Visão geral** | Itens, fotos, vídeos, tamanho e período; arquivos por tipo, por ano, formatos, câmeras, codecs; o cache de miniaturas. |
 | **Organizar** | Pastas por data (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` ou `2024-07-14-tema`), pastas por álbum (`2024/2024-07-14-álbum`), com `Raw/` e `Img/` dentro se quiser; *Mover para pasta* com subpastas por tipo; os arquivos do mesmo clique vão junto; operações recentes com desfazer. Os arquivos mudam de lugar de verdade no disco e também podem ser **renomeados** (`{data}-{álbum}-{fotógrafo}-{nº}` por padrão, numerados pela data; o RAW, o JPEG e o `.xmp` da mesma foto ficam com o mesmo nome), ou só renomeados onde estão. **Reorganizar a coleção** lê as pastas como estão e propõe uma estrutura única no disco — `2025/2025-12-24-Natal`, temas longos em `Temas/`, o que espera triagem em `_Entrada/`, testes de câmera em `_Equipamento/` — para revisar (renomear ou deixar de fora qualquer pasta, ver a árvore como vai ficar) antes de as pastas inteiras mudarem de lugar, com desfazer. **Arquivos relacionados soltos** (um `.xmp` ou `.dop` que ficou sozinho depois que a foto mudou de lugar) voltam para junto da foto, com o nome dela. **Duplicar** (Ctrl+D): uma cópia ao lado da foto, com os ajustes, o recorte, as marcações e os álbuns, com código digitado e desfazer. |
 | **Arquivos repetidos** | SHA-256 em três etapas (tamanho → primeiros/últimos 64 KB → arquivo inteiro), lado a lado com as miniaturas. |
@@ -184,6 +185,7 @@ Dê dois cliques em **`build-installer.bat`** (ou rode `npm run dist`). Os insta
 | `F5` | Procurar arquivos novos e alterados |
 | `Ctrl+K` · `Ctrl+F` | Buscar em toda a coleção (barra do título) |
 | `Ctrl+1` · `Ctrl+Shift+A` | Fotos · Álbuns |
+| `Ctrl+Shift+E` | Por editar |
 | `Ctrl+6` … `Ctrl+9` | Projetos · Pessoas · Pets · Lugares |
 | `Ctrl+L` | Limbo |
 | `Ctrl+2` · `Ctrl+3` · `Ctrl+4` · `Ctrl+0` | Visão geral · Arquivos repetidos · Organizar · Backup |
@@ -237,7 +239,7 @@ As mesmas camadas do [LionOrganizer](https://github.com/danielcarli/lionorganize
 src/
   base/            eventos, formatação, i18n, utilitários de DOM, ícones, gráficos
   platform/
-    library/       catálogo SQLite, varredura de pastas, leitores de metadados (EXIF, PNG, MP4/MOV, Matroska)
+    library/       catálogo SQLite, varredura de pastas, leitores de metadados (EXIF: JPEG, raw, HEIC, AVIF; PNG, MP4/MOV, Matroska)
     thumbs/        motor de miniaturas e prévias + a página oculta (workers, muxer WebM)
     media/         lionthumb:// e lionmedia:// (por id da biblioteca, com intervalos de bytes)
     faces/         reconhecimento de rostos e pets (página oculta na placa de vídeo, quem-é-quem no principal)
@@ -273,7 +275,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.51.1**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.52.0**.
 
 ## Créditos
 

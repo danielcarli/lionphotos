@@ -27,7 +27,22 @@ function loadSettings() {
   try { return { ...d, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; } catch { return d; }
 }
 
-export const dateOf = (it) => it.taken || it.mtime;
+/**
+ * When a photo was taken: its date as the camera wrote it; else the file's date — unless that is 1 January
+ * 1980, the "no date" of ZIP files and FAT drives (photos downloaded zipped from Google Drive, copied off a
+ * memory card…): then the date in its name or folder ("2021-11-14 - Planetário", "IMG_20211114_…"), if any.
+ */
+export const dateOf = (it) => it.taken || (it.mtime > DOS_NO_DATE ? it.mtime : (it.pathDate ??= dateInPath(it) || it.mtime));
+const DOS_NO_DATE = Date.UTC(1980, 0, 3);
+const DATE_IN_NAME = /(?:^|[^\d])((?:19[89]|20[0-9])\d)[-_. ]?(0[1-9]|1[0-2])[-_. ]?(0[1-9]|[12]\d|3[01])(?!\d)/g;
+function dateInPath(it) {
+  // the name first, then the folders from the nearest one up
+  for (const part of [it.name || '', ...String(it.folder || '').split(/[\\/]/).reverse()]) {
+    const m = part.matchAll(DATE_IN_NAME).next().value;
+    if (m) { const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 12); if (d.getMonth() === Number(m[2]) - 1) return d.getTime(); }
+  }
+  return 0;
+}
 /** The day of a photo, as the computer's clock has it: '2026-07-11' (the "all the photos of the day" filter). */
 export const dayOf = (it) => { const d = new Date(dateOf(it)); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 

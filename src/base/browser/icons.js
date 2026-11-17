@@ -113,6 +113,11 @@ const paths = {
   history: '<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3L4.5 9"/><path d="M4.5 4.5V9H9"/><path d="M12 8v4.5l3 1.8"/>',
   hash: '<path d="M9.5 4l-2 16M16.5 4l-2 16M4.5 9h15M3.5 15h15"/>',
   globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.4 5.2 3.4 8.5s-1.1 6.1-3.4 8.5c-2.3-2.4-3.4-5.2-3.4-8.5s1.1-6.1 3.4-8.5z"/>',
+  // "To edit": a pencil, drawn alone (rename has lines of text beside it)
+  pencil: '<path d="M15.2 4.8a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/><path d="M13.5 6.5l3 3"/>',
+  pencilFilled: '<path d="M15.2 4.8a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z" fill="currentColor"/><path d="M13.5 6.5l3 3" style="stroke: var(--pin-cut, #fff)"/>',
+  grip: '<circle cx="9" cy="6.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="6.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="17.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="17.5" r="1.2" fill="currentColor" stroke="none"/>',
+  toTop: '<path d="M5 4.5h14"/><path d="M12 20V9M7 13.5l5-5 5 5"/>',
   disk: '<rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 14h17M17 16.5h.01"/>',
 };
 

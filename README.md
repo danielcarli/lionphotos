@@ -11,7 +11,7 @@ Works on your folders as they are: small thumbnails made once, the metadata that
 
 **English** · [Português (Brasil)](docs/README.pt-BR.md) · [Português (Portugal)](docs/README.pt-PT.md) · [Español](docs/README.es.md) · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Italiano](docs/README.it.md) · [简体中文](docs/README.zh-CN.md) · [日本語](docs/README.ja.md) · [한국어](docs/README.ko.md)
 
-![Version 1.51.1](https://img.shields.io/badge/version-1.51.1-161214)
+![Version 1.52.0](https://img.shields.io/badge/version-1.52.0-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -120,10 +120,11 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Description and metadata** | Headline, caption, audio description, author and role, place (sublocation, city, state, country), keywords and instructions, for one photo or many at once — only the catalog changes. What the file already says (EXIF, IPTC, XMP, a raw file's `.xmp`) shows as the hint and is used by exports. *Write to the files* (with the typed code) puts it into the JPEG itself, the previous version going to the Recycle Bin, or into a `.xmp` next to any other file. The JPEG also gets the same `.xmp` next to it, so the data goes with the photo when it is sent and stays readable beside it. Every change can be undone (Ctrl+Z) and redone (Ctrl+Shift+Z); writing to the files is undone from the notice or the recent operations, and the files go back byte for byte. |
 | **Albums** | Cover, description and period; *Add to album…* on any selection, *Remove from album*, *Use as cover*; **albums from the folders** (the first level, the folders with photos, or the ones you pick), tied to the whole folder; full-screen slideshow. **Suggest albums**: the photos grouped as they were taken and named by what they are about — the folder, what the photos show (read on this computer from the thumbnails: beach, mountains, a cake, a wedding gown, food…), holidays by their date, the place, the person — plus albums of a subject across the years, for review before they are made. **Merge two albums** into one (the photos of both, under the name you choose; only the catalog changes, with undo). Shown as a mosaic, an even grid (every cover the same size), a list or highlights. |
 | **Projects, people, pets, places** | Each in its own tab, as a grid or a list grouped by year. Opening one shows its photos, under its tab; a photo can be taken out of it with one click. A folder's label covers everything inside it. A project groups albums and has a sheet (status, for whom, place, team, due date) and a panel showing where the work stands: sorted, edited, chosen into albums, audio descriptions. Places fill in by themselves from the photos (the GPS position or the place written in them) and are shown on a **world map**, drawn on this computer. |
+| **To edit** | The pencil on the cover of an album or a project puts it in the **To edit** tab (Ctrl+Shift+E), a list in the order things are to be done: drag the rows, or use the arrows or Alt+↑ ↓, to put first what comes first. Its place in the list shows on the cover, a project shows its due date (in red when late), and *Done* takes the pencil off. Only the catalog changes, and the list goes with the collection. |
 | **Faces and pets** | face-api (TensorFlow.js) for faces, COCO-SSD and MobileNet for animals, on the graphics card (WebGL). Groups of similar faces, suggestions you confirm or reject, "not them" remembered. Off by default; *Index now* or after each scan. |
 | **Marks and Limbo** | Great, OK, candidate to delete — on the tile, the list, the viewer and the info panel; keys `1` `2` `3` `0`. The Limbo shows every candidate and how much space they take, and sends them to the Recycle Bin in one step. **Highlights**: albums, people, pets and projects with only their great and OK photos, one row each — the name large, one chosen photo big — like a portfolio page. Places too; and inside any of them, its chosen photos large, one per row. |
 | **Open with** | The photo and video programs of the computer for the selected files (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), the last ones used first; on Windows also every program registered for the file type. |
-| **Plugins** | Install `.lionplugin` packages that export albums and projects as a page (HTML, CSS and JavaScript) with the file names, descriptions and audio descriptions; nothing in them runs inside LionPhotos. See [docs/PLUGINS.md](docs/PLUGINS.md). Each plugin turned on has its own tab after Projects, with its page: pick the albums and projects and export. |
+| **Plugins** | Install `.lionplugin` packages that export albums and projects as a page (HTML, CSS and JavaScript) with the file names, descriptions and audio descriptions; nothing in them runs inside LionPhotos. See [docs/PLUGINS.md](docs/PLUGINS.md). Each plugin turned on has its own tab after To edit, with its page: pick the albums and projects and export. |
 | **Overview** | Items, photos, videos, size and period; files by kind, by year, formats, cameras, codecs; the thumbnail cache. |
 | **Organize** | Date folders (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14`, or `2024-07-14-theme`), folders by album (`2024/2024-07-14-album`), optionally with `Raw/` and `Img/` inside; *Move to folder* with subfolders by kind; the files of the same shot go along; recent operations with undo. The files really move on the disk, and can also be **renamed** (`{data}-{álbum}-{fotógrafo}-{nº}` by default, numbered by date; the raw, JPEG and `.xmp` of a shot keep the same name), or only renamed where they are. **Reorganize the collection** reads the folders as they are and proposes one structure on the disk — `2025/2025-12-24-Natal`, long themes in `Themes/`, what waits to be sorted in `_Inbox/`, camera tests in `_Gear/` — for review (rename or leave out any folder, see the tree as it will be) before whole folders move, with undo. **Related files left behind** (an `.xmp` or `.dop` alone after its photo moved) go back next to their photo, with its name. **Duplicate** (Ctrl+D): a copy next to the photo with its adjustments, crop, marks and albums, with the typed code and undo. |
 | **Repeated files** | SHA-256 in three stages (size → first/last 64 KB → whole file), side by side with their thumbnails. |
@@ -184,6 +185,7 @@ Double-click **`build-installer.bat`** (or run `npm run dist`). The installers a
 | `F5` | Look for new and changed files |
 | `Ctrl+K` · `Ctrl+F` | Search the whole collection (title bar) |
 | `Ctrl+1` · `Ctrl+Shift+A` | Photos · Albums |
+| `Ctrl+Shift+E` | To edit |
 | `Ctrl+6` … `Ctrl+9` | Projects · People · Pets · Places |
 | `Ctrl+L` | Limbo |
 | `Ctrl+2` · `Ctrl+3` · `Ctrl+4` · `Ctrl+0` | Overview · Repeated files · Organize · Backup |
@@ -237,7 +239,7 @@ Same layering as [LionOrganizer](https://github.com/danielcarli/lionorganizer) a
 src/
   base/            events, formatting, i18n, DOM helpers, icons, charts
   platform/
-    library/       SQLite catalog, folder scanner, metadata readers (EXIF, PNG, MP4/MOV, Matroska)
+    library/       SQLite catalog, folder scanner, metadata readers (EXIF of JPEG, raw, HEIC, AVIF; PNG, MP4/MOV, Matroska)
     thumbs/        thumbnail and preview engine + the hidden page (workers, WebM muxer)
     media/         lionthumb:// and lionmedia:// (by library id, with byte ranges)
     faces/         face and pet recognition (hidden page on the graphics card, who-is-who in main)
@@ -273,7 +275,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.51.1**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.52.0**.
 
 ## Credits
 

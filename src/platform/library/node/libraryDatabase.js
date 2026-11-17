@@ -254,13 +254,16 @@ class LibraryDatabase {
     }
     // the collection a label was made in (its folder): an empty album belongs to it, not to every collection
     if (!this.db.prepare('PRAGMA table_info(labels)').all().some((c) => c.name === 'root')) this.db.exec('ALTER TABLE labels ADD COLUMN root TEXT');
+    // "To edit" (1.52.0): albums and projects marked with the pencil, in the order they are to be done (1 first)
+    if (!this.db.prepare('PRAGMA table_info(labels)').all().some((c) => c.name === 'todo')) this.db.exec('ALTER TABLE labels ADD COLUMN todo INTEGER');
     const dirty = (key) => `INSERT INTO meta(key, value) VALUES ('${key}', CAST(strftime('%s', 'now') AS INTEGER) * 1000) ON CONFLICT(key) DO UPDATE SET value = excluded.value;`;
     this.db.exec(`
       CREATE UNIQUE INDEX IF NOT EXISTS labels_uid ON labels(uid);
       CREATE TRIGGER IF NOT EXISTS labels_uid_new AFTER INSERT ON labels WHEN NEW.uid IS NULL
         BEGIN UPDATE labels SET uid = CASE WHEN NEW.type = 'sphere' THEN 'sphere:' || NEW.name ELSE lower(hex(randomblob(8))) END WHERE id = NEW.id; END;
       CREATE TRIGGER IF NOT EXISTS portable_labels_i AFTER INSERT ON labels BEGIN ${dirty('portable.dirty')} END;
-      CREATE TRIGGER IF NOT EXISTS portable_labels_u AFTER UPDATE OF type, name, parent_id, notes, info, cover ON labels BEGIN ${dirty('portable.dirty')} END;
+      DROP TRIGGER IF EXISTS portable_labels_u;
+      CREATE TRIGGER portable_labels_u AFTER UPDATE OF type, name, parent_id, notes, info, cover, todo ON labels BEGIN ${dirty('portable.dirty')} END;
       CREATE TRIGGER IF NOT EXISTS portable_labels_d AFTER DELETE ON labels BEGIN ${dirty('portable.dirty')} END;
       CREATE TRIGGER IF NOT EXISTS portable_links_i AFTER INSERT ON label_links BEGIN ${dirty('portable.dirty')} END;
       CREATE TRIGGER IF NOT EXISTS portable_links_u AFTER UPDATE ON label_links BEGIN ${dirty('portable.dirty')} END;
@@ -458,10 +461,13 @@ class LibraryDatabase {
       m.width ?? null, m.height ?? null, m.duration ?? null, m.takenAt ?? null, id);
   }
 
-  /** Photos whose metadata was read before the current reader (no XMP/IPTC yet): a few at a time. */
+  /**
+   * Photos whose metadata was read before the current reader, a few at a time: those read before version 3
+   * (no XMP/IPTC yet), and the HEIF/AVIF ones read before version 4 (no EXIF yet) — not every photo again.
+   */
   staleMeta(rootId, version, limit = 40) {
     return this.db.prepare(`SELECT id, path, ext, kind, size FROM media WHERE root_id = ? AND kind = 1 AND (${THUMB_VALID} OR ${THUMB_FAILED})
-      AND (meta IS NULL OR coalesce(json_extract(meta, '$.v'), 0) < ?) LIMIT ?`).all(rootId, version, limit);
+      AND (meta IS NULL OR coalesce(json_extract(meta, '$.v'), 0) < (CASE WHEN lower(ext) IN ('heic', 'heif', 'hif', 'avif') THEN ? ELSE 3 END)) LIMIT ?`).all(rootId, version, limit);
   }
 
   /**
@@ -867,7 +873,26 @@ class LibraryDatabase {
 
   // ------------------------------------------------------------------ labels (clients, projects, people, pets, places, albums)
   labels() {
-    return this.db.prepare('SELECT id, type, name, parent_id AS parentId, notes, created_at AS createdAt, cover, info, root FROM labels ORDER BY name COLLATE NOCASE').all();
+    return this.db.prepare('SELECT id, type, name, parent_id AS parentId, notes, created_at AS createdAt, cover, info, root, todo FROM labels ORDER BY name COLLATE NOCASE').all();
+  }
+
+  /** Marks a label "to edit" (at the end of the list) or takes the mark off. */
+  setLabelTodo(id, on) {
+    if (on) this.db.prepare('UPDATE labels SET todo = (SELECT coalesce(max(todo), 0) + 1 FROM labels) WHERE id = ? AND todo IS NULL').run(id);
+    else this.db.prepare('UPDATE labels SET todo = NULL WHERE id = ?').run(id);
+  }
+
+  /** The "to edit" list in a new order: ids, the first to be done first (only those marked change). */
+  orderLabelTodo(ids) {
+    const set = this.db.prepare('UPDATE labels SET todo = ? WHERE id = ? AND todo IS NOT NULL AND todo != ?');
+    this.db.exec('BEGIN');
+    try {
+      ids.forEach((id, i) => set.run(i + 1, id, i + 1));
+      this.db.exec('COMMIT');
+    } catch (err) {
+      this.db.exec('ROLLBACK');
+      throw err;
+    }
   }
 
   /** An album's cover: a file's absolute path, or null for "the first photo". */
@@ -927,8 +952,8 @@ class LibraryDatabase {
       for (const p of T.out) if (has(S, p)) { del.run(targetId, 'exclude', p); removedOut.push(p); }
       // left out of the source (its folder came along), and not in the target: still out
       for (const p of S.out) if (!has(T, p) && !T.out.has(p) && ins.run(targetId, 'exclude', p).changes) added.push({ kind: 'exclude', path: p });
-      this.db.prepare('UPDATE labels SET name = ?, notes = ?, cover = ?, parent_id = ? WHERE id = ?').run(
-        name || target.name, target.notes || source.notes || null, target.cover || source.cover || null, target.parent_id ?? source.parent_id ?? null, targetId);
+      this.db.prepare('UPDATE labels SET name = ?, notes = ?, cover = ?, parent_id = ?, todo = ? WHERE id = ?').run(
+        name || target.name, target.notes || source.notes || null, target.cover || source.cover || null, target.parent_id ?? source.parent_id ?? null, target.todo ?? source.todo ?? null, targetId);
       this.db.prepare('DELETE FROM labels WHERE id = ?').run(sourceId);
       this.db.exec('COMMIT');
     } catch (err) {
@@ -953,7 +978,7 @@ class LibraryDatabase {
       for (const l of u.source.links) ins.run(id, l.kind, l.path);
       for (const l of u.target.added) del.run(tgt.id, l.kind, l.path);
       for (const p of u.target.removedOut) ins.run(tgt.id, 'exclude', p);
-      this.db.prepare('UPDATE labels SET name = ?, notes = ?, cover = ?, parent_id = ? WHERE id = ?').run(tgt.name, tgt.notes ?? null, tgt.cover ?? null, tgt.parent_id ?? null, tgt.id);
+      this.db.prepare('UPDATE labels SET name = ?, notes = ?, cover = ?, parent_id = ?, todo = ? WHERE id = ?').run(tgt.name, tgt.notes ?? null, tgt.cover ?? null, tgt.parent_id ?? null, tgt.todo ?? null, tgt.id);
       this.db.exec('COMMIT');
       return id;
     } catch (err) {

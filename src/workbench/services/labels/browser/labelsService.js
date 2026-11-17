@@ -417,6 +417,37 @@ export class LabelsService {
 
   async setCover(labelId, itemId) { this.#set(await this.host.labels.cover(labelId, itemId)); }
 
+  // ---- "To edit": albums and projects marked with the pencil, in the order they are to be done
+  #todo = null;
+
+  /** The albums and projects to edit (those the title bar's category shows), the first to be done first. */
+  toEdit() {
+    const key = this.library.filter.sphere || '';
+    if (this.#todo?.labels !== this.labels || this.#todo.key !== key || this.#todo.items !== this.library.allItems) {
+      const list = this.labels.filter((l) => l.todo != null && !l.auto && (l.type === 'album' || l.type === 'project') && this.visible(l)).sort((a, b) => a.todo - b.todo);
+      this.#todo = { labels: this.labels, key, items: this.library.allItems, list, rank: new Map(list.map((l, i) => [l.id, i + 1])) };
+    }
+    return this.#todo.list;
+  }
+
+  /** Its place in the list to edit (1 = first), or 0 when it has no pencil. */
+  todoRank(l) { return l?.todo == null ? 0 : (this.toEdit(), this.#todo.rank.get(l.id) || 0); }
+
+  /** The pencil on (at the end of the list) or off. */
+  async setTodo(labelId, on) { this.#set(await this.host.labels.todo(labelId, on)); }
+
+  /**
+   * The list in a new order. `ids` are those shown; the ones another category hides keep their places
+   * among them.
+   */
+  async orderTodo(ids) {
+    const all = this.labels.filter((l) => l.todo != null && (l.type === 'album' || l.type === 'project')).sort((a, b) => a.todo - b.todo).map((l) => l.id);
+    const shown = new Set(ids);
+    const next = [...ids];
+    const full = all.map((id) => (shown.has(id) ? next.shift() : id));
+    this.#set(await this.host.labels.todoOrder(full));
+  }
+
   /** Folders (relative) linked directly to a label. */
   foldersOf(id) {
     return [...this.#folderLinks].filter(([, ids]) => ids.includes(id)).map(([rel]) => rel);

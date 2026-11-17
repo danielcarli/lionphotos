@@ -35,6 +35,8 @@ A.db.saveLabel({ id: album, type: 'album', name: 'Viagem a Roma', parentId: proj
 A.db.linkLabels({ kind: 'folder', paths: [path.join(A.root, 'Viagem')], add: [album] });
 A.db.linkLabels({ kind: 'exclude', paths: [path.join(A.root, 'Viagem', 'IMG_2.jpg')], add: [album] });
 A.db.setLabelCover(album, path.join(A.root, 'Viagem', 'IMG_1.jpg'));
+// To edit: the project first, then the album; reordered: the album first
+A.db.setLabelTodo(project, true); A.db.setLabelTodo(album, true); A.db.orderLabelTodo([album, project]);
 const ana = A.db.saveLabel({ type: 'person', name: 'Ana' });
 A.db.linkLabels({ kind: 'face', paths: [path.join(A.root, 'Casa', 'IMG_4.jpg')], add: [ana] });
 A.db.db.prepare("UPDATE media SET mark = 1, caption = 'Coliseu', meta_edit = ?, adjust = ? WHERE id = ?").run(JSON.stringify({ city: 'Roma' }), JSON.stringify({ exposure: 20, crop: { x: 0.1, y: 0, w: 0.8, h: 1 } }), A.ids['Viagem/IMG_1.jpg']);
@@ -59,6 +61,7 @@ const bLinks = B.db.db.prepare('SELECT kind, path FROM label_links WHERE label_i
 check('on the other computer: the album, its project and description', bAlbum && bAlbum.notes === 'Dezembro' && B.db.db.prepare('SELECT name FROM labels WHERE id = ?').get(bAlbum.parent_id)?.name === 'Cliente X');
 check('its folder and the photo left out, under the other drive letter', bLinks.join() === `exclude:${path.join('Viagem', 'IMG_2.jpg')},folder:Viagem`, bLinks.join());
 check('its cover', bAlbum.cover === path.join(B.root, 'Viagem', 'IMG_1.jpg'));
+check('“To edit” and its order go along', bAlbum.todo === 1 && B.db.db.prepare("SELECT todo FROM labels WHERE name = 'Cliente X'").get()?.todo === 2);
 const b1 = B.db.db.prepare('SELECT mark, caption, meta_edit, adjust FROM media WHERE id = ?').get(B.ids['Viagem/IMG_1.jpg']);
 check('the photo’s mark, caption, place and adjustments with the crop', b1.mark === 1 && b1.caption === 'Coliseu' && JSON.parse(b1.meta_edit).city === 'Roma' && JSON.parse(b1.adjust).crop.w === 0.8);
 const face = B.db.db.prepare('SELECT f.*, l.name FROM faces f JOIN labels l ON l.id = f.person_id WHERE f.media_id = ?').get(B.ids['Casa/IMG_4.jpg']);

@@ -11,7 +11,7 @@ Travaille sur vos dossiers tels qu'ils sont : de petites miniatures créées une
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · **Français** · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Version 1.51.1](https://img.shields.io/badge/version-1.51.1-161214)
+![Version 1.52.0](https://img.shields.io/badge/version-1.52.0-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -120,10 +120,11 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Description et métadonnées** | Titre, légende, audiodescription, auteur et fonction, lieu (sous-lieu, ville, région, pays), mots-clés et instructions, pour une photo ou plusieurs à la fois — seul le catalogue change. Ce que dit déjà le fichier (EXIF, IPTC, XMP, le `.xmp` d'un RAW) apparaît en indication et sert aux exports. *Écrire dans les fichiers* (avec le code saisi) l'inscrit dans le JPEG lui-même, l'ancienne version allant à la Corbeille, ou dans un `.xmp` à côté de tout autre fichier. Le JPEG reçoit aussi le même `.xmp` à côté : les données voyagent avec la photo envoyée et restent lisibles à côté. Toute modification peut être annulée (Ctrl+Z) et rétablie (Ctrl+Maj+Z) ; l’écriture dans les fichiers s’annule depuis la notification ou les opérations récentes, et les fichiers reviennent octet par octet. |
 | **Albums** | Couverture, description et période ; *Ajouter à un album…* sur toute sélection, *Retirer de l'album*, *Utiliser comme couverture* ; **albums à partir des dossiers** (le premier niveau, les dossiers contenant des photos ou ceux que vous choisissez), liés au dossier entier ; diaporama plein écran. **Suggérer des albums** : les photos regroupées comme elles ont été prises et nommées d'après leur sujet — le dossier, ce que montrent les photos (lu sur cet ordinateur à partir des vignettes : plage, montagne, gâteau, robe de mariée, cuisine…), les fêtes d'après leur date, le lieu, la personne — et des albums d'un sujet au fil des années, à revoir avant de les créer. **Fusionner deux albums** en un seul (les photos des deux, sous le nom choisi ; seul le catalogue change, avec annulation). Affichés en mosaïque, grille régulière (toutes les couvertures de même taille), liste ou sélection. |
 | **Projets, personnes, animaux, lieux** | Chacun dans son onglet, en grille ou en liste groupée par année. En ouvrir un affiche ses photos, sous son onglet ; une photo peut en être retirée d'un clic. L'étiquette d'un dossier vaut pour tout son contenu. Un projet regroupe des albums et a une fiche (état, pour qui, lieu, équipe, échéance) et un panneau d'avancement : triées, retouchées, choisies dans les albums, audiodescriptions. Les lieux se remplissent tout seuls à partir des photos (la position GPS ou le lieu inscrit) et s’affichent sur une **carte du monde** dessinée sur l’ordinateur. |
+| **À traiter** | Le crayon sur la couverture d’un album ou d’un projet le place dans l’onglet **À traiter** (Ctrl+Shift+E), une liste dans l’ordre où les choses doivent être faites : faites glisser les lignes, ou utilisez les flèches ou Alt+↑ ↓, pour mettre en premier ce qui vient en premier. Sa place dans la liste s’affiche sur la couverture, un projet montre son échéance (en rouge en cas de retard) et *Terminé* retire le crayon. Seul le catalogue change, et la liste suit la collection. |
 | **Visages et animaux** | face-api (TensorFlow.js) pour les visages, COCO-SSD et MobileNet pour les animaux, sur la carte graphique (WebGL). Groupes de visages semblables, suggestions que vous confirmez ou refusez, « ce n'est pas lui » mémorisé. Désactivé par défaut ; *Indexer maintenant* ou après chaque analyse. |
 | **Marques et Limbes** | Excellente, correcte, à supprimer — sur la miniature, dans la liste, la visionneuse et le panneau d'informations ; touches `1` `2` `3` `0`. Les Limbes montrent toutes les candidates et l'espace qu'elles occupent, et les envoient à la Corbeille en une fois. **Sélection** : albums, personnes, animaux et projets avec seulement leurs photos marquées d’une étoile ou OK, un par ligne — le nom en grand, une photo choisie en grand — comme une page de portfolio. Les lieux aussi ; et dans chacun, ses photos choisies en grand, une par ligne. |
 | **Ouvrir avec** | Les logiciels photo et vidéo de l'ordinateur pour les fichiers sélectionnés (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), les derniers utilisés en premier ; sous Windows, aussi tous les programmes enregistrés pour le type de fichier. |
-| **Extensions** | Installez des paquets `.lionplugin` qui exportent albums et projets sous forme de page (HTML, CSS et JavaScript), avec les noms de fichiers, les descriptions et les audiodescriptions ; rien ne s’y exécute dans LionPhotos. Voir [PLUGINS.md](PLUGINS.md) (en anglais). Chaque extension activée a son onglet après Projets, avec sa page : choisissez les albums et projets et exportez. |
+| **Extensions** | Installez des paquets `.lionplugin` qui exportent albums et projets sous forme de page (HTML, CSS et JavaScript), avec les noms de fichiers, les descriptions et les audiodescriptions ; rien ne s’y exécute dans LionPhotos. Voir [PLUGINS.md](PLUGINS.md) (en anglais). Chaque extension activée a son onglet après À traiter, avec sa page : choisissez les albums et projets et exportez. |
 | **Vue d'ensemble** | Éléments, photos, vidéos, taille et période ; fichiers par genre, par année, formats, appareils, codecs ; le cache des miniatures. |
 | **Ranger** | Dossiers par date (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` ou `2024-07-14-thème`), dossiers par album (`2024/2024-07-14-album`), avec `Raw/` et `Img/` dedans si souhaité ; *Déplacer vers un dossier* avec sous-dossiers par genre ; les fichiers de la même prise suivent ; opérations récentes avec annulation. Les fichiers sont vraiment déplacés sur le disque et peuvent aussi être **renommés** (`{data}-{álbum}-{fotógrafo}-{nº}` par défaut, numérotés par date ; le RAW, le JPEG et le `.xmp` d'une vue gardent le même nom), ou seulement renommés sur place. **Réorganiser la collection** lit les dossiers tels qu'ils sont et propose une structure unique sur le disque — `2025/2025-12-24-Noel`, thèmes longs dans `Thèmes/`, ce qui attend le tri dans `_A-trier/`, essais de matériel dans `_Materiel/` — à vérifier (renommer ou écarter un dossier, voir l'arbre final) avant de déplacer des dossiers entiers, avec annulation. **Fichiers associés laissés seuls** (un `.xmp` ou `.dop` resté seul après le déplacement de sa photo) retournent à côté de leur photo, sous son nom. **Dupliquer** (Ctrl+D) : une copie à côté de la photo, avec ses réglages, son recadrage, ses marques et ses albums, avec le code saisi et l’annulation. |
 | **Fichiers en double** | SHA-256 en trois étapes (taille → premiers/derniers 64 Ko → fichier entier), côte à côte avec leurs miniatures. |
@@ -184,6 +185,7 @@ Double-cliquez sur **`build-installer.bat`** (ou lancez `npm run dist`). Les ins
 | `F5` | Chercher les fichiers nouveaux et modifiés |
 | `Ctrl+K` · `Ctrl+F` | Rechercher dans toute la collection (barre de titre) |
 | `Ctrl+1` · `Ctrl+Shift+A` | Photos · Albums |
+| `Ctrl+Shift+E` | À traiter |
 | `Ctrl+6` … `Ctrl+9` | Projets · Personnes · Animaux · Lieux |
 | `Ctrl+L` | Limbes |
 | `Ctrl+2` · `Ctrl+3` · `Ctrl+4` · `Ctrl+0` | Vue d'ensemble · Fichiers en double · Ranger · Sauvegarde |
@@ -237,7 +239,7 @@ Les mêmes couches que [LionOrganizer](https://github.com/danielcarli/lionorgani
 src/
   base/            événements, formatage, i18n, utilitaires DOM, icônes, graphiques
   platform/
-    library/       catalogue SQLite, analyse des dossiers, lecteurs de métadonnées (EXIF, PNG, MP4/MOV, Matroska)
+    library/       catalogue SQLite, analyse des dossiers, lecteurs de métadonnées (EXIF: JPEG, raw, HEIC, AVIF; PNG, MP4/MOV, Matroska)
     thumbs/        moteur de miniatures et d'aperçus + la page cachée (workers, muxer WebM)
     media/         lionthumb:// et lionmedia:// (par id de bibliothèque, avec plages d'octets)
     faces/         reconnaissance des visages et des animaux (page cachée sur la carte graphique, qui-est-qui dans le principal)
@@ -273,7 +275,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.51.1**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.52.0**.
 
 ## Crédits
 

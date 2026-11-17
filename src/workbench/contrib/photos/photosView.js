@@ -24,6 +24,7 @@ import { detailsLine } from '../info/infoPanel.js';
 import { showMoveDialog } from '../organize/moveDialog.js';
 import { showLabelsDialog } from '../labels/labelsDialog.js';
 import { removeFromAlbum, removeFromLabel, editLabel, albumMenuItem } from '../albums/albumDialogs.js';
+import { todoPin } from '../todo/todoPin.js';
 import { dayLink, nameLines, organizeSection, selectionFacts, selectionList } from './selectionSummary.js';
 import { metadataSections } from './descriptionSection.js';
 import { collapsible, fileSection, infoFooter } from './infoSections.js';
@@ -334,6 +335,8 @@ export class PhotosView extends ViewPane {
           const res = await editLabel(label, { icon: typeIcon, eyebrow: t(`labels.type.${label.type}.one`), title: t('labels.editTitle'), nameLabel: t(`labels.type.${label.type}.name`) });
           if (res) await this.labels.save({ id: label.id, type: label.type, name: res.name, parentId: label.parentId, notes: res.notes });
         } }),
+        // the pencil of "to edit": put on while looking at the photos, taken off when they are done
+        album || label.type === 'project' ? todoPin(this.services, label, 'row') : null,
         album ? sphereIcons(this.labels, label.id) : null,
         h('span.label-back-count', tn('common.items', count)),
         label.notes ? h('span.label-back-notes', { title: label.notes }, label.notes) : null,

@@ -55,7 +55,7 @@ It runs the same checks as installing.
 - `id`: lower-case letters, digits, `.` and `-`. Installing a package with the same id replaces the plugin
   (the old version goes to the Recycle Bin).
 - `shortName`: the name under the plugin's icon in the activity bar (up to 24 characters; the full `name`
-  when there is none). Every plugin turned on has its tab there, after Projects, with its own page: what it
+  when there is none). Every plugin turned on has its tab there, after Projects and To edit, with its own page: what it
   is, and the albums and projects to pick and export. `icon` (a PNG or SVG in `assets/`) is its picture.
 - Texts can be a string or one per language (`en`, `pt-BR`, `pt-PT`, `es`, `fr`, `de`, `it`, `zh-CN`, `ja`, `ko`).
 - `photo.sizes`: the sizes offered for the photos (longer side, px); "original size" is always offered too.

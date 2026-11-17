@@ -11,7 +11,7 @@ Trabalha com as suas pastas tal como estão: miniaturas pequenas feitas uma vez,
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · **Português (Portugal)** · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versão 1.51.1](https://img.shields.io/badge/version-1.51.1-161214)
+![Versão 1.52.0](https://img.shields.io/badge/version-1.52.0-161214)
 ![Estado: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -120,10 +120,11 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 | **Descrição e metadados** | Título, descrição, audiodescrição, autor e cargo, local (sublocal, cidade, distrito/estado, país), palavras-chave e instruções, para uma fotografia ou várias de uma vez — só o catálogo muda. O que o ficheiro já diz (EXIF, IPTC, XMP, o `.xmp` de um RAW) aparece como sugestão e é usado nas exportações. *Gravar nos ficheiros* (com o código digitado) grava dentro do próprio JPEG, com a versão anterior a ir para a Reciclagem, ou num `.xmp` ao lado dos outros ficheiros. O JPEG também recebe o mesmo `.xmp` ao lado: os dados seguem com a fotografia quando é enviada e ficam legíveis ao lado dela. Qualquer alteração pode ser anulada (Ctrl+Z) e refeita (Ctrl+Shift+Z); a gravação nos ficheiros anula-se pelo aviso ou pelas operações recentes, e os ficheiros voltam byte a byte. |
 | **Álbuns** | Capa, descrição e período; *Adicionar a álbum…* em qualquer seleção, *Retirar do álbum*, *Usar como capa*; **álbuns a partir das pastas** (o primeiro nível, as pastas com fotografias ou as que escolher), ligados à pasta inteira; apresentação em ecrã inteiro. **Sugerir álbuns**: as fotografias agrupadas como foram tiradas e com nomes pelo que são — a pasta, o que as fotografias mostram (lido neste computador a partir das miniaturas: praia, montanha, bolo, vestido de noiva, comida…), feriados pela data, o local, a pessoa — e álbuns de um assunto ao longo dos anos, para rever antes de criar. **Juntar dois álbuns** num só (as fotografias dos dois, com o nome que escolher; só o catálogo muda, e pode anular). Mostrados em mosaico, grelha uniforme (todas as capas do mesmo tamanho), lista ou destaques. |
 | **Projetos, pessoas, animais, locais** | Cada um no seu separador, em grelha ou lista agrupada por ano. Abrir um mostra as respetivas fotografias, no seu separador; uma fotografia pode ser retirada com um clique. A etiqueta de uma pasta aplica-se a tudo o que está dentro dela. Um projeto agrupa álbuns e tem uma ficha (estado, para quem, local, equipa, prazo) e um painel com o andamento: triadas, editadas, escolhidas nos álbuns, audiodescrições. Os locais preenchem-se sozinhos a partir das fotografias (a posição de GPS ou o local escrito nelas) e aparecem num **mapa-múndi**, desenhado no próprio computador. |
+| **Por editar** | O lápis na capa de um álbum ou projeto coloca-o no separador **Por editar** (Ctrl+Shift+E), uma lista pela ordem em que as coisas devem ser feitas: arraste as linhas, ou use as setas ou Alt+↑ ↓, para pôr primeiro o que vem primeiro. A posição na lista aparece na capa, um projeto mostra a data de entrega (a vermelho quando atrasado) e *Pronto* tira o lápis. Só o catálogo muda, e a lista acompanha a coleção. |
 | **Rostos e animais** | face-api (TensorFlow.js) para rostos, COCO-SSD e MobileNet para animais, na placa gráfica (WebGL). Grupos de rostos semelhantes, sugestões que confirma ou recusa, "não é" memorizado. Desligado por predefinição; *Indexar agora* ou após cada análise. |
 | **Marcações e Limbo** | Ótima, OK, candidata a eliminar — na miniatura, na lista, no visualizador e no painel de informações; teclas `1` `2` `3` `0`. O Limbo mostra todas as candidatas e o espaço que ocupam, e envia-as para a Reciclagem de uma vez. **Destaques**: álbuns, pessoas, animais e projetos só com as fotografias marcadas com estrela ou OK, um por linha — o nome grande, uma fotografia escolhida em destaque — como uma página de portefólio. Locais também; e dentro de cada um, as fotografias escolhidas em grande, uma por linha. |
 | **Abrir com** | Os programas de fotografia e vídeo do computador para os ficheiros selecionados (Photoshop, Lightroom Classic, Bridge, Premiere Pro, Capture One, DxO PhotoLab, Affinity, darktable, GIMP, VLC…), os últimos usados primeiro; no Windows, também todos os programas registados para o tipo de ficheiro. |
-| **Plugins** | Instale pacotes `.lionplugin` que exportam álbuns e projetos como uma página (HTML, CSS e JavaScript), com os nomes dos ficheiros, as descrições e as audiodescrições; nada deles é executado dentro do LionPhotos. Veja [PLUGINS.md](PLUGINS.md) (em inglês). Cada plugin ativo ganha um separador depois de Projetos, com a sua página: escolha os álbuns e projetos e exporte. |
+| **Plugins** | Instale pacotes `.lionplugin` que exportam álbuns e projetos como uma página (HTML, CSS e JavaScript), com os nomes dos ficheiros, as descrições e as audiodescrições; nada deles é executado dentro do LionPhotos. Veja [PLUGINS.md](PLUGINS.md) (em inglês). Cada plugin ativo ganha um separador depois de Por editar, com a sua página: escolha os álbuns e projetos e exporte. |
 | **Visão geral** | Itens, fotografias, vídeos, tamanho e período; ficheiros por tipo, por ano, formatos, câmaras, codecs; a cache de miniaturas. |
 | **Organizar** | Pastas por data (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` ou `2024-07-14-tema`), pastas por álbum (`2024/2024-07-14-álbum`), com `Raw/` e `Img/` dentro se quiser; *Mover para pasta* com subpastas por tipo; os ficheiros do mesmo disparo vão junto; operações recentes com anular. Os ficheiros mudam de lugar no disco e também podem mudar de **nome** (`{data}-{álbum}-{fotógrafo}-{nº}` por omissão, numerados pela data; o RAW, o JPEG e o `.xmp` da mesma fotografia ficam com o mesmo nome), ou só mudar de nome onde estão. **Reorganizar a coleção** lê as pastas como estão e propõe uma estrutura única no disco — `2025/2025-12-24-Natal`, temas longos em `Temas/`, o que espera triagem em `_Entrada/`, testes de câmara em `_Equipamento/` — para rever (mudar o nome ou deixar de fora qualquer pasta, ver a árvore como vai ficar) antes de as pastas inteiras mudarem de lugar, com anular. **Ficheiros relacionados soltos** (um `.xmp` ou `.dop` que ficou sozinho depois de a fotografia mudar de lugar) voltam para junto da fotografia, com o nome dela. **Duplicar** (Ctrl+D): uma cópia ao lado da fotografia, com os ajustes, o recorte, as marcações e os álbuns, com código digitado e anular. |
 | **Ficheiros repetidos** | SHA-256 em três etapas (tamanho → primeiros/últimos 64 KB → ficheiro inteiro), lado a lado com as miniaturas. |
@@ -184,6 +185,7 @@ Faça duplo clique em **`build-installer.bat`** (ou execute `npm run dist`). Os 
 | `F5` | Procurar ficheiros novos e alterados |
 | `Ctrl+K` · `Ctrl+F` | Pesquisar em toda a coleção (barra do título) |
 | `Ctrl+1` · `Ctrl+Shift+A` | Fotografias · Álbuns |
+| `Ctrl+Shift+E` | Por editar |
 | `Ctrl+6` … `Ctrl+9` | Projetos · Pessoas · Animais · Locais |
 | `Ctrl+L` | Limbo |
 | `Ctrl+2` · `Ctrl+3` · `Ctrl+4` · `Ctrl+0` | Visão geral · Ficheiros repetidos · Organizar · Cópia de segurança |
@@ -237,7 +239,7 @@ As mesmas camadas do [LionOrganizer](https://github.com/danielcarli/lionorganize
 src/
   base/            eventos, formatação, i18n, utilitários de DOM, ícones, gráficos
   platform/
-    library/       catálogo SQLite, análise de pastas, leitores de metadados (EXIF, PNG, MP4/MOV, Matroska)
+    library/       catálogo SQLite, análise de pastas, leitores de metadados (EXIF: JPEG, raw, HEIC, AVIF; PNG, MP4/MOV, Matroska)
     thumbs/        motor de miniaturas e pré-visualizações + a página oculta (workers, muxer WebM)
     media/         lionthumb:// e lionmedia:// (por id da biblioteca, com intervalos de bytes)
     faces/         reconhecimento de rostos e animais (página oculta na placa gráfica, quem-é-quem no principal)
@@ -273,7 +275,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotografias"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.51.1**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.52.0**.
 
 ## Créditos
 

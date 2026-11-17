@@ -3,15 +3,15 @@
  *  Created and conceived by Daniel Michelon De Carli.
  *  Licensed under the MIT License. See LICENSE in the project root.
  *--------------------------------------------------------------------------------------------*/
-// Activity bar: the one navigation. The library (Photos, Albums, People, Pets, Places, Projects), each
-// plugin installed and turned on (its own page, right after Projects), then the Limbo (with how many wait there) and the Tools; at the bottom the side bar and Settings.
+// Activity bar: the one navigation. The library (Photos, Albums, People, Pets, Places, Projects, To edit), each
+// plugin installed and turned on (its own page, right after To edit), then the Limbo (with how many wait there) and the Tools; at the bottom the side bar and Settings.
 import { h } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { formatNumber } from '../../../base/common/format.js';
 import { VIEWS, TOOLS } from '../../services/layout/browser/layoutService.js';
 import { showSettingsDialog } from '../../contrib/settings/settingsDialog.js';
 import { showAboutDialog } from '../../contrib/about/aboutDialog.js';
-import { t } from '../../../base/common/nls.js';
+import { t, tn } from '../../../base/common/nls.js';
 import { textOf } from '../../services/plugins/browser/pluginsService.js';
 
 export class ActivitybarPart {
@@ -27,6 +27,9 @@ export class ActivitybarPart {
       title, 'aria-label': label, 'data-view': id, onclick: () => go(id),
     }, h('span.activity-icon', { html: icon(ic, 21) }), h('span.activity-label', label));
     const lib = VIEWS.filter((v) => v.group === 'library').map((v) => item(v.id, v.icon, v.label, `${v.label} (${v.shortcut})`));
+    // To edit: how many albums and projects wait with the pencil
+    this.todoBadge = h('span.activity-badge.activity-badge-todo', { hidden: true });
+    lib.find((b) => b.dataset.view === 'todo')?.append(this.todoBadge);
     const limbo = VIEWS.find((v) => v.id === 'limbo');
     this.limboBadge = h('span.activity-badge', { hidden: true });
     const limboBtn = item('limbo', limbo.icon, limbo.label, `${limbo.label} (${limbo.shortcut})`);
@@ -50,6 +53,8 @@ export class ActivitybarPart {
     const badge = () => this.#renderBadge();
     library.onDidChangeMarks(badge);
     library.onDidChangeData(badge);
+    labels?.onDidChange(badge);
+    library.onDidChangeFilter(badge);
     this.#renderPlugins();
     this.#renderBadge();
   }
@@ -77,6 +82,8 @@ export class ActivitybarPart {
     const view = this.layout.activeView;
     if (view === 'plugin') return `plugin:${this.plugins?.opened}`;
     const id = view === 'photos' && this.library.filter.labelId;
+    // an album or a project opened from To edit belongs to To edit (Back returns there)
+    if (id && this.library.labelReturn?.view === 'todo') return 'todo';
     const type = id && this.labels?.get(id)?.type;
     return type && VIEWS.some((v) => v.id === type && v.group === 'library') ? type : view;
   }
@@ -95,5 +102,9 @@ export class ActivitybarPart {
     const n = this.library.hasData ? this.library.limboCount() : 0;
     this.limboBadge.hidden = !n;
     this.limboBadge.textContent = n > 999 ? '999+' : formatNumber(n);
+    const todo = this.labels?.toEdit?.().length || 0;
+    this.todoBadge.hidden = !todo;
+    this.todoBadge.textContent = todo > 99 ? '99+' : formatNumber(todo);
+    this.todoBadge.parentElement?.setAttribute('title', `${t('views.todo')} (Ctrl+Shift+E)${todo ? ' — ' + tn('todo.count', todo) : ''}`);
   }
 }

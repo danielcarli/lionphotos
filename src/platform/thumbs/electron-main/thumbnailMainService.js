@@ -323,6 +323,7 @@ class ThumbnailMainService {
       meta.v = META_VERSION;
       meta.tags = searchTags(meta);
       this.db.updateMeta(row.id, meta);
+      if (meta.takenAt) this.#ready(row.id); // a date found now: the window learns it
     }
   }
 

@@ -11,7 +11,7 @@ Trabalha com as suas pastas como elas são: miniaturas pequenas feitas uma vez, 
 
 [English](../README.md) · **Português (Brasil)** · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![Versão 1.53.1](https://img.shields.io/badge/version-1.53.1-161214)
+![Versão 1.54.0](https://img.shields.io/badge/version-1.54.0-161214)
 ![Status: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -84,21 +84,15 @@ O LionPhotos está em **beta**. Isso quer dizer:
 
 ## Baixar
 
-Baixe o instalador do seu sistema. Todo instalador pega a **versão mais recente** no GitHub, e todo arquivo é conferido (SHA-256 e procedência de build assinada).
+Baixe o instalador do seu sistema. Os links apontam sempre para a **versão mais recente**, e todo arquivo é conferido (SHA-256 e procedência de build assinada).
 
-- **Windows 10/11** (x64, ARM): um assistente de instalação de cerca de 2 MB que baixa e confere o app durante a instalação. → [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe)
+- **Windows 10/11** (x64, ARM): um instalador com o programa completo dentro (cerca de 150 MB): nada é baixado durante a instalação, que leva segundos. → [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe) · [ARM](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup-arm64.exe) · [`.zip` portátil, sem instalar](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-win-x64.zip)
 - **macOS 11+** (Apple Silicon, Intel): abra o `.dmg` e arraste o LionPhotos para Aplicativos. → [`LionPhotos-mac-universal.dmg`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-mac-universal.dmg)
 - **Linux** (x64): `.deb` para Ubuntu, Debian, Mint…, `.rpm` para Fedora, RHEL, openSUSE…, ou o AppImage para qualquer distribuição, sem instalar. → [`.deb`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos_amd64.deb) · [`.rpm`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos.x86_64.rpm) · [AppImage](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-x86_64.AppImage)
 
 > Os instaladores ainda não são assinados com um certificado pago. Na primeira vez, o Windows pode mostrar "O Windows protegeu o computador" (**Mais informações › Executar assim mesmo**) e o macOS pede para liberar o app em **Ajustes do Sistema › Privacidade e Segurança › Abrir Mesmo Assim**.
 
-**Prefere o terminal?** Windows (PowerShell, sem administrador):
-
-```powershell
-irm https://github.com/danielcarli/lionphotos/releases/latest/download/install.ps1 | iex
-```
-
-macOS e Linux:
+**Prefere o terminal?** macOS e Linux:
 
 ```bash
 curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/install.sh | bash
@@ -276,7 +270,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.53.1**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.54.0**.
 
 ## Créditos
 

@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · **日本語** · [한국어](README.ko.md)
 
-![バージョン 1.53.1](https://img.shields.io/badge/version-1.53.1-161214)
+![バージョン 1.54.0](https://img.shields.io/badge/version-1.54.0-161214)
 ![ステータス：ベータテスト](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![ライセンス: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![対応: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -84,21 +84,15 @@ LionPhotos は**ベータ版**です。つまり：
 
 ## ダウンロード
 
-お使いのシステム用のインストーラーをダウンロードしてください。どのインストーラーも GitHub から**最新バージョン**を取得し、すべてのファイルを検証します（SHA-256 と署名付きのビルド来歴）。
+お使いのシステム用のインストーラーをダウンロードしてください。リンクは常に**最新バージョン**を指し、すべてのファイルが検証されます（SHA-256 と署名付きビルド来歴）。
 
-- **Windows 10/11**（x64、ARM）：約 2 MB のセットアップウィザードで、インストール中にアプリをダウンロードして検証します。→ [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe)
+- **Windows 10/11**（x64、ARM）：アプリ全体を含むセットアップ（約 150 MB）。インストール中は何もダウンロードせず、数秒で終わります。→ [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe) · [ARM](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup-arm64.exe) · [ポータブル版 `.zip`（インストール不要）](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-win-x64.zip)
 - **macOS 11+**（Apple シリコン、Intel）：`.dmg` を開き、LionPhotos を「アプリケーション」にドラッグします。→ [`LionPhotos-mac-universal.dmg`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-mac-universal.dmg)
 - **Linux**（x64）：Ubuntu、Debian、Mint などには `.deb`、Fedora、RHEL、openSUSE などには `.rpm`、どのディストリビューションでもインストール不要の AppImage。→ [`.deb`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos_amd64.deb) · [`.rpm`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos.x86_64.rpm) · [AppImage](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-x86_64.AppImage)
 
 > インストーラーはまだ有料の証明書で署名されていません。初回起動時、Windows では「Windows によって PC が保護されました」と表示されることがあり（**詳細情報 › 実行**）、macOS では **システム設定 › プライバシーとセキュリティ › このまま開く** でアプリを許可するよう求められます。
 
-**ターミナルを使いたい場合** Windows（PowerShell、管理者権限は不要）：
-
-```powershell
-irm https://github.com/danielcarli/lionphotos/releases/latest/download/install.ps1 | iex
-```
-
-macOS と Linux：
+**ターミナルを使いたい場合** macOS と Linux：
 
 ```bash
 curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/install.sh | bash
@@ -276,7 +270,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 変更履歴
 
-[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.53.1**。
+[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.54.0**。
 
 ## クレジット
 

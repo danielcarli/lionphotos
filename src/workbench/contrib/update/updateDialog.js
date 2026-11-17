@@ -12,11 +12,11 @@ import { t } from '../../../base/common/nls.js';
 import { formatBytes } from '../../../base/common/format.js';
 
 const HOW = {
-  installer: 'update.dialog.howInstaller', script: 'update.dialog.howScript', dmg: 'update.dialog.howDmg', sh: 'update.dialog.howSh',
+  setup: 'update.dialog.howSetup', dmg: 'update.dialog.howDmg', sh: 'update.dialog.howSh',
   appimage: 'update.dialog.howAppImage', deb: 'update.dialog.howDeb', rpm: 'update.dialog.howRpm', download: 'update.dialog.howDownload',
 };
 // these close the app once the installer has started
-const CLOSES = new Set(['installer', 'script', 'dmg', 'sh', 'appimage']);
+const CLOSES = new Set(['setup', 'dmg', 'sh', 'appimage']);
 
 const errorText = (e) => (e === 'checksum' ? t('update.error.checksum') : e === 'timeout' || /^net::|HTTP|fetch/i.test(e || '') ? t('update.error.network') : e || '');
 

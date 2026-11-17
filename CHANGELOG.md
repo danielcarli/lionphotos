@@ -2,6 +2,17 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.54.0] — 2026-11-17
+
+### Changed
+- **The Windows setup carries the whole app.** `LionPhotos-Setup.exe` was a 2 MB wizard (Inno Setup) that downloaded the app and the Electron runtime from GitHub while installing, which took about a minute and could fail halfway on a slow connection. It is now a standard setup (NSIS, made by electron-builder, in the app's 10 languages) with everything inside, about 150 MB: nothing is downloaded while it installs, it takes seconds and works offline. The app is packed (`app.asar`) and carries only the Chromium languages it is translated into, so it takes about 360 MB on disk instead of 409 MB. Still for one person with no administrator rights (`%LOCALAPPDATA%\Programs\LionPhotos`), or for everyone if chosen.
+- **Windows on ARM** has its own setup, `LionPhotos-Setup-arm64.exe`, and both processors a portable version (`LionPhotos-win-x64.zip`, `LionPhotos-win-arm64.zip`): unzip and open `LionPhotos.exe`, nothing to install. The file names have no version, so the `…/releases/latest/download/…` links are always the newest.
+- **Updating on Windows** (the version in the bottom-right corner): the new version's setup is downloaded with its progress shown, written to disk as it arrives (never held in memory) and checked against the release's SHA-256; then LionPhotos closes, the setup installs over it quietly and opens the new version. The setup is deleted once the new version runs.
+- **From 1.53 or earlier:** run the new `LionPhotos-Setup.exe` once. It uninstalls the earlier installation first — the Inno Setup one, or one made with `install.ps1` — quietly, keeping the settings and the catalog, so Settings › Apps has one LionPhotos. (The earlier versions' update window cannot make this jump by itself.)
+
+### Removed
+- The Inno Setup wizard (`installer/`), its "Update LionPhotos" Start-menu shortcut and the copy it kept in `%LOCALAPPDATA%\LionPhotos-Installer`, and the Windows command-line installers (`install.ps1`, `install.cmd`) with the app bundle they downloaded (`lionphotos-<version>.zip`). macOS and Linux keep `install.sh`.
+
 ## [1.53.1] — 2026-11-17
 
 ### Fixed

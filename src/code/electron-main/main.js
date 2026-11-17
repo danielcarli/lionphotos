@@ -236,6 +236,7 @@ if (gotTheLock) app.whenReady().then(() => {
   labels.recognizers = [faces, pets];
   // the tests (and benchmarks in tools/) reach the main services
   const update = new UpdateMainService(APP_ROOT, () => mainWindow?.webContents);
+  setTimeout(() => update.removeUsedSetups(), 30000); // the setup of an update, once its version runs
   if (process.env.LIONPHOTOS_E2E) globalThis.__lionphotosMain = { library, thumbs, faces, pets, scenes, labels, portable, update };
   const services = [
     new DialogMainService(),

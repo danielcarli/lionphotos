@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · **简体中文** · [日本語](README.ja.md) · [한국어](README.ko.md)
 
-![版本 1.53.1](https://img.shields.io/badge/version-1.53.1-161214)
+![版本 1.54.0](https://img.shields.io/badge/version-1.54.0-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -84,21 +84,15 @@ LionPhotos 处于 **Beta** 阶段。这意味着：
 
 ## 下载
 
-下载适合你系统的安装程序。每个安装程序都会从 GitHub 获取**最新版本**，每个文件都会被校验（SHA-256 和签名的构建来源证明）。
+下载适合你系统的安装程序。链接始终指向**最新版本**，每个文件都会被校验（SHA-256 和签名的构建来源证明）。
 
-- **Windows 10/11**（x64、ARM）：约 2 MB 的安装向导，在安装过程中下载并校验应用。→ [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe)
+- **Windows 10/11**（x64、ARM）：包含完整应用的安装程序（约 150 MB），安装时不下载任何内容，几秒即可完成。→ [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe) · [ARM](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup-arm64.exe) · [免安装 `.zip`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-win-x64.zip)
 - **macOS 11+**（Apple 芯片、Intel）：打开 `.dmg`，把 LionPhotos 拖到“应用程序”。→ [`LionPhotos-mac-universal.dmg`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-mac-universal.dmg)
 - **Linux**（x64）：适用于 Ubuntu、Debian、Mint… 的 `.deb`，适用于 Fedora、RHEL、openSUSE… 的 `.rpm`，或无需安装、适用于任何发行版的 AppImage。→ [`.deb`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos_amd64.deb) · [`.rpm`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos.x86_64.rpm) · [AppImage](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-x86_64.AppImage)
 
 > 安装程序尚未使用付费证书签名。首次启动时，Windows 可能显示“Windows 已保护你的电脑”（**更多信息 › 仍要运行**），macOS 会要求你在**系统设置 › 隐私与安全性 › 仍要打开**中允许该应用。
 
-**更喜欢终端？** Windows（PowerShell，无需管理员权限）：
-
-```powershell
-irm https://github.com/danielcarli/lionphotos/releases/latest/download/install.ps1 | iex
-```
-
-macOS 和 Linux：
+**更喜欢终端？** macOS 和 Linux：
 
 ```bash
 curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/install.sh | bash
@@ -276,7 +270,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.53.1**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.54.0**。
 
 ## 致谢
 

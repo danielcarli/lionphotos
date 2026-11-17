@@ -1,13 +1,13 @@
 {
   "name": "lionphotos",
-  "version": "1.53.1",
+  "version": "1.54.0",
   "description": "LionPhotos — fast photo & video browser and organizer. Browse folders of pictures and videos as small cached thumbnails, regenerated only when a file changes, and organize them safely.",
   "main": "src/code/electron-main/main.js",
   "desktopName": "lionphotos.desktop",
   "scripts": {
     "start": "electron .",
     "dist": "npx --yes electron-builder@26.18.0 --publish never",
-    "dist:win": "npx --yes electron-builder@26.18.0 --win --publish never",
+    "dist:win": "npx --yes electron-builder@26.18.0 --win nsis zip --x64 --publish never",
     "dist:mac": "npx --yes electron-builder@26.18.0 --mac --publish never",
     "dist:linux": "npx --yes electron-builder@26.18.0 --linux --publish never",
     "test:e2e": "electron tools/e2e.js",
@@ -64,15 +64,16 @@
         }
       ],
       "icon": "build/icon.ico",
+      "executableName": "LionPhotos",
       "legalTrademarks": "LionPhotos",
-      "artifactName": "LionPhotos-${version}-win-${arch}.${ext}"
+      "artifactName": "LionPhotos-win-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "shortcutName": "LionPhotos",
       "include": "build/installer.nsh",
-      "uninstallDisplayName": "LionPhotos — photo & video browser",
+      "uninstallDisplayName": "LionPhotos",
       "multiLanguageInstaller": true,
       "installerLanguages": [
         "en_US",
@@ -92,7 +93,12 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "deleteAppDataOnUninstall": false,
-      "artifactName": "LionPhotos-Setup-${version}-${arch}.${ext}"
+      "artifactName": "LionPhotos-Setup-${arch}.${ext}",
+      "installerSidebar": "build/installerSidebar.bmp",
+      "uninstallerSidebar": "build/uninstallerSidebar.bmp",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "menuCategory": false
     },
     "mac": {
       "target": [
@@ -146,7 +152,29 @@
     },
     "appImage": {
       "artifactName": "LionPhotos-${arch}.${ext}"
-    }
+    },
+    "electronLanguages": [
+      "en-US",
+      "pt-BR",
+      "pt-PT",
+      "es",
+      "fr",
+      "de",
+      "it",
+      "zh-CN",
+      "ja",
+      "ko"
+    ],
+    "extraFiles": [
+      {
+        "from": "LICENSE",
+        "to": "LICENSE.txt"
+      },
+      {
+        "from": "THIRD-PARTY-NOTICES.md",
+        "to": "THIRD-PARTY-NOTICES.md"
+      }
+    ]
   },
   "keywords": [
     "photos",

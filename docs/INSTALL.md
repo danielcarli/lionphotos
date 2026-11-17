@@ -1,8 +1,8 @@
 # Installing LionPhotos
 
-Every release on GitHub has **graphical installers** for each system, plus small **command-line installers**
-for people who prefer the terminal. Both always install the **latest version**, check every file and put the app
-where your operating system expects it, following the same layout as Visual Studio Code.
+Every release on GitHub has **graphical installers** for each system, with the whole app inside: nothing is
+downloaded while they install. macOS and Linux also have a small **command-line installer** for people who prefer
+the terminal. The app goes where your operating system expects it, following the same layout as Visual Studio Code.
 
 ## Graphical installers (recommended)
 
@@ -10,7 +10,9 @@ Download the file for your system from the **[latest release](https://github.com
 
 | System | File | How to install |
 |---|---|---|
-| **Windows 10/11** (x64, ARM) | [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe) | Double-click and follow the wizard. |
+| **Windows 10/11** (x64) | [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe) | Double-click and follow the wizard. |
+| **Windows on ARM** | [`LionPhotos-Setup-arm64.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup-arm64.exe) | Double-click and follow the wizard. |
+| **Windows, without installing** | [`LionPhotos-win-x64.zip`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-win-x64.zip) ([ARM](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-win-arm64.zip)) | Unzip it anywhere (a USB drive too) and open `LionPhotos.exe`. |
 | **macOS 11+** (Apple Silicon, Intel) | [`LionPhotos-mac-universal.dmg`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-mac-universal.dmg) | Open it and drag **LionPhotos** to **Applications**. |
 | **Ubuntu, Debian, Linux Mint, Pop!_OS…** | [`lionphotos_amd64.deb`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos_amd64.deb) | Double-click to open it in the software center, or `sudo apt install ./lionphotos_amd64.deb`. |
 | **Fedora, RHEL, openSUSE…** | [`lionphotos.x86_64.rpm`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos.x86_64.rpm) | Double-click, or `sudo dnf install ./lionphotos.x86_64.rpm` (`zypper install` on openSUSE). |
@@ -18,21 +20,18 @@ Download the file for your system from the **[latest release](https://github.com
 
 These links always point to the newest version.
 
-### The Windows setup wizard
+### The Windows setup
 
-`LionPhotos-Setup.exe` is a standard Windows setup wizard (Inno Setup), translated into the app's 10 languages,
-and it is only about **2 MB**. It works like the LEBR installer: it doesn't carry the app. During setup it downloads
-the latest version from GitHub and checks it, showing each step:
+`LionPhotos-Setup.exe` is a standard Windows setup wizard (NSIS, made by electron-builder), translated into the
+app's 10 languages. It carries the **whole app** (about 150 MB): nothing is downloaded while it installs, so it
+takes seconds and works offline. It installs in `%LOCALAPPDATA%\Programs\LionPhotos`, just for you, with no
+administrator rights (or, if you choose, for everyone in `Program Files`), and creates Start menu and desktop
+shortcuts and an entry in **Settings › Apps**.
 
-1. finds the latest release and checks its file list (SHA-256);
-2. downloads LionPhotos (about 30 MB, most of it the face and pet recognition models) and checks its SHA-256;
-3. downloads the official Electron runtime (about 110 MB) from Electron's GitHub releases and checks it against
-   the checksums Electron publishes;
-4. assembles the app and installs it in `%LOCALAPPDATA%\Programs\LionPhotos`: just for you, no administrator rights.
-
-If any check fails, nothing is installed and an existing installation stays as it was. The wizard creates Start
-menu and desktop shortcuts, an entry in **Settings › Apps** and an **Update LionPhotos** shortcut, which runs
-the wizard again in update mode to fetch the newest version. It takes about a minute.
+**Coming from LionPhotos 1.53 or earlier?** Those versions were installed by a small setup that downloaded the app
+from GitHub while installing. Run the new `LionPhotos-Setup.exe` once: it removes the earlier installation first
+(quietly, keeping your settings and catalog) and installs the new one in the same place. From then on, the app
+updates itself from the version number in its corner (see [Updating from inside the app](#updating-from-inside-the-app)).
 
 ### Before the first launch: no paid certificate yet
 
@@ -45,35 +44,15 @@ Every file is still listed in the release's `SHA256SUMS` and has a signed build-
   LionPhotos. You only need to do this once.
 - **Linux:** packages don't need this.
 
-## Command-line installers
+## Command-line installer (macOS and Linux)
 
-`install.ps1` (Windows) and `install.sh` (macOS and Linux) do the same downloads and checks as the Windows wizard,
-from a terminal. Run them again at any time to update.
+`install.sh` downloads the app from the release and the Electron runtime from Electron's own releases, checks
+them all and installs. Run it again at any time to update. (On Windows, use the setup above.)
 
 | System | Installs to | Also creates |
 |---|---|---|
-| **Windows 10/11** (x64, arm64) | `%LOCALAPPDATA%\Programs\LionPhotos` (just for you, no admin)<br>or `%ProgramFiles%\LionPhotos` with `-Scope Machine` | Start menu and desktop shortcuts, an entry in **Settings › Apps** (uninstall from there) |
 | **macOS 11+** (Apple Silicon, Intel) | `/Applications/LionPhotos.app`<br>or `~/Applications` if `/Applications` is not writable | Launchpad / Spotlight entry |
 | **Linux** (x64, arm64) | `~/.local/share/lionphotos` (just for you)<br>or `/opt/lionphotos` with `--system` | `lionphotos` command, menu entry (`.desktop`), icons |
-
-### Windows
-
-Open **PowerShell** (no need to run as administrator) and run:
-
-```powershell
-irm https://github.com/danielcarli/lionphotos/releases/latest/download/install.ps1 | iex
-```
-
-Or download **`install.cmd`** from the [latest release](https://github.com/danielcarli/lionphotos/releases/latest)
-and double-click it.
-
-To pass options, such as installing for all users from an elevated PowerShell:
-
-```powershell
-& ([scriptblock]::Create((irm https://github.com/danielcarli/lionphotos/releases/latest/download/install.ps1))) -Scope Machine
-```
-
-### macOS and Linux
 
 ```bash
 curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/install.sh | bash
@@ -83,7 +62,7 @@ To pass options: `… | bash -s -- --system`
 
 ### Prefer to read the script first?
 
-That is good practice for any `curl | bash` or `irm | iex` install. Download the script, read it, check it,
+That is good practice for any `curl | bash` install. Download the script, read it, check it,
 then run it:
 
 ```bash
@@ -97,17 +76,16 @@ bash install.sh
 
 ### Options
 
-| `install.sh` (macOS, Linux) | `install.ps1` (Windows) | What it does |
-|---|---|---|
-| `--user` | `-Scope User` | Install just for the current user, with no administrator rights. Default on Windows, and on Linux when not run as root. |
-| `--system` | `-Scope Machine` | Install for every user (uses `sudo` / an elevated PowerShell). Default as root, and on macOS when `/Applications` is writable. |
-| `--version 1.2.3` | `-Version 1.2.3` | Install a specific release instead of the latest one. |
-| `--require-attestation` | `-RequireAttestation` | Refuse to install unless the GitHub CLI verifies the build provenance (see below). |
-| `--force` | `-Force` | Reinstall even when the same version is already installed. |
-| `--yes` | `-Yes` | Don't ask for confirmation. |
-| `--no-deps` | — | Linux: never call the package manager. |
-| — | `-NoDesktopShortcut` | Don't create the desktop shortcut. |
-| `--uninstall [--purge]` | `-Uninstall [-Purge]` | Remove the app. `--purge` also removes your settings and the catalog. |
+| Option | What it does |
+|---|---|
+| `--user` | Install just for the current user, with no administrator rights. Default on Linux when not run as root. |
+| `--system` | Install for every user (uses `sudo`). Default as root, and on macOS when `/Applications` is writable. |
+| `--version 1.2.3` | Install a specific release instead of the latest one. |
+| `--require-attestation` | Refuse to install unless the GitHub CLI verifies the build provenance (see below). |
+| `--force` | Reinstall even when the same version is already installed. |
+| `--yes` | Don't ask for confirmation. |
+| `--no-deps` | Linux: never call the package manager. |
+| `--uninstall [--purge]` | Remove the app. `--purge` also removes your settings and the catalog. |
 
 ### Linux distributions
 
@@ -138,21 +116,21 @@ you or your photos is sent.
 
 | Installed with | What "Update now" does |
 |---|---|
-| Windows setup wizard | LionPhotos closes and the wizard kept for updates runs in update mode (the newest wizard is fetched first and checked). |
-| `install.ps1` for the current user | LionPhotos closes and the script kept next to the app runs again. |
+| Windows setup | The new version's setup (about 150 MB, the whole app) is downloaded into the app's settings folder while you watch the progress, and checked. LionPhotos closes, the setup installs over it quietly in a few seconds and opens the new version. The setup is deleted once the new version runs. |
 | macOS `.dmg` | The new `.dmg` is downloaded to Downloads, checked and opened; LionPhotos closes so you can drag it to Applications and choose **Replace**. |
 | `install.sh` (macOS, or Linux for the current user) | LionPhotos closes, the release's `install.sh` runs again and then reopens the app. |
 | Linux AppImage | The new AppImage is downloaded next to this one, checked, put in its place and opened. |
 | Linux `.deb` / `.rpm` | The new package is downloaded to Downloads, checked and opened in the system's software installer (it asks for your password). |
-| Anything else (an install for all users with `install.sh` on Linux, or running from the source) | The release page opens in the browser. |
+| Anything else (the portable Windows `.zip`, an install for all users with `install.sh` on Linux, or running from the source) | The release page opens in the browser. |
 
 Every file is kept only if its SHA-256 matches the release's `SHA256SUMS`; anything else is thrown away.
 
 ## How it stays safe
 
-This applies to the Windows wizard (which runs `install.ps1` behind the scenes) and to the command-line installers.
-The `.dmg`, `.deb`, `.rpm` and AppImage are complete packages built by GitHub Actions; check them against
-`SHA256SUMS` and their attestation as shown in [Prefer to read the script first?](#prefer-to-read-the-script-first).
+The Windows setup, the `.dmg`, `.deb`, `.rpm` and AppImage are complete packages built by GitHub Actions from the
+tagged commit; check them against `SHA256SUMS` and their attestation as shown in
+[Prefer to read the script first?](#prefer-to-read-the-script-first). The update window checks every file it
+downloads against `SHA256SUMS` before using it. The rest of this section is about `install.sh`:
 
 - **HTTPS only (TLS 1.2+)**, including redirects. Plain HTTP is refused.
 - **One exact release.** The script reads `manifest.txt` from the latest release, then downloads every other
@@ -170,35 +148,34 @@ The `.dmg`, `.deb`, `.rpm` and AppImage are complete packages built by GitHub Ac
   or to add missing Linux libraries.
 - **Safe updates.** The new version is assembled in a temporary folder and swapped in at the end. If anything
   fails, the installed version is left untouched. Your settings and catalog are never touched by an update.
-- **Pinned tools.** On Windows, the optional icon tool (`rcedit`) is pinned to a known SHA-256 and skipped if
-  it doesn't match. The release workflow pins Inno Setup by SHA-256 and every GitHub Action by commit hash.
+- **Pinned tools.** The release workflow pins electron-builder by version and every GitHub Action by commit hash.
 
-### Why the Windows installer downloads instead of bundling
+### Why the Windows setup carries the whole app
 
-GitHub limits files **in a repository** to 100 MB, but nothing large is ever committed: installers are built by
-GitHub Actions and attached to releases, where files can be up to 2 GB. The Windows wizard and the scripts stay
-tiny anyway: they fetch the app bundle (about 30 MB) from the release and the Electron runtime (about 110 MB) straight
-from Electron's releases, so every install gets a verified runtime and always the latest version. The macOS and
-Linux packages (100–250 MB) contain everything, because that is how those systems expect apps to be installed.
+It used to be a 2 MB setup that downloaded the app (about 30 MB) and the Electron runtime (about 110 MB) while
+installing, like the LEBR installer. Carrying everything is faster and simpler: the install takes seconds instead
+of a minute, works without internet, can't fail halfway on a slow connection, and what you install is exactly the
+file you downloaded and checked. GitHub limits files **in a repository** to 100 MB, but nothing large is ever
+committed: the setups are built by GitHub Actions and attached to releases, where files can be up to 2 GB.
 
 ### Code signing
 
-See [Before the first launch](#before-the-first-launch-no-paid-certificate-yet). Files that the Windows wizard and
-the scripts download themselves don't carry the "downloaded from the internet" mark, so only the installer
-you download with the browser triggers SmartScreen or Gatekeeper. When the project gets a code-signing certificate,
-the Windows wizard is signed by uncommenting `SignTool=` in `installer/lionphotos.iss`, and the macOS app by
+See [Before the first launch](#before-the-first-launch-no-paid-certificate-yet). Only a file you download with the
+browser carries the "downloaded from the internet" mark, so updates made from inside the app don't trigger
+SmartScreen. When the project gets a code-signing certificate, electron-builder signs the Windows setup and app
+(`CSC_LINK` / `CSC_KEY_PASSWORD`, or `build.win.signtoolOptions` in `package.json`), and the macOS app is signed by
 setting a Developer ID in `package.json` (`build.mac.identity`) and turning `hardenedRuntime` back on for notarization.
 
 ## Uninstall
 
-- **Windows:** Settings › Apps › LionPhotos › Uninstall (works for both the wizard and `install.ps1`).
+- **Windows:** Settings › Apps › LionPhotos › Uninstall. The portable `.zip` is just a folder to delete.
 - **macOS:** drag LionPhotos from Applications to the Trash, or run
   `curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/install.sh | bash -s -- --uninstall`
   if you installed it with the script.
 - **Linux:** remove the package (`sudo apt remove lionphotos`, `sudo dnf remove lionphotos`) or, for a script
   install, run the same `install.sh … --uninstall` command. An AppImage is just a file to delete.
 
-Settings and the catalog are kept (`--purge` / `-Purge` also removes them with the scripts).
+Settings and the catalog are kept (`--purge` also removes them with `install.sh`).
 
 ## For maintainers: publishing a release
 
@@ -206,12 +183,12 @@ Settings and the catalog are kept (`--purge` / `-Purge` also removes them with t
 2. Commit, then tag and push: `git tag v1.2.3 && git push origin main v1.2.3`.
 3. The **Release** workflow:
    - runs the tests;
-   - builds the Windows wizard with Inno Setup and tests it end to end on a Windows runner (install, launch, update,
-     a tampered download refused, uninstall);
+   - builds the Windows setups and portable `.zip` files (x64 and ARM) with electron-builder and tests the setup
+     end to end on a Windows runner (install, launch, update over it, replacing an earlier Inno Setup
+     installation, uninstall with the app open, settings kept);
    - builds the `.dmg` on macOS and the `.deb`, `.rpm` and AppImage on Linux (the `.deb` is installed and launched);
-   - builds the app bundle with `node tools/make-release.js` (reproducible archives);
+   - builds the `install.sh` bundle and `manifest.txt` with `node tools/make-release.js` (reproducible archives);
    - lists every file in `SHA256SUMS`, attests them and publishes the GitHub release.
 
-To build the Windows wizard locally: install [Inno Setup](https://jrsoftware.org/isinfo.php) 6.5 or newer and run
-`iscc /DAppVersion=1.2.3 installer\lionphotos.iss` (output in `dist-installer\`). Native packages can be built
-locally with `npm run dist:*`.
+To build the Windows setup locally: `npm ci`, then `npm run dist:win` (or double-click `build-installer.bat`); the
+setup and the portable `.zip` land in `dist\`. The other packages: `npm run dist:mac`, `npm run dist:linux`.

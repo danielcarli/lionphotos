@@ -26,10 +26,12 @@ const VERSION_RE = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.]+))?$/;
 const TIMEOUT_MS = 15000;
 const QUIT_AFTER_SPAWN_MS = 100;
 const MARKER = 'lionphotos-install.txt';
-const SETUP_NAME = 'LionPhotos-Setup.exe';
+// the Windows setup holds the whole app (about 150 MB): nothing else is downloaded while it installs
+const UNINSTALLER = 'Uninstall LionPhotos.exe';
 // the files of a release (as .github/workflows/release.yml publishes them) and their size limits
 const ASSET = {
-  setup: [SETUP_NAME, 64 << 20],
+  setup: ['LionPhotos-Setup.exe', 512 << 20],
+  setupArm64: ['LionPhotos-Setup-arm64.exe', 512 << 20],
   dmg: ['LionPhotos-mac-universal.dmg', 1024 << 20],
   appimage: ['LionPhotos-x86_64.AppImage', 1024 << 20],
   deb: ['lionphotos_amd64.deb', 1024 << 20],
@@ -68,51 +70,28 @@ function compareVersions(a, b) {
 }
 
 /**
- * The setup kept for updates cannot replace itself while it runs. During an update it fetches the release's
- * setup (verified) next to itself as LionPhotos-Setup.new.exe; here, while nothing runs it, that one takes
- * its place. Returns the setup to start.
- */
-function useNewestSetup(setup) {
-  const next = setup.replace(/\.exe$/i, '.new.exe');
-  if (!isFile(next)) return setup;
-  const old = setup.replace(/\.exe$/i, '.old.exe');
-  try {
-    fs.rmSync(old, { force: true });
-    if (isFile(setup)) fs.renameSync(setup, old);
-  } catch { return next; }
-  try { fs.renameSync(next, setup); } catch {
-    try { fs.renameSync(old, setup); } catch { /* the new one is started instead */ }
-    return next;
-  }
-  fs.rm(old, { force: true }, () => {});
-  return setup;
-}
-
-/**
  * How a copy of the app is updated, from where and how it was installed:
- *  - 'installer'  Windows, the setup wizard (LionPhotos-Setup.exe): its kept copy runs again with /UPDATE;
- *  - 'script'     Windows, install.ps1 for the current user: the copy kept next to the app runs with -Yes;
+ *  - 'setup'      Windows, installed by LionPhotos-Setup.exe: the new setup (the whole app, verified) installs
+ *                 over this one quietly once the app has closed, then opens it;
  *  - 'dmg'        macOS, the .dmg: the new .dmg opens, and the app closes so it can be replaced;
  *  - 'sh'         macOS or Linux, install.sh (where no administrator is needed): it runs again, then reopens;
  *  - 'appimage'   Linux AppImage: the new AppImage takes the place of this one and opens;
  *  - 'deb'/'rpm'  Linux packages: the new package opens in the system's software installer;
- *  - 'download'   anything else (running from source, an install for all users on Linux): the release page.
+ *  - 'download'   anything else (running from source, the portable .zip of Windows, an install for all users on
+ *                 Linux): the release page.
  * `env` lets the tests describe a computer; normally it is this one.
  */
 function detectMethod(env = {}) {
   const e = {
-    platform: process.platform, packaged: !!app?.isPackaged, execPath: process.execPath,
-    localAppData: process.env.LOCALAPPDATA || '', appImage: process.env.APPIMAGE || '',
+    platform: process.platform, packaged: !!app?.isPackaged, execPath: process.execPath, arch: process.arch,
+    appImage: process.env.APPIMAGE || '',
     dpkgList: '/var/lib/dpkg/info/lionphotos.list', rpmBin: '/usr/bin/rpm', ...env,
   };
   if (!e.packaged) return { kind: 'download' };
   const exeDir = path.dirname(e.execPath);
   if (e.platform === 'win32') {
-    const setup = path.join(e.localAppData, 'LionPhotos-Installer', SETUP_NAME);
-    const inUserPrograms = e.localAppData && exeDir.toLowerCase() === path.join(e.localAppData, 'Programs', 'LionPhotos').toLowerCase();
-    if (inUserPrograms && isFile(setup) && isFile(path.join(exeDir, 'unins000.exe'))) return { kind: 'installer', file: setup };
-    const script = path.join(exeDir, 'install.ps1');
-    if (isFile(script) && markerScope(path.join(exeDir, MARKER)) === 'User') return { kind: 'script', file: script };
+    // installed by the setup: its uninstaller is beside the app (the portable .zip has none)
+    if (isFile(path.join(exeDir, UNINSTALLER))) return { kind: 'setup', asset: e.arch === 'arm64' ? 'setupArm64' : 'setup' };
     return { kind: 'download' };
   }
   if (e.platform === 'darwin') {
@@ -137,6 +116,22 @@ class UpdateMainService {
     this.version = JSON.parse(fs.readFileSync(path.join(appRoot, 'package.json'), 'utf8')).version;
     this.getWebContents = getWebContents;
     this.latest = '';
+  }
+
+  /**
+   * The Windows setup an update used (150 MB) is not kept once that version runs: at start, the setups of
+   * this version or older are removed from the updates folder (in the background).
+   */
+  removeUsedSetups() {
+    let dir;
+    try { dir = path.join(app.getPath('userData'), 'updates'); } catch { return; }
+    fs.readdir(dir, (err, names) => {
+      if (err) return;
+      for (const name of names) {
+        const v = /^LionPhotos-Setup-(.+?)\.exe(\.part)?$/i.exec(name)?.[1];
+        if (v && (!VERSION_RE.test(v) || compareVersions(v, this.version) <= 0)) fs.rm(path.join(dir, name), { force: true }, () => {});
+      }
+    });
   }
 
   registerChannels(ipc) {
@@ -167,39 +162,17 @@ class UpdateMainService {
       if (!latest || !VERSION_RE.test(latest)) throw new Error('unexpected manifest');
       this.latest = latest;
       const available = compareVersions(latest, this.version) > 0;
-      if (available && base.method === 'installer') this.#prefetchSetup(latest).catch(() => { /* the kept copy is used */ });
       return { ...base, ok: true, latest, available };
     } catch (err) {
       return { ...base, ok: false, error: err.name === 'AbortError' ? 'timeout' : String(err.message || err) };
     }
   }
 
-  /** Network GET with a timeout and a size limit; `onProgress(received, total)` while it arrives. */
-  async #get(url, maxBytes, timeoutMs, onProgress) {
-    const controller = new AbortController();
-    let timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await net.fetch(url, { signal: controller.signal, headers: { 'User-Agent': `LionPhotos/${this.version}` } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const total = Number(res.headers.get('content-length') || 0);
-      if (total > maxBytes) throw new Error('too large');
-      const parts = [];
-      let received = 0;
-      const reader = res.body.getReader();
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        received += value.length;
-        if (received > maxBytes) throw new Error('too large');
-        parts.push(Buffer.from(value));
-        // a slow connection is fine while bytes keep coming
-        clearTimeout(timer); timer = setTimeout(() => controller.abort(), timeoutMs);
-        onProgress?.(received, total);
-      }
-      return Buffer.concat(parts);
-    } finally {
-      clearTimeout(timer);
-    }
+  /** A small file of the release, whole (manifest.txt, SHA256SUMS). */
+  async #get(url, maxBytes, timeoutMs) {
+    const parts = [];
+    await this.#stream(url, maxBytes, timeoutMs, (chunk) => parts.push(chunk));
+    return Buffer.concat(parts);
   }
 
   /** The SHA-256 the release publishes for one of its files. */
@@ -211,8 +184,9 @@ class UpdateMainService {
   }
 
   /**
-   * Downloads one file of the release into `dir` (as `name`, written as `.part` and renamed), with progress
-   * sent to the window, and keeps it only if its SHA-256 matches the one published with the release.
+   * Downloads one file of the release into `dir` (as `name`): written as it arrives to a `.part` file while its
+   * SHA-256 is computed — a Windows setup is 150 MB, never held in memory — with progress sent to the window,
+   * and kept (renamed) only if the SHA-256 matches the one published with the release.
    */
   async download(kind, dir, version = this.latest, name = ASSET[kind][0]) {
     if (!VERSION_RE.test(version || '')) throw new Error('no new version known');
@@ -220,34 +194,52 @@ class UpdateMainService {
     const expected = await this.#publishedSum(version, file);
     const target = path.join(dir, name);
     if (isFile(target) && sha256(target) === expected) return target; // already here, from an earlier try
-    let last = 0;
-    const data = await this.#get(`${this.releases}/download/v${version}/${file}`, max, TIMEOUT_MS * 2, (received, total) => {
-      const now = Date.now();
-      if (now - last < 150) return;
-      last = now;
-      this.getWebContents()?.send('update:progress', { received, total, name: file });
-    });
-    if (crypto.createHash('sha256').update(data).digest('hex') !== expected) throw new Error('checksum');
     fs.mkdirSync(dir, { recursive: true });
     const part = `${target}.part`;
-    fs.writeFileSync(part, data, { mode: kind === 'appimage' || kind === 'sh' ? 0o755 : 0o644 });
+    const hash = crypto.createHash('sha256');
+    const out = fs.openSync(part, 'w', kind === 'appimage' || kind === 'sh' ? 0o755 : 0o644);
+    let last = 0;
+    try {
+      await this.#stream(`${this.releases}/download/v${version}/${file}`, max, TIMEOUT_MS * 2, (chunk, received, total) => {
+        hash.update(chunk);
+        fs.writeSync(out, chunk);
+        const now = Date.now();
+        if (now - last < 150) return;
+        last = now;
+        this.getWebContents()?.send('update:progress', { received, total, name: file });
+      });
+    } catch (err) {
+      fs.closeSync(out);
+      fs.rmSync(part, { force: true });
+      throw err;
+    }
+    fs.closeSync(out);
+    if (hash.digest('hex') !== expected) { fs.rmSync(part, { force: true }); throw new Error('checksum'); }
     fs.renameSync(part, target);
     return target;
   }
 
-  /** Windows wizard: the release's setup fetched beside the kept copy after a check (see useNewestSetup). */
-  async #prefetchSetup(latest) {
-    if (this.prefetching) return;
-    const m = this.method();
-    if (m.kind !== 'installer') return;
-    this.prefetching = true;
+  /** A network GET handed over piece by piece (`onChunk(chunk, received, total)`), with a timeout and a size limit. */
+  async #stream(url, maxBytes, timeoutMs, onChunk) {
+    const controller = new AbortController();
+    let timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const expected = await this.#publishedSum(latest, SETUP_NAME);
-      const next = m.file.replace(/\.exe$/i, '.new.exe');
-      if (sha256(m.file) === expected) { fs.rmSync(next, { force: true }); return; } // already the latest
-      await this.download('setup', path.dirname(m.file), latest, path.basename(next));
+      const res = await net.fetch(url, { signal: controller.signal, headers: { 'User-Agent': `LionPhotos/${this.version}` } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const total = Number(res.headers.get('content-length') || 0);
+      if (total > maxBytes) throw new Error('too large');
+      let received = 0;
+      const reader = res.body.getReader();
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        received += value.length;
+        if (received > maxBytes) throw new Error('too large');
+        clearTimeout(timer); timer = setTimeout(() => controller.abort(), timeoutMs);
+        onChunk(Buffer.from(value.buffer, value.byteOffset, value.length), received, total);
+      }
     } finally {
-      this.prefetching = false;
+      clearTimeout(timer);
     }
   }
 
@@ -275,16 +267,18 @@ class UpdateMainService {
       const updates = path.join(app.getPath('userData'), 'updates');
       const downloads = (() => { try { return app.getPath('downloads'); } catch { return os.homedir(); } })();
 
-      if (m.kind === 'installer' || m.kind === 'script') {
-        // the installer replaces the app's files, so the app quits as soon as it has started
-        const [cmd, args] = m.kind === 'installer'
-          ? [useNewestSetup(m.file), ['/UPDATE']]
-          : [path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe'),
-              ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', m.file, '-Yes']];
-        const err = await this.#start(cmd, args);
+      if (m.kind === 'setup') {
+        // the new setup (verified) installs quietly over this copy — it waits for the app to close — and opens
+        // the new version when it is done (--updated: an update, not a first install; the settings, the
+        // catalog and the shortcuts stay as they are)
+        const setup = await this.download(m.asset || 'setup', updates, this.latest, `LionPhotos-Setup-${this.latest}.exe`);
+        for (const old of fs.readdirSync(updates)) {
+          if (/^LionPhotos-Setup-.*\.exe(\.part)?$/i.test(old) && path.join(updates, old) !== setup) fs.rm(path.join(updates, old), { force: true }, () => {});
+        }
+        const err = await this.#start(setup, ['--updated', '/S', '--force-run']);
         if (err) return { ok: false, error: err };
         this.#quitSoon();
-        return { ok: true, action: m.kind };
+        return { ok: true, action: 'setup' };
       }
 
       if (m.kind === 'appimage') {
@@ -334,4 +328,4 @@ class UpdateMainService {
   }
 }
 
-module.exports = { UpdateMainService, compareVersions, useNewestSetup, publishedSum, detectMethod, ASSET };
+module.exports = { UpdateMainService, compareVersions, publishedSum, detectMethod, ASSET };

@@ -47,7 +47,7 @@ jobs:
           fi
 
   lint:
-    name: Lint installers
+    name: Lint install.sh
     needs: gate
     if: ${{ !cancelled() && needs.gate.outputs.tagged != 'true' }}
     runs-on: ubuntu-24.04
@@ -58,17 +58,6 @@ jobs:
           persist-credentials: false
       - name: shellcheck install.sh
         run: shellcheck -s bash -S warning scripts/install.sh
-      - name: PSScriptAnalyzer install.ps1
-        shell: pwsh
-        run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
-          $issues = Invoke-ScriptAnalyzer -Path scripts/install.ps1 -Severity Warning,Error `
-            -ExcludeRule PSAvoidUsingWriteHost,PSUseShouldProcessForStateChangingFunctions,PSUseSingularNouns,PSReviewUnusedParameter
-          $issues | Format-Table -AutoSize
-          if ($issues) { exit 1 }
-      - name: install.ps1 is ASCII (Windows PowerShell 5.1 reads BOM-less files as ANSI)
-        run: "! LC_ALL=C grep -nP '[^\\x00-\\x7F]' scripts/install.ps1 scripts/install.cmd"
 
   test:
     name: Tests
@@ -146,11 +135,11 @@ jobs:
           test ! -e "$HOME/.local/share/lionphotos"
 
   windows:
-    name: Windows installers
+    name: Windows setup (the whole app inside) and portable .zip
     needs: gate
     if: ${{ !cancelled() && needs.gate.outputs.tagged != 'true' }}
     runs-on: windows-2025
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -158,51 +147,41 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
+          cache: npm
+      - run: npm ci
 
-      - name: Release assets
-        shell: pwsh
-        run: node tools/make-release.js --out "$env:RUNNER_TEMP\r1"
-
-      - name: Inno Setup 6.7.4 (pinned by SHA-256)
-        shell: pwsh
-        run: |
-          $exe = Join-Path $env:RUNNER_TEMP 'innosetup.exe'
-          Invoke-WebRequest -UseBasicParsing 'https://github.com/jrsoftware/issrc/releases/download/is-6_7_4/innosetup-6.7.4.exe' -OutFile $exe
-          $hash = (Get-FileHash $exe -Algorithm SHA256).Hash
-          if ($hash -ne 'A549929319F9120716677C685535CA4671E4B937B5FDC87E2585F32D8EB30E8C') { throw "Inno Setup checksum mismatch: $hash" }
-          $dir = Join-Path $env:RUNNER_TEMP 'inno'
-          Start-Process $exe -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/CURRENTUSER', "/DIR=$dir" -Wait
-          Add-Content -Path $env:GITHUB_PATH -Value $dir
-
-      - name: Build the graphical installer
+      # The setup holds the whole app (electron-builder + NSIS): nothing is downloaded while it installs. One
+      # setup per processor; the file names have no version, so ".../releases/latest/download/LionPhotos-Setup.exe"
+      # is always the newest.
+      - name: Build the setups and the portable versions (x64, ARM)
         shell: pwsh
         run: |
-          $v = node -p "require('./package.json').version"
-          ISCC.exe /Q "/DAppVersion=$v" installer\lionphotos.iss
+          npx --yes electron-builder@26.18.0 --win nsis zip --x64 --publish never
           if ($LASTEXITCODE -ne 0) { exit 1 }
-          Get-Item dist-installer\LionPhotos-Setup.exe | Format-Table Name, Length
+          npx --yes electron-builder@26.18.0 --win nsis zip --arm64 --publish never
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          Move-Item dist\LionPhotos-Setup-x64.exe dist\LionPhotos-Setup.exe
+          Get-Item dist\LionPhotos-Setup.exe, dist\LionPhotos-Setup-arm64.exe, dist\LionPhotos-win-x64.zip, dist\LionPhotos-win-arm64.zip | Format-Table Name, Length
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: installer-windows
-          path: dist-installer/LionPhotos-Setup.exe
+          path: |
+            dist/LionPhotos-Setup.exe
+            dist/LionPhotos-Setup-arm64.exe
+            dist/LionPhotos-win-x64.zip
+            dist/LionPhotos-win-arm64.zip
           if-no-files-found: error
 
-      - name: Installers end to end (local release, real Electron download)
+      - name: The setup end to end (install, start, update over it, earlier setup replaced, uninstall)
         shell: pwsh
+        timeout-minutes: 15
         run: |
           $ErrorActionPreference = 'Stop'
           $v = node -p "require('./package.json').version"
-          $srv = Join-Path $env:RUNNER_TEMP 'srv'
-          $rel = Join-Path $srv 'releases'
-          New-Item -ItemType Directory -Force -Path "$rel\latest\download", "$rel\download\v$v" | Out-Null
-          Copy-Item "$env:RUNNER_TEMP\r1\*" "$rel\latest\download\"
-          Copy-Item "$env:RUNNER_TEMP\r1\*" "$rel\download\v$v\"
-          $server = Start-Process python -ArgumentList '-m', 'http.server', '8765', '--bind', '127.0.0.1', '--directory', $srv -PassThru -WindowStyle Hidden
-          Start-Sleep -Seconds 3
-          $env:LIONPHOTOS_ALLOW_INSECURE_FOR_TESTS = '1'
-          $env:LIONPHOTOS_RELEASES_URL = 'http://127.0.0.1:8765/releases'
+          $setup = (Resolve-Path dist\LionPhotos-Setup.exe).Path
           $app = Join-Path $env:LOCALAPPDATA 'Programs\LionPhotos'
+          $data = Join-Path $env:APPDATA 'LionPhotos'
           $innoKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{10F3A9B6-64DA-4D56-BE79-9E2BE938402D}_is1'
           function Assert-True($ok, [string] $msg) { if (-not $ok) { throw "FAILED: $msg" }; Write-Host "OK   $msg" }
           function Get-AppProcess { @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Path -and $_.Path.StartsWith("$app\", [StringComparison]::OrdinalIgnoreCase) }) }
@@ -210,68 +189,53 @@ jobs:
             $p = Start-Process (Join-Path $app 'LionPhotos.exe') -PassThru
             Start-Sleep -Seconds 12
             $alive = -not $p.HasExited
-            # LionPhotos.exe and Electron's helper processes
             Get-AppProcess | Stop-Process -Force -ErrorAction SilentlyContinue
             Start-Sleep -Seconds 3
             return $alive
           }
           function Wait-Gone([string] $path) { for ($i = 0; $i -lt 120 -and (Test-Path $path); $i++) { Start-Sleep -Seconds 1 }; -not (Test-Path $path) }
-          function Invoke-Setup([string] $exe, [string[]] $extra) {
-            $log = Join-Path $env:RUNNER_TEMP ("setup-" + [Guid]::NewGuid().ToString('N') + '.log')
-            $p = Start-Process $exe -ArgumentList (@('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$log") + $extra) -Wait -PassThru
-            # Write-Host, not output: anything written to the pipeline here would become part of the return value
-            Get-Content $log -Tail 15 -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "   | $_" }
-            return $p.ExitCode
+          function Get-AppEntry { Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall' | Get-ItemProperty | Where-Object { $_.DisplayName -eq 'LionPhotos' } | Select-Object -First 1 }
+          function Invoke-Setup([string[]] $arguments) { (Start-Process $setup -ArgumentList $arguments -Wait -PassThru).ExitCode }
+
+          # 0. a LionPhotos installed by the earlier setup (Inno Setup, up to 1.53), when the latest published
+          #    release still has it: the new setup must replace it, keeping the settings and the catalog
+          $earlier = Join-Path $env:RUNNER_TEMP 'earlier-setup.exe'
+          try { Invoke-WebRequest -UseBasicParsing "https://github.com/$env:GITHUB_REPOSITORY/releases/latest/download/LionPhotos-Setup.exe" -OutFile $earlier } catch { Write-Host "no earlier setup to try: $_" }
+          if (Test-Path $earlier) {
+            Start-Process $earlier -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART' -Wait | Out-Null
+            Start-Sleep -Seconds 5
           }
-          try {
-            # 1. the PowerShell script, under Windows PowerShell 5.1 (what users have)
-            powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\install.ps1 -Yes
-            Assert-True ($LASTEXITCODE -eq 0) 'install.ps1 finished'
-            Assert-True ((Get-Content "$app\resources\app\package.json" -Raw | ConvertFrom-Json).version -eq $v) "install.ps1 installed version $v"
-            Assert-True (Test-Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\LionPhotos') 'install.ps1 entry in Settings > Apps'
-            Assert-True (Test-AppStarts) 'the app installed by install.ps1 starts'
-            powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$app\install.ps1" -Uninstall -Yes
-            Assert-True (-not (Test-Path "$app\LionPhotos.exe")) 'install.ps1 -Uninstall removed the app'
+          $hadInno = Test-Path $innoKey
+          if ($hadInno) { Write-Host 'the earlier setup (Inno) is installed: the new setup must replace it' } else { Write-Host 'the latest release is not the earlier setup: nothing to replace' }
+          New-Item -ItemType Directory -Force -Path $data | Out-Null
+          Set-Content -Path (Join-Path $data 'keep.txt') -Value 'the settings and the catalog stay'
 
-            # 2. the graphical installer, silent
-            $code = Invoke-Setup 'dist-installer\LionPhotos-Setup.exe' @()
-            Assert-True ($code -eq 0) "LionPhotos-Setup.exe finished (exit code $code)"
-            Assert-True ((Get-Content "$app\resources\app\package.json" -Raw | ConvertFrom-Json).version -eq $v) "setup installed version $v"
-            Assert-True ((Get-ItemProperty $innoKey).DisplayVersion -eq $v) 'setup entry in Settings > Apps shows the installed version'
-            Assert-True (Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\LionPhotos.lnk") 'Start menu shortcut'
-            Assert-True (Test-Path "$env:LOCALAPPDATA\LionPhotos-Installer\LionPhotos-Setup.exe") 'installer copy for updates'
-            Assert-True (-not (Test-Path "$env:LOCALAPPDATA\LionPhotos-Installer\staging")) 'temporary folder removed'
-            Assert-True (Test-AppStarts) 'the app installed by the setup starts'
-
-            # 3. update with the copy used by the "Update LionPhotos" shortcut
-            $code = Invoke-Setup "$env:LOCALAPPDATA\LionPhotos-Installer\LionPhotos-Setup.exe" @('/UPDATE')
-            Assert-True ($code -eq 0) "update from the Start menu copy (exit code $code)"
-            Assert-True ((Test-Path "$app\unins000.dat") -and -not (Test-Path "$app\unins001.exe")) 'the update kept the same uninstaller'
-
-            # 4. a tampered release is refused and the installed version is kept
-            Add-Content -Path "$rel\download\v$v\lionphotos-$v.zip" -Value 'x'
-            $code = Invoke-Setup 'dist-installer\LionPhotos-Setup.exe' @()
-            Assert-True ($code -ne 0) "tampered package refused (exit code $code)"
-            Assert-True (Test-Path "$app\LionPhotos.exe") 'the installed version was kept'
-
-            # 5. uninstall, with the app open: the uninstaller must close it first
-            Start-Process (Join-Path $app 'LionPhotos.exe') | Out-Null
-            Start-Sleep -Seconds 8
-            Write-Host ("app processes before uninstalling: " + (Get-AppProcess).Count)
-            $ulog = Join-Path $env:RUNNER_TEMP 'uninstall.log'
-            # the uninstaller registered in Settings > Apps, as Windows runs it
-            $uninstaller = (Get-ItemProperty $innoKey).UninstallString.Trim('"')
-            Write-Host "uninstaller: $uninstaller"
-            Start-Process $uninstaller -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$ulog" -Wait
-            $gone = Wait-Gone "$app\LionPhotos.exe"
-            if (-not $gone) {
-              Write-Host '--- uninstall log'; Get-Content $ulog -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "   | $_" }
-              Write-Host '--- files left'; Get-ChildItem $app -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "   $($_.Name)" }
-              Write-Host '--- processes from the app folder'; Get-AppProcess | ForEach-Object { Write-Host "   $($_.Id) $($_.Path)" }
-            }
-            Assert-True $gone 'uninstaller closed the app and removed it'
-            Assert-True (Wait-Gone $innoKey) 'uninstaller removed the entry in Settings > Apps'
-            Assert-True (Wait-Gone "$env:LOCALAPPDATA\LionPhotos-Installer") 'uninstaller removed the installer copy'
-          } finally {
-            Stop-Process $server -ErrorAction SilentlyContinue
+          # 1. install, quietly
+          $code = Invoke-Setup @('/S')
+          Assert-True ($code -eq 0) "LionPhotos-Setup.exe /S finished (exit code $code)"
+          Assert-True (Test-Path "$app\LionPhotos.exe") 'installed in %LOCALAPPDATA%\Programs\LionPhotos'
+          Assert-True (Test-Path "$app\resources\app.asar") 'the app is inside (app.asar), nothing was downloaded'
+          Assert-True ((Get-AppEntry).DisplayVersion -eq $v) "Settings > Apps shows LionPhotos $v"
+          Assert-True (Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\LionPhotos.lnk") 'Start menu shortcut'
+          if ($hadInno) {
+            Assert-True (Wait-Gone $innoKey) 'the earlier setup was uninstalled (one LionPhotos in Settings > Apps)'
+            Assert-True (-not (Test-Path "$app\unins000.exe")) "the earlier setup's files are gone"
+            Assert-True (Wait-Gone "$env:LOCALAPPDATA\LionPhotos-Installer") "the earlier setup's kept copy is gone"
           }
+          Assert-True (Test-Path (Join-Path $data 'keep.txt')) 'settings and catalog kept'
+          Assert-True (Test-AppStarts) 'the installed app starts'
+
+          # 2. an update, as the update window starts it: quietly over the installed one
+          $code = Invoke-Setup @('--updated', '/S')
+          Assert-True ($code -eq 0) "update over the installed version (exit code $code)"
+          Assert-True ((Test-Path "$app\LionPhotos.exe") -and (Test-Path "$app\Uninstall LionPhotos.exe")) 'still installed after the update'
+          Assert-True (@(Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall' | Get-ItemProperty | Where-Object { $_.DisplayName -eq 'LionPhotos' }).Count -eq 1) 'one entry in Settings > Apps'
+
+          # 3. uninstall, with the app open: the uninstaller closes it, removes the app, keeps the settings and the catalog
+          Start-Process (Join-Path $app 'LionPhotos.exe') | Out-Null
+          Start-Sleep -Seconds 8
+          Start-Process (Join-Path $app 'Uninstall LionPhotos.exe') -ArgumentList '/S' -Wait | Out-Null
+          Assert-True (Wait-Gone "$app\LionPhotos.exe") 'the uninstaller closed the app and removed it'
+          for ($i = 0; $i -lt 60 -and (Get-AppEntry); $i++) { Start-Sleep -Seconds 1 }
+          Assert-True (-not (Get-AppEntry)) 'the entry in Settings > Apps is gone'
+          Assert-True (Test-Path (Join-Path $data 'keep.txt')) 'settings and catalog kept after uninstalling'

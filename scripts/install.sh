@@ -99,7 +99,7 @@ OS="$(uname -s)"
 case "$OS" in
   Darwin) PLATFORM="darwin" ;;
   Linux) PLATFORM="linux" ;;
-  *) die "Unsupported system: $OS. On Windows, use install.ps1." ;;
+  *) die "Unsupported system: $OS. On Windows, use LionPhotos-Setup.exe from the release page." ;;
 esac
 case "$(uname -m)" in
   x86_64|amd64) ARCH="x64" ;;

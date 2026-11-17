@@ -2153,6 +2153,7 @@
   "update.dialog.preparing": "正在获取新版本的文件…",
   "update.dialog.closingDmg": "正在关闭 LionPhotos：请在打开的窗口中将其拖到“应用程序”并选择“替换”。",
   "update.dialog.privacy": "只有在你打开此窗口时，LionPhotos 才会连接互联网：它会读取 GitHub 上已发布版本中的一个小文件。更新时会下载适用于你系统的安装程序，并在使用前进行校验（SHA-256）。不会发送任何关于你或你照片的数据。",
+  "update.dialog.howSetup": "将下载并校验新版本的安装程序（约 150 MB，完整应用）。随后 LionPhotos 关闭，安装程序安装新版本并重新打开。你的设置和目录会保留。",
   "update.failed": "无法开始更新：{error}",
   "update.downloadOpened": "已在浏览器中打开下载页面。",
   "update.packageOpened": "新版本已在系统安装程序中打开。安装完成后请重新打开 LionPhotos。",

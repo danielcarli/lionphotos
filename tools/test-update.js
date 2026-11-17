@@ -4,12 +4,12 @@
  *  Licensed under the MIT License. See LICENSE in the project root.
  *--------------------------------------------------------------------------------------------*/
 // Unit tests for the update check (src/platform/update/electron-main/updateMainService.js): versions, the
-// checksums of a release, the setup that replaces itself, and how each kind of install is updated.
+// checksums of a release, and how each kind of install is updated.
 //   node tools/test-update.js
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { compareVersions, publishedSum, useNewestSetup, detectMethod } = require('../src/platform/update/electron-main/updateMainService.js');
+const { compareVersions, publishedSum, detectMethod, ASSET } = require('../src/platform/update/electron-main/updateMainService.js');
 
 let failures = 0;
 const check = (ok, label, extra = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${label}${extra ? '  ' + extra : ''}`); if (!ok) failures++; };
@@ -28,28 +28,19 @@ check(publishedSum(sums, 'LionPhotos-Setup.exe') === 'a'.repeat(64) && published
   'the published SHA-256 of a file is found (binary marker and capitals too)');
 check(publishedSum(sums, 'short.txt') === '' && publishedSum(sums, 'missing.dmg') === '', 'a missing file or a malformed checksum gives nothing');
 
-// the kept setup takes the new one's place
-const kept = touch(path.join(tmp, 'win', 'LionPhotos-Setup.exe'), 'old');
-check(useNewestSetup(kept) === kept && fs.readFileSync(kept, 'utf8') === 'old', 'with no newer setup, the kept one runs');
-touch(kept.replace(/\.exe$/, '.new.exe'), 'new');
-check(useNewestSetup(kept) === kept && fs.readFileSync(kept, 'utf8') === 'new' && !fs.existsSync(kept.replace(/\.exe$/, '.new.exe')),
-  'a verified newer setup takes the place of the kept one before it runs');
+// Windows: the setup (it holds the whole app) is the release's own file, for each processor
+check(ASSET.setup[0] === 'LionPhotos-Setup.exe' && ASSET.setupArm64[0] === 'LionPhotos-Setup-arm64.exe' && ASSET.setup[1] >= 300 << 20,
+  'Windows: the update downloads the release\'s complete setup (x64 or ARM), up to 512 MB');
 
 // how each install is updated
-const local = path.join(tmp, 'AppData', 'Local');
-const winExe = touch(path.join(local, 'Programs', 'LionPhotos', 'LionPhotos.exe'));
-check(detectMethod({ platform: 'win32', packaged: true, execPath: winExe, localAppData: local }).kind === 'download', 'Windows without the wizard nor the script: the download page');
-touch(path.join(local, 'Programs', 'LionPhotos', 'unins000.exe'));
-const setup = touch(path.join(local, 'LionPhotos-Installer', 'LionPhotos-Setup.exe'));
-const w = detectMethod({ platform: 'win32', packaged: true, execPath: winExe, localAppData: local });
-check(w.kind === 'installer' && w.file === setup, 'Windows, installed by the setup wizard: its kept copy updates');
-const psDir = path.join(tmp, 'ps', 'LionPhotos');
-const psExe = touch(path.join(psDir, 'LionPhotos.exe'));
-touch(path.join(psDir, 'install.ps1'));
-touch(path.join(psDir, 'lionphotos-install.txt'), 'version=1.38.1\nscope=Machine\n');
-check(detectMethod({ platform: 'win32', packaged: true, execPath: psExe, localAppData: local }).kind === 'download', 'Windows, install.ps1 for all users: the download page (it needs an administrator)');
-touch(path.join(psDir, 'lionphotos-install.txt'), 'version=1.38.1\nscope=User\n');
-check(detectMethod({ platform: 'win32', packaged: true, execPath: psExe, localAppData: local }).kind === 'script', 'Windows, install.ps1 for this user: the script runs again');
+const winDir = path.join(tmp, 'AppData', 'Local', 'Programs', 'LionPhotos');
+const winExe = touch(path.join(winDir, 'LionPhotos.exe'));
+check(detectMethod({ platform: 'win32', packaged: true, execPath: winExe }).kind === 'download', 'Windows, the portable .zip (no uninstaller beside it): the download page');
+touch(path.join(winDir, 'Uninstall LionPhotos.exe'));
+const w = detectMethod({ platform: 'win32', packaged: true, execPath: winExe, arch: 'x64' });
+check(w.kind === 'setup' && w.asset === 'setup', 'Windows, installed by the setup: the new setup installs over it');
+check(detectMethod({ platform: 'win32', packaged: true, execPath: winExe, arch: 'arm64' }).asset === 'setupArm64', 'Windows on ARM: the ARM setup');
+check(detectMethod({ platform: 'win32', packaged: false, execPath: winExe }).kind === 'download', 'Windows, running from the source: the download page');
 
 const macApp = path.join(tmp, 'Applications', 'LionPhotos.app');
 const macExe = touch(path.join(macApp, 'Contents', 'MacOS', 'LionPhotos'));

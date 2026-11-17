@@ -3,11 +3,13 @@
  *  Created and conceived by Daniel Michelon De Carli.
  *  Licensed under the MIT License. See LICENSE in the project root.
  *--------------------------------------------------------------------------------------------*/
-// Builds the release assets consumed by the lightweight installers (scripts/install.*):
-//   lionphotos-<version>.tar.gz / .zip  the app source bundle (no Electron, a few MB)
-//   manifest.txt                           version, Electron version and bundle names
-//   install.sh / install.ps1 / install.cmd the installers
-//   SHA256SUMS                             checksums of everything above
+// Builds the release assets of the command-line installer for macOS and Linux (scripts/install.sh) and the
+// version file the app's update window reads:
+//   lionphotos-<version>.tar.gz  the app source bundle (no Electron, a few MB)
+//   manifest.txt                 version, Electron version and bundle name (read by the update window too)
+//   install.sh                   the installer
+//   SHA256SUMS                   checksums of everything above
+// Windows needs none of these: its setup (electron-builder + NSIS, built by release.yml) holds the whole app.
 // Archives are reproducible: sorted entries, fixed timestamps (SOURCE_DATE_EPOCH) and permissions.
 // Usage: node tools/make-release.js [--tag vX.Y.Z] [--out dist-release]
 const fs = require('fs');
@@ -77,55 +79,20 @@ function tarGz(list) {
   return zlib.gzipSync(Buffer.concat(blocks), { level: 9, mtime: 0 });
 }
 
-// ------------------------------------------------------------------ zip (deflate)
-function zip(list) {
-  const d = new Date(epoch * 1000);
-  const dosTime = (d.getUTCHours() << 11) | (d.getUTCMinutes() << 5) | (d.getUTCSeconds() >> 1);
-  const dosDate = ((d.getUTCFullYear() - 1980) << 9) | ((d.getUTCMonth() + 1) << 5) | d.getUTCDate();
-  const local = [];
-  const central = [];
-  let offset = 0;
-  for (const e of list) {
-    const name = Buffer.from(e.name, 'utf8');
-    const comp = zlib.deflateRawSync(e.data, { level: 9 });
-    const crc = zlib.crc32(e.data);
-    const lh = Buffer.alloc(30);
-    lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(20, 4); lh.writeUInt16LE(0x0800, 6); lh.writeUInt16LE(8, 8);
-    lh.writeUInt16LE(dosTime, 10); lh.writeUInt16LE(dosDate, 12); lh.writeUInt32LE(crc, 14);
-    lh.writeUInt32LE(comp.length, 18); lh.writeUInt32LE(e.data.length, 22); lh.writeUInt16LE(name.length, 26);
-    local.push(lh, name, comp);
-    const ch = Buffer.alloc(46);
-    ch.writeUInt32LE(0x02014b50, 0); ch.writeUInt16LE(0x0314, 4); ch.writeUInt16LE(20, 6); ch.writeUInt16LE(0x0800, 8); ch.writeUInt16LE(8, 10);
-    ch.writeUInt16LE(dosTime, 12); ch.writeUInt16LE(dosDate, 14); ch.writeUInt32LE(crc, 16);
-    ch.writeUInt32LE(comp.length, 20); ch.writeUInt32LE(e.data.length, 24); ch.writeUInt16LE(name.length, 28);
-    ch.writeUInt32LE((0o100644 << 16) >>> 0, 38); ch.writeUInt32LE(offset, 42);
-    central.push(ch, name);
-    offset += lh.length + name.length + comp.length;
-  }
-  const cd = Buffer.concat(central);
-  const end = Buffer.alloc(22);
-  end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(list.length, 8); end.writeUInt16LE(list.length, 10);
-  end.writeUInt32LE(cd.length, 12); end.writeUInt32LE(offset, 16);
-  return Buffer.concat([...local, cd, end]);
-}
-
 // ------------------------------------------------------------------ write the release
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.mkdirSync(outDir, { recursive: true });
 const tarName = `lionphotos-${version}.tar.gz`;
-const zipName = `lionphotos-${version}.zip`;
 fs.writeFileSync(path.join(outDir, tarName), tarGz(entries));
-fs.writeFileSync(path.join(outDir, zipName), zip(entries));
 fs.writeFileSync(path.join(outDir, 'manifest.txt'), [
   'name=LionPhotos',
   `version=${version}`,
   `tag=${tag}`,
   `electron=${electron}`,
   `source_tar=${tarName}`,
-  `source_zip=${zipName}`,
   '',
 ].join('\n'));
-for (const f of ['install.sh', 'install.ps1', 'install.cmd']) fs.copyFileSync(path.join(ROOT, 'scripts', f), path.join(outDir, f));
+for (const f of ['install.sh']) fs.copyFileSync(path.join(ROOT, 'scripts', f), path.join(outDir, f));
 fs.chmodSync(path.join(outDir, 'install.sh'), 0o755);
 
 const assets = fs.readdirSync(outDir).filter((f) => f !== 'SHA256SUMS').sort();

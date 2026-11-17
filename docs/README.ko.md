@@ -11,7 +11,7 @@
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · **한국어**
 
-![버전 1.53.1](https://img.shields.io/badge/version-1.53.1-161214)
+![버전 1.54.0](https://img.shields.io/badge/version-1.54.0-161214)
 ![상태: 베타 테스트](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![라이선스: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![플랫폼: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -84,21 +84,15 @@ LionPhotos는 **베타**입니다. 즉:
 
 ## 다운로드
 
-사용하는 시스템의 설치 프로그램을 다운로드하세요. 모든 설치 프로그램은 GitHub에서 **최신 버전**을 받고, 모든 파일을 검증합니다(SHA-256과 서명된 빌드 출처 증명).
+사용하는 시스템의 설치 프로그램을 다운로드하세요. 링크는 항상 **최신 버전**을 가리키며, 모든 파일을 검증합니다(SHA-256과 서명된 빌드 출처 증명).
 
-- **Windows 10/11**(x64, ARM): 설치 중에 앱을 다운로드하고 검증하는 약 2 MB의 설치 마법사. → [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe)
+- **Windows 10/11**(x64, ARM): 앱 전체가 들어 있는 설치 프로그램(약 150MB). 설치 중에는 아무것도 내려받지 않고 몇 초면 끝납니다. → [`LionPhotos-Setup.exe`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe) · [ARM](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup-arm64.exe) · [설치 없이 쓰는 `.zip`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-win-x64.zip)
 - **macOS 11+**(Apple 실리콘, Intel): `.dmg`를 열고 LionPhotos를 응용 프로그램으로 끌어 놓으세요. → [`LionPhotos-mac-universal.dmg`](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-mac-universal.dmg)
 - **Linux**(x64): Ubuntu, Debian, Mint 등은 `.deb`, Fedora, RHEL, openSUSE 등은 `.rpm`, 설치 없이 모든 배포판에서 쓰는 AppImage. → [`.deb`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos_amd64.deb) · [`.rpm`](https://github.com/danielcarli/lionphotos/releases/latest/download/lionphotos.x86_64.rpm) · [AppImage](https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-x86_64.AppImage)
 
 > 설치 프로그램은 아직 유료 인증서로 서명되지 않았습니다. 처음 실행할 때 Windows는 "Windows의 PC 보호"를 표시할 수 있고(**추가 정보 › 실행**), macOS는 **시스템 설정 › 개인정보 보호 및 보안 › 그래도 열기**에서 앱을 허용하라고 요청합니다.
 
-**터미널이 더 편하신가요?** Windows(PowerShell, 관리자 권한 불필요):
-
-```powershell
-irm https://github.com/danielcarli/lionphotos/releases/latest/download/install.ps1 | iex
-```
-
-macOS와 Linux:
+**터미널이 더 편하신가요?** macOS와 Linux:
 
 ```bash
 curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/install.sh | bash
@@ -276,7 +270,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 변경 내역
 
-[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.53.1**.
+[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.54.0**.
 
 ## 만든 사람들
 

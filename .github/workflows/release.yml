@@ -1,14 +1,16 @@
 # LionPhotos — publishes a GitHub release when a version tag (vX.Y.Z) is pushed.
 #
 # The release holds:
-#   - graphical installers: LionPhotos-Setup.exe (Windows, Inno Setup wizard of about 2 MB that downloads
-#     and verifies the app during setup, like the LEBR installer), LionPhotos-mac-universal.dmg (macOS),
-#     lionphotos_amd64.deb / lionphotos.x86_64.rpm / LionPhotos-x86_64.AppImage (Linux);
-#   - the command-line installers (install.ps1, install.cmd, install.sh);
-#   - the small files they download: the app source bundle, manifest.txt and SHA256SUMS.
-# The Windows wizard and the scripts download the Electron runtime from Electron's own GitHub releases and
-# verify it against Electron's published checksums. Every asset is listed in SHA256SUMS and gets a signed
-# build-provenance attestation (Sigstore), which users can check with
+#   - Windows: LionPhotos-Setup.exe (x64) and LionPhotos-Setup-arm64.exe, setups with the whole app inside
+#     (electron-builder + NSIS, built by the ci.yml "windows" job): nothing is downloaded while they install;
+#     LionPhotos-win-x64.zip / LionPhotos-win-arm64.zip, the same app without installing (portable);
+#   - macOS: LionPhotos-mac-universal.dmg; Linux: lionphotos_amd64.deb / lionphotos.x86_64.rpm /
+#     LionPhotos-x86_64.AppImage;
+#   - the command-line installer for macOS and Linux (install.sh) and the small files it downloads: the app
+#     source bundle and manifest.txt (which the app's update window also reads, to know the latest version);
+#   - SHA256SUMS. The file names have no version, so ".../releases/latest/download/<name>" is always the newest.
+# Every asset is listed in SHA256SUMS and gets a signed build-provenance attestation (Sigstore), which users can
+# check with
 #   gh attestation verify <file> --repo danielcarli/lionphotos
 name: Release
 
@@ -164,14 +166,17 @@ jobs:
 
           | System | Download |
           |---|---|
-          | **Windows** 10/11 (x64, ARM) | [LionPhotos-Setup.exe](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/LionPhotos-Setup.exe) — setup wizard (about 2 MB) that downloads and checks the app |
+          | **Windows** 10/11 (x64) | [LionPhotos-Setup.exe](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/LionPhotos-Setup.exe) — setup with the whole app inside: nothing is downloaded while it installs |
+          | **Windows** on ARM | [LionPhotos-Setup-arm64.exe](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/LionPhotos-Setup-arm64.exe) |
+          | **Windows**, without installing | [LionPhotos-win-x64.zip](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/LionPhotos-win-x64.zip) — unzip and open LionPhotos.exe |
           | **macOS** 11+ (Apple Silicon, Intel) | [LionPhotos-mac-universal.dmg](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/LionPhotos-mac-universal.dmg) |
           | **Ubuntu, Debian, Mint…** | [lionphotos_amd64.deb](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/lionphotos_amd64.deb) |
           | **Fedora, RHEL, openSUSE…** | [lionphotos.x86_64.rpm](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/lionphotos.x86_64.rpm) |
           | **Any Linux** | [LionPhotos-x86_64.AppImage](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/LionPhotos-x86_64.AppImage) |
 
-          Command line: \`irm https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/install.ps1 | iex\` (Windows) or
-          \`curl -fsSL https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/install.sh | bash\` (macOS, Linux).
+          Command line (macOS, Linux): \`curl -fsSL https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/install.sh | bash\`.
+
+          Coming from LionPhotos 1.53 or earlier on Windows? Run the new LionPhotos-Setup.exe once: it replaces the earlier setup (which downloaded the app while installing) and keeps your settings and catalog. Later versions update from the version number in the app.
 
           The installers are not signed with a paid certificate yet: Windows may show "Windows protected your PC" (More info › Run anyway) and macOS asks you to confirm in System Settings › Privacy & Security › Open Anyway. Every file is listed in SHA256SUMS and has a build-provenance attestation. See [docs/INSTALL.md](https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/docs/INSTALL.md).
           EOF

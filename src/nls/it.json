@@ -2153,6 +2153,7 @@
   "update.dialog.preparing": "Recupero dei file della nuova versione…",
   "update.dialog.closingDmg": "Chiusura di LionPhotos: nella finestra che si è aperta, trascinalo in Applicazioni e scegli Sostituisci.",
   "update.dialog.privacy": "LionPhotos si collega a Internet solo quando apri questa finestra: legge un piccolo file delle versioni pubblicate su GitHub. L’aggiornamento scarica il programma di installazione per il tuo sistema e lo verifica (SHA-256) prima di usarlo. Non viene inviato alcun dato su di te o sulle tue foto.",
+  "update.dialog.howSetup": "Il programma di installazione della nuova versione (circa 150 MB, l’app completa) verrà scaricato e verificato. Poi LionPhotos si chiude, l’installazione installa la nuova versione e la riapre. Le impostazioni e il catalogo vengono mantenuti.",
   "update.failed": "Impossibile avviare l’aggiornamento: {error}",
   "update.downloadOpened": "La pagina di download è stata aperta nel browser.",
   "update.packageOpened": "La nuova versione è stata aperta nel programma di installazione del sistema. Installala, poi riapri LionPhotos.",

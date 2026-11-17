@@ -77,13 +77,25 @@ jobs:
         with:
           path: models/tinyclip
           key: tinyclip-${{ hashFiles('tools/models/build.py', 'tools/models/requirements.txt', 'src/workbench/contrib/albums/contentCategories.js') }}
+      # its own Python (the runner's system Python refuses packages) and the Node of the other jobs (build.py
+      # reads the categories with it)
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          node-version: 24
       - name: Build the model
         if: steps.cache.outputs.cache-hit != 'true'
         timeout-minutes: 25
         run: |
-          python3 -m pip install --quiet --break-system-packages "torch==$(grep -oP '^torch==\K.*' tools/models/requirements.txt)" --index-url https://download.pytorch.org/whl/cpu
-          python3 -m pip install --quiet --break-system-packages -r <(grep -v '^torch==' tools/models/requirements.txt)
-          python3 tools/models/build.py --only tinyclip
+          set -x
+          python -m pip install --progress-bar off --index-url https://download.pytorch.org/whl/cpu "torch==$(sed -n 's/^torch==//p' tools/models/requirements.txt)"
+          grep -v '^torch==' tools/models/requirements.txt > "$RUNNER_TEMP/requirements.txt"
+          python -m pip install --progress-bar off -r "$RUNNER_TEMP/requirements.txt"
+          python tools/models/build.py --only tinyclip
       - name: The model is complete
         run: |
           test -s models/tinyclip/vision.onnx && test -s models/tinyclip/categories.bin && test -s models/tinyclip/manifest.json

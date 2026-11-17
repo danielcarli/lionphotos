@@ -4,19 +4,13 @@
 
 # LionPhotos
 
-**快速浏览、搜索和整理照片与视频收藏。**<br>
-直接使用你现有的文件夹：缩略图只生成一次，展示真正重要的元数据，并提供安全的整理工具。
+### 你拍过的每一张照片，几秒内就能找到。
+
+在照片和视频原本所在的位置——本机磁盘、外置硬盘或云端文件夹——浏览、搜索和整理海量收藏。快速、私密、免费。
 
 <sub>由 <b>LionPhotos Team</b> 开发 · 由 <b>Daniel Michelon De Carli</b> 创建和构思 · <a href="https://github.com/danielcarli/lionorganizer">LionOrganizer</a> 的姊妹软件</sub>
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · **简体中文** · [日本語](README.ja.md) · [한국어](README.ko.md)
-
-![版本 1.57.0](https://img.shields.io/badge/version-1.57.0-161214)
-![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
-![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
-![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
-![Electron](https://img.shields.io/badge/Electron-45-eecd25)
-![界面语言：10](https://img.shields.io/badge/UI%20languages-10-e5307a)
 
 <p>
   <a href="https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe"><img src="https://img.shields.io/badge/Windows-%E4%B8%8B%E8%BD%BD%20.exe-0194b2?style=for-the-badge&labelColor=161214" alt="Windows .exe"></a>
@@ -30,37 +24,50 @@
 
 <img src="screenshots/photos-grid.webp" alt="LionPhotos：带文件夹树和信息面板的照片网格" width="900">
 
+**无需导入** · **数据不出本机** · **10 万张照片如 100 张般流畅** · **免费开源**
+
+![版本 1.57.2](https://img.shields.io/badge/version-1.57.2-161214)
+![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
+![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
+![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
+![Electron](https://img.shields.io/badge/Electron-45-eecd25)
+![界面语言：10](https://img.shields.io/badge/UI%20languages-10-e5307a)
+
 </div>
 
 > **Beta 测试。** LionPhotos 已可日常使用，并在约 15,000 张照片和视频的真实收藏上测试，但仍处于 Beta 阶段：可能还有不完善之处；第一次重新整理收藏之前，请先备份。[这里的 Beta 是什么意思](#beta-测试)。
+
+## 实际效果
+
+从第一次滚动到交付相册：看看 LionPhotos 如何处理一份真实的收藏。
+
+| | |
+|---|---|
+| ![相册](screenshots/albums.webp) **相册** — 按年份的马赛克，带描述 | ![精选](screenshots/highlights.webp) **精选** — 只显示星标和 OK 的照片，像作品集一样 |
+| ![相册内部](screenshots/album.webp) **相册内部** — 马赛克、均匀网格、列表或精选 | ![搜索](screenshots/search.webp) **搜索** — 在标题栏中搜索整个收藏 |
+| ![地点](screenshots/places-map.webp) **地点** — 在本机绘制的世界地图上 | ![查看器](screenshots/viewer.webp) **查看器** — 带编辑面板（黑白） |
+| ![镜头校正](screenshots/lens.webp) **镜头校正** — 手动校正透视 | ![裁剪](screenshots/crop.webp) **裁剪** — 适合 Instagram、快拍、YouTube 等 |
+| ![描述](screenshots/metadata.webp) **描述** — IPTC 元数据，输入即保存 | ![导出照片](screenshots/export.webp) **导出照片** — 统一命名，适配各平台尺寸 |
+| ![列表](screenshots/photos-list.webp) **列表** — 文件夹、类型、尺寸、大小、日期 | ![重复文件](screenshots/duplicates.webp) **重复文件** — 按内容查找 |
+
+<div align="center">
+<img src="screenshots/reorganize.webp" alt="重新整理收藏：在移动任何东西之前，逐个文件夹查看建议" width="820">
+</div>
+
+**准备好重新找到你的照片了吗？** [下载 LionPhotos](#下载)，支持 Windows、macOS 和 Linux——免费、无需账号、10 种语言。
 
 ## 它解决什么问题
 
 照片收藏增长的速度总是快过整理的速度：多年的拍摄散落在各个文件夹和移动硬盘里，同一张照片存了三份，RAW 文件大多数看图软件打不开，而整理的成果又被锁在某一台电脑的某一个软件里。LionPhotos 正是为此而做：
 
-- **“找不到那张照片。”** 按名称、文件夹、相机、作者、描述、相册、项目、人物、宠物或地点搜索。人脸和宠物在你的电脑上识别，地点会根据 GPS 或照片里写的地点自动填好。
+- **“找不到那张照片。”** 按名称、文件夹、相机、作者、描述、相册、项目、人物、宠物或地点搜索。人脸和宠物在你的电脑上识别，地点会根据 GPS 或照片里写的地点自动填好。 也可以直接按照片内容搜索：输入“海滩”“狗”或“生日派对”。
 - **“打开收藏要等很久。”** 不导入，也不复制你的照片：LionPhotos 直接浏览原有的文件夹，每张缩略图只生成一次，文件改变时才重做。10 万项滚动起来和 100 项一样流畅。
 - **“文件夹一团乱。”** *重新整理收藏* 会读取现有文件夹，在磁盘上提出一个清晰的结构（`2025/2025-12-24-圣诞节`、主题、待整理、相机测试），在移动任何东西之前供你审阅——而且一切都可以撤销。
 - **“磁盘里塞满了不需要的东西。”** 边看边标记废片并送进 Limbo；按内容找出重复文件。所有删除都经过回收站，绝不永久删除。
 - **“我的整理成果只在一台电脑上。”** 相册、人物、标记、描述、调整和裁剪也保存在收藏内的一个隐藏文件夹中，同一块移动硬盘在另一台电脑上、无论盘符是什么，打开后一切都在。
 - **“我要交付作品。”** 快速编辑和适配各个社交网络的裁剪，为无障碍准备的说明文字和音频描述，以及统一文件名、可选元数据的导出。原始文件永远不变。
 
-## 它是什么，以及它不是什么
-
-LionPhotos 是一个**整理工具和目录**。它的主要功能是把工作整理好，并维护一个简单、易用、直观的目录：找到照片、筛选一次拍摄、建立相册和项目，并交付成果。
-
-它也能**编辑和校正**，用于大多数照片所需的快速、轻量的处理——曝光、色彩、黑白、裁剪和校正水平、镜头校正、RAW 显影——在这方面它已经相当能干，出结果也快。
-
-它**并不打算取代 Lightroom、Photoshop 以及其他专门用于数码照片显影的编辑器**。使用处理图层的工作、局部修饰和合成，交给那些更专业的软件；LionPhotos 可以在其中打开照片（*打开方式*），并把结果带回目录。
-
-## 适合谁
-
-- **职业和业余摄影师**：作品存放在文件夹和移动硬盘中，拍 RAW + JPEG，希望不把一切导入目录也能整理、查找和交付。
-- **传播团队、编辑部和工作室**：在多台电脑、多个人之间共享收藏，需要统一的文件名、署名和无障碍描述，并按项目和客户组织工作。
-- **家庭以及手机里攒了多年照片的人**：照片散落在各处文件夹，想重新找到人物、地点和时刻，并安全地释放空间。
-- **重视隐私的人**：不上传任何东西，没有账号，不经过网络。
-
-## 优势
+## 为什么选择 LionPhotos
 
 - **就用你现有的文件夹。** 不导入，没有封闭的图库：照片留在你放的地方，其他软件照常使用它们。
 - **本地且私密。** 无账号、无遥测；只有在你让它检查新版本时才会联网。人脸和宠物识别在你的电脑上运行。只读取你选择的文件夹及其子文件夹。
@@ -71,16 +78,20 @@ LionPhotos 是一个**整理工具和目录**。它的主要功能是把工作�
 - **真正地整理。** 目录中的相册、项目、人物、宠物和地点——需要时还有磁盘上的文件夹和文件名，同一次拍摄的 RAW、JPEG 和附属文件始终在一起。
 - **免费开源**（MIT），支持 Windows、macOS 和 Linux，10 种界面语言。
 
-## Beta 测试
+## 适合谁
 
-LionPhotos 处于 **Beta** 阶段。这意味着：
+- **职业和业余摄影师**：作品存放在文件夹和移动硬盘中，拍 RAW + JPEG，希望不把一切导入目录也能整理、查找和交付。
+- **传播团队、编辑部和工作室**：在多台电脑、多个人之间共享收藏，需要统一的文件名、署名和无障碍描述，并按项目和客户组织工作。
+- **家庭以及手机里攒了多年照片的人**：照片散落在各处文件夹，想重新找到人物、地点和时刻，并安全地释放空间。
+- **重视隐私的人**：不上传任何东西，没有账号，不经过网络。
 
-- 它每天都在一个真实收藏上使用，每个版本都通过 100 多项自动化端到端检查，但还没有在许多不同的电脑和收藏上使用过。
-- **在普通硬盘上用大型照片集测试：** 在一块 USB 3.1 外置机械硬盘（普通硬盘，不是 SSD）上的 7 万多个文件。在这项测试中，性能表现令人满意。
-- 第一次整理、重命名或重新整理收藏之前，**请先备份**（“备份”标签页可以完成）。所有操作都可以撤销，也不会永久删除任何东西，但备份才是最稳妥的保障。
-- 安装程序尚未使用付费证书签名（见[下载](#下载)）。
-- RAW 照片默认基于相机存放在其中的 JPEG（8 位）编辑；**显影模式**（调整中的开关）则编辑传感器数据，在本机用 LibRaw 以 16 位显影——这是新功能，仍在调校（颜色既不同于相机，也不同于 Lightroom）。需要支持 WebGL 2 的显卡。
-- 发现问题或有建议？请提交一个 [issue](https://github.com/danielcarli/lionphotos/issues)，写明版本（状态栏中显示）以及你做了什么。LionPhotos 从不自行发送任何内容。
+## 它是什么，以及它不是什么
+
+LionPhotos 是一个**整理工具和目录**。它的主要功能是把工作整理好，并维护一个简单、易用、直观的目录：找到照片、筛选一次拍摄、建立相册和项目，并交付成果。
+
+它也能**编辑和校正**，用于大多数照片所需的快速、轻量的处理——曝光、色彩、黑白、裁剪和校正水平、镜头校正、RAW 显影——在这方面它已经相当能干，出结果也快。
+
+它**并不打算取代 Lightroom、Photoshop 以及其他专门用于数码照片显影的编辑器**。使用处理图层的工作、局部修饰和合成，交给那些更专业的软件；LionPhotos 可以在其中打开照片（*打开方式*），并把结果带回目录。
 
 ## 下载
 
@@ -99,6 +110,17 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 ```
 
 [所有版本](https://github.com/danielcarli/lionphotos/releases) · [安装指南](INSTALL.md)（英文）：详细信息、安全机制、更新和卸载。
+
+## Beta 测试
+
+LionPhotos 处于 **Beta** 阶段。这意味着：
+
+- 它每天都在一个真实收藏上使用，每个版本都通过 100 多项自动化端到端检查，但还没有在许多不同的电脑和收藏上使用过。
+- **在普通硬盘上用大型照片集测试：** 在一块 USB 3.1 外置机械硬盘（普通硬盘，不是 SSD）上的 7 万多个文件。在这项测试中，性能表现令人满意。
+- 第一次整理、重命名或重新整理收藏之前，**请先备份**（“备份”标签页可以完成）。所有操作都可以撤销，也不会永久删除任何东西，但备份才是最稳妥的保障。
+- 安装程序尚未使用付费证书签名（见[下载](#下载)）。
+- RAW 照片默认基于相机存放在其中的 JPEG（8 位）编辑；**显影模式**（调整中的开关）则编辑传感器数据，在本机用 LibRaw 以 16 位显影——这是新功能，仍在调校（颜色既不同于相机，也不同于 Lightroom）。需要支持 WebGL 2 的显卡。
+- 发现问题或有建议？请提交一个 [issue](https://github.com/danielcarli/lionphotos/issues)，写明版本（状态栏中显示）以及你做了什么。LionPhotos 从不自行发送任何内容。
 
 ## 功能
 
@@ -139,40 +161,6 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 - **移到回收站，而不是永久删除。**
 - **范围受限。** 界面只能通过已打开文件夹的图库 ID 访问文件，从不通过路径。
 - **默认只读。** 浏览、元数据、缩略图、预览、重复文件检查和“打开方式”从不修改你的文件。相册、标签、标记和人脸只改变 LionPhotos 自己的目录。 唯一的例外：你对照片所做的也会以 JSON 写入收藏内的隐藏文件夹 `.lionphotos`（仅在做了改动之后；可在备份中关闭）。
-
-<div align="center">
-<img src="screenshots/reorganize.webp" alt="重新整理收藏：在移动任何东西之前，逐个文件夹查看建议" width="820">
-</div>
-
-## 截图
-
-| | |
-|---|---|
-| ![相册](screenshots/albums.webp) **相册** — 按年份的马赛克，带描述 | ![精选](screenshots/highlights.webp) **精选** — 只显示星标和 OK 的照片，像作品集一样 |
-| ![相册内部](screenshots/album.webp) **相册内部** — 马赛克、均匀网格、列表或精选 | ![搜索](screenshots/search.webp) **搜索** — 在标题栏中搜索整个收藏 |
-| ![地点](screenshots/places-map.webp) **地点** — 在本机绘制的世界地图上 | ![查看器](screenshots/viewer.webp) **查看器** — 带编辑面板（黑白） |
-| ![镜头校正](screenshots/lens.webp) **镜头校正** — 手动校正透视 | ![裁剪](screenshots/crop.webp) **裁剪** — 适合 Instagram、快拍、YouTube 等 |
-| ![描述](screenshots/metadata.webp) **描述** — IPTC 元数据，输入即保存 | ![导出照片](screenshots/export.webp) **导出照片** — 统一命名，适配各平台尺寸 |
-| ![列表](screenshots/photos-list.webp) **列表** — 文件夹、类型、尺寸、大小、日期 | ![重复文件](screenshots/duplicates.webp) **重复文件** — 按内容查找 |
-
-## 快速开始
-
-### 从源代码运行（Windows）
-
-1. 安装 [Node.js LTS](https://nodejs.org)。
-2. 下载或克隆本仓库。
-3. 双击 **`start.bat`** — 首次运行会安装依赖。
-
-或在终端中：
-
-```powershell
-npm install
-npm start
-```
-
-### 构建安装程序
-
-双击 **`build-installer.bat`**（或运行 `npm run dist`）。安装程序会生成在 `dist/` 中。推送 `vX.Y.Z` 标签时，GitHub Actions 会构建发布版本。
 
 ## 键盘快捷键
 
@@ -219,6 +207,25 @@ LionPhotos 只在你要求时才联网：点击右下角的版本号会在 GitHu
 ```
 
 *概览 › 清除缓存*会删除缩略图，绝不会影响你的照片。
+
+## 快速开始
+
+### 从源代码运行（Windows）
+
+1. 安装 [Node.js LTS](https://nodejs.org)。
+2. 下载或克隆本仓库。
+3. 双击 **`start.bat`** — 首次运行会安装依赖。
+
+或在终端中：
+
+```powershell
+npm install
+npm start
+```
+
+### 构建安装程序
+
+双击 **`build-installer.bat`**（或运行 `npm run dist`）。安装程序会生成在 `dist/` 中。推送 `vX.Y.Z` 标签时，GitHub Actions 会构建发布版本。
 
 ## 缩略图为何一直很快
 
@@ -272,7 +279,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.57.0**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.57.2**。
 
 ## 致谢
 

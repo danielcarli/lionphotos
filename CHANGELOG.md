@@ -2,6 +2,16 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.57.2] — 2026-11-17
+
+### Fixed
+- **The release could not be built** (1.57.0): the job that builds the content model stopped at once — the runner's own Python refuses packages and its Node could not read the list of categories — so the tests and the installers had no model to take. The job now sets up its own Python 3.12 and Node 24, shows each command in the log, and `tools/models/build.py` no longer hides Node's errors. Checked with the same commands in a clean environment: the model comes out the same, category for category.
+
+## [1.57.1] — 2026-11-17
+
+### Changed
+- **The README, in the ten languages, opens with the app.** A new headline and promise, the screenshots right after the main picture (*See it in action*, with the reorganization of a collection and a link to download), then what it solves, why LionPhotos and who it is for, the download and the beta; the full list of features, the shortcuts and privacy come next, and the technical parts (running from source, how thumbnails stay fast, architecture, development) last. The search by what the photo shows is among the first things it names.
+
 ## [1.57.0] — 2026-11-17
 
 ### Added

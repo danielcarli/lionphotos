@@ -4,19 +4,13 @@
 
 # LionPhotos
 
-**Explore, busque y organice colecciones de fotos y vídeos, con rapidez.**<br>
-Trabaja con sus carpetas tal como están: miniaturas pequeñas hechas una sola vez, los metadatos que importan y herramientas seguras para organizar.
+### Todas las fotos que has hecho — encontradas en segundos.
+
+Explora, busca y organiza colecciones enormes de fotos y vídeos allí donde ya están: en tu disco, en un disco externo o en una carpeta en la nube. Rápido, privado y gratuito.
 
 <sub>por el <b>LionPhotos Team</b> · creado e ideado por <b>Daniel Michelon De Carli</b> · hermano de <a href="https://github.com/danielcarli/lionorganizer">LionOrganizer</a></sub>
 
 [English](../README.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · **Español** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
-
-![Versión 1.57.0](https://img.shields.io/badge/version-1.57.0-161214)
-![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
-![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
-![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
-![Electron](https://img.shields.io/badge/Electron-45-eecd25)
-![Idiomas: 10](https://img.shields.io/badge/UI%20languages-10-e5307a)
 
 <p>
   <a href="https://github.com/danielcarli/lionphotos/releases/latest/download/LionPhotos-Setup.exe"><img src="https://img.shields.io/badge/Windows-Descargar%20.exe-0194b2?style=for-the-badge&labelColor=161214" alt="Windows .exe"></a>
@@ -30,37 +24,50 @@ Trabaja con sus carpetas tal como están: miniaturas pequeñas hechas una sola v
 
 <img src="screenshots/photos-grid.webp" alt="LionPhotos: la cuadrícula de fotos con el árbol de carpetas y el panel de información" width="900">
 
+**Sin importar nada** · **Nada sale de tu ordenador** · **100 000 fotos se desplazan como 100** · **Gratuito y de código abierto**
+
+![Versión 1.57.2](https://img.shields.io/badge/version-1.57.2-161214)
+![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
+![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
+![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
+![Electron](https://img.shields.io/badge/Electron-45-eecd25)
+![Idiomas: 10](https://img.shields.io/badge/UI%20languages-10-e5307a)
+
 </div>
 
 > **Prueba beta.** LionPhotos ya sirve para el uso diario y se prueba con una colección real de unas 15 000 fotos y vídeos, pero todavía está en beta: puede haber detalles por pulir, y conviene tener una copia de seguridad de la colección antes de reorganizarla por primera vez. [Qué significa beta aquí](#prueba-beta).
+
+## Míralo en acción
+
+Del primer desplazamiento al álbum entregado: un recorrido por lo que LionPhotos hace con una colección real.
+
+| | |
+|---|---|
+| ![Álbumes](screenshots/albums.webp) **Álbumes** — mosaico por año, con descripciones | ![Destacados](screenshots/highlights.webp) **Destacados** — solo las fotos marcadas con estrella u OK, como un portafolio |
+| ![Dentro de un álbum](screenshots/album.webp) **Dentro de un álbum** — mosaico, cuadrícula uniforme, lista o destacados | ![Búsqueda](screenshots/search.webp) **Búsqueda** — en la barra de título, en toda la colección |
+| ![Lugares](screenshots/places-map.webp) **Lugares** — en un mapamundi dibujado en el ordenador | ![Visor](screenshots/viewer.webp) **Visor** — con el panel de edición (blanco y negro) |
+| ![Corrección del objetivo](screenshots/lens.webp) **Corrección del objetivo** — perspectiva enderezada a mano | ![Recorte](screenshots/crop.webp) **Recorte** — para Instagram, Stories, YouTube… |
+| ![Descripción](screenshots/metadata.webp) **Descripción** — metadatos IPTC, guardados mientras escribe | ![Exportar fotos](screenshots/export.webp) **Exportar fotos** — nombres uniformes, tamaños de cada red |
+| ![Lista](screenshots/photos-list.webp) **Lista** — carpeta, tipo, dimensiones, tamaño, fecha | ![Archivos repetidos](screenshots/duplicates.webp) **Archivos repetidos** — encontrados por su contenido |
+
+<div align="center">
+<img src="screenshots/reorganize.webp" alt="Reorganizar la colección: la propuesta, carpeta por carpeta, antes de mover nada" width="820">
+</div>
+
+**¿Listo para reencontrar tus fotos?** [Descarga LionPhotos](#descargar) para Windows, macOS o Linux — gratuito, sin cuenta, en 10 idiomas.
 
 ## Qué resuelve
 
 Las colecciones de fotos crecen más rápido de lo que nadie puede ordenarlas: años de trabajos repartidos en carpetas y discos externos, la misma foto en tres sitios, archivos RAW que la mayoría de los visores no abre, y el trabajo de ordenarlas encerrado en un solo programa, en un solo ordenador. LionPhotos está hecho para esa situación:
 
-- **«No encuentro esa foto.»** Busque por nombre, carpeta, cámara, autor, descripción, álbum, proyecto, persona, mascota o lugar. Las caras y las mascotas se reconocen en su ordenador, y los lugares se completan solos a partir del GPS o del lugar escrito en la foto.
+- **«No encuentro esa foto.»** Busque por nombre, carpeta, cámara, autor, descripción, álbum, proyecto, persona, mascota o lugar. Las caras y las mascotas se reconocen en su ordenador, y los lugares se completan solos a partir del GPS o del lugar escrito en la foto. O simplemente por lo que muestra la foto: escribe *playa*, *perro* o *cumpleaños*.
 - **«Abrir la colección tarda una eternidad.»** Sin importar y sin copiar sus fotos: LionPhotos recorre las carpetas tal como están, hace cada miniatura una vez y solo la rehace cuando el archivo cambia. 100 000 elementos se desplazan como 100.
 - **«Mis carpetas son un desorden.»** *Reorganizar la colección* lee las carpetas y propone una estructura clara en el disco (`2025/2025-12-24-Navidad`, temas, una bandeja de entrada, pruebas de cámara), para revisarla antes de mover nada — y todo se puede deshacer.
 - **«El disco está lleno de cosas que no necesito.»** Marque los descartes mientras mira y envíelos al Limbo; encuentre archivos repetidos por su contenido. Todo sale por la Papelera, nunca se borra para siempre.
 - **«Mi trabajo se queda en un ordenador.»** Álbumes, personas, marcas, descripciones, ajustes y recortes también se guardan en una carpeta oculta dentro de la colección, así que el mismo disco externo se abre con todo ello en otro ordenador, con cualquier letra de unidad.
 - **«Tengo que entregar.»** Edición rápida y recortes para cada red social, pies de foto y audiodescripción para la accesibilidad, y exportación con nombres de archivo coherentes y los metadatos que elija. Los originales nunca cambian.
 
-## Qué es — y qué no es
-
-LionPhotos es un **organizador y un catálogo**. Su función principal es ordenar el trabajo y mantener un catálogo fácil, accesible e intuitivo: encontrar una foto, separar una sesión, crear álbumes y proyectos y entregar el resultado.
-
-También **edita y corrige**, para el trabajo rápido y ligero que necesita la mayoría de las fotos — exposición, color, blanco y negro, recorte y enderezado, correcciones de lente, revelado de RAW — y en eso ya es bastante capaz y da resultados rápidos.
-
-**No pretende sustituir a Lightroom, Photoshop ni a otros editores dedicados al revelado de fotos digitales**. Los trabajos con capas de tratamiento, el retoque localizado y la composición quedan a cargo de esos programas más dedicados; LionPhotos abre la foto en ellos (*Abrir con*) y trae el resultado de vuelta al catálogo.
-
-## Para quién es
-
-- **Fotógrafos profesionales y aficionados** que guardan su trabajo en carpetas y discos externos, disparan en RAW + JPEG y quieren ordenar, encontrar y entregar sin importarlo todo a un catálogo.
-- **Equipos de comunicación, redacciones y estudios** que comparten una colección entre ordenadores y personas, necesitan nombres, autoría y descripciones accesibles coherentes y organizan el trabajo por proyecto y cliente.
-- **Familias y cualquiera con años de fotos del móvil** repartidas en carpetas, que quiere reencontrar personas, lugares y momentos y liberar espacio con seguridad.
-- **Quien se preocupa por la privacidad:** no se sube nada, no hay cuenta y nada pasa por la red.
-
-## Puntos fuertes
+## Por qué LionPhotos
 
 - **Sus carpetas, tal como están.** Sin importación y sin biblioteca cerrada: las fotos se quedan donde las puso, y sus otros programas siguen trabajando con ellas.
 - **Local y privado.** Sin cuenta, sin telemetría; solo se conecta a internet cuando le pide buscar una nueva versión. El reconocimiento de caras y mascotas funciona en su ordenador. Solo lee la carpeta que elija y sus subcarpetas.
@@ -71,16 +78,20 @@ También **edita y corrige**, para el trabajo rápido y ligero que necesita la m
 - **Organiza de verdad.** Álbumes, proyectos, personas, mascotas y lugares en el catálogo — y, cuando quiera, carpetas y nombres de archivo en el disco, con el RAW, el JPEG y los archivos auxiliares de una misma toma siempre juntos.
 - **Gratuito y de código abierto** (MIT), para Windows, macOS y Linux, en 10 idiomas.
 
-## Prueba beta
+## Para quién es
 
-LionPhotos está en **beta**. Eso significa:
+- **Fotógrafos profesionales y aficionados** que guardan su trabajo en carpetas y discos externos, disparan en RAW + JPEG y quieren ordenar, encontrar y entregar sin importarlo todo a un catálogo.
+- **Equipos de comunicación, redacciones y estudios** que comparten una colección entre ordenadores y personas, necesitan nombres, autoría y descripciones accesibles coherentes y organizan el trabajo por proyecto y cliente.
+- **Familias y cualquiera con años de fotos del móvil** repartidas en carpetas, que quiere reencontrar personas, lugares y momentos y liberar espacio con seguridad.
+- **Quien se preocupa por la privacidad:** no se sube nada, no hay cuenta y nada pasa por la red.
 
-- Se usa a diario con una colección real, y cada versión supera más de 100 comprobaciones automáticas de extremo a extremo, pero todavía no se ha usado en muchos ordenadores y colecciones distintos.
-- **Probado con una colección grande en un disco común:** más de 70 000 archivos en un disco duro externo USB 3.1 — un disco común, no un SSD. En esta prueba, el rendimiento ha resultado satisfactorio.
-- Antes de organizar, renombrar o reorganizar una colección por primera vez, **tenga una copia de seguridad** (la pestaña Copia de seguridad puede hacerla). Toda operación se puede deshacer y nada se borra para siempre, pero la copia de seguridad es la red más segura.
-- Los instaladores todavía no están firmados con un certificado de pago (vea [Descargar](#descargar)).
-- Las fotos RAW se editan, por defecto, sobre el JPEG que la cámara guarda dentro (8 bits); el **modo revelado** (un interruptor en Ajustes) edita los datos del sensor, revelados en este ordenador en 16 bits con LibRaw — nuevo y aún en ajuste (sus colores no son los de la cámara ni los de Lightroom). Necesita tarjeta gráfica con WebGL 2.
-- ¿Encontró un problema o tiene una sugerencia? Abra un [issue](https://github.com/danielcarli/lionphotos/issues) con la versión (en la barra de estado) y lo que hizo. LionPhotos nunca envía nada por su cuenta.
+## Qué es — y qué no es
+
+LionPhotos es un **organizador y un catálogo**. Su función principal es ordenar el trabajo y mantener un catálogo fácil, accesible e intuitivo: encontrar una foto, separar una sesión, crear álbumes y proyectos y entregar el resultado.
+
+También **edita y corrige**, para el trabajo rápido y ligero que necesita la mayoría de las fotos — exposición, color, blanco y negro, recorte y enderezado, correcciones de lente, revelado de RAW — y en eso ya es bastante capaz y da resultados rápidos.
+
+**No pretende sustituir a Lightroom, Photoshop ni a otros editores dedicados al revelado de fotos digitales**. Los trabajos con capas de tratamiento, el retoque localizado y la composición quedan a cargo de esos programas más dedicados; LionPhotos abre la foto en ellos (*Abrir con*) y trae el resultado de vuelta al catálogo.
 
 ## Descargar
 
@@ -99,6 +110,17 @@ curl -fsSL https://github.com/danielcarli/lionphotos/releases/latest/download/in
 ```
 
 [Todas las versiones](https://github.com/danielcarli/lionphotos/releases) · [Guía de instalación](INSTALL.md) (en inglés): detalles, cómo se mantiene segura, actualizar y desinstalar.
+
+## Prueba beta
+
+LionPhotos está en **beta**. Eso significa:
+
+- Se usa a diario con una colección real, y cada versión supera más de 100 comprobaciones automáticas de extremo a extremo, pero todavía no se ha usado en muchos ordenadores y colecciones distintos.
+- **Probado con una colección grande en un disco común:** más de 70 000 archivos en un disco duro externo USB 3.1 — un disco común, no un SSD. En esta prueba, el rendimiento ha resultado satisfactorio.
+- Antes de organizar, renombrar o reorganizar una colección por primera vez, **tenga una copia de seguridad** (la pestaña Copia de seguridad puede hacerla). Toda operación se puede deshacer y nada se borra para siempre, pero la copia de seguridad es la red más segura.
+- Los instaladores todavía no están firmados con un certificado de pago (vea [Descargar](#descargar)).
+- Las fotos RAW se editan, por defecto, sobre el JPEG que la cámara guarda dentro (8 bits); el **modo revelado** (un interruptor en Ajustes) edita los datos del sensor, revelados en este ordenador en 16 bits con LibRaw — nuevo y aún en ajuste (sus colores no son los de la cámara ni los de Lightroom). Necesita tarjeta gráfica con WebGL 2.
+- ¿Encontró un problema o tiene una sugerencia? Abra un [issue](https://github.com/danielcarli/lionphotos/issues) con la versión (en la barra de estado) y lo que hizo. LionPhotos nunca envía nada por su cuenta.
 
 ## Funciones
 
@@ -139,40 +161,6 @@ Las mismas reglas que LionOrganizer:
 - **Papelera, no borrado definitivo.**
 - **Alcance limitado.** La interfaz llega a los archivos solo por los identificadores de la biblioteca de la carpeta abierta, nunca por la ruta.
 - **Solo lectura por defecto.** Explorar, los metadatos, las miniaturas, las previsualizaciones, la búsqueda de repetidos y "Abrir con" nunca modifican sus archivos. Los álbumes, etiquetas, marcas y caras solo cambian el catálogo propio de LionPhotos. La única excepción: lo que hace con las fotos también se escribe, en JSON, en una carpeta oculta `.lionphotos` dentro de la colección (solo cuando ya hizo algo; se puede apagar en Copia de seguridad).
-
-<div align="center">
-<img src="screenshots/reorganize.webp" alt="Reorganizar la colección: la propuesta, carpeta por carpeta, antes de mover nada" width="820">
-</div>
-
-## Capturas de pantalla
-
-| | |
-|---|---|
-| ![Álbumes](screenshots/albums.webp) **Álbumes** — mosaico por año, con descripciones | ![Destacados](screenshots/highlights.webp) **Destacados** — solo las fotos marcadas con estrella u OK, como un portafolio |
-| ![Dentro de un álbum](screenshots/album.webp) **Dentro de un álbum** — mosaico, cuadrícula uniforme, lista o destacados | ![Búsqueda](screenshots/search.webp) **Búsqueda** — en la barra de título, en toda la colección |
-| ![Lugares](screenshots/places-map.webp) **Lugares** — en un mapamundi dibujado en el ordenador | ![Visor](screenshots/viewer.webp) **Visor** — con el panel de edición (blanco y negro) |
-| ![Corrección del objetivo](screenshots/lens.webp) **Corrección del objetivo** — perspectiva enderezada a mano | ![Recorte](screenshots/crop.webp) **Recorte** — para Instagram, Stories, YouTube… |
-| ![Descripción](screenshots/metadata.webp) **Descripción** — metadatos IPTC, guardados mientras escribe | ![Exportar fotos](screenshots/export.webp) **Exportar fotos** — nombres uniformes, tamaños de cada red |
-| ![Lista](screenshots/photos-list.webp) **Lista** — carpeta, tipo, dimensiones, tamaño, fecha | ![Archivos repetidos](screenshots/duplicates.webp) **Archivos repetidos** — encontrados por su contenido |
-
-## Primeros pasos
-
-### Ejecutar desde el código fuente (Windows)
-
-1. Instale [Node.js LTS](https://nodejs.org).
-2. Descargue o clone este repositorio.
-3. Haga doble clic en **`start.bat`**: la primera ejecución instala las dependencias.
-
-O desde una terminal:
-
-```powershell
-npm install
-npm start
-```
-
-### Crear un instalador
-
-Haga doble clic en **`build-installer.bat`** (o ejecute `npm run dist`). Los instaladores se crean en `dist/`. Las versiones publicadas las crea GitHub Actions cuando se envía una etiqueta `vX.Y.Z`.
 
 ## Atajos de teclado
 
@@ -219,6 +207,25 @@ El catálogo y las miniaturas están en un único archivo en su equipo:
 ```
 
 *Resumen › Vaciar caché* borra las miniaturas. Sus fotos nunca se tocan.
+
+## Primeros pasos
+
+### Ejecutar desde el código fuente (Windows)
+
+1. Instale [Node.js LTS](https://nodejs.org).
+2. Descargue o clone este repositorio.
+3. Haga doble clic en **`start.bat`**: la primera ejecución instala las dependencias.
+
+O desde una terminal:
+
+```powershell
+npm install
+npm start
+```
+
+### Crear un instalador
+
+Haga doble clic en **`build-installer.bat`** (o ejecute `npm run dist`). Los instaladores se crean en `dist/`. Las versiones publicadas las crea GitHub Actions cuando se envía una etiqueta `vX.Y.Z`.
 
 ## Cómo las miniaturas siguen siendo rápidas
 
@@ -272,7 +279,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Historial de cambios
 
-Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.57.0**.
+Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.57.2**.
 
 ## Créditos
 

@@ -549,3 +549,9 @@ _merge(MESSAGES, {'similar': {'statusFromCatalog': {'one': '사진 {count}장의
 _merge(MESSAGES, {'similar': {'only': '묶인 사진만', 'onlyTitle': '비슷한 사진 그룹만 보여 줍니다(각 그룹은 가장 좋은 사진으로). 혼자인 사진은 빠집니다'}})
 
 _merge(MESSAGES, {'photos': {'kind': {'grouped': '묶인 사진'}}})
+
+_merge(MESSAGES, {'viewer': {'stackLabel': {'one': '비슷한 사진 {count}장', 'other': '비슷한 사진 {count}장'}, 'stackOpen': '남길 사진 고르기', 'stackOpenTitle': '그룹을 열어 남길 사진과 보류함으로 보낼 사진을 고릅니다'}})
+
+_merge(MESSAGES, {'similar': {'why': {'menu': '왜 묶였나요(묶이지 않았나요)?', 'title': '이 사진들이 묶인(묶이지 않은) 이유', 'reading': '사진을 읽는 중…', 'picture': '이미지', 'unread': '읽지 않음(아직 썸네일 없음)', 'alike': '{pct} 비슷함({level} 기준은 {need})', 'time': '시간', 'apart': '{span} 차이(최대 {max})', 'people': '인물', 'others': '사진마다 다른 사람이 있음', 'notSeen': '아직 분석되지 않음', 'same': '같은 사람(또는 사람 없음)', 'decision': '내 결정', 'said': '같은 그룹이 아니라고 지정함', 'together': '같은 그룹에 있습니다.', 'firstPhoto': '서로는 충분히 비슷하지만, 들어갈 그룹이 덜 비슷한 사진으로 시작되었습니다(각 사진은 그룹의 첫 사진과도 비슷해야 합니다).', 'wouldAt': '{levels} 수준에서 함께 묶입니다.', 'never': '어떤 수준에서도 함께 묶이지 않습니다.', 'useLevel': '{level} 수준으로 묶기', 'unsay': '같은 그룹입니다', 'stillReading': '사진을 아직 읽는 중입니다. 그룹은 바뀔 수 있습니다.', 'lead': '찍은 순서대로 각 사진과 다음 사진을, 지금 수준({level})에서 본 내용과 함께 보여 줍니다.', 'seconds': '{n}초', 'minutes': '{m}분 {s}초', 'hours': '{h}시간 {m}분'}}})
+
+_merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m}분', 'days': {'one': '{count}일', 'other': '{count}일'}}}})

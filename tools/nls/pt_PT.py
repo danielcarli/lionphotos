@@ -552,3 +552,9 @@ _merge(MESSAGES, {'similar': {'statusFromCatalog': {'one': 'rostos de {count} fo
 _merge(MESSAGES, {'similar': {'only': 'Só as agrupadas', 'onlyTitle': 'Mostra só os grupos de fotografias parecidas (cada um pela melhor), deixando de fora as fotografias sozinhas'}})
 
 _merge(MESSAGES, {'photos': {'kind': {'grouped': 'Fotografias agrupadas'}}})
+
+_merge(MESSAGES, {'viewer': {'stackLabel': {'one': '{count} fotografia parecida', 'other': '{count} fotografias parecidas'}, 'stackOpen': 'Escolher o que fica', 'stackOpenTitle': 'Abre o grupo, para escolher que fotografias ficam e quais vão para o Limbo'}})
+
+_merge(MESSAGES, {'similar': {'why': {'menu': 'Porque (não) estão agrupadas?', 'title': 'Porque estão (ou não) estas fotografias agrupadas?', 'reading': 'A ler as fotografias…', 'picture': 'Imagem', 'unread': 'não lida (ainda sem miniatura)', 'alike': '{pct} parecidas (o nível {level} pede {need})', 'time': 'Tempo', 'apart': '{span} de diferença (até {max})', 'people': 'Pessoas', 'others': 'outras pessoas em cada fotografia', 'notSeen': 'ainda não analisadas', 'same': 'as mesmas pessoas (ou ninguém)', 'decision': 'A sua decisão', 'said': 'disse que não são do mesmo grupo', 'together': 'Estão no mesmo grupo.', 'firstPhoto': 'Parecidas o bastante entre si: o grupo em que entrariam começou por uma fotografia menos parecida (cada fotografia também tem de lembrar a primeira do grupo).', 'wouldAt': 'Ficariam juntas no nível {levels}.', 'never': 'Não ficariam juntas em nenhum nível.', 'useLevel': 'Agrupar no nível {level}', 'unsay': 'São do mesmo grupo', 'stillReading': 'As fotografias ainda estão a ser lidas: os grupos ainda podem mudar.', 'lead': 'Cada fotografia ao lado da seguinte, com o que o agrupamento viu no nível usado agora ({level}).', 'seconds': '{n} s', 'minutes': '{m} min {s} s', 'hours': '{h} h {m} min'}}})
+
+_merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} min', 'days': {'one': '{count} dia', 'other': '{count} dias'}}}})

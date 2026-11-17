@@ -80,7 +80,8 @@ check(groupSimilar(units, 'same').length >= 2 && groupSimilar(units, 'scene').le
   const ph = (...faces) => ({ scanned: true, faces: faces.map((f, i) => ({ id: i + 1, w: 0.1, personId: null, ...f })) });
   check(sameWho(ph({ v: ana }), ph({ v: near(ana, 0.2) }), 'face') === true, 'the same person in two shots: the same group');
   check(sameWho(ph({ v: ana }), ph({ v: bia }), 'face') === false, 'another person in the same framing: apart');
-  check(sameWho(ph({ v: ana }, { v: bia }), ph({ v: near(ana, 0.1) }), 'face') === false, 'a person more in one of them: apart (groups with the same people)');
+  check(sameWho(ph({ v: ana }, { v: bia }), ph({ v: near(ana, 0.1) }), 'face') === true, 'a face found in one shot only (turned, covered, missed): still the same group');
+  check(sameWho(ph({ v: ana }, { v: bia }), ph({ v: near(ana, 0.1) }, { v: vec(3) }), 'face') === false, 'somebody else on each side (the same place, other people): apart');
   check(sameWho(ph({ v: ana }, { v: bia, w: 0.02 }), ph({ v: near(ana, 0.1) }), 'face') === true, 'someone small in the background does not count');
   check(sameWho(ph({ v: ana, personId: 7 }), ph({ v: near(ana, 0.05), personId: 8 }), 'face') === false && sameWho(ph({ v: ana, personId: 7 }), ph({ v: bia, personId: 7 }), 'face') === true, 'named people: the names decide');
   check(sameWho(null, ph({ v: ana }), 'face') === null && sameWho(ph(), ph(), 'face') === true, 'a photo not looked at yet: not known (not apart); nobody in either: the same');

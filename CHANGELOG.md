@@ -2,6 +2,20 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.62.5] — 2026-11-17
+
+### Added
+- **"Why are these (not) grouped?"** — in the menu of two or more photos selected. Each photo beside the next one taken, with what the grouping saw: how alike the pictures are (and what the level asks), how far apart in time (and how far the level allows), whether the people are the same (or not looked at yet), a decision taken ("not of the same group") — and at which level they would be together, with a button to group at that level (or to undo the decision).
+- **The levels of grouping on the line under the bar** of Photos (Almost the same · Similar · Same scene), as in the window of similar photos: a looser level groups more.
+
+### Changed
+- **People keep photos apart only when there is somebody else.** A face found in one shot of a sequence and not in the next (turned away, covered by a hand, missed) no longer keeps them apart; photos are apart when each has a face the other has not (the same place, other people), or named people differ.
+
+## [1.62.4] — 2026-11-17
+
+### Added
+- **The viewer shows the group of the photo, as in Google Photos.** With *Group similar photos* on, a photo that stands for a group has the photos of its group in a strip below it ("3 similar photos"), its best one marked: a click shows another of them right there (its panel, marks and Limbo act on it), and *Choose what stays* opens the group to decide. The arrows go on to the next photo of Photos; a slideshow hides the strip.
+
 ## [1.62.3] — 2026-11-17
 
 ### Added

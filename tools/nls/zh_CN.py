@@ -549,3 +549,9 @@ _merge(MESSAGES, {'similar': {'statusFromCatalog': {'one': '{count} 张照片的
 _merge(MESSAGES, {'similar': {'only': '只看分组的', 'onlyTitle': '只显示相似照片组（每组显示最佳的一张），不显示单独的照片'}})
 
 _merge(MESSAGES, {'photos': {'kind': {'grouped': '分组的照片'}}})
+
+_merge(MESSAGES, {'viewer': {'stackLabel': {'one': '{count} 张相似照片', 'other': '{count} 张相似照片'}, 'stackOpen': '选择保留哪些', 'stackOpenTitle': '打开该组，选择保留哪些照片、哪些移到待删区'}})
+
+_merge(MESSAGES, {'similar': {'why': {'menu': '为什么（没有）分组？', 'title': '这些照片为什么（没有）分在一组？', 'reading': '正在读取照片…', 'picture': '画面', 'unread': '未读取（还没有缩略图）', 'alike': '相似度 {pct}（{level} 要求 {need}）', 'time': '时间', 'apart': '相隔 {span}（最多 {max}）', 'people': '人物', 'others': '每张照片里是不同的人', 'notSeen': '尚未分析', 'same': '相同的人物（或没有人）', 'decision': '你的决定', 'said': '你指定它们不属于同一组', 'together': '在同一组中。', 'firstPhoto': '彼此足够相似：但它们本应加入的组是由一张不太相似的照片开始的（每张照片也须与组内第一张相似）。', 'wouldAt': '在 {levels} 级别下会分在一起。', 'never': '在任何级别下都不会分在一起。', 'useLevel': '按 {level} 分组', 'unsay': '属于同一组', 'stillReading': '照片仍在读取中：分组可能还会变化。', 'lead': '按拍摄顺序，每张照片与下一张并列，显示当前级别（{level}）下的判断。', 'seconds': '{n} 秒', 'minutes': '{m} 分 {s} 秒', 'hours': '{h} 小时 {m} 分'}}})
+
+_merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} 分', 'days': {'one': '{count} 天', 'other': '{count} 天'}}}})

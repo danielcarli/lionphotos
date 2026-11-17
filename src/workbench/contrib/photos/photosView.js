@@ -38,6 +38,7 @@ import { exportPhotos, exportMenuItem } from '../export/exportPhotos.js';
 import { LABEL_ICON } from '../../services/labels/browser/labelsService.js';
 import { applyMark } from '../limbo/sendToLimbo.js';
 import { showSimilar } from '../similar/similarView.js';
+import { showWhyGrouped } from '../similar/similarExplain.js';
 import { etaText } from '../../browser/parts/statusbarPart.js';
 import { sharpenCover } from '../albums/albumCovers.js';
 import { renderPhotoShowcase } from '../labels/showcase.js';
@@ -954,6 +955,9 @@ export class PhotosView extends ViewPane {
       // the similar photos of the day these were taken
       ...(!inLimbo && sel.every((x) => x.kind === KIND.image && dayOf(x) === dayOf(sel[0]))
         ? [{ label: t('similar.menu'), icon: 'similar', run: () => showSimilar(this.services, dayOf(sel[0])) }] : []),
+      // a few photos expected together: why they are (not) grouped
+      ...(!inLimbo && sel.length >= 2 && sel.length <= 12 && sel.every((x) => x.kind === KIND.image)
+        ? [{ label: t('similar.why.menu'), icon: 'stack', run: () => showWhyGrouped(this.services, sel) }] : []),
       '-',
       inLimbo
         ? { label: t('contextMenu.restore'), icon: 'undo', run: () => library.setMark(ids, 0) }
@@ -1357,13 +1361,17 @@ export class PhotosView extends ViewPane {
       lines.push(line('stack', s.groups ? t('similar.statusDone', { groups: tn('similar.statusGroups', s.groups), grouped: formatNumber(s.grouped), photos: formatNumber(s.photos) }) : t('similar.statusNone', { photos: formatNumber(s.photos) }),
         0, 0, !f?.running ? fromCatalog : null));
     }
+    // how alike photos must be to be grouped (the same three levels as the window of similar photos)
+    const levels = h('div.segmented.stack-levels', { role: 'radiogroup', 'aria-label': t('similar.levelLabel') },
+      ['same', 'similar', 'scene'].map((k) => h('button', { class: `seg${k === sim.level ? ' active' : ''}`, role: 'radio', 'aria-checked': String(k === sim.level), title: t(`similar.level.${k}Title`),
+        onclick: () => { if (k !== sim.level) { sim.setLevel(k); this.#paintStackStatus(); } } }, t(`similar.level.${k}`))));
     // only the groups: a switch at the end of the line (the photos alone out of the way)
     const only = sim.onlyGrouped;
     const onlySwitch = h(only ? 'label.tb-switch.stack-only.on' : 'label.tb-switch.stack-only', { title: t('similar.onlyTitle') },
       h('input', { type: 'checkbox', role: 'switch', checked: only, 'aria-checked': String(only), onchange: (e) => sim.setOnlyGrouped(e.target.checked) }),
       h('span.tb-switch-track', { 'aria-hidden': 'true' }), h('span.tb-switch-text', t('similar.only')));
     el.hidden = false;
-    el.replaceChildren(h('div.stack-lines', lines), onlySwitch);
+    el.replaceChildren(h('div.stack-lines', lines), levels, onlySwitch);
   }
 
   /** A group of similar photos (Photos grouped): it opens on its own, to choose what stays. */

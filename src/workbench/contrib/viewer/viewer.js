@@ -16,6 +16,7 @@ import { exportPhotos } from '../export/exportPhotos.js';
 import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
+import { showSimilar } from '../similar/similarView.js';
 import { formatBytes, formatDateTime, formatNumber } from '../../../base/common/format.js';
 import { KIND, dateOf, MARK_NAMES } from '../../services/library/browser/libraryService.js';
 import { detailsLine } from '../info/infoPanel.js';
@@ -73,6 +74,7 @@ export class Viewer {
     this.list = list;
     this.title = opts.title || '';
     this.index = Math.max(0, Math.min(index, list.length - 1));
+    this.stackPick = null;
     this.onMove = onMove;
     // a viewer opened again starts fitted to the screen
     this.scale = 0;
@@ -94,7 +96,7 @@ export class Viewer {
       this.el = h('div.viewer', { role: 'dialog', 'aria-modal': 'true', 'aria-label': t('viewer.label') },
         this.bar, // the left panel comes after the right one in the page (CSS order puts it on the left): the right panel stays
         // the first .vw-info, the one every part of the app (and the tests) means by "the panel"
-        h('div.vw-body', h('div.vw-stage-wrap', this.stage, this.outNote, this.busyNote), this.gripRight, this.side, this.sideLeft, this.gripLeft),
+        h('div.vw-body', h('div.vw-stage-wrap', this.stage, this.outNote, this.busyNote, this.stackEl = h('div.vw-stack', { role: 'group', hidden: true })), this.gripRight, this.side, this.sideLeft, this.gripLeft),
         h('button.vw-nav.vw-prev', { 'aria-label': t('viewer.previous'), html: icon('chevronLeft', 28), onclick: () => this.move(-1) }),
         h('button.vw-nav.vw-next', { 'aria-label': t('viewer.next'), html: icon('chevronRight', 28), onclick: () => this.move(1) }));
       this.onKey = (e) => this.#key(e);
@@ -160,12 +162,18 @@ export class Viewer {
     if (this.playing && this.list.length > 1) next = (next + this.list.length) % this.list.length;
     if (next < 0 || next >= this.list.length) return;
     this.index = next;
+    this.stackPick = null;
     this.scale = 0;
     this.#show();
     this.onMove?.(this.current.id);
   }
 
-  get current() { return this.library.byId.get(this.list[this.index]?.id) || this.list[this.index]; }
+  get current() {
+    // a photo of the group picked in the strip below (Photos grouped): shown in place of the one of the list
+    const pick = this.stackPick && this.stackPickAt === this.index ? this.stackPick : null;
+    const it = pick || this.list[this.index];
+    return this.library.byId.get(it?.id) || it;
+  }
 
   #show() {
     const it = this.current;
@@ -175,10 +183,40 @@ export class Viewer {
     this.el.querySelector('.vw-next').disabled = !loop && this.index === this.list.length - 1;
     this.#renderBar(it);
     this.#renderStage(it);
+    this.#renderStack(it);
     this.#renderInfo(it);
     this.#preload();
     this.#prepareNext();
     this.#schedule();
+  }
+
+  /**
+   * "Group similar photos" on, and the photo shown stands for a group: the photos of its group in a strip
+   * below it, as in the stacks of Google Photos — a click shows one here; "Choose" opens the group to decide
+   * what stays.
+   */
+  #renderStack(it) {
+    const el = this.stackEl;
+    const top = this.list[this.index];
+    const stack = !this.playing && top ? this.services.similar?.groupOf(top.id) : null;
+    if (!stack || stack.count < 2) { el.hidden = true; el.replaceChildren(); return; }
+    const best = stack.top;
+    const isShown = (u) => u.files.some((f) => f.id === it.id);
+    const pick = (u) => { if (isShown(u)) return; this.stackPick = u.rep; this.stackPickAt = this.index; this.scale = 0; this.#show(); };
+    el.hidden = false;
+    el.setAttribute('aria-label', tn('viewer.stackLabel', stack.count));
+    setChildren(el,
+      h('span.vw-stack-label', h('span', { html: icon('stack', 14) }), tn('viewer.stackLabel', stack.count)),
+      h('div.vw-stack-thumbs', stack.units.map((u) => h(`button.vw-stack-thumb${isShown(u) ? '.is-shown' : ''}`, {
+        type: 'button', title: u.files.map((f) => f.name).join(' + '), 'aria-pressed': String(isShown(u)), onclick: () => pick(u),
+      }, this.thumbs.shown(h('img', { alt: '', draggable: false, decoding: 'async' }), u.rep),
+      u.rep.id === best ? h('span.vw-stack-best', { title: t('similar.bestTitle') }, h('span', { html: icon('sparkle', 10) })) : null))),
+      h('button.vw-stack-open', { type: 'button', title: t('viewer.stackOpenTitle'), onclick: () => {
+        const items = stack.units.flatMap((u) => u.files);
+        this.close();
+        showSimilar(this.services, { items }, { title: tn('similar.stackOpen', stack.count) });
+      } }, t('viewer.stackOpen')));
+    el.querySelector('.is-shown')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 
   // ------------------------------------------------------------------ slideshow

@@ -552,3 +552,9 @@ _merge(MESSAGES, {'similar': {'statusFromCatalog': {'one': 'faces of {count} pho
 _merge(MESSAGES, {'similar': {'only': 'Only the grouped photos', 'onlyTitle': 'Show only the groups of similar photos (each as its best photo), leaving out the photos that are alone'}})
 
 _merge(MESSAGES, {'photos': {'kind': {'grouped': 'Grouped photos'}}})
+
+_merge(MESSAGES, {'viewer': {'stackLabel': {'one': '{count} similar photo', 'other': '{count} similar photos'}, 'stackOpen': 'Choose what stays', 'stackOpenTitle': 'Open the group, to choose which photos stay and which go to the Limbo'}})
+
+_merge(MESSAGES, {'similar': {'why': {'menu': 'Why are these (not) grouped?', 'title': 'Why are these photos (not) grouped?', 'reading': 'Reading the photos…', 'picture': 'Picture', 'unread': 'not read (no thumbnail yet)', 'alike': '{pct} alike (the level {level} asks {need})', 'time': 'Time', 'apart': '{span} apart (up to {max})', 'people': 'People', 'others': 'other people in each photo', 'notSeen': 'not looked at yet', 'same': 'the same people (or nobody)', 'decision': 'Your decision', 'said': 'you said they are not of the same group', 'together': 'Grouped together.', 'firstPhoto': 'Close enough to each other: the group they join was started by a photo less alike (each photo must also look like the first of its group).', 'wouldAt': 'Together at the level {levels}.', 'never': 'Not together at any level.', 'useLevel': 'Group at the level {level}', 'unsay': 'They are of the same group', 'stillReading': 'The photos are still being read: the groups can still change.', 'lead': 'Each photo beside the next one taken, with what the grouping saw at the level used now ({level}).', 'seconds': '{n} s', 'minutes': '{m} min {s} s', 'hours': '{h} h {m} min'}}})
+
+_merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} min', 'days': {'one': '{count} day', 'other': '{count} days'}}}})

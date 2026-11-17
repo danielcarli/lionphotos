@@ -552,3 +552,9 @@ _merge(MESSAGES, {'similar': {'statusFromCatalog': {'one': 'Gesichter von {count
 _merge(MESSAGES, {'similar': {'only': 'Nur die gruppierten', 'onlyTitle': 'Zeigt nur die Gruppen ähnlicher Fotos (jede durch ihr bestes Foto), ohne die einzelnen Fotos'}})
 
 _merge(MESSAGES, {'photos': {'kind': {'grouped': 'Gruppierte Fotos'}}})
+
+_merge(MESSAGES, {'viewer': {'stackLabel': {'one': '{count} ähnliches Foto', 'other': '{count} ähnliche Fotos'}, 'stackOpen': 'Auswählen, was bleibt', 'stackOpenTitle': 'Öffnet die Gruppe, um zu wählen, welche Fotos bleiben und welche in den Limbo kommen'}})
+
+_merge(MESSAGES, {'similar': {'why': {'menu': 'Warum (nicht) gruppiert?', 'title': 'Warum sind diese Fotos (nicht) gruppiert?', 'reading': 'Die Fotos werden gelesen…', 'picture': 'Bild', 'unread': 'nicht gelesen (noch keine Miniatur)', 'alike': 'zu {pct} ähnlich (die Stufe {level} verlangt {need})', 'time': 'Zeit', 'apart': '{span} Abstand (bis {max})', 'people': 'Personen', 'others': 'andere Personen auf jedem Foto', 'notSeen': 'noch nicht untersucht', 'same': 'dieselben Personen (oder niemand)', 'decision': 'Ihre Entscheidung', 'said': 'Sie haben gesagt, sie gehören nicht zusammen', 'together': 'Sie sind in derselben Gruppe.', 'firstPhoto': 'Einander ähnlich genug: die Gruppe, zu der sie kämen, begann mit einem weniger ähnlichen Foto (jedes Foto muss auch dem ersten der Gruppe ähneln).', 'wouldAt': 'Zusammen auf der Stufe {levels}.', 'never': 'Auf keiner Stufe zusammen.', 'useLevel': 'Auf der Stufe {level} gruppieren', 'unsay': 'Sie gehören zusammen', 'stillReading': 'Die Fotos werden noch gelesen: die Gruppen können sich noch ändern.', 'lead': 'Jedes Foto neben dem nächsten, mit dem, was die Gruppierung auf der jetzigen Stufe ({level}) sah.', 'seconds': '{n} s', 'minutes': '{m} min {s} s', 'hours': '{h} h {m} min'}}})
+
+_merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} min', 'days': {'one': '{count} Tag', 'other': '{count} Tage'}}}})

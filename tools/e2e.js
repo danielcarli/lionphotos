@@ -1938,6 +1938,31 @@ app.whenReady().then(async () => {
       'a group of similar photos says how many it has; each photo has a menu (best, keep only it, take it out, compare); the best chosen is kept in the catalog', JSON.stringify({ count: simAll.count, menu: simAll.menu, bestNow: simAll.bestNow, bestKept: simAll.bestKept }));
     check(simAll.apartGone && simAll.apartKept >= 1 && simAll.apartToast && simAll.stillGone && simAll.undone,
       '"Not the same" (alike pictures of different people): the group goes and is not formed again; the notice undoes it', JSON.stringify({ apartGone: simAll.apartGone, apartKept: simAll.apartKept, toast: simAll.apartToast, stillGone: simAll.stillGone, undone: simAll.undone }));
+    // "Why (not) grouped?": two photos of a group and a photo of another scene, each beside the next
+    const why = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const a = lib.allItems.find((x) => x.name === 'IMG_1014-Edit.jpg'), b = lib.allItems.find((x) => x.name === 'IMG_1014.JPG');
+      const c = lib.allItems.find((x) => x.kind === 1 && x.thumb === 1 && /^IMG_/.test(x.name) && Math.abs((x.taken || x.mtime) - (b.taken || b.mtime)) > 3600e3);
+      // the menu of two photos selected has it
+      lib.setFilter({ day: '', year: 0, folder: '', recursive: true, kind: 'image' }); s.layout.openView('photos'); await wait(400);
+      const tiles = [...document.querySelectorAll('.view-photos .tile[data-id]')].slice(0, 2);
+      lib.setSelection(tiles.map((x) => Number(x.dataset.id))); await wait(100);
+      tiles[0].dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 300, clientY: 300 })); await wait(500);
+      const item = [...document.querySelectorAll('.ctx-item')].find((x) => x.textContent.includes('Why are these (not) grouped?'));
+      const res = { menu: !!item };
+      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
+      lib.setFilter({ kind: 'all' }); await wait(200);
+      (await import('/src/workbench/contrib/similar/similarExplain.js')).showWhyGrouped(s, [a, b, c]);
+      for (let i = 0; i < 60 && !document.querySelector('.why-row'); i++) await wait(100);
+      const rows = [...document.querySelectorAll('.why-row')];
+      res.rows = rows.length;
+      res.first = rows[0]?.querySelector('.why-verdict')?.textContent;
+      res.second = rows[1]?.querySelector('.why-verdict')?.textContent;
+      res.facts = rows[1]?.querySelector('.why-facts')?.textContent;
+      document.querySelector('.why-dialog .btn-primary')?.click(); await wait(200);
+      lib.clearSelection();
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(why.menu && why.rows === 2 && /Grouped together\.|Together at the level/.test(why.first || '') && /Not together at any level\.|Together at the level/.test(why.second || '') && /Picture.*alike.*Time.*apart.*People/.test(why.facts || ''),
+      '"Why are these (not) grouped?" (two or more photos selected): each beside the next, how alike, how far apart in time, the people, and at which level they would be together', JSON.stringify(why));
     // "Group similar photos", beside "Similar photos": each group as its best photo, a stack with how many; the
     // stack opens its group; side by side, the space bar says whether a photo stays or goes
     const st = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1953,6 +1978,17 @@ app.whenReady().then(async () => {
       res.status = document.querySelector('.view-photos .stack-status:not([hidden])')?.textContent;
       res.shown = lib.view('main').length; res.all = lib.viewAll('main').length;
       res.tileHasBadge = !!badge?.closest('.tile');
+      // the viewer: the photos of the group in a strip below the one shown; a click shows another of them
+      badge.closest('.tile').dispatchEvent(new MouseEvent('dblclick', { bubbles: true })); await wait(600);
+      const strip = document.querySelector('.viewer .vw-stack:not([hidden])');
+      res.vwThumbs = strip?.querySelectorAll('.vw-stack-thumb').length;
+      res.vwLabel = strip?.querySelector('.vw-stack-label')?.textContent;
+      const other = strip?.querySelector('.vw-stack-thumb:not(.is-shown)');
+      const otherName = other?.title.split(' + ')[0];
+      other?.click(); await wait(500);
+      res.vwPicked = s.viewer.current?.name === otherName && !!document.querySelector('.viewer .vw-stack-thumb.is-shown');
+      res.vwOpen = document.querySelector('.viewer .vw-stack-open')?.textContent;
+      s.viewer.close(); await wait(200);
       badge.click();
       for (let i = 0; i < 100 && !document.querySelector('.sim-group, .sim-empty'); i++) await wait(100);
       res.groupTitle = document.querySelector('.sim-title')?.textContent; res.groups = document.querySelectorAll('.sim-group').length; res.tiles = document.querySelectorAll('.sim-group .sim-tile').length;
@@ -1993,6 +2029,8 @@ app.whenReady().then(async () => {
       '"Group similar photos" beside "Similar photos": each group shown as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     check(st.onlyLabel === 'Only the grouped photos' && st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && st.onlyBack && st.onlyChip && st.fromMenu && st.menuChecked && st.menuBack,
       '"Grouped photos" (on the line under the bar, and in Filters › Type, with its chip): only the groups, each as its best photo; off, or "All", the photos alone again', JSON.stringify({ label: st.onlyLabel, onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, back: st.onlyBack, chip: st.onlyChip, fromMenu: st.fromMenu, menuChecked: st.menuChecked, menuBack: st.menuBack }));
+    check(st.vwThumbs === Number(st.badge) && st.vwLabel === `${st.badge} similar photos` && st.vwPicked && st.vwOpen === 'Choose what stays',
+      'the viewer, Photos grouped: the photos of the group in a strip below the one shown (as in Google Photos); a click shows another of them', JSON.stringify({ thumbs: st.vwThumbs, label: st.vwLabel, picked: st.vwPicked, open: st.vwOpen }));
     check(st.groups === 1 && st.tiles === Number(st.badge) && /^A group of \d+ similar photos$/.test(st.groupTitle || '') && st.keep0 === 'Goes to the Limbo' && st.keep1 === 'Stays' && st.out1 === st.out0 - 1 && st.more && /^Space: stays or goes/.test(st.hint || '') && st.outAfter === st.out0 - 1,
       'the stack opens its group; side by side, as in a phone\'s burst: the space bar says whether a photo stays or goes (the strip and the group follow), and the photo\'s menu is there', JSON.stringify(st));
     // the viewer's editing panel: the same sections; typing in a field does not reach the viewer's keys; a

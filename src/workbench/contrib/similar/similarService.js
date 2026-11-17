@@ -16,7 +16,7 @@ import { Emitter } from '../../../base/common/event.js';
 import { Eta } from '../../../base/common/eta.js';
 import { dateOf, adjustOf, KIND, MARK } from '../../services/library/browser/libraryService.js';
 import { isRawExt } from '../../services/library/common/mediaCategories.js';
-import { featuresOf, groupSimilar, bestOf, SENSITIVITY } from './similarFinder.js';
+import { featuresOf, groupSimilar, bestOf, similarity, SENSITIVITY } from './similarFinder.js';
 
 const STACK_KEY = 'lionphotos.photos.stacks';
 const ONLY_KEY = 'lionphotos.photos.stacksOnly';
@@ -91,28 +91,30 @@ export function shotsOfItems(library, items) {
 /** The groups, as a short text: Photos is drawn again only when it changes. */
 const signature = (groups) => groups.map((g) => `${g.units[g.best].rep.id}:${g.units.length}`).join(',');
 
-/** Do the faces (or pets) of two photos match, one for one? null: not known (a photo not looked at). */
+/**
+ * Are the people (or pets) of two photos others? A face of one with no match in the other, AND a face of the
+ * other with no match in the first: somebody else is there (the same place, other people). A face found in one
+ * and not in the other alone does not count — in a sequence a face turns, a hand covers it, and it is missed.
+ * Named faces: the names decide. @returns {boolean|null} true: the same people; false: others; null: not known
+ */
 export function sameWho(a, b, kind) {
   if (!a || !b) return null;
   const { minW, same } = PEOPLE[kind];
   const A = a.faces.filter((f) => f.w >= minW), B = b.faces.filter((f) => f.w >= minW);
-  if (!A.length && !B.length) return true;
-  const used = new Set();
-  for (const f of A) {
-    let pick = -1, best = Infinity;
-    B.forEach((g, j) => {
-      if (used.has(j)) return;
-      // named by the person: the names decide
-      if (f.personId && g.personId) { if (f.personId === g.personId) { pick = j; best = -1; } return; }
-      let d = 0;
-      for (let k = 0; k < f.v.length; k++) { const x = f.v[k] - g.v[k]; d += x * x; }
-      d = Math.sqrt(d);
-      if (d < same && d < best) { best = d; pick = j; }
-    });
-    if (pick < 0) return false;
-    used.add(pick);
-  }
-  return used.size === B.length;
+  if (!A.length || !B.length) return true;
+  const dist = (f, g) => {
+    if (f.personId && g.personId) return f.personId === g.personId ? 0 : Infinity;
+    let d = 0;
+    for (let k = 0; k < f.v.length; k++) { const x = f.v[k] - g.v[k]; d += x * x; }
+    return Math.sqrt(d);
+  };
+  // the closest pairs first, each face used once
+  const pairs = [];
+  A.forEach((f, i) => B.forEach((g, j) => { const d = dist(f, g); if (d < same) pairs.push([d, i, j]); }));
+  pairs.sort((x, y) => x[0] - y[0]);
+  const ua = new Set(), ub = new Set();
+  for (const [, i, j] of pairs) if (!ua.has(i) && !ub.has(j)) { ua.add(i); ub.add(j); }
+  return !(ua.size < A.length && ub.size < B.length);
 }
 
 export class SimilarService {
@@ -344,6 +346,35 @@ export class SimilarService {
     return groupSimilar(shots.filter((s) => s.f), level, this.apart).map((g) => ({ units: g.units, best: bestOf(g, this.chosen) }));
   }
 
+  // ------------------------------------------------------------------ why (or why not) together
+  /**
+   * For photos the person expected together: each one with the next (in the order taken) — how alike the
+   * pictures are, how far apart in time, whether the people are the same, a decision taken — and at which
+   * levels they would be grouped. Reads what is missing (the pictures; the faces from the catalog).
+   */
+  async explain(items) {
+    await this.loadChoices();
+    const { shots } = shotsOfItems(this.library, items);
+    await this.read(shots);
+    await this.readWho(shots, { look: false });
+    const rows = [];
+    for (let i = 1; i < shots.length; i++) {
+      const a = shots[i - 1], b = shots[i];
+      const sim = a.f && b.f ? similarity(a.f, b.f) : null;
+      const dt = Math.abs(b.t - a.t);
+      const said = a.files.some((f) => b.files.some((g) => this.choices.apart.has(pairKey(f.id, g.id))));
+      const face = sameWho(this.whoOf(a, 'face'), this.whoOf(b, 'face'), 'face');
+      const pet = sameWho(this.whoOf(a, 'pet'), this.whoOf(b, 'pet'), 'pet');
+      const seen = !!this.whoOf(a, 'face') && !!this.whoOf(b, 'face');
+      const levels = Object.entries(SENSITIVITY).map(([level, v]) => ({ level, ok: sim != null && sim >= v.threshold && dt <= v.windowMs && !said && face !== false && pet !== false, threshold: v.threshold, windowMs: v.windowMs }));
+      // Photos grouped: as it is there; else as the level used would do it
+      const ga = this.groupOf(a.rep.id), gb = this.groupOf(b.rep.id);
+      const together = this.active ? !!ga && ga === gb : !!levels.find((x) => x.level === this.level)?.ok;
+      rows.push({ a, b, sim, dt, said, face, pet, seen, levels, together });
+    }
+    return { rows, level: this.level, reading: !!this.progress };
+  }
+
   // ------------------------------------------------------------------ decisions, kept in the catalog
   async setBest(g, i) {
     const u = g.units[i];
@@ -391,6 +422,8 @@ export class SimilarService {
 
   /** The group a photo of Photos stands for (when it is the one shown). */
   stackOf(id) { const s = this.#stackOf.get(id); return s && s.top === id ? s : null; }
+  /** The group of Photos a photo is in (the one shown or one behind it). */
+  groupOf(id) { return this.active ? this.#stackOf.get(id) || null : null; }
 
   /**
    * Reads the photos of Photos not read yet, the newest first (the top of the grid): their groups show when the

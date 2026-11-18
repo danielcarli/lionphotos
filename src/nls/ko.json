@@ -613,6 +613,8 @@
   "photos.why.day": "{day}의 사진만",
   "photos.clearSearch": "검색 지우기",
   "photos.clearDay": "모든 날짜 표시",
+  "photos.rawsInGroup.one": "이 그룹의 RAW 파일 {count}개",
+  "photos.rawsInGroup.other": "이 그룹의 RAW 파일 {count}개",
   "list.name": "이름",
   "list.folder": "폴더",
   "list.type": "종류",

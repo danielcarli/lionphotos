@@ -613,6 +613,8 @@
   "photos.why.day": "Solo le foto del {day}",
   "photos.clearSearch": "Cancella la ricerca",
   "photos.clearDay": "Mostra tutti i giorni",
+  "photos.rawsInGroup.one": "{count} file raw in questo gruppo",
+  "photos.rawsInGroup.other": "{count} file raw in questo gruppo",
   "list.name": "Nome",
   "list.folder": "Cartella",
   "list.type": "Tipo",

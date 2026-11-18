@@ -613,6 +613,8 @@
   "photos.why.day": "{day} の写真のみ",
   "photos.clearSearch": "検索をクリア",
   "photos.clearDay": "すべての日を表示",
+  "photos.rawsInGroup.one": "このグループの RAW ファイル {count} 個",
+  "photos.rawsInGroup.other": "このグループの RAW ファイル {count} 個",
   "list.name": "名前",
   "list.folder": "フォルダー",
   "list.type": "種類",

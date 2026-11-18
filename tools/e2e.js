@@ -1978,6 +1978,16 @@ app.whenReady().then(async () => {
       res.status = document.querySelector('.view-photos .stack-status:not([hidden])')?.textContent;
       res.shown = lib.view('main').length; res.all = lib.viewAll('main').length;
       res.tileHasBadge = !!badge?.closest('.tile');
+      // the raw files come with their group (RAW and how many on it), and a raw twin behind its JPEG
+      const withRaw = lib.view('main').find((x) => s.similar.stackOf(x.id)?.raws > 0);
+      res.rawCount = withRaw && s.similar.stackOf(withRaw.id).raws;
+      const rawTile = withRaw && document.querySelector('.view-photos .tile[data-id="' + withRaw.id + '"]');
+      rawTile?.scrollIntoView({ block: 'center' }); await wait(300);
+      res.rawOnStack = document.querySelector('.view-photos .tile[data-id="' + withRaw?.id + '"] .tile-raw')?.textContent;
+      const shownIds = new Set(lib.view('main').map((x) => x.id));
+      const twins = lib.twinsOf(lib.view('main'));
+      res.twinBoth = [...twins].filter(([id, ts]) => ts.some((x) => shownIds.has(x.id))).length;
+      res.twinsBefore = (() => { const all = lib.viewAll('main'); const ids = new Set(all.map((x) => x.id)); return [...lib.twinsOf(all)].filter(([, ts]) => ts.some((x) => ids.has(x.id))).length; })();
       // the viewer: the photos of the group in a strip below the one shown; a click shows another of them
       badge.closest('.tile').dispatchEvent(new MouseEvent('dblclick', { bubbles: true })); await wait(600);
       const strip = document.querySelector('.viewer .vw-stack:not([hidden])');
@@ -2029,6 +2039,8 @@ app.whenReady().then(async () => {
       '"Group similar photos" beside "Similar photos": each group shown as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     check(st.onlyLabel === 'Only the grouped photos' && st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && st.onlyBack && st.onlyChip && st.fromMenu && st.menuChecked && st.menuBack,
       '"Grouped photos" (on the line under the bar, and in Filters › Type, with its chip): only the groups, each as its best photo; off, or "All", the photos alone again', JSON.stringify({ label: st.onlyLabel, onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, back: st.onlyBack, chip: st.onlyChip, fromMenu: st.fromMenu, menuChecked: st.menuChecked, menuBack: st.menuBack }));
+    check(st.rawOnStack === `RAW${st.rawCount}` && st.twinBoth === 0 && st.twinsBefore > 0,
+      'Photos grouped: a group holding raw files says RAW and how many; a raw file alone with its JPEG stays behind it (one photo)', JSON.stringify({ rawOnStack: st.rawOnStack, rawCount: st.rawCount, twinBoth: st.twinBoth, twinsBefore: st.twinsBefore }));
     check(st.vwThumbs === Number(st.badge) && st.vwLabel === `${st.badge} similar photos` && st.vwPicked && st.vwOpen === 'Choose what stays',
       'the viewer, Photos grouped: the photos of the group in a strip below the one shown (as in Google Photos); a click shows another of them', JSON.stringify({ thumbs: st.vwThumbs, label: st.vwLabel, picked: st.vwPicked, open: st.vwOpen }));
     check(st.groups === 1 && st.tiles === Number(st.badge) && /^A group of \d+ similar photos$/.test(st.groupTitle || '') && st.keep0 === 'Goes to the Limbo' && st.keep1 === 'Stays' && st.out1 === st.out0 - 1 && st.more && /^Space: stays or goes/.test(st.hint || '') && st.outAfter === st.out0 - 1,

@@ -879,7 +879,7 @@ export class PhotosView extends ViewPane {
         adjustOf(it) ? h('span.tile-badge.tile-edited', { title: t('adjust.edited') }, h('span', { html: icon('sliders', 11) })) : null,
         it.kind === KIND.video
           ? h('span.tile-badge', h('span', { html: icon(it.preview === 1 ? 'film' : 'play', 11) }), it.dur ? formatClock(it.dur) : t('common.video'))
-          : this.layout.tileDetails ? this.#formatBadge(it) : categoryOf(it) === 'raw' ? h('span.tile-badge.tile-raw', { title: it.fmt || it.ext.toUpperCase() }, 'RAW') : null));
+          : this.#rawsBadge(it) || (this.layout.tileDetails ? this.#formatBadge(it) : categoryOf(it) === 'raw' ? h('span.tile-badge.tile-raw', { title: it.fmt || it.ext.toUpperCase() }, 'RAW') : null)));
     if (it.mark) tile.classList.add(`mark-${MARK_NAMES[it.mark]}`);
     this.#markSphere(tile, it);
     this.#paintTile(tile, it.id);
@@ -895,6 +895,18 @@ export class PhotosView extends ViewPane {
       type: 'button', title: tn('similar.stackBadge', stack.count), 'aria-label': tn('similar.stackBadge', stack.count),
       onclick: (e) => { e.stopPropagation(); this.#openStack(stack); }, ondblclick: (e) => e.stopPropagation(),
     }, h('span', { html: icon('stack', 15) }), String(stack.count));
+  }
+
+  /**
+   * Photos grouped: the raw files behind the photo shown — its group's (RAW and how many), or its own raw twin
+   * (RAW) — so a group that holds raw files says so, whatever the photo on top.
+   */
+  #rawsBadge(it) {
+    const r = !this.limbo && it.kind === KIND.image ? this.services.similar?.rawsBehind(it.id) : null;
+    if (!r) return null;
+    const title = r.group ? `${tn('photos.rawsInGroup', r.raws)}\n${r.names.join('\n')}` : r.names.join('\n');
+    return h('span.tile-badge.tile-raw', { title, 'aria-label': r.group ? tn('photos.rawsInGroup', r.raws) : 'RAW' },
+      'RAW', r.group ? h('span.tile-raw-count', String(r.raws)) : null);
   }
 
   /** The kind of file at a glance: RAW · CR3, JPG, HEIC, PNG… with the colour of its kind (original, edited, raw). */

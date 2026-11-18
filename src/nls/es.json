@@ -613,6 +613,8 @@
   "photos.why.day": "Solo las fotos del {day}",
   "photos.clearSearch": "Quitar la búsqueda",
   "photos.clearDay": "Mostrar todos los días",
+  "photos.rawsInGroup.one": "{count} archivo raw en este grupo",
+  "photos.rawsInGroup.other": "{count} archivos raw en este grupo",
   "list.name": "Nombre",
   "list.folder": "Carpeta",
   "list.type": "Tipo",

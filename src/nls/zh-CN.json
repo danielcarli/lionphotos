@@ -613,6 +613,8 @@
   "photos.why.day": "仅 {day} 的照片",
   "photos.clearSearch": "清除搜索",
   "photos.clearDay": "显示所有日期",
+  "photos.rawsInGroup.one": "此组中有 {count} 个 RAW 文件",
+  "photos.rawsInGroup.other": "此组中有 {count} 个 RAW 文件",
   "list.name": "名称",
   "list.folder": "文件夹",
   "list.type": "类型",

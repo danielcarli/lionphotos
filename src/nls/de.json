@@ -613,6 +613,8 @@
   "photos.why.day": "Nur die Fotos vom {day}",
   "photos.clearSearch": "Suche löschen",
   "photos.clearDay": "Alle Tage anzeigen",
+  "photos.rawsInGroup.one": "{count} Raw-Datei in dieser Gruppe",
+  "photos.rawsInGroup.other": "{count} Raw-Dateien in dieser Gruppe",
   "list.name": "Name",
   "list.folder": "Ordner",
   "list.type": "Typ",

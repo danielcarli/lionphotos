@@ -2,6 +2,12 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.63.0] — 2026-11-17
+
+### Added
+- **Photos grouped: the raw files come with their group.** A group that holds raw files says so on its photo, whatever the photo on top: the RAW label (bottom right, where it always is) with how many raw files the group holds; its tooltip names them. A raw file alone with its JPEG (the two files of one shot) is one photo too: the raw file behind its JPEG, the RAW label on it.
+- **Raw files with no thumbnail yet are grouped too**, read from the JPEG the camera put inside them.
+
 ## [1.62.5] — 2026-11-17
 
 ### Added

@@ -555,3 +555,5 @@ _merge(MESSAGES, {'viewer': {'stackLabel': {'one': '似た写真 {count} 枚', '
 _merge(MESSAGES, {'similar': {'why': {'menu': 'なぜまとめられて（いない）？', 'title': 'これらの写真がまとめられて（いない）理由', 'reading': '写真を読み込み中…', 'picture': '画像', 'unread': '未読み込み（サムネイルなし）', 'alike': '{pct} 似ている（{level} の基準は {need}）', 'time': '時間', 'apart': '{span} の差（最大 {max}）', 'people': '人物', 'others': 'それぞれ別の人が写っています', 'notSeen': 'まだ解析していません', 'same': '同じ人物（または人物なし）', 'decision': 'あなたの判断', 'said': '同じグループではないと指定されています', 'together': '同じグループです。', 'firstPhoto': '互いには十分似ていますが、入るはずのグループはあまり似ていない写真から始まっています（各写真はグループの最初の写真にも似ている必要があります）。', 'wouldAt': '{levels} ならまとめられます。', 'never': 'どの基準でもまとめられません。', 'useLevel': '{level} でまとめる', 'unsay': '同じグループです', 'stillReading': '写真をまだ読み込み中です。グループは変わる可能性があります。', 'lead': '撮影順に隣り合う写真ごとに、現在の基準（{level}）で判断した内容を示します。', 'seconds': '{n} 秒', 'minutes': '{m} 分 {s} 秒', 'hours': '{h} 時間 {m} 分'}}})
 
 _merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} 分', 'days': {'one': '{count} 日', 'other': '{count} 日'}}}})
+
+_merge(MESSAGES, {'photos': {'rawsInGroup': {'one': 'このグループの RAW ファイル {count} 個', 'other': 'このグループの RAW ファイル {count} 個'}}})

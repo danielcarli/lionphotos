@@ -216,7 +216,7 @@ export class Viewer {
         }, this.thumbs.shown(h('img', { alt: '', draggable: false, decoding: 'async' }), u.rep),
         u.rep.id === best ? h('span.vw-stack-best', { title: t('similar.bestTitle') }, h('span', { html: icon('sparkle', 10) })) : null),
         // × : this photo out of the group (it is not grouped with these again; the notice undoes it)
-        h('button.vw-stack-remove', { type: 'button', title: t('similar.removeFromGroup'), 'aria-label': `${t('similar.removeFromGroup')} · ${u.rep.name}`, html: icon('close', 11),
+        h('button.vw-stack-remove', { type: 'button', title: t('similar.removeFromStack'), 'aria-label': `${t('similar.removeFromStack')} · ${u.rep.name}`, html: icon('close', 11),
           onclick: (e) => { e.stopPropagation(); this.#removeFromStack(stack, u); } })))),
       h('button.vw-stack-open', { type: 'button', title: t('viewer.stackOpenTitle'), onclick: () => {
         const items = stack.units.flatMap((u) => u.files);
@@ -234,14 +234,14 @@ export class Viewer {
     const repaint = () => { sim.regroupNow(); if (this.el && this.current) this.#renderStack(this.current); };
     await sim.setApart(pairs, true);
     repaint();
-    this.notifications?.info(t('similar.removedFromGroup', { name: u.rep.name }), 8000, { label: t('ops.undo'), run: async () => { await sim.setApart(pairs, false); repaint(); } });
+    this.notifications?.info(t('similar.removedFromStack', { name: u.rep.name }), 8000, { label: t('ops.undo'), run: async () => { await sim.setApart(pairs, false); repaint(); } });
   }
 
   #stackMenu(stack, u, x, y) {
     const sim = this.services.similar;
     const i = stack.units.indexOf(u);
     showContextMenu(x, y, [
-      { label: t('similar.makeSingle'), icon: 'takeOut', title: t('similar.removeFromGroup'), run: () => this.#removeFromStack(stack, u) },
+      { label: t('similar.makeSingle'), icon: 'takeOut', title: t('similar.removeFromStack'), run: () => this.#removeFromStack(stack, u) },
       { label: t('similar.setBest'), icon: 'sparkle', checked: u.rep.id === stack.top, run: async () => {
         if (u.rep.id === stack.top) return;
         await sim.setBest({ units: stack.units }, i);

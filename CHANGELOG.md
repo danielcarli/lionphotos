@@ -2,6 +2,20 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.69.1] — 2026-11-18
+
+### Fixed
+- The end-to-end test says again, at the end of its log, every check that failed (with what it saw), and on GitHub each one shows in the run's *Annotations*: a failure no longer hides in the middle of a long log.
+- The test of the catalog kept with the collection waits a moment for its last file (`faces.json`), written by the catalog's own queue, before looking (it could fail on a slow disk).
+
+## [1.69.0] — 2026-11-18
+
+### Added
+- **Stack photos** by hand, as in Lightroom: select two or more photos and choose *Stack photos* (a photo's menu, the selection's *More* menu, or `Ctrl+G`). They become one stack whatever they look like, shown as its best photo with the little stack and how many it holds, and the stack is kept in the catalog. *Unstack* (`Ctrl+Shift+G`) undoes a stack made by hand; on a stack found by likeness, it says its photos are not of the same stack. Both have an undo in the notice. A photo taken out of a stack made by hand (× in the viewer's strip, *Make single*) leaves it.
+
+### Changed
+- The words of Google Photos: **Stack photos** in place of "Group photos" (the switch), **Only stacks**, *Why are these (not) stacked?*, the stacks on the line under the bar, on the photo's badge, in the viewer's strip and in the sensitivity, in the 10 languages. The window that reviews similar photos keeps its groups.
+
 ## [1.68.0] — 2026-11-18
 
 ### Changed

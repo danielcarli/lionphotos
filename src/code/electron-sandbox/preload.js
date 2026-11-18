@@ -71,6 +71,7 @@ contextBridge.exposeInMainWorld('host', {
     saveSimilarFeatures: (rows) => ipcRenderer.invoke('library:saveSimilarFeatures', rows),
     similarApart: (pairs, apart) => ipcRenderer.invoke('library:similarApart', pairs, apart),
     similarBest: (id, group) => ipcRenderer.invoke('library:similarBest', id, group),
+    similarStack: (rows) => ipcRenderer.invoke('library:similarStack', rows),
     onProgress: on('library:progress'),
   },
 

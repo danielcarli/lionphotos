@@ -28,7 +28,7 @@ Parcourez, recherchez et organisez d’immenses collections de photos et de vid�
 
 **Aucune importation** · **Rien ne quitte votre ordinateur** · **100 000 photos défilent comme 100** · **Gratuit et open source**
 
-![Version 1.68.0](https://img.shields.io/badge/version-1.68.0-161214)
+![Version 1.69.1](https://img.shields.io/badge/version-1.69.1-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -235,6 +235,7 @@ Les mêmes règles que LionOrganizer :
 | `1` `2` `3` · `0` | Marquer la sélection excellente · correcte · à supprimer · effacer |
 | `Ctrl+A` · `Entrée` · `H` · `Suppr` · `F2` · `Échap` | Tout sélectionner · ouvrir · panneau d'informations · Corbeille · renommer · vider la sélection |
 | `E` · `D` · `I` | Panneau latéral sur Ajuster · Décrire · Infos (la même touche le replie) |
+| `Ctrl+G` · `Ctrl+Shift+G` | Empiler · désempiler la sélection |
 | `V` · `?` | Comparer côte à côte · Raccourcis clavier |
 | `Ctrl+E` | Exporter les photos (la sélection, ou les photos affichées) |
 | `←` `→` · `Espace` · `Échap` | Visionneuse : précédente/suivante · lecture/pause · fermer |
@@ -335,7 +336,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.68.0**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.69.1**.
 
 ## Crédits
 

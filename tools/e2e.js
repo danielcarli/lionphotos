@@ -56,7 +56,15 @@ require('../src/code/electron-main/main.js');
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 let failures = 0;
-const check = (ok, label, extra = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${label}${extra ? '  ' + extra : ''}`); if (!ok) failures++; };
+const failed = []; // the names of the checks that failed: said again at the end (and, on GitHub, as annotations)
+const check = (ok, label, extra = '') => {
+  console.log(`${ok ? 'PASS' : 'FAIL'}  ${label}${extra ? '  ' + extra : ''}`);
+  if (ok) return;
+  failures++;
+  failed.push(`${label}${extra ? '  ' + String(extra).slice(0, 600) : ''}`);
+  // GitHub Actions: the check named on the run's page (Annotations), with what it saw
+  if (process.env.GITHUB_ACTIONS) console.log(`::error title=e2e failed::${`${label} — ${String(extra).slice(0, 600)}`.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`);
+};
 
 app.whenReady().then(async () => {
   let win;
@@ -985,6 +993,8 @@ app.whenReady().then(async () => {
         const st = await host.portable.saveNow();
         return { id, folder, state: st.state, enabled: st.enabled };
       })()`);
+      // written by the catalog's own queue: a moment for the last file (slow disks)
+      for (let i = 0; i < 30 && !['catalog.json', 'faces.json', 'collection.json'].every((n) => fs.existsSync(path.join(PC, n))); i++) await new Promise((r) => setTimeout(r, 100));
       const cat = fs.existsSync(path.join(PC, 'catalog.json')) ? JSON.parse(fs.readFileSync(path.join(PC, 'catalog.json'), 'utf8')) : null;
       const info = fs.existsSync(path.join(PC, 'collection.json')) ? JSON.parse(fs.readFileSync(path.join(PC, 'collection.json'), 'utf8')) : null;
       const label = cat?.labels.find((l) => l.name === 'Portátil');
@@ -1983,8 +1993,8 @@ app.whenReady().then(async () => {
       res.undone = !!grp() && (await s.host.library.similarChoices()).apart.length === 0;
       document.querySelector('.sim-close')?.click(); await wait(200);
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(simAll.near && simAll.label === 'Similar photos' && simAll.popup === 'menu' && simAll.barMenu === 'Only groups|Review similar photos…|Why are these (not) grouped?' && simAll.menuSens === 'Almost the same|Alike' && simAll.title === 'Similar photos among those shown' && simAll.groups >= 1 && simAll.prevHidden && /\d{4}/.test(simAll.meta || ''),
-      '"Similar photos ▾" beside the switch "Group photos": a menu with the sensitivity (Almost the same … Alike), Only groups, Review similar photos… (the photos shown, across days: dated groups, no day arrows) and Why (not) grouped', JSON.stringify(simAll));
+    check(simAll.near && simAll.label === 'Similar photos' && simAll.popup === 'menu' && simAll.barMenu === 'Only stacks|Review similar photos…|Why are these (not) stacked?' && simAll.menuSens === 'Almost the same|Alike' && simAll.title === 'Similar photos among those shown' && simAll.groups >= 1 && simAll.prevHidden && /\d{4}/.test(simAll.meta || ''),
+      '"Similar photos ▾" beside the switch "Stack photos": a menu with the sensitivity (Almost the same … Alike), Only stacks, Review similar photos… (the photos shown, across days: dated groups, no day arrows) and Why (not) stacked', JSON.stringify(simAll));
     check(/^1 of \d+ groups selected$/.test(simAll.sel?.one?.[2] || '') && simAll.sel?.none?.[0] === 'Select a group' && simAll.sel?.none?.[1] && simAll.sel?.none?.[2]
       && simAll.sel?.one?.[0] === (simAll.sel.one[1] === 1 ? 'Send 1 to the Limbo' : `Send ${simAll.sel.one[1]} to the Limbo`) && simAll.sel?.back,
       'similar photos: a checkbox on each group, Select all and Clear selection; sending to the Limbo applies to the groups selected only', JSON.stringify(simAll.sel));
@@ -2022,7 +2032,7 @@ app.whenReady().then(async () => {
       const tiles = [...document.querySelectorAll('.view-photos .tile[data-id]')].slice(0, 2);
       lib.setSelection(tiles.map((x) => Number(x.dataset.id))); await wait(100);
       tiles[0].dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 300, clientY: 300 })); await wait(500);
-      const item = [...document.querySelectorAll('.ctx-item')].find((x) => x.textContent.includes('Why are these (not) grouped?'));
+      const item = [...document.querySelectorAll('.ctx-item')].find((x) => x.textContent.includes('Why are these (not) stacked?'));
       const res = { menu: !!item };
       document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
       lib.setFilter({ kind: 'all' }); await wait(200);
@@ -2036,8 +2046,8 @@ app.whenReady().then(async () => {
       document.querySelector('.why-dialog .btn-primary')?.click(); await wait(200);
       lib.clearSelection();
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(why.menu && why.rows === 2 && /Grouped together\.|Together with the sensitivity at/.test(why.first || '') && /Not together at any level\.|Together with the sensitivity at/.test(why.second || '') && /Picture.*alike.*Time.*apart.*People/.test(why.facts || ''),
-      '"Why are these (not) grouped?" (two or more photos selected): each beside the next, how alike, how far apart in time, the people, and at which level they would be together', JSON.stringify(why));
+    check(why.menu && why.rows === 2 && /In the same stack\.|Together with the sensitivity at/.test(why.first || '') && /Not together at any level\.|Together with the sensitivity at/.test(why.second || '') && /Picture.*alike.*Time.*apart.*People/.test(why.facts || ''),
+      '"Why are these (not) stacked?" (two or more photos selected): each beside the next, how alike, how far apart in time, the people, and at which level they would be together', JSON.stringify(why));
     // "Group similar photos", beside "Similar photos": each group as its best photo, a stack with how many; the
     // stack opens its group; side by side, the space bar says whether a photo stays or goes
     const st = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -2088,7 +2098,7 @@ app.whenReady().then(async () => {
       const after = [...document.querySelectorAll('.viewer .vw-stack:not([hidden]) .vw-stack-thumb')].map((x) => x.title);
       res.vwRemoved = !after.includes(goneName) && (before > 2 ? after.length === before - 1 : after.length === 0);
       res.vwAfter = { before, after: after.length };
-      [...document.querySelectorAll('.toast')].find((x) => x.textContent.includes('out of the group'))?.querySelector('.toast-actions button')?.click(); await wait(1200);
+      [...document.querySelectorAll('.toast')].find((x) => x.textContent.includes('out of the stack'))?.querySelector('.toast-actions button')?.click(); await wait(1200);
       // a thumbnail's menu (right button): "Make single"
       document.querySelector('.viewer .vw-stack-thumb')?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 600, clientY: 600 })); await wait(300);
       res.vwMenu = [...document.querySelectorAll('.ctx-menu .ctx-item')].map((x) => x.textContent.trim()).join('|');
@@ -2113,33 +2123,73 @@ app.whenReady().then(async () => {
       res.outAfter = document.querySelectorAll('.sim-group .sim-tile.is-out').length;
       document.querySelector('.sim-close')?.click(); await wait(200);
       // Only groups (in the menu): every photo shown stands for a group; no chip, the button is marked
-      await simMenu('Only groups');
+      await simMenu('Only stacks');
       res.onlyShown = lib.view('main').length;
       res.onlyAll = lib.view('main').every((it) => !!s.similar.stackOf(it.id)) && document.querySelectorAll('.view-photos .tile').length === document.querySelectorAll('.view-photos .tile .tile-stack').length;
-      res.onlyChip = !![...document.querySelectorAll('.view-photos .filter-chip')].find((c) => c.textContent.includes('Only groups'));
+      res.onlyChip = !![...document.querySelectorAll('.view-photos .filter-chip')].find((c) => c.textContent.includes('Only stacks'));
       res.onlyMarked = !!document.querySelector('.view-photos .similar-btn.is-active .similar-only');
       res.noOldSwitch = !document.querySelector('.view-photos .stack-only') && !document.querySelector('.view-photos .stack-mode');
-      await simMenu('Only groups');
+      await simMenu('Only stacks');
       res.onlyBack = lib.view('main').length === res.shown && s.similar.mode === 'stacks';
       // Filters › Type no longer has it (one place for it)
       document.querySelector('.view-photos .filters-btn').click(); await wait(250);
-      res.noMenuItem = ![...document.querySelectorAll('.ctx-menu .ctx-item')].some((x) => /Grouped photos|Only groups/.test(x.textContent));
+      res.noMenuItem = ![...document.querySelectorAll('.ctx-menu .ctx-item')].some((x) => /Grouped photos|Only groups|Only stacks/.test(x.textContent));
       document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
       sw().click(); await wait(500);
       res.off = !document.querySelector('.view-photos .tile-stack') && lib.view('main').length === allBefore;
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(st.label === 'Group photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the group$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /groups? of similar photos · \d+ of \d+ photos are in a group/.test(st.status || ''),
-      'the switch "Group photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
+    check(st.label === 'Stack photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the stack$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /stacks? of similar photos · \d+ of \d+ photos are in a stack/.test(st.status || ''),
+      'the switch "Stack photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && !st.onlyChip && st.onlyMarked && st.onlyBack && st.noOldSwitch && st.noMenuItem,
-      'Only groups (in the menu of "Similar photos"): only the groups, each as its best photo, the button marked, no chip nor filter for it; again in the menu, every photo grouped again', JSON.stringify({ onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, chip: st.onlyChip, marked: st.onlyMarked, back: st.onlyBack, noOldSwitch: st.noOldSwitch, noMenuItem: st.noMenuItem }));
+      'Only stacks (in the menu of "Similar photos"): only the groups, each as its best photo, the button marked, no chip nor filter for it; again in the menu, every photo grouped again', JSON.stringify({ onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, chip: st.onlyChip, marked: st.onlyMarked, back: st.onlyBack, noOldSwitch: st.noOldSwitch, noMenuItem: st.noMenuItem }));
     check(st.rawOnStack === `RAW${st.rawCount}` && st.twinBoth === 0 && st.twinsBefore > 0,
       'Photos grouped: a group holding raw files says RAW and how many; a raw file alone with its JPEG stays behind it (one photo)', JSON.stringify({ rawOnStack: st.rawOnStack, rawCount: st.rawCount, twinBoth: st.twinBoth, twinsBefore: st.twinsBefore }));
-    check(/^Almost the same\|Alike:\d+$/.test(st.slider || '') && !st.lineSlider && st.removeTitle === 'Remove photo from the group' && st.vwRemove === 'Remove photo from the group' && st.vwRemoved && /^Make single\|Choose as the best/.test(st.vwMenu || ''),
+    check(/^Almost the same\|Alike:\d+$/.test(st.slider || '') && !st.lineSlider && st.removeTitle === 'Remove photo from the group' && st.vwRemove === 'Remove photo from the stack' && st.vwRemoved && /^Make single\|Choose as the best/.test(st.vwMenu || ''),
       'the sensitivity as a slider (Almost the same … Alike), in the menu of "Similar photos" and in the group (no longer on the line under the bar); × on a photo of a group (and of the viewer\'s strip): "Remove photo from the group"; a thumbnail\'s menu: "Make single"', JSON.stringify({ slider: st.slider, line: st.lineSlider, remove: st.removeTitle, vwRemove: st.vwRemove, vwRemoved: st.vwRemoved, vwMenu: st.vwMenu }));
     check(st.vwThumbs === Number(st.badge) && st.vwLabel === `${st.badge} similar photos` && st.vwPicked && st.vwOpen === 'Choose what stays',
       'the viewer, Photos grouped: the photos of the group in a strip below the one shown (as in Google Photos); a click shows another of them', JSON.stringify({ thumbs: st.vwThumbs, label: st.vwLabel, picked: st.vwPicked, open: st.vwOpen }));
-    check(st.groups === 1 && st.tiles === Number(st.badge) && /^A group of \d+ similar photos$/.test(st.groupTitle || '') && st.keep0 === 'Goes to the Limbo' && st.keep1 === 'Stays' && st.out1 === st.out0 - 1 && st.more && /^Space: stays or goes/.test(st.hint || '') && st.outAfter === st.out0 - 1,
+    check(st.groups === 1 && st.tiles === Number(st.badge) && /^A stack of \d+ similar photos$/.test(st.groupTitle || '') && st.keep0 === 'Goes to the Limbo' && st.keep1 === 'Stays' && st.out1 === st.out0 - 1 && st.more && /^Space: stays or goes/.test(st.hint || '') && st.outAfter === st.out0 - 1,
       'the stack opens its group; side by side, as in a phone\'s burst: the space bar says whether a photo stays or goes (the strip and the group follow), and the photo\'s menu is there', JSON.stringify(st));
+    // "Stack photos" (Ctrl+G, as in Lightroom): photos selected put in one stack by hand, whatever they look like;
+    // kept in the catalog; "Unstack" (Ctrl+Shift+G) undoes it, and the notice's undo brings it back
+    const man = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      lib.setFilter({ day: '', year: 0, folder: '', recursive: true }); s.layout.openView('photos'); await wait(300);
+      const imgs = lib.view('main').filter((x) => x.kind === 1 && !x.mark && x.thumb === 1);
+      const a = imgs[0], b = imgs.at(-1);
+      const res = { off: !s.similar.active, apart: Math.abs(a.taken - b.taken) > 86400e3 || a.folder !== b.folder };
+      lib.setSelection([a.id, b.id]); await wait(150);
+      const tile = document.querySelector('.view-photos .tile[data-id="' + a.id + '"]');
+      tile?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 400, clientY: 400 })); await wait(300);
+      const item = [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Stack photos'));
+      res.item = item?.textContent.trim();
+      item?.click();
+      for (let i = 0; i < 60 && !s.similar.groupOf(a.id); i++) await wait(100);
+      await wait(300);
+      const g = s.similar.groupOf(a.id);
+      res.on = s.similar.active; res.together = !!g && g === s.similar.groupOf(b.id); res.count = g?.count;
+      res.badge = s.similar.stackOf(g?.top)?.count === 2 && lib.view('main').some((x) => x.id === g?.top);
+      res.kept = ((await s.host.library.similarChoices()).stacks || []).filter(([id]) => id === a.id || id === b.id).length;
+      const toast = [...document.querySelectorAll('.toast')].find((x) => x.textContent.includes('photos stacked'));
+      res.toast = !!toast;
+      // Ctrl+Shift+G on the photo standing for the stack: unstacked
+      lib.setSelection([g.top]); await wait(100);
+      document.querySelector('.view-photos .vs-scroller').dispatchEvent(new KeyboardEvent('keydown', { key: 'G', ctrlKey: true, shiftKey: true, bubbles: true })); await wait(600);
+      res.unstacked = s.similar.groupOf(a.id) !== s.similar.groupOf(b.id) && ((await s.host.library.similarChoices()).stacks || []).length === 0;
+      const toast2 = [...document.querySelectorAll('.toast')].find((x) => x.textContent.includes('Stack undone'));
+      res.toast2 = !!toast2;
+      toast2?.querySelector('.toast-actions button')?.click(); await wait(600);
+      res.back = !!s.similar.groupOf(a.id) && s.similar.groupOf(a.id) === s.similar.groupOf(b.id);
+      // Ctrl+G with one photo: nothing, a word on what to do
+      const alone = lib.view('main').find((x) => x.kind === 1 && !x.mark && !s.similar.groupOf(x.id));
+      lib.setSelection([alone.id]); await wait(100);
+      document.querySelector('.view-photos .vs-scroller').dispatchEvent(new KeyboardEvent('keydown', { key: 'g', ctrlKey: true, bubbles: true })); await wait(300);
+      res.few = [...document.querySelectorAll('.toast')].some((x) => x.textContent.includes('Select 2 or more photos'));
+      // tidy: unstack, grouping off
+      lib.setSelection([a.id]); await s.similar.unstackPhotos([a]); lib.clearSelection();
+      s.similar.setMode('all'); await wait(400);
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(man.off && man.apart && man.item === 'Stack photosCtrl+G' && man.on && man.together && man.count === 2 && man.badge && man.kept === 2 && man.toast && man.unstacked && man.toast2 && man.back && man.few,
+      '"Stack photos" (menu and Ctrl+G): two photos far apart put in one stack by hand (stacking turned on, kept in the catalog); Ctrl+Shift+G unstacks it, the notice brings it back; one photo alone: a word on what to do', JSON.stringify(man));
     // the viewer's editing panel: the same sections; typing in a field does not reach the viewer's keys; a
     // photo moved to a category the filter does not show stays in view, greyed, with a note naming it
     const vw = await js(`(async () => {
@@ -2952,7 +3002,10 @@ app.whenReady().then(async () => {
   } catch (err) {
     console.error(err);
     failures++;
+    failed.push(`the script stopped: ${String(err?.stack || err).slice(0, 600)}`);
+    if (process.env.GITHUB_ACTIONS) console.log(`::error title=e2e stopped::${String(err?.message || err).replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`);
   }
-  console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');
+  // the checks that failed, again at the end (where a log is read)
+  console.log(failures ? `\n${failures} check(s) failed:\n${failed.map((f) => `  FAIL  ${f}`).join('\n')}` : '\nall checks passed');
   app.exit(failures ? 1 : 0);
 });

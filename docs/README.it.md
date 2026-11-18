@@ -28,7 +28,7 @@ Sfoglia, cerca e organizza enormi raccolte di foto e video là dove sono già: s
 
 **Nessuna importazione** · **Nulla lascia il tuo computer** · **100.000 foto scorrono come 100** · **Gratuito e open source**
 
-![Versione 1.68.0](https://img.shields.io/badge/version-1.68.0-161214)
+![Versione 1.69.1](https://img.shields.io/badge/version-1.69.1-161214)
 ![Stato: versione beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licenza: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Piattaforme: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -235,6 +235,7 @@ Le stesse regole di LionOrganizer:
 | `1` `2` `3` · `0` | Segna la selezione come ottima · OK · da eliminare · togli il segno |
 | `Ctrl+A` · `Invio` · `H` · `Canc` · `F2` · `Esc` | Seleziona tutto · apri · pannello informazioni · Cestino · rinomina · annulla la selezione |
 | `E` · `D` · `I` | Pannello laterale su Regola · Descrivi · Info (lo stesso tasto di nuovo lo chiude) |
+| `Ctrl+G` · `Ctrl+Shift+G` | Impila · disimpila la selezione |
 | `V` · `?` | Confronta fianco a fianco · Scorciatoie da tastiera |
 | `Ctrl+E` | Esporta foto (la selezione, o le foto mostrate) |
 | `←` `→` · `Spazio` · `Esc` | Visualizzatore: precedente/successiva · riproduci/pausa · chiudi |
@@ -335,7 +336,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-foto"; npm run test:e2e
 
 ## Registro delle modifiche
 
-Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.68.0**.
+Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.69.1**.
 
 ## Riconoscimenti
 

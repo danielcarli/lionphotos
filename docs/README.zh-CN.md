@@ -28,7 +28,7 @@
 
 **无需导入** · **数据不出本机** · **10 万张照片如 100 张般流畅** · **免费开源**
 
-![版本 1.68.0](https://img.shields.io/badge/version-1.68.0-161214)
+![版本 1.69.1](https://img.shields.io/badge/version-1.69.1-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -235,6 +235,7 @@ LionPhotos 处于 **Beta** 阶段。这意味着：
 | `1` `2` `3` · `0` | 把所选标记为很好 · 可以 · 待删除 · 清除标记 |
 | `Ctrl+A` · `Enter` · `H` · `Delete` · `F2` · `Esc` | 全选 · 打开 · 信息面板 · 回收站 · 重命名 · 取消选择 |
 | `E` · `D` · `I` | 侧面板切换到 调整 · 描述 · 信息（再按一次同一键收起） |
+| `Ctrl+G` · `Ctrl+Shift+G` | 堆叠 · 取消堆叠所选项 |
 | `V` · `?` | 并排比较 · 键盘快捷键 |
 | `Ctrl+E` | 导出照片（所选照片，或显示的照片） |
 | `←` `→` · `空格` · `Esc` | 查看器：上一张/下一张 · 播放/暂停 · 关闭 |
@@ -335,7 +336,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.68.0**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.69.1**。
 
 ## 致谢
 

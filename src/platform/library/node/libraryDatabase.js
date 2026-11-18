@@ -161,6 +161,12 @@ CREATE TABLE IF NOT EXISTS similar_apart (
   PRIMARY KEY (a, b)
 ) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS similar_best (id INTEGER PRIMARY KEY REFERENCES media(id) ON DELETE CASCADE);
+-- photos stacked by the person (selected and stacked, as in Lightroom): each photo with its stack (the smallest
+-- id of the stack when it was made); they stay together whatever the similarity
+CREATE TABLE IF NOT EXISTS similar_stack (
+  media_id INTEGER PRIMARY KEY REFERENCES media(id) ON DELETE CASCADE,
+  stack INTEGER NOT NULL
+);
 -- what each photo looks like, for the similar photos (light and shade, colours, sharpness, exposure: 320
 -- bytes, read from its thumbnail), so a collection is not read again at each start
 CREATE TABLE IF NOT EXISTS similar_features (
@@ -427,6 +433,7 @@ class LibraryDatabase {
               this.db.prepare('UPDATE OR IGNORE similar_apart SET a = ? WHERE a = ?').run(n.id, s.id);
               this.db.prepare('UPDATE OR IGNORE similar_apart SET b = ? WHERE b = ?').run(n.id, s.id);
               this.db.prepare('UPDATE OR IGNORE similar_best SET id = ? WHERE id = ?').run(n.id, s.id);
+              this.db.prepare('UPDATE OR IGNORE similar_stack SET media_id = ? WHERE media_id = ?').run(n.id, s.id);
               this.db.prepare('UPDATE OR IGNORE similar_features SET media_id = ? WHERE media_id = ?').run(n.id, s.id);
               out.reused++;
               out.reusedIds.push(n.id);
@@ -672,12 +679,14 @@ class LibraryDatabase {
 
   /**
    * What the person decided about similar photos in a collection: the pairs that are not of the same group and
-   * the photos chosen as the best of theirs. @returns {{ apart: number[][], best: number[] }}
+   * the photos chosen as the best of theirs, and the photos stacked by hand (each with its stack).
+   * @returns {{ apart: number[][], best: number[], stacks: number[][] }}
    */
   similarChoices(rootId) {
     const apart = this.db.prepare('SELECT s.a, s.b FROM similar_apart s JOIN media m ON m.id = s.a WHERE m.root_id = ?').all(rootId).map((r) => [r.a, r.b]);
     const best = this.db.prepare('SELECT s.id FROM similar_best s JOIN media m ON m.id = s.id WHERE m.root_id = ?').all(rootId).map((r) => r.id);
-    return { apart, best };
+    const stacks = this.db.prepare('SELECT s.media_id AS id, s.stack FROM similar_stack s JOIN media m ON m.id = s.media_id WHERE m.root_id = ?').all(rootId).map((r) => [r.id, r.stack]);
+    return { apart, best, stacks };
   }
 
   /**
@@ -726,6 +735,24 @@ class LibraryDatabase {
         const a = Math.min(x, y), b = Math.max(x, y);
         if (!Number.isInteger(a) || !Number.isInteger(b) || a === b) continue;
         if (apart) add.run(a, b, a, b); else del.run(a, b);
+      }
+      this.db.exec('COMMIT');
+    } catch (err) { this.db.exec('ROLLBACK'); throw err; }
+    return true;
+  }
+
+  /**
+   * Photos stacked by hand: each pair [id, stack] puts a photo in a stack (stack null: out of its stack).
+   * @param {[number, number|null][]} rows
+   */
+  setSimilarStack(rows) {
+    const put = this.db.prepare('INSERT OR REPLACE INTO similar_stack(media_id, stack) SELECT id, ? FROM media WHERE id = ?');
+    const del = this.db.prepare('DELETE FROM similar_stack WHERE media_id = ?');
+    this.db.exec('BEGIN');
+    try {
+      for (const [id, stack] of rows) {
+        if (!Number.isInteger(id)) continue;
+        if (Number.isInteger(stack)) put.run(stack, id); else del.run(id);
       }
       this.db.exec('COMMIT');
     } catch (err) { this.db.exec('ROLLBACK'); throw err; }

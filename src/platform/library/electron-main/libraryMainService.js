@@ -112,8 +112,9 @@ class LibraryMainService {
     ipc.handle('library:contentVectors', (_e, mediaIds) => this.db.contentVectors(Array.isArray(mediaIds) ? mediaIds.map(Number).filter(Number.isInteger) : []));
     ipc.handle('library:similarFeatures', (_e, mediaIds) => this.db.similarFeatures(Array.isArray(mediaIds) ? mediaIds.map(Number).filter(Number.isInteger) : []));
     ipc.handle('library:saveSimilarFeatures', (_e, rows) => this.db.saveSimilarFeatures(Array.isArray(rows) ? rows.map((r) => ({ id: Number(r?.id), data: r?.data })) : []));
-    ipc.handle('library:similarChoices', () => (this.rootId ? this.db.similarChoices(this.rootId) : { apart: [], best: [] }));
+    ipc.handle('library:similarChoices', () => (this.rootId ? this.db.similarChoices(this.rootId) : { apart: [], best: [], stacks: [] }));
     ipc.handle('library:similarApart', (_e, pairs, apart) => this.db.setSimilarApart(Array.isArray(pairs) ? pairs.filter(Array.isArray).map((p) => p.map(Number)) : [], apart !== false));
+    ipc.handle('library:similarStack', (_e, rows) => this.db.setSimilarStack(Array.isArray(rows) ? rows.filter(Array.isArray).map(([id, stack]) => [Number(id), stack == null ? null : Number(stack)]) : []));
     ipc.handle('library:similarBest', (_e, id, group) => this.db.setSimilarBest(id == null ? null : Number(id), Array.isArray(group) ? group.map(Number) : []));
     // a folder off the list of folders opened before (its catalog kept), or back on it
     ipc.handle('library:hideRoot', (_e, rootPath, hidden) => (typeof rootPath === 'string' ? this.db.hideRoot(rootPath, hidden !== false) : false));

@@ -222,7 +222,7 @@ export class PhotosView extends ViewPane {
       !this.limbo && !f.labelId ? h(f.noAlbum ? 'label.tb-switch.on' : 'label.tb-switch', { title: t('photos.noAlbumTitle') },
         h('input', { type: 'checkbox', role: 'switch', checked: !!f.noAlbum, 'aria-checked': String(!!f.noAlbum), onchange: (e) => library.setFilter({ noAlbum: e.target.checked }) }),
         h('span.tb-switch-track', { 'aria-hidden': 'true' }), h('span.tb-switch-text', t('photos.noAlbum'))) : null,
-      // "Group photos": each group of similar photos shown as its best photo, with a little stack and how many it holds
+      // "Stack photos": each stack of similar photos shown as its best photo, with a little stack and how many it holds
       !this.limbo ? this.#stackSwitch() : null,
       // "Similar photos ▾": how alike, only the groups, reviewing them (to keep the best of each sequence), and why (not) together
       !this.limbo ? this.#similarButton() : null,
@@ -515,6 +515,7 @@ export class PhotosView extends ViewPane {
           { label: t('photos.duplicate'), icon: 'copy', hint: 'Ctrl+D', run: () => this.operations.duplicate(ids) },
           exportMenuItem(this.services, sel),
           { label: t('compare.menu'), icon: 'columns', hint: 'V', disabled: !comparable(this.services, sel).length, run: () => this.compareSelection() },
+          ...this.#stackItems(sel, this.limbo),
           { label: t('photos.organize'), icon: 'calendar', run: () => this.layout.openView('organize') },
           ...(videos.length ? [{ label: t('previews.generate'), icon: 'film', run: () => this.thumbs.generatePreviews({ ids: videos.map((v) => v.id) }, tn('previews.scope.selected', videos.length)) }] : []),
           ...(heics.length ? [{ label: t('convert.button'), icon: 'image', title: t('convert.buttonTitle'), run: () => this.operations.convertHeic(heics.map((it) => it.id)) }] : []),
@@ -956,9 +957,11 @@ export class PhotosView extends ViewPane {
       // the similar photos of the day these were taken
       ...(!inLimbo && sel.every((x) => x.kind === KIND.image && dayOf(x) === dayOf(sel[0]))
         ? [{ label: t('similar.menu'), icon: 'similar', run: () => showSimilar(this.services, dayOf(sel[0])) }] : []),
-      // a few photos expected together: why they are (not) grouped
+      // stack the photos selected (whatever they look like), or unstack the stacks they stand for
+      ...this.#stackItems(sel, inLimbo),
+      // a few photos expected together: why they are (not) stacked
       ...(!inLimbo && sel.length >= 2 && sel.length <= 12 && sel.every((x) => x.kind === KIND.image)
-        ? [{ label: t('similar.why.menu'), icon: 'stack', run: () => showWhyGrouped(this.services, sel) }] : []),
+        ? [{ label: t('similar.why.menu'), icon: 'search', run: () => showWhyGrouped(this.services, sel) }] : []),
       '-',
       inLimbo
         ? { label: t('contextMenu.restore'), icon: 'undo', run: () => library.setMark(ids, 0) }
@@ -1132,6 +1135,8 @@ export class PhotosView extends ViewPane {
     if (mod && e.key.toLowerCase() === 'a') { e.preventDefault(); this.picking = true; library.setSelection(this.list.map((it) => it.id)); return; }
     // Ctrl+D: duplicate the selection (copies next to the originals, with the typed code)
     if (mod && !e.shiftKey && e.key.toLowerCase() === 'd' && library.selection.size && !this.limbo) { e.preventDefault(); this.operations.duplicate([...library.selection]); return; }
+    // Ctrl+G: stack the selection · Ctrl+Shift+G: unstack it (as in Lightroom)
+    if (mod && !e.altKey && e.key.toLowerCase() === 'g' && library.selection.size && !this.limbo) { e.preventDefault(); if (e.shiftKey) this.#unstack(library.selectedItems()); else this.#stack(library.selectedItems()); return; }
     // V: two photos side by side — the selected ones, or the one selected and the next
     if (!mod && !e.altKey && e.key.toLowerCase() === 'v' && library.selection.size) { e.preventDefault(); this.compareSelection(); return; }
     // Ctrl+E: export the selection (or, with none, the photos shown)
@@ -1326,7 +1331,32 @@ export class PhotosView extends ViewPane {
   }
 
   /** Next (or previous) photo, keeping the panel as it is — to describe a series one after the other. */
-  /** "Group photos": a switch in the bar of Photos — each group of similar photos as its best photo, with a stack. */
+  /** "Stack photos" and "Unstack" for a selection (menus of a photo and of the selection bar). */
+  #stackItems(sel, inLimbo) {
+    const sim = this.services.similar;
+    if (!sim || inLimbo) return [];
+    const images = sel.filter((x) => x.kind === KIND.image);
+    const stacked = sel.some((x) => sim.groupOf(x.id));
+    return [
+      { label: t('similar.stackSel'), icon: 'stack', hint: 'Ctrl+G', disabled: images.length < 2 && !(images.length && stacked), title: images.length < 2 ? t('similar.stackFew') : t('similar.stackSelTitle'), run: () => this.#stack(sel) },
+      ...(stacked ? [{ label: t('similar.unstack'), icon: 'takeOut', hint: 'Ctrl+Shift+G', title: t('similar.unstackTitle'), run: () => this.#unstack(sel) }] : []),
+    ];
+  }
+  async #stack(sel) {
+    const sim = this.services.similar;
+    const res = await sim?.stackPhotos(sel.filter((x) => x.kind === KIND.image));
+    if (!res) { this.notifications.info(t('similar.stackFew')); return; }
+    this.library.clearSelection();
+    this.#paintStackStatus();
+    this.notifications.info(tn('similar.stacked', res.count), 8000, { label: t('ops.undo'), run: () => res.undo() });
+  }
+  async #unstack(sel) {
+    const res = await this.services.similar?.unstackPhotos(sel);
+    if (!res) return;
+    this.notifications.info(tn('similar.unstacked', res.count), 8000, { label: t('ops.undo'), run: () => res.undo() });
+  }
+
+  /** "Stack photos": a switch in the bar of Photos — each stack of similar photos as its best photo. */
   #stackSwitch() {
     const sim = this.services.similar;
     if (!sim) return null;

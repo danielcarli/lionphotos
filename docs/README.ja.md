@@ -28,7 +28,7 @@
 
 **インポート不要** · **何もコンピューターの外に出ない** · **10万枚でも100枚のように軽快** · **無料・オープンソース**
 
-![バージョン 1.68.0](https://img.shields.io/badge/version-1.68.0-161214)
+![バージョン 1.69.1](https://img.shields.io/badge/version-1.69.1-161214)
 ![ステータス：ベータテスト](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![ライセンス: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![対応: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -235,6 +235,7 @@ LionOrganizer と同じルールです。
 | `1` `2` `3` · `0` | 選択項目をとても良い · OK · 削除候補にする · マークを外す |
 | `Ctrl+A` · `Enter` · `H` · `Delete` · `F2` · `Esc` | すべて選択 · 開く · 情報パネル · ごみ箱 · 名前の変更 · 選択解除 |
 | `E` · `D` · `I` | サイドパネルを 調整 · 説明 · 情報 に切り替え（同じキーをもう一度押すと閉じる） |
+| `Ctrl+G` · `Ctrl+Shift+G` | 選択をスタック · 解除 |
 | `V` · `?` | 並べて比較 · キーボードショートカット |
 | `Ctrl+E` | 写真を書き出す（選択した写真、または表示中の写真） |
 | `←` `→` · `Space` · `Esc` | ビューアー：前/次 · 再生/一時停止 · 閉じる |
@@ -335,7 +336,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 変更履歴
 
-[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.68.0**。
+[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.69.1**。
 
 ## クレジット
 

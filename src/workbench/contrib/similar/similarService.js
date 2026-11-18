@@ -146,7 +146,7 @@ export class SimilarService {
   #reading = null;       // the photos being read for Photos
   #root = null;
   #timer = null;
-  choices = { apart: new Set(), best: new Set() };
+  choices = { apart: new Set(), best: new Set(), stacks: new Map() };
   progress = null;       // { done, total, left } while the photos of Photos are being read
   summary = null;        // { groups, grouped, photos }: Photos, grouped
 
@@ -174,7 +174,7 @@ export class SimilarService {
     this.#clipAsked.clear();
     this.#lookedFor.clear();
     for (const k of ['face', 'pet']) { this.#who[k].clear(); this.#whoAsked[k].clear(); }
-    this.choices = { apart: new Set(), best: new Set() };
+    this.choices = { apart: new Set(), best: new Set(), stacks: new Map() };
     this.#choicesLoaded = null;
   }
 
@@ -184,7 +184,7 @@ export class SimilarService {
     if (this.#choicesLoaded) return this.#choicesLoaded;
     this.#choicesLoaded = (async () => {
       const ch = await this.api.similarChoices?.().catch(() => null);
-      this.choices = { apart: new Set((ch?.apart || []).map(([a, b]) => pairKey(a, b))), best: new Set(ch?.best || []) };
+      this.choices = { apart: new Set((ch?.apart || []).map(([a, b]) => pairKey(a, b))), best: new Set(ch?.best || []), stacks: new Map(ch?.stacks || []) };
     })();
     return this.#choicesLoaded;
   }
@@ -409,9 +409,33 @@ export class SimilarService {
     return false;
   };
   chosen = (u) => u.files.some((f) => this.choices.best.has(f.id));
-  /** The groups of these shots (read), each with its best. */
+  /** The stack a shot was put in by hand (null: none). */
+  stackKeyOf(s) {
+    const st = this.choices.stacks;
+    if (!st.size) return null;
+    for (const f of s.files) { const k = st.get(f.id); if (k != null) return k; }
+    return null;
+  }
+  /**
+   * The groups of these shots, each with its best: the stacks made by hand (whatever the pictures look like, read
+   * or not), then the others grouped by how alike they are.
+   */
   groups(shots, level = this.level) {
-    return groupSimilar(shots.filter((s) => s.f), level, this.apart).map((g) => ({ units: g.units, best: bestOf(g, this.chosen) }));
+    const byHand = new Map();
+    const rest = [];
+    for (const s of shots) {
+      const k = this.stackKeyOf(s);
+      if (k == null) { rest.push(s); continue; }
+      if (!byHand.has(k)) byHand.set(k, []);
+      byHand.get(k).push(s);
+    }
+    const out = [];
+    for (const units of byHand.values()) {
+      if (units.length < 2) { rest.push(...units); continue; }
+      const g = { units, manual: true };
+      out.push({ units, best: units.every((u) => u.f) ? bestOf(g, this.chosen) : Math.max(0, units.findIndex(this.chosen)), manual: true });
+    }
+    return out.concat(groupSimilar(rest.filter((s) => s.f), level, this.apart).map((g) => ({ units: g.units, best: bestOf(g, this.chosen) })));
   }
 
   // ------------------------------------------------------------------ why (or why not) together
@@ -461,7 +485,79 @@ export class SimilarService {
   async setApart(pairs, apart = true) {
     await this.api.similarApart?.(pairs, apart).catch(() => false);
     for (const [a, b] of pairs) { if (apart) this.choices.apart.add(pairKey(a, b)); else this.choices.apart.delete(pairKey(a, b)); }
+    // a stack made by hand: a photo said apart from all the others of its stack leaves it (undone: back in it)
+    const key = pairs.map(([a, b]) => pairKey(a, b)).sort().join(',');
+    if (apart) {
+      const st = this.choices.stacks;
+      const met = new Map(); // id → photos of its stack it is said apart from
+      for (const [a, b] of pairs) {
+        const k = st.get(a);
+        if (k == null || st.get(b) !== k) continue;
+        for (const [x, y] of [[a, b], [b, a]]) { if (!met.has(x)) met.set(x, new Set()); met.get(x).add(y); }
+      }
+      const out = [...met].filter(([id, others]) => [...st].filter(([x, k]) => k === st.get(id) && x !== id).every(([x]) => others.has(x))).map(([id]) => id);
+      if (out.length) { const before = out.map((id) => [id, st.get(id)]); this.#unstacked.set(key, before); await this.#putStacks(out.map((id) => [id, null])); }
+    } else if (this.#unstacked.has(key)) {
+      await this.#putStacks(this.#unstacked.get(key));
+      this.#unstacked.delete(key);
+    }
     this.#later();
+  }
+  #unstacked = new Map(); // pairs said apart → the photos they took out of a stack made by hand (for the undo)
+
+  // ------------------------------------------------------------------ stacks made by hand
+  async #putStacks(rows) {
+    await this.api.similarStack?.(rows).catch(() => false);
+    for (const [id, k] of rows) { if (k == null) this.choices.stacks.delete(id); else this.choices.stacks.set(id, k); }
+  }
+  /** The files of these photos as Photos shows them: a photo standing for a stack brings the stack, a JPEG its raw file. */
+  filesOf(items) {
+    const ids = new Set();
+    for (const it of items) {
+      const g = this.groupOf(it.id);
+      if (g) for (const u of g.units) for (const f of u.files) ids.add(f.id);
+      else { ids.add(it.id); for (const f of this.#pairOf.get(it.id)?.files || []) ids.add(f.id); }
+    }
+    return [...ids];
+  }
+  /**
+   * Stacks these photos (and the stacks they stand for), whatever they look like; "Stack photos" is turned on.
+   * @returns {Promise<{ count:number, undo:()=>Promise<void> }|null>} null: fewer than two photos
+   */
+  async stackPhotos(items) {
+    await this.loadChoices();
+    const ids = this.filesOf(items);
+    const shots = shotsOfItems(this.library, ids.map((id) => this.library.byId.get(id)).filter(Boolean)).shots;
+    if (shots.length < 2) return null;
+    const before = ids.map((id) => [id, this.choices.stacks.get(id) ?? null]);
+    const k = Math.min(...ids);
+    await this.#putStacks(ids.map((id) => [id, k]));
+    const wasOn = this.active;
+    if (!wasOn) this.setMode('stacks'); else this.regroupNow();
+    return { count: shots.length, undo: async () => { await this.#putStacks(before); if (!wasOn) this.setMode('all'); else this.regroupNow(); } };
+  }
+  /**
+   * Unstacks the stacks these photos stand for (or are in): made by hand, they are undone; found by likeness, their
+   * photos are said not to be of the same stack. @returns {Promise<{ count:number, undo:()=>Promise<void> }|null>}
+   */
+  async unstackPhotos(items) {
+    const stacks = [...new Set(items.map((it) => this.groupOf(it.id)).filter(Boolean))];
+    if (!stacks.length) return null;
+    const byHand = [], pairs = [];
+    for (const g of stacks) {
+      const files = g.units.flatMap((u) => u.files.map((f) => f.id));
+      if (files.some((id) => this.choices.stacks.has(id))) byHand.push(...files.filter((id) => this.choices.stacks.has(id)));
+      else for (let i = 0; i < g.units.length; i++) for (let j = i + 1; j < g.units.length; j++) for (const a of g.units[i].files) for (const b of g.units[j].files) pairs.push([a.id, b.id]);
+    }
+    const before = byHand.map((id) => [id, this.choices.stacks.get(id)]);
+    if (byHand.length) await this.#putStacks(byHand.map((id) => [id, null]));
+    if (pairs.length) { await this.api.similarApart?.(pairs, true).catch(() => false); for (const [a, b] of pairs) this.choices.apart.add(pairKey(a, b)); }
+    this.regroupNow();
+    return { count: stacks.length, undo: async () => {
+      if (before.length) await this.#putStacks(before);
+      if (pairs.length) { await this.api.similarApart?.(pairs, false).catch(() => false); for (const [a, b] of pairs) this.choices.apart.delete(pairKey(a, b)); }
+      this.regroupNow();
+    } };
   }
 
   // ------------------------------------------------------------------ Photos, grouped

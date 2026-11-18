@@ -15,7 +15,7 @@ const GROUPS = [
     [['Ctrl+B', '\\'], 'sidebar'], [['Ctrl+Z', 'Ctrl+Y'], 'undo'], [['Alt+←', 'Alt+Home'], 'back'], [['?'], 'this'],
   ]],
   ['photos', [
-    [['1', '2', '3', '0'], 'marks'], [['Enter', 'Ctrl+A', 'Esc'], 'select'], [['F2', 'Ctrl+D', 'Ctrl+E'], 'files'], [['V'], 'compare'],
+    [['1', '2', '3', '0'], 'marks'], [['Enter', 'Ctrl+A', 'Esc'], 'select'], [['F2', 'Ctrl+D', 'Ctrl+E'], 'files'], [['V'], 'compare'], [['Ctrl+G', 'Ctrl+Shift+G'], 'stack'],
   ]],
   ['panel', [[['E', 'D', 'I'], 'tabs'], [['H'], 'hide']]],
   ['viewer', [

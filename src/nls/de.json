@@ -2244,6 +2244,7 @@
   "keys.group.viewer": "Betrachter",
   "keys.todo": "Zu bearbeiten",
   "keys.stack": "Auswahl stapeln · Stapel auflösen",
+  "keys.stackNav": "Die Fotos eines Stapels (der Streifen unten): vorheriges · nächstes",
   "compare.title": "Nebeneinander vergleichen",
   "compare.hint": "← → wechseln das Foto der markierten Seite · Tab wechselt die Seite · 1 2 3 markieren · das Mausrad zoomt beide",
   "compare.left": "Linkes Foto",

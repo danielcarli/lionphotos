@@ -2244,6 +2244,7 @@
   "keys.group.viewer": "뷰어",
   "keys.todo": "편집 대기",
   "keys.stack": "선택 항목 스택 · 해제",
+  "keys.stackNav": "스택의 사진(아래 띠): 이전 · 다음",
   "compare.title": "나란히 비교",
   "compare.hint": "← → 표시된 쪽의 사진 변경 · Tab 쪽 전환 · 1 2 3 표시 · 휠로 두 사진 함께 확대",
   "compare.left": "왼쪽 사진",

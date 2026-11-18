@@ -2244,6 +2244,7 @@
   "keys.group.viewer": "查看器",
   "keys.todo": "待编辑",
   "keys.stack": "堆叠 · 取消堆叠所选项",
+  "keys.stackNav": "堆叠中的照片（下方条带）：上一张 · 下一张",
   "compare.title": "并排比较",
   "compare.hint": "← → 更换标记一侧的照片 · Tab 切换一侧 · 1 2 3 标记 · 滚轮同时缩放两张",
   "compare.left": "左侧照片",

@@ -591,3 +591,5 @@ _merge(MESSAGES, {'photos': {'stacksCount': {'one': '스택 {count}개', 'other'
 _merge(MESSAGES, {'photos': {'uniqueTotal': '고유한 사진의 예상 합계: {count}', 'uniqueTotalTitle': '비슷한 사진 스택 하나를 한 장으로, 단독 사진도 한 장으로 셉니다(RAW + JPEG는 한 장)'}})
 
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '고유 사진 {count}장(예상 합계)', 'other': '고유 사진 {count}장(예상 합계)'}}})
+
+_merge(MESSAGES, {'keys': {'stackNav': '스택의 사진(아래 띠): 이전 · 다음'}})

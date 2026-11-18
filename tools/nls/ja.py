@@ -591,3 +591,5 @@ _merge(MESSAGES, {'photos': {'stacksCount': {'one': 'スタック {count} 個', 
 _merge(MESSAGES, {'photos': {'uniqueTotal': 'ユニークな写真の推定合計: {count}', 'uniqueTotalTitle': '似た写真のスタックはそれぞれ1枚、単独の写真も1枚として数えます（RAW + JPEG は1枚）'}})
 
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': 'ユニークな写真 {count} 枚（推定合計）', 'other': 'ユニークな写真 {count} 枚（推定合計）'}}})
+
+_merge(MESSAGES, {'keys': {'stackNav': 'スタックの写真（下の帯）: 前 · 次'}})

@@ -2244,6 +2244,7 @@
   "keys.group.viewer": "Visionneuse",
   "keys.todo": "À traiter",
   "keys.stack": "Empiler · désempiler la sélection",
+  "keys.stackNav": "Les photos d’une pile (la bande du bas) : précédente · suivante",
   "compare.title": "Comparer côte à côte",
   "compare.hint": "← → changent la photo du côté marqué · Tab change de côté · 1 2 3 marquent · la molette zoome les deux",
   "compare.left": "Photo de gauche",

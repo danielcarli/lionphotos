@@ -2244,6 +2244,7 @@
   "keys.group.viewer": "Visualizador",
   "keys.todo": "Por editar",
   "keys.stack": "Empilhar · desempilhar a seleção",
+  "keys.stackNav": "As fotos de uma pilha (a faixa de baixo): anterior · próxima",
   "compare.title": "Comparar lado a lado",
   "compare.hint": "← → trocam a foto do lado marcado · Tab troca de lado · 1 2 3 marcam · a roda aproxima as duas",
   "compare.left": "Foto da esquerda",

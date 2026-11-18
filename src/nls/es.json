@@ -2244,6 +2244,7 @@
   "keys.group.viewer": "Visor",
   "keys.todo": "Por editar",
   "keys.stack": "Apilar · desapilar la selección",
+  "keys.stackNav": "Las fotos de una pila (la tira de abajo): anterior · siguiente",
   "compare.title": "Comparar lado a lado",
   "compare.hint": "← → cambian la foto del lado marcado · Tab cambia de lado · 1 2 3 marcan · la rueda acerca las dos",
   "compare.left": "Foto de la izquierda",

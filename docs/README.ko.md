@@ -28,7 +28,7 @@
 
 **가져오기 없음** · **컴퓨터 밖으로 나가는 것 없음** · **10만 장도 100장처럼 매끄럽게** · **무료 오픈 소스**
 
-![버전 1.78.1](https://img.shields.io/badge/version-1.78.1-161214)
+![버전 1.79.0](https://img.shields.io/badge/version-1.79.0-161214)
 ![상태: 베타 테스트](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![라이선스: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![플랫폼: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -239,6 +239,7 @@ LionOrganizer와 같은 규칙입니다.
 | `V` · `?` | 나란히 비교 · 키보드 단축키 |
 | `Ctrl+E` | 사진 내보내기 (선택한 사진 또는 표시된 사진) |
 | `←` `→` · `Space` · `Esc` | 뷰어: 이전/다음 · 재생/일시 정지 · 닫기 |
+| `↑` `↓` | 뷰어: 스택의 사진(아래 띠) |
 | `P` · `F` · `A` | 뷰어: 슬라이드쇼 · 전체 화면 · 앨범에 추가 |
 
 ## 언어
@@ -336,7 +337,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 변경 내역
 
-[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.78.1**.
+[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.79.0**.
 
 ## 만든 사람들
 

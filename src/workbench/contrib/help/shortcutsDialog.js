@@ -19,7 +19,7 @@ const GROUPS = [
   ]],
   ['panel', [[['E', 'D', 'I'], 'tabs'], [['H'], 'hide']]],
   ['viewer', [
-    [['←', '→', 'Home', 'End'], 'nav'], [['Z', '+', '−'], 'zoom'], [['C', 'Y', '\\'], 'edit'], [['P', 'F', 'A'], 'show'],
+    [['←', '→', 'Home', 'End'], 'nav'], [['↑', '↓'], 'stackNav'], [['Z', '+', '−'], 'zoom'], [['C', 'Y', '\\'], 'edit'], [['P', 'F', 'A'], 'show'],
     [['V', 'Ctrl+E'], 'viewerMore'], [['Delete'], 'limbo'], [['Esc'], 'close'],
   ]],
 ];

@@ -2244,6 +2244,7 @@
   "keys.group.viewer": "Viewer",
   "keys.todo": "To edit",
   "keys.stack": "Stack · unstack the selection",
+  "keys.stackNav": "The photos of a stack (the strip below): previous · next",
   "compare.title": "Compare side by side",
   "compare.hint": "← → change the photo of the marked side · Tab changes side · 1 2 3 mark · wheel zooms both",
   "compare.left": "Left photo",

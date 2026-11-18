@@ -2308,8 +2308,14 @@ app.whenReady().then(async () => {
       if (at < 0) return { none: true };
       const st = s.similar.stackOf(list[at].id);
       s.viewer.open(list, at); await wait(500);
-      const shown0 = s.viewer.current.id;
       const res = { count: st.count, strip0: document.querySelectorAll('.viewer .vw-stack-cell').length };
+      // ↓ ↑: the photos of the stack, one after the other (as a click on the strip)
+      const idx = () => [...document.querySelectorAll('.viewer .vw-stack-thumb')].findIndex((b) => b.classList.contains('is-shown'));
+      const i0 = idx(), key = (k) => document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+      key('ArrowDown'); await wait(300); const i1 = idx();
+      key('ArrowUp'); await wait(300); const i2 = idx();
+      res.keys = { i0, i1, i2, ok: i1 === (i0 + 1) % st.count && i2 === i0 && s.viewer.index === at };
+      const shown0 = s.viewer.current.id;
       document.querySelector('.viewer .vw-btn.danger').click(); await wait(300);
       res.asked = !!document.querySelector('.cm-dialog');
       document.querySelector('.cm-dialog .btn-primary')?.click(); await wait(900);
@@ -2327,6 +2333,7 @@ app.whenReady().then(async () => {
       s.viewer.close(); await wait(300);
       s.similar.setMode('all'); await wait(400);
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(vl.none || vl.keys?.ok, 'the viewer on a stack: ↓ and ↑ go round the photos of the stack (the strip below), the photo of the list unchanged', JSON.stringify(vl.keys || vl));
     check(vl.none || (vl.asked && vl.gone && vl.open && vl.strip === vl.strip0 && vl.marked === 1 && vl.next && vl.shownCell && vl.backItem && vl.back),
       'the viewer on a stack: a photo sent to the Limbo (asked as always) stays in the strip, marked as gone, the next photo of the stack shows and the stack stays; its menu brings it back', JSON.stringify(vl));
     // "Stack photos" (Ctrl+G, as in Lightroom): photos selected put in one stack by hand, whatever they look like;

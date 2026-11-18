@@ -275,6 +275,18 @@ export class Viewer {
       isShown(top) || it.thumb === 2 ? null : h('button.vw-stack-open.vw-pair-cover', { type: 'button', title: t('similar.setCoverTitle'), onclick: () => cover(it) }, t('similar.setCover')));
   }
 
+  /** The next (or previous) photo of the stack shown, round it, as a click on the strip. @returns {boolean} false: no stack */
+  #stackStep(dir) {
+    if (this.stackEl.hidden) return false;
+    const thumbs = [...this.stackEl.querySelectorAll('.vw-stack-thumb')];
+    if (thumbs.length < 2) return false;
+    const at = thumbs.findIndex((b) => b.classList.contains('is-shown'));
+    // round the stack: after the last, the first again
+    const next = ((at < 0 ? 0 : at) + dir + thumbs.length) % thumbs.length;
+    if (next !== at) thumbs[next].click();
+    return true;
+  }
+
   /** A photo out of its group (from the strip): said apart from the others of the group, with an undo. */
   async #removeFromStack(stack, u) {
     const sim = this.services.similar;
@@ -1141,6 +1153,8 @@ export class Viewer {
     // Ctrl+E: export this photo; V: this photo and the next, side by side
     else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'e') { e.preventDefault(); exportPhotos(this.services, [this.current]); }
     else if ((e.key === 'v' || e.key === 'V') && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); this.#sideBySide(); }
+    // ↑ ↓: the photos of the stack shown (the strip below), one after the other
+    else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey && this.#stackStep(e.key === 'ArrowDown' ? 1 : -1)) e.preventDefault();
     else if (e.key === 'ArrowRight') { e.preventDefault(); this.move(1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); this.move(-1); }
     else if (e.key === 'Delete') { e.preventDefault(); this.#discard(); }

@@ -594,3 +594,5 @@ _merge(MESSAGES, {'photos': {'stacksCount': {'one': '{count} stack', 'other': '{
 _merge(MESSAGES, {'photos': {'uniqueTotal': 'Probable total of unique photos: {count}', 'uniqueTotalTitle': 'Each stack of similar photos counts as one photo, as each photo alone (a RAW + JPEG is one photo)'}})
 
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} unique photo (probable total)', 'other': '{count} unique photos (probable total)'}}})
+
+_merge(MESSAGES, {'keys': {'stackNav': 'The photos of a stack (the strip below): previous · next'}})

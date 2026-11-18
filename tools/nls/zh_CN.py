@@ -591,3 +591,5 @@ _merge(MESSAGES, {'photos': {'stacksCount': {'one': '{count} 个堆叠', 'other'
 _merge(MESSAGES, {'photos': {'uniqueTotal': '唯一照片的估计总数：{count}', 'uniqueTotalTitle': '每个相似照片堆叠算作一张照片，每张单独照片也算一张（RAW + JPEG 算一张）'}})
 
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} 张不重复照片（估计总数）', 'other': '{count} 张不重复照片（估计总数）'}}})
+
+_merge(MESSAGES, {'keys': {'stackNav': '堆叠中的照片（下方条带）：上一张 · 下一张'}})

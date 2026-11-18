@@ -2,6 +2,11 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.79.0] — 2026-11-18
+
+### Added
+- Viewer: **↑ and ↓** go through the photos of the stack shown (and the two files of a RAW + JPEG), as a click on the strip below, round the stack (after the last, the first); ← → still go to the previous and next photo of the list. In the shortcuts window and the README.
+
 ## [1.78.1] — 2026-11-18
 
 ### Changed

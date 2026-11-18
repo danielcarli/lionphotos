@@ -28,7 +28,7 @@ Explora, busca y organiza colecciones enormes de fotos y vídeos allí donde ya 
 
 **Sin importar nada** · **Nada sale de tu ordenador** · **100 000 fotos se desplazan como 100** · **Gratuito y de código abierto**
 
-![Versión 1.78.1](https://img.shields.io/badge/version-1.78.1-161214)
+![Versión 1.79.0](https://img.shields.io/badge/version-1.79.0-161214)
 ![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -239,6 +239,7 @@ Las mismas reglas que LionOrganizer:
 | `V` · `?` | Comparar lado a lado · Atajos de teclado |
 | `Ctrl+E` | Exportar fotos (la selección, o las fotos mostradas) |
 | `←` `→` · `Espacio` · `Esc` | Visor: anterior/siguiente · reproducir/pausar · cerrar |
+| `↑` `↓` | Visor: las fotos de una pila (la tira de abajo) |
 | `P` · `F` · `A` | Visor: presentación · pantalla completa · añadir a un álbum |
 
 ## Idiomas
@@ -336,7 +337,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Historial de cambios
 
-Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.78.1**.
+Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.79.0**.
 
 ## Créditos
 

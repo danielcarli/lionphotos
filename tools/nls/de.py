@@ -594,3 +594,5 @@ _merge(MESSAGES, {'photos': {'stacksCount': {'one': '{count} Stapel', 'other': '
 _merge(MESSAGES, {'photos': {'uniqueTotal': 'Wahrscheinliche Gesamtzahl einzigartiger Fotos: {count}', 'uniqueTotalTitle': 'Jeder Stapel ähnlicher Fotos zählt als ein Foto, ebenso jedes Einzelfoto (RAW + JPEG ist ein Foto)'}})
 
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} einzigartiges Foto (wahrscheinliche Summe)', 'other': '{count} einzigartige Fotos (wahrscheinliche Summe)'}}})
+
+_merge(MESSAGES, {'keys': {'stackNav': 'Die Fotos eines Stapels (der Streifen unten): vorheriges · nächstes'}})

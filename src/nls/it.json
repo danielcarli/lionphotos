@@ -2244,6 +2244,7 @@
   "keys.group.viewer": "Visualizzatore",
   "keys.todo": "Da modificare",
   "keys.stack": "Impila · disimpila la selezione",
+  "keys.stackNav": "Le foto di una pila (la striscia in basso): precedente · successiva",
   "compare.title": "Confronta fianco a fianco",
   "compare.hint": "← → cambiano la foto del lato evidenziato · Tab cambia lato · 1 2 3 contrassegnano · la rotellina ingrandisce entrambe",
   "compare.left": "Foto di sinistra",

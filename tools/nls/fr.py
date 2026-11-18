@@ -594,3 +594,5 @@ _merge(MESSAGES, {'photos': {'stacksCount': {'one': '{count} pile', 'other': '{c
 _merge(MESSAGES, {'photos': {'uniqueTotal': 'Total probable de photos uniques : {count}', 'uniqueTotalTitle': 'Chaque pile de photos similaires compte pour une photo, comme chaque photo seule (un RAW + JPEG est une photo)'}})
 
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} photo unique (total probable)', 'other': '{count} photos uniques (total probable)'}}})
+
+_merge(MESSAGES, {'keys': {'stackNav': 'Les photos d’une pile (la bande du bas) : précédente · suivante'}})

@@ -2244,6 +2244,7 @@
   "keys.group.viewer": "ビューアー",
   "keys.todo": "編集待ち",
   "keys.stack": "選択をスタック · 解除",
+  "keys.stackNav": "スタックの写真（下の帯）: 前 · 次",
   "compare.title": "並べて比較",
   "compare.hint": "← → で印のある側の写真を変更 · Tab で側を切り替え · 1 2 3 でマーク · ホイールで両方を拡大",
   "compare.left": "左の写真",

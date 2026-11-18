@@ -571,3 +571,5 @@ _merge(MESSAGES, {'similar': {'mode': {'label': '似た写真の表示方法', '
 _merge(MESSAGES, {'similar': {'pickAll': 'すべて選択', 'pickNoneBtn': '選択を解除', 'pickedOf': '{total} グループ中 {n} グループを選択', 'pickTitle': '選択中：ここでの操作が適用されます', 'inPicked': '選択したグループで：', 'pickNone': 'グループを選択してください'}})
 
 _merge(MESSAGES, {'adjust': {'group': {'curves': 'トーンカーブ'}}, 'curves': {'canvasLabel': 'カーブ：それぞれの明るさがどうなるか', 'channel': 'チャンネル', 'resetChannel': 'このカーブを直線に戻す', 'hint': 'カーブをクリックして点を追加し、ドラッグします。点を外へドラッグするかダブルクリックすると削除します。矢印キーで選んだ点を動かせます。', 'point': '入力 {x} → 出力 {y}', 'mixed': '選択した写真のカーブが異なります。ここでの設定はすべてに適用されます。', 'ch': {'rgb': 'RGB', 'r': '赤', 'g': '緑', 'b': '青', 'rgbTitle': '画像全体（明るさ）', 'rTitle': '画像の赤', 'gTitle': '画像の緑', 'bTitle': '画像の青'}}})
+
+_merge(MESSAGES, {'similar': {'groupSwitch': '写真をまとめる', 'menuTitle': '似ている度合い、グループのみ、似た写真の確認、まとめられて（いない）理由', 'review': '似た写真を確認…', 'sens': {'heading': '感度'}, 'why': {'pick': '2〜12枚の写真を選ぶと、まとめられて（いない）理由が表示されます。'}}})

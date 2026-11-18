@@ -17,6 +17,7 @@ export function closeContextMenu() { open?.close(); }
  * @param {({ label:string, icon?:string, img?:string, checked?:boolean, disabled?:boolean, hint?:string, tag?:string, danger?:boolean, run?:()=>void, submenu?:object[] }|'-')[]} items
  *   tag: a short word after the label (where a folder is: "Google Drive", "External")
  *   remove: { title, run } — an × at the end of the item (also Delete on it): takes the item off a list, and off the menu
+ *   element: a control of its own (a slider) shown as it is, in place of an item
  */
 export function showContextMenu(x, y, items) {
   closeContextMenu();
@@ -36,6 +37,8 @@ export function showContextMenu(x, y, items) {
     const menu = h('div.ctx-menu', { role: 'menu' });
     for (const it of list) {
       if (it === '-') { menu.append(h('div.ctx-sep', { role: 'separator' })); continue; }
+      // a control of its own inside the menu (a slider): not an item, the menu stays open while it is used
+      if (it.element) { menu.append(h('div.ctx-custom', it.element)); continue; }
       const btn = h('button.ctx-item', {
         role: 'menuitem', class: `ctx-item${it.danger ? ' danger' : ''}${it.submenu ? ' has-sub' : ''}`, disabled: !!it.disabled, title: it.title || '',
         'aria-checked': it.checked === undefined ? undefined : String(!!it.checked),

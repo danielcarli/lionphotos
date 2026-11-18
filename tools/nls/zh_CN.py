@@ -571,3 +571,5 @@ _merge(MESSAGES, {'similar': {'mode': {'label': '相似照片的显示方式', '
 _merge(MESSAGES, {'similar': {'pickAll': '全选', 'pickNoneBtn': '取消选择', 'pickedOf': '已选择 {n} / {total} 组', 'pickTitle': '已选择：此处的操作将应用于它', 'inPicked': '在所选组中：', 'pickNone': '请选择一个组'}})
 
 _merge(MESSAGES, {'adjust': {'group': {'curves': '曲线'}}, 'curves': {'canvasLabel': '曲线：每种亮度会变成什么', 'channel': '通道', 'resetChannel': '将此曲线恢复为直线', 'hint': '点击曲线添加一个点并拖动；把点拖出方框或双击它即可删除。方向键可移动所选的点。', 'point': '输入 {x} → 输出 {y}', 'mixed': '所选照片的曲线不同：此处的设置将应用于全部照片。', 'ch': {'rgb': 'RGB', 'r': '红', 'g': '绿', 'b': '蓝', 'rgbTitle': '整个画面（亮度）', 'rTitle': '画面的红色', 'gTitle': '画面的绿色', 'bTitle': '画面的蓝色'}}})
+
+_merge(MESSAGES, {'similar': {'groupSwitch': '照片分组', 'menuTitle': '相似程度、仅分组、检查相似照片以及为什么（没有）分组', 'review': '检查相似照片…', 'sens': {'heading': '灵敏度'}, 'why': {'pick': '选择 2 到 12 张照片，查看它们为什么（没有）分组。'}}})

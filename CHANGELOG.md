@@ -2,6 +2,12 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.68.0] — 2026-11-18
+
+### Changed
+- Photos › the similar photos, simpler: the control of three positions (All · Grouped · Only groups) is back to a switch, **Group photos**, and beside it one button, **Similar photos ▾**. Its menu has the sensitivity (a slider from *Almost the same* to *Alike*; the menu stays open while it is moved), **Only groups**, **Review similar photos…** (the window to compare and send to the Limbo) and **Why are these (not) grouped?** (for 2 to 12 photos selected).
+- *Only groups* is no longer a filter chip: while it is on, the button *Similar photos* is marked. The sensitivity left the line under the bar, which now only says what is being done and what came of it.
+
 ## [1.67.0] — 2026-11-18
 
 ### Added

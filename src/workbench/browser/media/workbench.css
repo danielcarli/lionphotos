@@ -3558,8 +3558,7 @@ button.vw-chip:hover { filter: brightness(1.2); }
 @media (prefers-reduced-motion: no-preference) { .vw-stack-thumb { transition: opacity 0.12s, border-color 0.12s; } }
 .viewer.vw-playing .vw-stack { display: none; }
 
-/* the levels of "Group similar photos" on its line, and "why (not) grouped" (1.62.5) */
-.stack-levels { flex: none; }
+/* "why (not) grouped" (1.62.5) */
 .why-dialog { width: min(760px, 100%); max-height: calc(100vh - 48px); display: flex; flex-direction: column; }
 .why-body { overflow: auto; min-height: 0; }
 .why-row { padding: 12px 0; border-top: 1px solid var(--border); display: grid; grid-template-columns: 236px 1fr; gap: 6px 16px; align-items: start; }
@@ -3603,10 +3602,15 @@ button.vw-chip:hover { filter: brightness(1.2); }
 @media (hover: none) { .sim-remove, .vw-stack-remove { opacity: 1; } }
 .vw-stack-thumbs { padding: 5px 5px 0 0; }
 
-/* how Photos shows the similar photos: one control of three positions (1.65.0) */
-.stack-mode { align-items: center; }
-.stack-mode-icon { display: grid; place-items: center; padding: 0 4px 0 6px; color: var(--text-muted); line-height: 0; }
-.stack-mode .seg { display: inline-flex; align-items: center; white-space: nowrap; }
+/* "Group photos" (a switch) and "Similar photos ▾" (a menu with the sensitivity) in the bar of Photos (1.68.0) */
+.similar-btn { gap: 6px; }
+.similar-btn .btn-caret { display: grid; place-items: center; margin: 0 -2px 0 0; color: var(--text-muted); line-height: 0; }
+.similar-btn.is-active { border-color: var(--accent); color: var(--text-primary); }
+.similar-only { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
+.ctx-custom { padding: 6px 10px 8px; }
+.sim-menu-head { margin: 0 0 4px; color: var(--text-secondary); }
+.sim-menu-sens .sens { display: flex; }
+.sim-menu-sens .sens-range { flex: 1; min-width: 140px; }
 
 /* similar photos: the selection of groups the operations apply to (1.66.0) */
 .sim-selbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-subtle); }

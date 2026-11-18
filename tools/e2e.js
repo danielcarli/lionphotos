@@ -556,6 +556,53 @@ app.whenReady().then(async () => {
     const row = await js(`(() => { const tb = document.querySelector('.view-photos .photos-toolbar') || document.querySelector('.photos-toolbar'); const kids = [...(tb?.children || [])].filter((x) => !x.hidden); return { last: kids.slice(-2).map((x) => x.className), first: kids[0]?.className || '' }; })()`);
     check(/view-mode/.test(row.last[0] || '') && /info-toggle/.test(row.last[1] || '') && /photos-crumbs/.test(row.first),
       'Photos: where you are first in the row; the view modes at its end, before the info panel switch (as on the other pages)', JSON.stringify(row));
+    // photos selected: the bar of the view stays (filters, sort, zoom), the selection's band right under it, and
+    // the photos do not move when it comes or goes
+    const sb = await js(`(async () => {
+      const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      s.layout.openView('photos'); lib.setFilter({ query: '', labelId: 0, mark: '' }); lib.clearSelection(); await wait(300);
+      const sc = document.querySelector('.view-photos .vs-scroller');
+      sc.scrollTop = 400; await wait(300);
+      const tile = [...document.querySelectorAll('.view-photos .tile[data-id]')].find((t) => { const r = t.getBoundingClientRect(); return r.top > sc.getBoundingClientRect().top + 60; });
+      const y0 = tile.getBoundingClientRect().top, id = tile.dataset.id;
+      const yNow = () => document.querySelector('.view-photos .tile[data-id="' + id + '"]')?.getBoundingClientRect().top ?? -999;
+      lib.setSelection([Number(id)]); await wait(300);
+      const tb = document.querySelector('.view-photos .photos-toolbar'), bar = document.querySelector('.view-photos .selection-bar');
+      const res = { toolbar: !tb.hidden && tb.offsetHeight > 0, bar: !bar.hidden, under: tb.nextElementSibling === bar && Math.abs(bar.getBoundingClientRect().top - tb.getBoundingClientRect().bottom) < 2,
+        filters: !!tb.querySelector('.filters-btn'), noDouble: !bar.querySelector('.view-controls'), moved: Math.abs(yNow() - y0) };
+      lib.clearSelection(); await wait(300);
+      res.back = bar.hidden && Math.abs(yNow() - y0) < 2;
+      sc.scrollTop = 0;
+      return res; })()`);
+    check(sb.toolbar && sb.bar && sb.under && sb.filters && sb.noDouble && sb.moved < 2 && sb.back,
+      'photos selected: the bar of the view stays (filters, sort, zoom) and the selection\'s band comes right under it; the photos do not move', JSON.stringify(sb));
+    // a submenu of the selection's "More" (at the window's right edge) opens against its menu, on the left
+    const subMenu = await js(`(async () => {
+      const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const imgs = lib.view('main').filter((x) => x.kind === 1).slice(0, 2);
+      lib.setSelection(imgs.map((x) => x.id)); await wait(300);
+      document.querySelector('.view-photos .selection-bar .more-btn').click(); await wait(300);
+      const why = [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Why are these (not) stacked?'));
+      const whyOn = !!why && !why.disabled;
+      const item = [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.querySelector('.ctx-arrow'));
+      item.dispatchEvent(new MouseEvent('mouseenter')); await wait(200);
+      const menus = [...document.querySelectorAll('.ctx-menu')];
+      const a = menus[0].getBoundingClientRect(), b = menus[1]?.getBoundingClientRect();
+      const res = { whyOn, menus: menus.length, fitsRight: a.right + (b?.width || 0) <= innerWidth - 6, gap: b ? Math.round(b.left >= a.right - 8 ? b.left - a.right : a.left - b.right) : null, inside: b ? b.left >= 0 && b.right <= innerWidth : false };
+      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(100);
+      // the item opens the window that says why
+      lib.setSelection(imgs.map((x) => x.id)); await wait(200);
+      document.querySelector('.view-photos .selection-bar .more-btn').click(); await wait(300);
+      [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Why are these (not) stacked?'))?.click();
+      for (let i = 0; i < 40 && !document.querySelector('.why-dialog, .sim-why'); i++) await wait(100);
+      res.whyOpened = !!document.querySelector('.why-dialog, .sim-why');
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(200);
+      document.querySelector('.cm-overlay')?.remove();
+      lib.clearSelection(); await wait(200);
+      return res; })()`);
+    check(subMenu.whyOn && subMenu.whyOpened, 'the selection\'s "More" has "Why are these (not) stacked?" (2 to 12 photos), and it opens the window that says why', JSON.stringify(subMenu));
+    check(subMenu.menus === 2 && subMenu.inside && subMenu.gap !== null && Math.abs(subMenu.gap) <= 12,
+      'a submenu of "More" opens against its menu (on the left when there is no room on the right), not far from it', JSON.stringify(subMenu));
     // the panel by task (1.40.0): Adjust · Describe · Info as tabs in the photos' panel and the viewer (E, D, I; H
     // folds it), the adjustment groups as an accordion, the lens by hand folded, the width dragged, and two panels
     // in a wide viewer (Describe and Info on the left, Adjust on the right)
@@ -1999,6 +2046,35 @@ app.whenReady().then(async () => {
       && simAll.sel?.one?.[0] === (simAll.sel.one[1] === 1 ? 'Send 1 to the Limbo' : `Send ${simAll.sel.one[1]} to the Limbo`) && simAll.sel?.back,
       'similar photos: a checkbox on each group, Select all and Clear selection; sending to the Limbo applies to the groups selected only', JSON.stringify(simAll.sel));
     check(simAll.cmp?.ok, 'comparing a group of similar photos keeps the order of the group, names the best on its side and starts on the other photo', JSON.stringify(simAll.cmp));
+    // "Keep only the suggested" (a group, or the groups selected): the others go to the Limbo at once, no question;
+    // the notice undoes it
+    const kb = await js(`(async () => { try {
+      const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      lib.setFilter({ day: '', year: 0, folder: '', recursive: true }); s.layout.openView('photos'); await wait(300);
+      document.querySelector('.view-photos .similar-btn').click(); await wait(250);
+      [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Review similar photos'))?.click();
+      for (let i = 0; i < 150 && !document.querySelector('.sim-group, .sim-empty'); i++) await wait(100);
+      const grp = document.querySelector('.sim-group');
+      if (!grp) return { none: true };
+      const n = Number((grp.querySelector('.sim-count')?.textContent.match(/\d+/) || [0])[0]);
+      const before = lib.allItems.filter((x) => x.mark === 3).length;
+      const btn = grp.querySelector('.sim-keep-best');
+      const res = { n, title: btn?.title, label: btn?.textContent };
+      btn.click();
+      for (let i = 0; i < 30 && !document.querySelector('.carry-dialog') && lib.allItems.filter((x) => x.mark === 3).length === before; i++) await wait(100);
+      res.asked = !!document.querySelector('.carry-dialog');
+      if (res.asked) { [...document.querySelectorAll('.carry-dialog .cm-actions button')].find((b) => /Go without taking/.test(b.textContent))?.click(); await wait(500); }
+      for (let i = 0; i < 30 && lib.allItems.filter((x) => x.mark === 3).length === before; i++) await wait(100);
+      res.noConfirm = !document.querySelector('.cm-overlay .cm-dialog');
+      res.sent = lib.allItems.filter((x) => x.mark === 3).length - before;
+      const toast = [...document.querySelectorAll('.toast')].reverse().find((x) => /went to the Limbo/.test(x.textContent));
+      res.toast = !!toast;
+      toast?.querySelector('.toast-actions button')?.click(); await wait(600);
+      res.undone = lib.allItems.filter((x) => x.mark === 3).length === before;
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(kb.none || (kb.label === 'Keep only the suggested' && /sends the others to the Limbo now/.test(kb.title || '') && kb.sent >= 1 && kb.noConfirm && kb.toast && kb.undone),
+      '"Keep only the suggested": the others of the group go to the Limbo at once (no question; what they have is offered first when there is something), the notice undoes it', JSON.stringify(kb));
     check(simAll.count === '2 photos' && ['Choose as the best', 'Keep only this one: the other one to the Limbo', 'Make single', 'Compare side by side'].every((x) => simAll.menu?.includes(x)) && simAll.bestNow && simAll.bestKept,
       'a group of similar photos says how many it has; each photo has a menu (best, keep only it, take it out, compare); the best chosen is kept in the catalog', JSON.stringify({ count: simAll.count, menu: simAll.menu, bestNow: simAll.bestNow, bestKept: simAll.bestKept }));
     check(simAll.apartGone && simAll.apartKept >= 1 && simAll.apartToast && simAll.stillGone && simAll.undone,
@@ -2077,6 +2153,35 @@ app.whenReady().then(async () => {
       const twins = lib.twinsOf(lib.view('main'));
       res.twinBoth = [...twins].filter(([id, ts]) => ts.some((x) => shownIds.has(x.id))).length;
       res.twinsBefore = (() => { const all = lib.viewAll('main'); const ids = new Set(all.map((x) => x.id)); return [...lib.twinsOf(all)].filter(([, ts]) => ts.some((x) => ids.has(x.id))).length; })();
+      // a RAW + JPEG shown as one: "RAW+JPG" on it, the two files named; the RAW edited, it is the one shown
+      // (a RAW + JPEG alone: the one in a stack said apart from the others of it, for the test)
+      let apartPairs = [];
+      if (!lib.view('main').some((x) => { const r = s.similar.rawsBehind(x.id); return r && !r.group; })) {
+        const st0 = lib.view('main').map((x) => s.similar.stackOf(x.id)).find((g) => g && g.units.some((u) => u.files.length > 1));
+        const u0 = st0?.units.find((u) => u.files.length > 1);
+        if (u0) {
+          apartPairs = u0.files.flatMap((f) => st0.units.filter((u) => u !== u0).flatMap((u) => u.files.map((o) => [f.id, o.id])));
+          await s.similar.setApart(apartPairs, true); s.similar.regroupNow(); await wait(600);
+        }
+      }
+      const pairTop = lib.view('main').find((x) => { const r = s.similar.rawsBehind(x.id); return r && !r.group; });
+      res.pairFound = !!pairTop;
+      if (pairTop) {
+        document.querySelector('.view-photos .tile[data-id="' + pairTop.id + '"]')?.scrollIntoView({ block: 'center' }); await wait(300);
+        const pb = document.querySelector('.view-photos .tile[data-id="' + pairTop.id + '"] .tile-pair');
+        res.pairLabel = pb?.textContent; res.pairTitle = (pb?.title || '').split('\\n')[0];
+        const raw = (lib.twinsOf([pairTop]).get(pairTop.id) || []).find((x) => x.ext !== pairTop.ext);
+        res.rawReadable = raw?.thumb === 1;
+        if (raw && res.rawReadable) {
+          await lib.describe([raw.id], { adjust: { exposure: 0.3 } }, { history: false });
+          for (let i = 0; i < 30 && !lib.view('main').some((x) => x.id === raw.id); i++) await wait(100);
+          res.editedShown = lib.view('main').some((x) => x.id === raw.id) && !lib.view('main').some((x) => x.id === pairTop.id);
+          await lib.describe([raw.id], { adjust: { exposure: 0 } }, { history: false });
+          for (let i = 0; i < 30 && lib.view('main').some((x) => x.id === raw.id); i++) await wait(100);
+          res.jpegBack = lib.view('main').some((x) => x.id === pairTop.id);
+        }
+      }
+      if (apartPairs.length) { await s.similar.setApart(apartPairs, false); s.similar.regroupNow(); await wait(600); }
       // the viewer: the photos of the group in a strip below the one shown; a click shows another of them
       badge.closest('.tile').dispatchEvent(new MouseEvent('dblclick', { bubbles: true })); await wait(600);
       const strip = document.querySelector('.viewer .vw-stack:not([hidden])');
@@ -2142,6 +2247,8 @@ app.whenReady().then(async () => {
       'the switch "Stack photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && !st.onlyChip && st.onlyMarked && st.onlyBack && st.noOldSwitch && st.noMenuItem,
       'Only stacks (in the menu of "Similar photos"): only the groups, each as its best photo, the button marked, no chip nor filter for it; again in the menu, every photo grouped again', JSON.stringify({ onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, chip: st.onlyChip, marked: st.onlyMarked, back: st.onlyBack, noOldSwitch: st.noOldSwitch, noMenuItem: st.noMenuItem }));
+    check(st.pairLabel === 'RAW+JPG' && st.pairTitle === '2 files of the same photo (shown as one):' && (!st.rawReadable || (st.editedShown && st.jpegBack)),
+      'Photos stacked: a RAW and its JPEG shown as one say "RAW+JPG" (the two files named); the RAW edited, it is the one shown, and back', JSON.stringify({ found: st.pairFound, label: st.pairLabel, title: st.pairTitle, rawReadable: st.rawReadable, editedShown: st.editedShown, jpegBack: st.jpegBack }));
     check(st.rawOnStack === `RAW${st.rawCount}` && st.twinBoth === 0 && st.twinsBefore > 0,
       'Photos grouped: a group holding raw files says RAW and how many; a raw file alone with its JPEG stays behind it (one photo)', JSON.stringify({ rawOnStack: st.rawOnStack, rawCount: st.rawCount, twinBoth: st.twinBoth, twinsBefore: st.twinsBefore }));
     check(/^Almost the same\|Alike:\d+$/.test(st.slider || '') && !st.lineSlider && st.removeTitle === 'Remove photo from the group' && st.vwRemove === 'Remove photo from the stack' && st.vwRemoved && /^Make single\|Choose as the best/.test(st.vwMenu || ''),

@@ -296,6 +296,7 @@ class PortableCatalogMainService {
     const out = exportCatalog(this.db.db, this.root, this.rootId);
     out.catalog.rev = Math.max(there?.rev || 0, this.#synced()) + 1;
     fs.mkdirSync(f.dir, { recursive: true });
+    this.#markSync(f.dir);
     const put = (file, text) => { const tmp = `${file}.${process.pid}-${Date.now()}-s.tmp`; fs.writeFileSync(tmp, text); if (fs.existsSync(file)) fs.copyFileSync(file, `${file}.bak`); fs.renameSync(tmp, file); };
     put(f.catalog, JSON.stringify(out.catalog));
     put(f.faces, JSON.stringify(out.faces));
@@ -318,14 +319,25 @@ class PortableCatalogMainService {
 
   /** The folder, hidden and left out of indexers and galleries (its face pictures are not photos). */
   async #ensureDir(f) {
-    if (fs.existsSync(f.dir)) return;
     await fs.promises.mkdir(f.dir, { recursive: true });
-    await fs.promises.writeFile(path.join(f.dir, 'README.txt'), README).catch(() => {});
-    await fs.promises.writeFile(path.join(f.dir, '.nomedia'), '').catch(() => {});            // Android galleries
-    await fs.promises.writeFile(path.join(f.dir, '.metadata_never_index'), '').catch(() => {}); // Spotlight
-    // Windows: hidden and not content-indexed (the dot already hides it on macOS and Linux)
-    if (process.platform === 'win32') await new Promise((resolve) => execFile('attrib', ['+h', '+i', f.dir], { windowsHide: true }, () => resolve()));
+    this.#markSync(f.dir);
   }
+
+  /**
+   * Its marks, whoever made the folder (a write on leaving the collection makes it too): README.txt, out of
+   * galleries (.nomedia) and Spotlight (.metadata_never_index), hidden and not indexed on Windows. Once a session.
+   */
+  #markSync(dir) {
+    if (this.#marked === dir) return;
+    this.#marked = dir;
+    const put = (name, text) => { const file = path.join(dir, name); try { if (!fs.existsSync(file)) fs.writeFileSync(file, text); } catch { /* read-only: said by the writes */ } };
+    put('README.txt', README);
+    put('.nomedia', '');               // Android galleries
+    put('.metadata_never_index', '');  // Spotlight
+    // Windows: hidden and not content-indexed (the dot already hides it on macOS and Linux)
+    if (process.platform === 'win32') execFile('attrib', ['+h', '+i', dir], { windowsHide: true }, () => {});
+  }
+  #marked = '';
 
   async #atomic(file, text) {
     const tmp = `${file}.${process.pid}-${Date.now()}-${++this.tmpSeq}.tmp`;

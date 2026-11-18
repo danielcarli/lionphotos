@@ -208,7 +208,8 @@ export function showSimilar(services, scope, opts = {}) {
       h('button.btn.btn-ghost.btn-sm', { disabled: !nPicked, onclick: () => { groups.forEach((g) => unpicked.add(keyOf(g))); render(); } }, t('similar.pickNoneBtn')),
       h('span.sim-sp'),
       h('span.small.muted', t('similar.inPicked')),
-      h('button.btn.btn-secondary.btn-sm', { disabled: !nPicked, onclick: inPicked((g) => g.units.forEach((u, i) => (i === g.best ? goes.delete(u.id) : goes.add(u.id)))) }, t('similar.keepBest')),
+      // the others of each group selected to the Limbo now (an undo in the notice)
+      h('button.btn.btn-secondary.btn-sm.sim-keep-best-all', { disabled: !nPicked, title: t('similar.keepBestTitle'), onclick: () => keepBest(groups.filter(picked)) }, t('similar.keepBest')),
       h('button.btn.btn-secondary.btn-sm', { disabled: !nPicked, onclick: inPicked((g) => g.units.forEach((u) => goes.delete(u.id))) }, t('similar.keepAll')));
     setChildren(body, h('p.sim-lead.small.muted', t('similar.lead')), selBar, groups.slice(0, more).map((g, n) => group(g, n)),
       groups.length > more ? h('button.btn.btn-secondary.sim-more', { onclick: () => { more += PAGE; render(); } }, tn('similar.more', groups.length - more)) : null);
@@ -231,7 +232,7 @@ export function showSimilar(services, scope, opts = {}) {
         h('span.sim-sp'),
         h('button.btn.btn-ghost.btn-sm', { title: t('similar.compareTitle'), onclick: () => compare(g, g.best) }, h('span', { html: icon('compare', 13) }), t('similar.compare')),
         h('button.btn.btn-ghost.btn-sm', { onclick: () => { g.units.forEach((u) => goes.delete(u.id)); render(); } }, t('similar.keepAll')),
-        h('button.btn.btn-ghost.btn-sm', { onclick: () => { g.units.forEach((u, i) => (i === g.best ? goes.delete(u.id) : goes.add(u.id))); render(); } }, t('similar.keepBest')),
+        h('button.btn.btn-ghost.btn-sm.sim-keep-best', { title: t('similar.keepBestTitle'), onclick: () => keepBest([g]) }, t('similar.keepBest')),
         h('button.btn.btn-ghost.btn-sm.sim-apart', { title: t('similar.notOneTitle'), onclick: () => notOne(g) }, h('span', { html: icon('ungroup', 13) }), t('similar.notOne'))),
       h('div.sim-tiles', g.units.map((u, i) => tile(g, u, i))));
   };
@@ -334,19 +335,25 @@ export function showSimilar(services, scope, opts = {}) {
     setApart(pairs, tn('similar.notOneDone', g.units.length));
   };
 
-  // keep only this photo: the others of the group go to the Limbo now (after asking), with an undo
-  const keepOnly = async (g, i) => {
-    const others = g.units.filter((_, k) => k !== i);
-    if (!(await carryMetadata(services, [{ keep: g.units[i], go: others }]))) return;
-    const ids = await confirmLimbo(others);
-    if (!ids) return;
+  // keep only one photo of each group (the one suggested, or the one chosen): the others go to the Limbo now —
+  // the Limbo is undone at a click, so no question; what they have that the one kept has not is offered first —
+  // with an undo in the notice
+  const keepOnlyOf = async (plan) => {
+    plan = plan.filter((p) => p.go.length);
+    if (!plan.length) return;
+    if (!(await carryMetadata(services, plan))) return;
+    const twins = readPref(TWINS_KEY, '1') !== '0'; // with their raw twins, as last chosen
+    const shots = plan.flatMap((p) => p.go);
+    const ids = shots.flatMap((u) => (twins ? u.files.map((x) => x.id) : [u.rep.id]));
     busy = true;
     try { await library.setMark(ids, 'reject'); } finally { busy = false; }
-    others.forEach((u) => goes.delete(u.id));
+    shots.forEach((u) => goes.delete(u.id));
     again();
     regroup(true);
-    notifications.info(tn('similar.sent', others.length), 8000, { label: t('similar.undo'), run: () => library.setMark(ids, 'reject') });
+    notifications.info(tn('similar.sent', shots.length), 8000, { label: t('similar.undo'), run: () => library.setMark(ids, 'reject') });
   };
+  const keepOnly = (g, i) => keepOnlyOf([{ keep: g.units[i], go: g.units.filter((_, k) => k !== i) }]);
+  const keepBest = (list) => keepOnlyOf(list.map((g) => ({ keep: g.units[g.best], go: g.units.filter((_, k) => k !== g.best) })));
 
   // side by side in the order of the group (the one on the left here is on the left there), the best named;
   // ← → step the photo that is not the best

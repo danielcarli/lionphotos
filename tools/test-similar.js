@@ -130,5 +130,19 @@ check(!tw.has(3) && ids(9) === '', 'an edited copy, or a JPEG of the same name i
 check(ids(4) === '5' && ids(6) === '7' && ids(5) === '4', 'renamed by Organize into Raw/ and Img/, taken in the same second and numbered one after the other: twins, in pairs');
 check(!tw.has(8) && !tw.has(10) && !tw.has(11), 'a JPEG of another second, or a PNG, is not a twin');
 
+// the photo shown for a RAW + JPEG: the JPEG, unless the RAW is the one edited
+{
+  const { shotsOfItems } = await import('../src/workbench/contrib/similar/similarService.js');
+  for (const x of library.allItems) x.thumb = 1;
+  const pairOf = () => shotsOfItems(library, [library.byId.get(1), library.byId.get(2)]).shots;
+  const plain = pairOf();
+  check(plain.length === 1 && plain[0].rep.id === 2 && plain[0].files.length === 2, 'a RAW and its JPEG are one shot, shown by the JPEG');
+  library.byId.get(1).aj = JSON.stringify({ exposure: 0.4 });
+  check(pairOf()[0].rep.id === 1, 'the RAW edited (developed in LionPhotos): the RAW is the one shown');
+  library.byId.get(1).aj = null; library.byId.get(1).ajParsed = null;
+  library.byId.get(1).thumb = 2; library.byId.get(1).aj = JSON.stringify({ exposure: 0.4 });
+  check(pairOf()[0].rep.id === 2, 'a RAW edited but with no thumbnail: the JPEG is still the one shown');
+}
+
 console.log(failures ? `\n${failures} failed` : '\nall similar-photo checks passed');
 process.exit(failures ? 1 : 0);

@@ -32,7 +32,8 @@ export function showContextMenu(x, y, items) {
     window.removeEventListener('resize', close);
     open = null;
   };
-  const build = (list, px, py, level) => {
+  // backX: where a submenu goes when it does not fit on the right (against the left side of its item)
+  const build = (list, px, py, level, backX) => {
     while (layers.length > level) layers.pop().remove();
     const menu = h('div.ctx-menu', { role: 'menu' });
     for (const it of list) {
@@ -56,7 +57,7 @@ export function showContextMenu(x, y, items) {
       btn._item = it;
       const openSub = () => {
         const r = btn.getBoundingClientRect();
-        build(it.submenu, r.right - 4, r.top - 5, level + 1);
+        build(it.submenu, r.right - 4, r.top - 5, level + 1, r.left + 4);
       };
       btn.addEventListener('mouseenter', () => { btn.focus({ preventScroll: true }); if (it.submenu) openSub(); else while (layers.length > level + 1) layers.pop().remove(); });
       btn.addEventListener('click', (e) => {
@@ -71,7 +72,8 @@ export function showContextMenu(x, y, items) {
     layers.push(menu);
     // inside the window
     const r = menu.getBoundingClientRect();
-    const left = px + r.width > innerWidth - 6 ? Math.max(6, (level ? px - r.width * 2 + 8 : innerWidth - r.width - 6)) : px;
+    // too wide on the right: the menu against the window's edge; a submenu turns to the left of its item
+    const left = px + r.width > innerWidth - 6 ? Math.max(6, level && backX != null ? backX - r.width : innerWidth - r.width - 6) : px;
     const top = py + r.height > innerHeight - 6 ? Math.max(6, innerHeight - r.height - 6) : py;
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;

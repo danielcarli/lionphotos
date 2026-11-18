@@ -120,7 +120,7 @@ export class PhotosView extends ViewPane {
         e.preventDefault(); e.stopPropagation(); this.#stepInfo(e.key === 'ArrowDown' ? 1 : -1);
       }
     }, true);
-    this.element.append(...(this.banner ? [this.banner] : []), this.labelBar, this.projectPanel, this.toolbar, this.stackStatus, this.selbar,
+    this.element.append(...(this.banner ? [this.banner] : []), this.labelBar, this.projectPanel, this.toolbar, this.selbar, this.stackStatus,
       h('div.photos-body', h('div.photos-main', this.listHead, this.scroller, this.empty, this.spot, this.stamp, this.rail), this.infoGrip, this.info));
 
     this.scroller.addEventListener('scroll', () => { this.thumbs.hold(); this.#schedule(); }, { passive: true });
@@ -244,7 +244,7 @@ export class PhotosView extends ViewPane {
       this.#infoToggle());
   }
 
-  /** Sort, zoom and the info panel: in the header, and in the selection bar too (they stay at hand). */
+  /** Sort, zoom and the info panel: in the bar of the view (it stays while photos are selected). */
   #viewControls(withInfo = true) {
     const { library } = this;
     const f = library.filter;
@@ -466,9 +466,15 @@ export class PhotosView extends ViewPane {
   #renderSelectionBar() {
     const { library } = this;
     const sel = library.selectedItems();
-    // while items are selected, the header becomes the selection's (one band, not two)
-    this.selbar.hidden = !sel.length;
-    this.toolbar.hidden = !!sel.length;
+    // while items are selected, a band under the bar of the view (its filters, sort and zoom stay at hand); the
+    // photos do not move when it comes or goes: the grid scrolls by its height
+    const was = !this.selbar.hidden;
+    if (was !== !!sel.length) {
+      const top = this.scroller.getBoundingClientRect().top;
+      this.selbar.hidden = !sel.length;
+      const d = this.scroller.getBoundingClientRect().top - top;
+      if (d && this.scroller.scrollTop + d >= 0) this.scroller.scrollTop += d;
+    }
     if (!sel.length) return;
     const bytes = sel.reduce((s, it) => s + it.size, 0);
     const videos = sel.filter((it) => it.kind === KIND.video);
@@ -516,6 +522,8 @@ export class PhotosView extends ViewPane {
           exportMenuItem(this.services, sel),
           { label: t('compare.menu'), icon: 'columns', hint: 'V', disabled: !comparable(this.services, sel).length, run: () => this.compareSelection() },
           ...this.#stackItems(sel, this.limbo),
+          // why the photos selected are (not) stacked (2 to 12 photos)
+          ...(!this.limbo && this.services.similar ? [this.#whyItem(sel)] : []),
           { label: t('photos.organize'), icon: 'calendar', run: () => this.layout.openView('organize') },
           ...(videos.length ? [{ label: t('previews.generate'), icon: 'film', run: () => this.thumbs.generatePreviews({ ids: videos.map((v) => v.id) }, tn('previews.scope.selected', videos.length)) }] : []),
           ...(heics.length ? [{ label: t('convert.button'), icon: 'image', title: t('convert.buttonTitle'), run: () => this.operations.convertHeic(heics.map((it) => it.id)) }] : []),
@@ -530,9 +538,7 @@ export class PhotosView extends ViewPane {
             ? { label: t('photos.trash'), icon: 'trash', danger: true, run: () => this.operations.trash(ids) }
             : { label: t('limbo.send'), icon: 'binQuestion', danger: true, run: () => applyMark(library, ids, 'reject') },
         ]);
-      } }, h('span', { html: icon('more', 14) }), t('photos.more')),
-      // the view's own controls stay at hand while items are selected
-      this.#viewControls());
+      } }, h('span', { html: icon('more', 14) }), t('photos.more')));
   }
 
   // ------------------------------------------------------------------ layout (virtual rows)
@@ -888,15 +894,20 @@ export class PhotosView extends ViewPane {
   }
 
   /**
-   * Photos grouped: the raw files behind the photo shown — its group's (RAW and how many), or its own raw twin
-   * (RAW) — so a group that holds raw files says so, whatever the photo on top.
+   * Photos stacked: the raw files behind the photo shown — its stack's (RAW and how many), or its own twin
+   * (RAW+JPG: one photo in two files) — so a stack that holds raw files says so, whatever the photo on top.
    */
   #rawsBadge(it) {
     const r = !this.limbo && it.kind === KIND.image ? this.services.similar?.rawsBehind(it.id) : null;
     if (!r) return null;
-    const title = r.group ? `${tn('photos.rawsInGroup', r.raws)}\n${r.names.join('\n')}` : r.names.join('\n');
-    return h('span.tile-badge.tile-raw', { title, 'aria-label': r.group ? tn('photos.rawsInGroup', r.raws) : 'RAW' },
-      'RAW', r.group ? h('span.tile-raw-count', String(r.raws)) : null);
+    if (r.group) {
+      return h('span.tile-badge.tile-raw', { title: `${tn('photos.rawsInGroup', r.raws)}\n${r.names.join('\n')}`, 'aria-label': tn('photos.rawsInGroup', r.raws) },
+        'RAW', h('span.tile-raw-count', String(r.raws)));
+    }
+    // a RAW and its JPEG (one photo in two files): both named, so the one behind is not taken for gone
+    const label = ['RAW', ...r.others].join('+');
+    const title = `${tn('photos.pairFiles', r.files.length)}\n${r.files.join('\n')}`;
+    return h('span.tile-badge.tile-raw.tile-pair', { title, 'aria-label': title }, label);
   }
 
   /** The kind of file at a glance: RAW · CR3, JPG, HEIC, PNG… with the colour of its kind (original, edited, raw). */
@@ -959,9 +970,8 @@ export class PhotosView extends ViewPane {
         ? [{ label: t('similar.menu'), icon: 'similar', run: () => showSimilar(this.services, dayOf(sel[0])) }] : []),
       // stack the photos selected (whatever they look like), or unstack the stacks they stand for
       ...this.#stackItems(sel, inLimbo),
-      // a few photos expected together: why they are (not) stacked
-      ...(!inLimbo && sel.length >= 2 && sel.length <= 12 && sel.every((x) => x.kind === KIND.image)
-        ? [{ label: t('similar.why.menu'), icon: 'search', run: () => showWhyGrouped(this.services, sel) }] : []),
+        // a few photos expected together: why they are (not) stacked
+      ...(!inLimbo && this.services.similar && sel.length >= 2 ? [this.#whyItem(sel)] : []),
       '-',
       inLimbo
         ? { label: t('contextMenu.restore'), icon: 'undo', run: () => library.setMark(ids, 0) }
@@ -1341,6 +1351,12 @@ export class PhotosView extends ViewPane {
       { label: t('similar.stackSel'), icon: 'stack', hint: 'Ctrl+G', disabled: images.length < 2 && !(images.length && stacked), title: images.length < 2 ? t('similar.stackFew') : t('similar.stackSelTitle'), run: () => this.#stack(sel) },
       ...(stacked ? [{ label: t('similar.unstack'), icon: 'takeOut', hint: 'Ctrl+Shift+G', title: t('similar.unstackTitle'), run: () => this.#unstack(sel) }] : []),
     ];
+  }
+  /** "Why are these (not) stacked?" for the photos selected: 2 to 12 photos (else said why not). */
+  #whyItem(sel) {
+    const images = sel.filter((x) => x.kind === KIND.image);
+    const ok = images.length >= 2 && images.length <= 12 && images.length === sel.length;
+    return { label: t('similar.why.menu'), icon: 'search', disabled: !ok, title: ok ? t('similar.why.title') : t('similar.why.pick'), run: () => showWhyGrouped(this.services, images) };
   }
   async #stack(sel) {
     const sim = this.services.similar;

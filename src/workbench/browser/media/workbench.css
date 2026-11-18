@@ -2033,7 +2033,7 @@ button.person-pending { border: 0; cursor: pointer; z-index: 1; }
 .photos-toolbar .filter-chips { flex: 0 1 auto; }
 
 /* the selection takes the header's place */
-.selection-bar { height: 52px; padding: 0 16px 0 10px; gap: 8px; background: var(--accent-softer); border-bottom: 1px solid var(--accent-soft); }
+.selection-bar { height: 44px; padding: 0 16px 0 10px; gap: 8px; background: var(--accent-softer); border-bottom: 1px solid var(--accent-soft); }
 .selbar-clear { width: 30px; height: 30px; }
 .selbar-count { display: inline-flex; align-items: baseline; gap: 8px; padding: 4px 6px; border-radius: 7px; white-space: nowrap; font-size: 13.5px; }
 .selbar-count:hover { background: var(--hover); }
@@ -2213,9 +2213,6 @@ input.desc-input { min-height: 32px; resize: none; }
 .toast-bar { display: block; height: 8px; border-radius: 8px; background: color-mix(in srgb, var(--toast-c) 15%, var(--bg-subtle)); overflow: hidden; }
 .toast-bar-fill { display: block; height: 100%; width: 0; border-radius: 8px; background: var(--toast-c); transition: width 0.25s; }
 .view-controls { display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto; }
-.selection-bar .view-controls { margin-left: 6px; padding-left: 10px; border-left: 1px solid var(--border); }
-.selection-bar input.zoom { width: 90px; }
-@container (max-width: 860px) { .selection-bar input.zoom { width: 64px; } }
 
 /* ------------------------------------------------------------------ plugins: export dialog, settings */
 .exp-dialog { width: min(640px, calc(100vw - 48px)); }

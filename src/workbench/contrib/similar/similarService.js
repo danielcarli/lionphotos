@@ -81,7 +81,8 @@ export function shotsOfItems(library, items) {
     if (seen.has(it.id)) continue;
     const files = [it, ...(twins.get(it.id) || []).filter((x) => inList.has(x.id) && !seen.has(x.id))];
     files.forEach((x) => seen.add(x.id));
-    let rep = files.find((x) => x.thumb === 1 && !isRawExt(x.ext)) || files.find((x) => x.thumb === 1);
+    // the photo shown for the shot: the one edited (the RAW developed, say), else the JPEG, else any read
+    let rep = files.find((x) => x.thumb === 1 && adjustOf(x)) || files.find((x) => x.thumb === 1 && !isRawExt(x.ext)) || files.find((x) => x.thumb === 1);
     // a raw file with no thumbnail yet: read from the JPEG the camera put inside it
     let viaRaw = false;
     if (!rep) { rep = files.find((x) => isRawExt(x.ext) && x.thumb !== 2); viaRaw = !!rep; }
@@ -93,7 +94,7 @@ export function shotsOfItems(library, items) {
 }
 
 /** The groups, as a short text: Photos is drawn again only when it changes. */
-const signature = (groups) => groups.map((g) => `${g.units[g.best].rep.id}:${g.units.length}`).join(',');
+const signature = (groups, shots) => `${groups.map((g) => `${g.units[g.best].rep.id}:${g.units.length}`).join(',')}|${shots.filter((s) => s.files.length > 1).map((s) => s.rep.id).join(',')}`; // the stacks, and the photo shown for each RAW + JPEG
 
 /**
  * Are the people (or pets) of two photos others? A face of one with no match in the other, AND a face of the
@@ -158,6 +159,13 @@ export class SimilarService {
     this.host = services.host;
     this.library.stacks = this;
     this.library.onDidChangeData(() => { if (this.library.root !== this.#root) this.#reset(); });
+    // a thumbnail ready, an edit, a mark: the photo shown for a RAW + JPEG (or a stack) can be another now
+    this.library.onDidUpdateItems((ids) => {
+      if (!this.active || !this.#lastList) return;
+      if (!ids.some((id) => this.#stackOf.has(id) || this.#pairOf.has(id) || this.#behind.has(id))) return;
+      clearTimeout(this.#updTimer);
+      this.#updTimer = setTimeout(() => this.#maybeRegroup(), 400);
+    });
     // people or pets found or named: who is in the photos may have changed
     for (const kind of ['face', 'pet']) {
       // while faces are being looked for, news comes every few seconds: who is in the photos is read again
@@ -208,7 +216,7 @@ export class SimilarService {
     if (!this.active || !this.#lastList) return;
     const { shots } = shotsOfItems(this.library, this.#lastList);
     for (const x of shots) x.f = this.known(x) ?? null;
-    if (signature(this.groups(shots)) !== this.#sig) this.#regroup();
+    if (signature(this.groups(shots), shots) !== this.#sig) this.#regroup();
   }
 
   #later() {
@@ -503,6 +511,8 @@ export class SimilarService {
     }
     this.#later();
   }
+  #behind = new Set(); // the photos hidden behind another (in a stack, or a RAW behind its JPEG)
+  #updTimer = null;
   #unstacked = new Map(); // pairs said apart → the photos they took out of a stack made by hand (for the undo)
 
   // ------------------------------------------------------------------ stacks made by hand
@@ -575,7 +585,7 @@ export class SimilarService {
     else if (shots.some((s) => s.f && !s.f.clip && !this.#clipAsked.has(`${s.rep.id}:${s.rep.mtime}`))) this.readContent(shots).then((found) => { if (found) this.#maybeRegroup(); });
     const groups = this.groups(shots);
     this.#lastList = list;
-    this.#sig = signature(groups);
+    this.#sig = signature(groups, shots);
     this.#inGroups = groups.flatMap((g) => g.units);
     this.summary = { groups: groups.length, grouped: this.#inGroups.length, photos: shots.length };
     // who is in the photos of the groups (once): groups of different people come apart
@@ -594,13 +604,14 @@ export class SimilarService {
       this.#pairOf.set(u.rep.id, { files: u.files, raws: rawsOf([u]) });
       for (const f of u.files) if (f.id !== u.rep.id) hidden.add(f.id);
     }
+    this.#behind = hidden;
     if (this.onlyGrouped) return list.filter((it) => this.stackOf(it.id));
     return hidden.size ? list.filter((it) => !hidden.has(it.id)) : list;
   }
 
   /**
    * The raw files behind a photo of Photos (Photos grouped): those of its group, or its own raw twin.
-   * @returns {{ raws:number, names:string[], group:boolean }|null}
+   * @returns {{ raws:number, names:string[], group:boolean, files:string[], others:string[] }|null}
    */
   rawsBehind(id) {
     if (!this.active) return null;
@@ -608,7 +619,10 @@ export class SimilarService {
     const files = s ? s.units.flatMap((u) => u.files) : this.#pairOf.get(id)?.files;
     if (!files) return null;
     const raws = files.filter((f) => isRawExt(f.ext));
-    return raws.length ? { raws: raws.length, names: raws.map((f) => f.name), group: !!s } : null;
+    if (!raws.length) return null;
+    // the others of a RAW + JPEG (or HEIF…): named on the badge
+    const others = [...new Set(files.filter((f) => !isRawExt(f.ext)).map((f) => (f.ext === 'jpeg' || f.ext === 'jpe' ? 'JPG' : f.ext.toUpperCase())))];
+    return { raws: raws.length, names: raws.map((f) => f.name), group: !!s, files: files.map((f) => f.name), others };
   }
 
   /** The group a photo of Photos stands for (when it is the one shown). */

@@ -2,6 +2,34 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.73.0] — 2026-11-18
+
+### Changed
+- Photos › *Stack photos*: a RAW and its JPEG (one photo in two files) shown as one now say so: the badge reads **RAW+JPG** (or RAW+HEIF…), and its tip names both files, so the one behind is not taken for gone.
+- The photo shown for a RAW + JPEG is the one edited (a RAW developed in LionPhotos shows as edited), else the JPEG.
+- When a thumbnail is ready, a photo is edited or marked, the photo shown for a RAW + JPEG (or a stack) is worked out again and the grid follows: a tile could stay drawn as before, without its RAW badge.
+
+## [1.72.0] — 2026-11-18
+
+### Changed
+- Similar photos › **Keep only the suggested** (on a group, or for the groups selected) now does it: the other photos go to the Limbo at once, with their raw twins as last chosen, and the photo suggested stays. No question is asked (the Limbo gives everything back), except what the others have and the suggested one has not (a caption, keywords, an album), offered to it first as before. The notice has the undo. *Keep only this one* in the side-by-side view works the same way.
+
+## [1.71.0] — 2026-11-18
+
+### Added
+- The selection's **More** menu has **Why are these (not) stacked?**, as the photo's own menu: for 2 to 12 photos selected, it opens the window that says what was compared and why they are, or are not, in one stack. With other selections it is shown greyed, saying how many photos to select.
+
+## [1.70.1] — 2026-11-18
+
+### Fixed
+- A submenu (*Add to album*, *Category*, *Marks* in the selection's *More*) opened far to the left, in the middle of the photos, when its menu was at the window's right edge. It now opens right against its menu, on the left side when there is no room on the right.
+- The folder of the catalog kept with the collection (`.lionphotos`) could be made without its marks (`README.txt`, `.nomedia` for Android galleries, `.metadata_never_index` for Spotlight, hidden on Windows) when its first write was the one made on leaving the collection. They are now added whoever makes the folder, and to folders that already lack them. This was the check that failed on GitHub for 1.68.0.
+
+## [1.70.0] — 2026-11-18
+
+### Changed
+- Photos selected: the bar of the view no longer gives way to the selection. Its filters, *Stack photos*, *Similar photos*, sort, zoom and modes stay where they are, and the selection's band (how many, *Send to the Limbo*, *More*) comes right under it, a little slimmer. The photos do not move when the band comes or goes.
+
 ## [1.69.1] — 2026-11-18
 
 ### Fixed

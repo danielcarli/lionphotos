@@ -567,3 +567,5 @@ _merge(MESSAGES, {'labels': {'type': {'person': {'find': '查找或添加人物'
 _merge(MESSAGES, {'similar': {'why': {'content': '内容', 'contentUnread': '尚未由内容模型读取', 'contentAlike': '所拍内容相似度 {pct}（内容模型）'}}})
 
 _merge(MESSAGES, {'similar': {'mode': {'label': '相似照片的显示方式', 'all': '全部', 'stacks': '分组', 'groups': '仅分组', 'allTitle': '所有照片，逐张显示', 'stacksTitle': '每组相似照片显示为一张（最佳的那张），并显示堆叠和张数', 'groupsTitle': '只显示相似照片组（不显示单独的照片）', 'groupsOff': '也显示单独的照片'}}})
+
+_merge(MESSAGES, {'similar': {'pickAll': '全选', 'pickNoneBtn': '取消选择', 'pickedOf': '已选择 {n} / {total} 组', 'pickTitle': '已选择：此处的操作将应用于它', 'inPicked': '在所选组中：', 'pickNone': '请选择一个组'}})

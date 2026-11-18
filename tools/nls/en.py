@@ -570,3 +570,5 @@ _merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Find or add a person'}
 _merge(MESSAGES, {'similar': {'why': {'content': 'Content', 'contentUnread': 'not read by the content model yet', 'contentAlike': '{pct} alike in what they show (content model)'}}})
 
 _merge(MESSAGES, {'similar': {'mode': {'label': 'How similar photos are shown', 'all': 'All', 'stacks': 'Grouped', 'groups': 'Only groups', 'allTitle': 'Every photo, one by one', 'stacksTitle': 'Each group of similar photos as one photo — its best — with a stack and how many it holds', 'groupsTitle': 'Only the groups of similar photos (the photos alone left out)', 'groupsOff': 'Show the photos alone too'}}})
+
+_merge(MESSAGES, {'similar': {'pickAll': 'Select all', 'pickNoneBtn': 'Clear selection', 'pickedOf': '{n} of {total} groups selected', 'pickTitle': 'Selected: what is done here applies to it', 'inPicked': 'In the groups selected:', 'pickNone': 'Select a group'}})

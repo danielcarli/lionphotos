@@ -28,7 +28,7 @@ Explore, pesquise e organize coleções enormes de fotografias e vídeos onde j�
 
 **Sem importar nada** · **Nada sai do seu computador** · **100 mil fotografias deslizam como 100** · **Gratuito e de código aberto**
 
-![Versão 1.65.0](https://img.shields.io/badge/version-1.65.0-161214)
+![Versão 1.66.0](https://img.shields.io/badge/version-1.66.0-161214)
 ![Estado: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -333,7 +333,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotografias"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.65.0**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.66.0**.
 
 ## Créditos
 

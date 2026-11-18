@@ -567,3 +567,5 @@ _merge(MESSAGES, {'labels': {'type': {'person': {'find': '인물 찾기 또는 �
 _merge(MESSAGES, {'similar': {'why': {'content': '내용', 'contentUnread': '아직 내용 모델이 읽지 않음', 'contentAlike': '보여 주는 내용이 {pct} 비슷함(내용 모델)'}}})
 
 _merge(MESSAGES, {'similar': {'mode': {'label': '비슷한 사진 표시 방법', 'all': '모두', 'stacks': '묶음', 'groups': '그룹만', 'allTitle': '모든 사진을 한 장씩', 'stacksTitle': '비슷한 사진 그룹을 가장 좋은 사진 한 장으로, 묶음과 장수와 함께', 'groupsTitle': '비슷한 사진 그룹만(혼자인 사진은 빠짐)', 'groupsOff': '혼자인 사진도 보기'}}})
+
+_merge(MESSAGES, {'similar': {'pickAll': '모두 선택', 'pickNoneBtn': '선택 해제', 'pickedOf': '그룹 {total}개 중 {n}개 선택됨', 'pickTitle': '선택됨: 여기서 하는 작업이 적용됩니다', 'inPicked': '선택한 그룹에서:', 'pickNone': '그룹을 선택하세요'}})

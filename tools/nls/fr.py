@@ -570,3 +570,5 @@ _merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Chercher ou ajouter un
 _merge(MESSAGES, {'similar': {'why': {'content': 'Contenu', 'contentUnread': 'pas encore lu par le modèle de contenu', 'contentAlike': 'semblables à {pct} dans ce qu’elles montrent (modèle de contenu)'}}})
 
 _merge(MESSAGES, {'similar': {'mode': {'label': 'Affichage des photos semblables', 'all': 'Toutes', 'stacks': 'Regroupées', 'groups': 'Groupes seuls', 'allTitle': 'Toutes les photos, une à une', 'stacksTitle': 'Chaque groupe de photos semblables comme une seule photo — la meilleure — avec la pile et leur nombre', 'groupsTitle': 'Seulement les groupes de photos semblables (sans les photos seules)', 'groupsOff': 'Afficher aussi les photos seules'}}})
+
+_merge(MESSAGES, {'similar': {'pickAll': 'Tout sélectionner', 'pickNoneBtn': 'Retirer la sélection', 'pickedOf': '{n} groupes sur {total} sélectionnés', 'pickTitle': 'Sélectionné : ce qui est fait ici s’y applique', 'inPicked': 'Dans les groupes sélectionnés :', 'pickNone': 'Sélectionnez un groupe'}})

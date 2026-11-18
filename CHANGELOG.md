@@ -2,6 +2,11 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.66.0] — 2026-11-17
+
+### Added
+- **Similar photos: a selection of groups.** Each group has a checkbox, and a bar above the groups says how many are selected, with *Select all* and *Clear selection* (and a checkbox for all, half-ticked when some are). *Send to the Limbo* applies to the groups selected only — the others are dimmed and left as they are — and the bar has *Keep only the suggested one* and *Keep all* for the groups selected. Every group is selected when the window opens, as before.
+
 ## [1.65.0] — 2026-11-17
 
 ### Added

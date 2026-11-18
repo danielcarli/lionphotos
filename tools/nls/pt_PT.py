@@ -570,3 +570,5 @@ _merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Pesquisar ou criar pes
 _merge(MESSAGES, {'similar': {'why': {'content': 'Conteúdo', 'contentUnread': 'ainda não lido pelo modelo de conteúdo', 'contentAlike': '{pct} parecidas no que mostram (modelo de conteúdo)'}}})
 
 _merge(MESSAGES, {'similar': {'mode': {'label': 'Como aparecem as fotografias parecidas', 'all': 'Todas', 'stacks': 'Agrupadas', 'groups': 'Só os grupos', 'allTitle': 'Todas as fotografias, uma a uma', 'stacksTitle': 'Cada grupo de fotografias parecidas como uma só — a melhor — com a pilha e quantas tem', 'groupsTitle': 'Só os grupos de fotografias parecidas (as fotografias sozinhas ficam de fora)', 'groupsOff': 'Mostrar também as fotografias sozinhas'}}})
+
+_merge(MESSAGES, {'similar': {'pickAll': 'Selecionar todos', 'pickNoneBtn': 'Remover seleção', 'pickedOf': '{n} de {total} grupos selecionados', 'pickTitle': 'Selecionado: o que for feito aqui aplica-se a ele', 'inPicked': 'Nos grupos selecionados:', 'pickNone': 'Selecione um grupo'}})

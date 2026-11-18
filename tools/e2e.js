@@ -1900,6 +1900,18 @@ app.whenReady().then(async () => {
       const strip = document.querySelectorAll('.cmp-thumb').length;
       res.cmp = { names, b, cn, tagAt, actAt, strip, ok: strip === tiles.length && sides.length === 2 && names[l].includes(cn[0]) && names[r].includes(cn[1]) && tagAt === (b === l ? 0 : 1) && actAt === 1 - tagAt };
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
+      // the selection of groups: clear it, pick one group, and Send applies to it only; Select all again
+      const sendBtn = () => document.querySelector('.sim-foot .btn-primary');
+      const selBtn = (label) => [...document.querySelectorAll('.sim-selbar .btn')].find((b) => b.textContent === label);
+      res.sel = { all: sendBtn().textContent, label: document.querySelector('.sim-pick-label')?.textContent };
+      selBtn('Clear selection').click(); await wait(150);
+      res.sel.none = [sendBtn().textContent, sendBtn().disabled, document.querySelectorAll('.sim-group.is-unpicked').length === document.querySelectorAll('.sim-group').length];
+      const g0 = document.querySelector('.sim-group');
+      const goesIn0 = g0.querySelectorAll('.sim-tile.is-out').length;
+      g0.querySelector('.sim-pick').click(); await wait(150);
+      res.sel.one = [sendBtn().textContent, goesIn0, document.querySelector('.sim-pick-label')?.textContent];
+      selBtn('Select all').click(); await wait(150);
+      res.sel.back = sendBtn().textContent === res.sel.all;
       // the group says how many photos it has; a photo's menu: choose it as the best (kept in the catalog)
       const first = (sel) => [...document.querySelectorAll('.sim-group')].find((x) => x.querySelector('.sim-tile')?.title.split('\\n')[0] === names[0]);
       const grp = () => first();
@@ -1933,6 +1945,9 @@ app.whenReady().then(async () => {
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
     check(simAll.near && simAll.label === 'Similar photos' && simAll.title === 'Similar photos among those shown' && simAll.groups >= 1 && simAll.prevHidden && /\d{4}/.test(simAll.meta || ''),
       'similar photos from the Photos bar, beside "Photos in no album": the photos shown, across days (dated groups, no day arrows)', JSON.stringify(simAll));
+    check(/^1 of \d+ groups selected$/.test(simAll.sel?.one?.[2] || '') && simAll.sel?.none?.[0] === 'Select a group' && simAll.sel?.none?.[1] && simAll.sel?.none?.[2]
+      && simAll.sel?.one?.[0] === (simAll.sel.one[1] === 1 ? 'Send 1 to the Limbo' : `Send ${simAll.sel.one[1]} to the Limbo`) && simAll.sel?.back,
+      'similar photos: a checkbox on each group, Select all and Clear selection; sending to the Limbo applies to the groups selected only', JSON.stringify(simAll.sel));
     check(simAll.cmp?.ok, 'comparing a group of similar photos keeps the order of the group, names the best on its side and starts on the other photo', JSON.stringify(simAll.cmp));
     check(simAll.count === '2 photos' && ['Choose as the best', 'Keep only this one: the other one to the Limbo', 'Make single', 'Compare side by side'].every((x) => simAll.menu?.includes(x)) && simAll.bestNow && simAll.bestKept,
       'a group of similar photos says how many it has; each photo has a menu (best, keep only it, take it out, compare); the best chosen is kept in the catalog', JSON.stringify({ count: simAll.count, menu: simAll.menu, bestNow: simAll.bestNow, bestKept: simAll.bestKept }));

@@ -570,3 +570,5 @@ _merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Person suchen oder hin
 _merge(MESSAGES, {'similar': {'why': {'content': 'Inhalt', 'contentUnread': 'noch nicht vom Inhaltsmodell gelesen', 'contentAlike': 'zu {pct} ähnlich in dem, was sie zeigen (Inhaltsmodell)'}}})
 
 _merge(MESSAGES, {'similar': {'mode': {'label': 'Wie ähnliche Fotos gezeigt werden', 'all': 'Alle', 'stacks': 'Gruppiert', 'groups': 'Nur Gruppen', 'allTitle': 'Alle Fotos, einzeln', 'stacksTitle': 'Jede Gruppe ähnlicher Fotos als ein Foto — das beste — mit Stapel und Anzahl', 'groupsTitle': 'Nur die Gruppen ähnlicher Fotos (ohne die einzelnen Fotos)', 'groupsOff': 'Auch die einzelnen Fotos zeigen'}}})
+
+_merge(MESSAGES, {'similar': {'pickAll': 'Alle auswählen', 'pickNoneBtn': 'Auswahl aufheben', 'pickedOf': '{n} von {total} Gruppen ausgewählt', 'pickTitle': 'Ausgewählt: was hier getan wird, gilt dafür', 'inPicked': 'In den ausgewählten Gruppen:', 'pickNone': 'Eine Gruppe auswählen'}})

@@ -73,6 +73,10 @@ export function showSimilar(services, scope, opts = {}) {
   let reading = 0;       // a token: a newer read cancels an older one
   let busy = false;
   let more = PAGE;       // groups drawn
+  // the groups the operations apply to: every one, but those taken off the selection (by their first photo)
+  const unpicked = new Set();
+  const keyOf = (g) => g.units[0].id;
+  const picked = (g) => !unpicked.has(keyOf(g));
   let ready = false;      // the photos are read (the groups can be made)
 
   const days = daysWithPhotos(library);
@@ -174,11 +178,16 @@ export function showSimilar(services, scope, opts = {}) {
       groups.length ? tn('similar.groups', groups.length) : null,
       data.noThumb ? tn('similar.noThumb', data.noThumb) : null,
     ].filter(Boolean).join(' · ');
-    const going = [...goes];
+    // only the groups selected: what goes from them
+    const chosen = groups.filter(picked);
+    const going = chosen.flatMap((g) => g.units.filter((u) => goes.has(u.id)).map((u) => u.id));
+    const inChosen = chosen.reduce((n, g) => n + g.units.length, 0);
     const files = going.reduce((n, id) => n + (data.shots.find((s) => s.id === id)?.files.length || 0), 0);
     send.disabled = !going.length;
-    send.textContent = going.length ? tn('similar.send', going.length) : t('similar.sendNone');
-    footNote.textContent = groups.length ? t('similar.footNote', { keep: formatNumber(inGroups - going.length), go: formatNumber(going.length) }) + (files > going.length ? ` ${tn('similar.withTwins', files - going.length)}` : '') : '';
+    send.textContent = going.length ? tn('similar.send', going.length) : chosen.length ? t('similar.sendNone') : t('similar.pickNone');
+    footNote.textContent = groups.length ? (chosen.length < groups.length ? `${t('similar.pickedOf', { n: formatNumber(chosen.length), total: formatNumber(groups.length) })} · ` : '')
+      + t('similar.footNote', { keep: formatNumber(inChosen - going.length), go: formatNumber(going.length) }) + (files > going.length ? ` ${tn('similar.withTwins', files - going.length)}` : '') : '';
+    void inGroups;
     if (!groups.length) {
       setChildren(body, h('div.empty-state.sim-empty', h('span', { html: icon('similar', 30) }), h('h3', t('similar.none')),
         h('p.muted', level >= 90 ? t('similar.noneScene') : t('similar.noneTry')),
@@ -187,7 +196,21 @@ export function showSimilar(services, scope, opts = {}) {
     }
     const top = body.scrollTop;
     // many groups (a whole year): the first ones, and the rest a click away
-    setChildren(body, h('p.sim-lead.small.muted', t('similar.lead')), groups.slice(0, more).map((g, n) => group(g, n)),
+    // the selection of groups: all, none, and what to do in those selected
+    const nPicked = groups.filter(picked).length;
+    const pickAll = h('input.sim-pick-all', { type: 'checkbox', checked: nPicked === groups.length, 'aria-label': t('similar.pickAll'),
+      onchange: (e) => { if (e.target.checked) unpicked.clear(); else groups.forEach((g) => unpicked.add(keyOf(g))); render(); } });
+    pickAll.indeterminate = nPicked > 0 && nPicked < groups.length;
+    const inPicked = (fn) => () => { groups.filter(picked).forEach(fn); render(); };
+    const selBar = h('div.sim-selbar',
+      h('label.sim-pick-label', pickAll, h('span', t('similar.pickedOf', { n: formatNumber(nPicked), total: formatNumber(groups.length) }))),
+      h('button.btn.btn-ghost.btn-sm', { disabled: nPicked === groups.length, onclick: () => { unpicked.clear(); render(); } }, t('similar.pickAll')),
+      h('button.btn.btn-ghost.btn-sm', { disabled: !nPicked, onclick: () => { groups.forEach((g) => unpicked.add(keyOf(g))); render(); } }, t('similar.pickNoneBtn')),
+      h('span.sim-sp'),
+      h('span.small.muted', t('similar.inPicked')),
+      h('button.btn.btn-secondary.btn-sm', { disabled: !nPicked, onclick: inPicked((g) => g.units.forEach((u, i) => (i === g.best ? goes.delete(u.id) : goes.add(u.id)))) }, t('similar.keepBest')),
+      h('button.btn.btn-secondary.btn-sm', { disabled: !nPicked, onclick: inPicked((g) => g.units.forEach((u) => goes.delete(u.id))) }, t('similar.keepAll')));
+    setChildren(body, h('p.sim-lead.small.muted', t('similar.lead')), selBar, groups.slice(0, more).map((g, n) => group(g, n)),
       groups.length > more ? h('button.btn.btn-secondary.sim-more', { onclick: () => { more += PAGE; render(); } }, tn('similar.more', groups.length - more)) : null);
     body.scrollTop = top;
   };
@@ -196,8 +219,12 @@ export function showSimilar(services, scope, opts = {}) {
     const keeps = g.units.filter((u) => !goes.has(u.id)).length;
     // across days: the date too
     const when = new Intl.DateTimeFormat(getLocale(), day ? { hour: '2-digit', minute: '2-digit' } : { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(g.units[0].t);
-    return h('section.sim-group', { 'aria-label': t('similar.groupLabel', { n: n + 1, count: g.units.length }) },
+    const on = picked(g);
+    return h(`section.sim-group${on ? '' : '.is-unpicked'}`, { 'aria-label': t('similar.groupLabel', { n: n + 1, count: g.units.length }) },
       h('div.sim-group-head',
+        // in the selection (the operations apply to the groups selected)
+        h('input.sim-pick', { type: 'checkbox', checked: on, title: t('similar.pickTitle'), 'aria-label': `${t('similar.pickTitle')} · ${t('similar.group', { n: n + 1 })}`,
+          onchange: (e) => { if (e.target.checked) unpicked.delete(keyOf(g)); else unpicked.add(keyOf(g)); render(); } }),
         h('span.sim-group-title', t('similar.group', { n: n + 1 })),
         h('span.sim-count', { title: t('similar.countTitle') }, h('span', { html: icon('similar', 13) }), tn('similar.count', g.units.length)),
         h('span.sim-group-meta', `${when} · ${tn('similar.keeps', keeps)}`),
@@ -358,10 +385,13 @@ export function showSimilar(services, scope, opts = {}) {
     return shots.flatMap((s) => (check?.checked ? s.files.map((x) => x.id) : [s.rep.id]));
   };
   const sendToLimbo = async () => {
-    const shots = data.shots.filter((s) => goes.has(s.id));
+    // only from the groups selected
+    const chosen = groups.filter(picked);
+    const goingIds = new Set(chosen.flatMap((g) => g.units.filter((u) => goes.has(u.id)).map((u) => u.id)));
+    const shots = data.shots.filter((s) => goingIds.has(s.id));
     if (!shots.length) return;
     // what the photos that go have and the one that stays has not (a caption, keywords, an album…): offered to it
-    const plan = groups.map((g) => {
+    const plan = chosen.map((g) => {
       const kept = g.units.filter((u) => !goes.has(u.id));
       return { keep: kept.includes(g.units[g.best]) ? g.units[g.best] : kept[0], go: g.units.filter((u) => goes.has(u.id)) };
     }).filter((p) => p.keep && p.go.length);

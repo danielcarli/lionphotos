@@ -565,3 +565,7 @@ _merge(MESSAGES, {'similar': {'sens': {'label': 'Quanto devono somigliarsi le fo
 _merge(MESSAGES, {'similar': {'makeSingle': 'Rendi singola'}})
 
 _merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Cerca o aggiungi una persona'}, 'pet': {'find': 'Cerca o aggiungi un animale'}, 'place': {'find': 'Cerca o aggiungi un luogo'}, 'album': {'find': 'Cerca o aggiungi un album'}}, 'findOrNew': 'Invio: crea «{name}»', 'findNone': 'Nessuno con «{name}» — Invio lo crea'}})
+
+_merge(MESSAGES, {'similar': {'why': {'content': 'Contenuto', 'contentUnread': 'non ancora letto dal modello di contenuto', 'contentAlike': 'simili al {pct} in ciò che mostrano (modello di contenuto)'}}})
+
+_merge(MESSAGES, {'similar': {'mode': {'label': 'Come appaiono le foto simili', 'all': 'Tutte', 'stacks': 'Raggruppate', 'groups': 'Solo gruppi', 'allTitle': 'Tutte le foto, una per una', 'stacksTitle': 'Ogni gruppo di foto simili come una sola foto — la migliore — con la pila e quante ne contiene', 'groupsTitle': 'Solo i gruppi di foto simili (senza le foto da sole)', 'groupsOff': 'Mostra anche le foto da sole'}}})

@@ -680,6 +680,20 @@ class LibraryDatabase {
     return { apart, best };
   }
 
+  /**
+   * What the content model saw in these photos (its 512 numbers, int8), when read as they are now: the similar
+   * photos compare them too. @returns {{ id:number, vec:Uint8Array }[]}
+   */
+  contentVectors(mediaIds) {
+    const out = [];
+    for (let i = 0; i < mediaIds.length; i += 500) {
+      const part = mediaIds.slice(i, i + 500);
+      out.push(...this.db.prepare(`SELECT c.media_id AS id, c.vec FROM content_scans c JOIN media m ON m.id = c.media_id
+        WHERE c.media_id IN (${part.map(() => '?').join(',')}) AND c.vec IS NOT NULL AND c.size = m.size AND c.mtime = m.mtime`).all(...part));
+    }
+    return out;
+  }
+
   /** What these photos look like (read before, the photo unchanged since). @returns {{ id:number, data:Uint8Array }[]} */
   similarFeatures(mediaIds) {
     const out = [];

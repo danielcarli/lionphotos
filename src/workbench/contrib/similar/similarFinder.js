@@ -127,11 +127,44 @@ export function similarity(a, b) {
   let rough = 0;
   for (let i = 0; i < 64; i++) rough += ca[i] * cb[i];
   const dot = 0.5 * fine + 0.5 * rough;
+  const pixels = dot - 2 * Math.max(0, cdOf(a, b) - 0.06);
+  // what the pictures show (the content model, TinyCLIP, when both were read by it): two shots of the same
+  // moment show the same things even when the person turned or the camera moved — it can make them alike, never
+  // less alike than their pixels say
+  const shows = contentSimilarity(a, b);
+  if (shows == null) return pixels;
+  return Math.max(pixels, 0.5 * pixels + 0.5 * shows);
+}
+
+/** How close two colour grids are (the mean difference, 0–1). */
+function cdOf(a, b) {
   let cd = 0;
   for (let i = 0; i < a.color.length; i++) cd += Math.abs(a.color[i] - b.color[i]);
-  cd /= a.color.length;
   // the same shapes in other colours (another shirt, another light) are another picture
-  return dot - 2 * Math.max(0, cd - 0.06);
+  return cd / a.color.length;
+}
+
+/**
+ * How alike two pictures are in what they show, from the content model's numbers (`clip`, normalized): its
+ * cosine, put on the scale of the pixels (0.6 or less: other things → 0; the same → 1). null: not known.
+ */
+export function contentSimilarity(a, b) {
+  if (!a.clip || !b.clip || a.clip.length !== b.clip.length) return null;
+  let c = 0;
+  for (let i = 0; i < a.clip.length; i++) c += a.clip[i] * b.clip[i];
+  return Math.max(0, Math.min(1, (c - 0.6) / 0.4));
+}
+
+/** The content model's numbers (int8 ×127) as a normalized vector. */
+export function clipVector(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const v8 = new Int8Array(b.buffer, b.byteOffset, b.byteLength);
+  const v = new Float32Array(v8.length);
+  let n = 0;
+  for (let i = 0; i < v8.length; i++) { v[i] = v8[i]; n += v[i] * v[i]; }
+  n = Math.sqrt(n) || 1;
+  for (let i = 0; i < v.length; i++) v[i] /= n;
+  return v;
 }
 
 /**

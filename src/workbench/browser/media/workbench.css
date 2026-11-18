@@ -3602,3 +3602,8 @@ button.vw-chip:hover { filter: brightness(1.2); }
 .vw-stack-remove:focus-visible, .sim-remove:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 @media (hover: none) { .sim-remove, .vw-stack-remove { opacity: 1; } }
 .vw-stack-thumbs { padding: 5px 5px 0 0; }
+
+/* how Photos shows the similar photos: one control of three positions (1.65.0) */
+.stack-mode { align-items: center; }
+.stack-mode-icon { display: grid; place-items: center; padding: 0 4px 0 6px; color: var(--text-muted); line-height: 0; }
+.stack-mode .seg { display: inline-flex; align-items: center; white-space: nowrap; }

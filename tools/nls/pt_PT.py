@@ -566,3 +566,7 @@ _merge(MESSAGES, {'similar': {'sens': {'label': 'Quão parecidas as fotografias 
 _merge(MESSAGES, {'similar': {'makeSingle': 'Tornar única'}})
 
 _merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Pesquisar ou criar pessoa'}, 'pet': {'find': 'Pesquisar ou criar animal'}, 'place': {'find': 'Pesquisar ou criar lugar'}, 'album': {'find': 'Pesquisar ou criar álbum'}}, 'findOrNew': 'Enter: criar “{name}”', 'findNone': 'Nenhum com “{name}” — Enter cria'}})
+
+_merge(MESSAGES, {'similar': {'why': {'content': 'Conteúdo', 'contentUnread': 'ainda não lido pelo modelo de conteúdo', 'contentAlike': '{pct} parecidas no que mostram (modelo de conteúdo)'}}})
+
+_merge(MESSAGES, {'similar': {'mode': {'label': 'Como aparecem as fotografias parecidas', 'all': 'Todas', 'stacks': 'Agrupadas', 'groups': 'Só os grupos', 'allTitle': 'Todas as fotografias, uma a uma', 'stacksTitle': 'Cada grupo de fotografias parecidas como uma só — a melhor — com a pilha e quantas tem', 'groupsTitle': 'Só os grupos de fotografias parecidas (as fotografias sozinhas ficam de fora)', 'groupsOff': 'Mostrar também as fotografias sozinhas'}}})

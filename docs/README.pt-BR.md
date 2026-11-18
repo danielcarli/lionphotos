@@ -28,7 +28,7 @@ Navegue, pesquise e organize coleções enormes de fotos e vídeos onde elas já
 
 **Sem importar nada** · **Nada sai do seu computador** · **100 mil fotos rolam como 100** · **Gratuito e de código aberto**
 
-![Versão 1.64.1](https://img.shields.io/badge/version-1.64.1-161214)
+![Versão 1.65.0](https://img.shields.io/badge/version-1.65.0-161214)
 ![Status: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -38,6 +38,10 @@ Navegue, pesquise e organize coleções enormes de fotos e vídeos onde elas já
 </div>
 
 > **Teste beta.** O LionPhotos já serve para o uso diário e é testado numa coleção real de cerca de 15 mil fotos e vídeos, mas ainda está em beta: podem aparecer arestas, e é bom ter um backup da coleção antes de reorganizá-la pela primeira vez. [O que beta quer dizer aqui](#teste-beta).
+
+**Cobertura impressionante.** O LionPhotos já junta o essencial do módulo Biblioteca do Lightroom (catálogo, marcas, IPTC, RAW+JPEG, ajustes não destrutivos) com o melhor do Google Fotos (pessoas, pets, busca por conteúdo, pilhas de fotos parecidas). Ainda tem o Limbo, plugins com marca própria e 10 idiomas.
+
+**Feito a partir de uso real.** Muitos recursos nasceram de problemas reais de quem fotografa: Google Drive lento, RAW+JPEG, comparar metadados antes de descartar. Isso costuma gerar software útil, e não só vistoso.
 
 ## Veja como é
 
@@ -329,7 +333,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.64.1**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.65.0**.
 
 ## Créditos
 

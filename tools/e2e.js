@@ -1988,12 +1988,15 @@ app.whenReady().then(async () => {
     const st = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
       lib.setFilter({ day: '', year: 0, folder: '', recursive: true }); s.layout.openView('photos'); await wait(300);
       const allBefore = lib.viewAll('main').length;
-      const sw = () => document.querySelector('.view-photos .stack-switch');
-      const res = { label: sw()?.querySelector('.tb-switch-text')?.textContent, near: sw()?.previousElementSibling?.classList.contains('similar-btn'), allBefore };
-      sw().querySelector('input').click();
+      // one control of three positions: All · Grouped · Only groups
+      const ctl = () => document.querySelector('.view-photos .stack-mode');
+      const pos = (label) => [...ctl().querySelectorAll('.seg')].find((b) => b.textContent === label);
+      const res = { label: [...(ctl()?.querySelectorAll('.seg') || [])].map((b) => b.textContent).join('|'), near: ctl()?.previousElementSibling?.classList.contains('similar-btn'), allBefore,
+        startAll: ctl()?.querySelector('.seg.active')?.textContent === 'All' };
+      pos('Grouped').click();
       for (let i = 0; i < 200 && !document.querySelector('.view-photos .tile-stack'); i++) await wait(100);
       const badge = document.querySelector('.view-photos .tile-stack');
-      res.badge = badge?.textContent; res.title = badge?.title; res.on = sw()?.classList.contains('on');
+      res.badge = badge?.textContent; res.title = badge?.title; res.on = pos('Grouped')?.getAttribute('aria-checked') === 'true';
       await wait(300);
       res.status = document.querySelector('.view-photos .stack-status:not([hidden])')?.textContent;
       res.lineSlider = !!document.querySelector('.view-photos .stack-status .sens-range');
@@ -2054,31 +2057,26 @@ app.whenReady().then(async () => {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
       res.outAfter = document.querySelectorAll('.sim-group .sim-tile.is-out').length;
       document.querySelector('.sim-close')?.click(); await wait(200);
-      // only the grouped photos: every photo shown stands for a group
-      const only = () => document.querySelector('.view-photos .stack-status .stack-only');
-      res.onlyLabel = only()?.querySelector('.tb-switch-text')?.textContent;
-      only().querySelector('input').click(); await wait(500);
+      // Only groups: every photo shown stands for a group, with a chip whose × goes back to Grouped
+      pos('Only groups').click(); await wait(500);
       res.onlyShown = lib.view('main').length;
       res.onlyAll = lib.view('main').every((it) => !!s.similar.stackOf(it.id)) && document.querySelectorAll('.view-photos .tile').length === document.querySelectorAll('.view-photos .tile .tile-stack').length;
-      res.onlyChip = [...document.querySelectorAll('.view-photos .filter-chip')].some((c) => c.textContent.includes('Grouped photos'));
-      only().querySelector('input').click(); await wait(500);
-      res.onlyBack = lib.view('main').length === res.shown;
-      // the same from Filters › Type: "Grouped photos" (and All gives every photo again)
+      const chipEl = [...document.querySelectorAll('.view-photos .filter-chip')].find((c) => c.textContent.includes('Only groups'));
+      res.onlyChip = !!chipEl;
+      res.noOldSwitch = !document.querySelector('.view-photos .stack-only') && !document.querySelector('.view-photos .stack-switch');
+      chipEl?.querySelector('button')?.click(); await wait(500);
+      res.onlyBack = lib.view('main').length === res.shown && s.similar.mode === 'stacks';
+      // Filters › Type no longer has it (one place for it)
       document.querySelector('.view-photos .filters-btn').click(); await wait(250);
-      const typeItem = (label) => [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.trim() === label);
-      typeItem('Grouped photos').click(); await wait(500);
-      res.fromMenu = lib.view('main').length === res.onlyShown && s.similar.onlyGrouped;
-      document.querySelector('.view-photos .filters-btn').click(); await wait(250);
-      res.menuChecked = typeItem('Grouped photos')?.getAttribute('aria-checked') === 'true';
-      typeItem('All')?.click(); await wait(500);
-      res.menuBack = !s.similar.onlyGrouped && lib.view('main').length === res.shown;
-      sw().querySelector('input').click(); await wait(500);
+      res.noMenuItem = ![...document.querySelectorAll('.ctx-menu .ctx-item')].some((x) => /Grouped photos|Only groups/.test(x.textContent));
+      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
+      pos('All').click(); await wait(500);
       res.off = !document.querySelector('.view-photos .tile-stack') && lib.view('main').length === allBefore;
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(st.label === 'Group similar photos' && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the group$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /groups? of similar photos · \d+ of \d+ photos are in a group/.test(st.status || ''),
-      '"Group similar photos" beside "Similar photos": each group shown as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
-    check(st.onlyLabel === 'Only the grouped photos' && st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && st.onlyBack && st.onlyChip && st.fromMenu && st.menuChecked && st.menuBack,
-      '"Grouped photos" (on the line under the bar, and in Filters › Type, with its chip): only the groups, each as its best photo; off, or "All", the photos alone again', JSON.stringify({ label: st.onlyLabel, onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, back: st.onlyBack, chip: st.onlyChip, fromMenu: st.fromMenu, menuChecked: st.menuChecked, menuBack: st.menuBack }));
+    check(st.label === 'All|Grouped|Only groups' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the group$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /groups? of similar photos · \d+ of \d+ photos are in a group/.test(st.status || ''),
+      'All · Grouped · Only groups, beside "Similar photos": Grouped shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
+    check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && st.onlyChip && st.onlyBack && st.noOldSwitch && st.noMenuItem,
+      'Only groups (the third position): only the groups, each as its best photo, with a chip whose × goes back to Grouped; no other switch or filter for it', JSON.stringify({ onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, chip: st.onlyChip, back: st.onlyBack, noOldSwitch: st.noOldSwitch, noMenuItem: st.noMenuItem }));
     check(st.rawOnStack === `RAW${st.rawCount}` && st.twinBoth === 0 && st.twinsBefore > 0,
       'Photos grouped: a group holding raw files says RAW and how many; a raw file alone with its JPEG stays behind it (one photo)', JSON.stringify({ rawOnStack: st.rawOnStack, rawCount: st.rawCount, twinBoth: st.twinBoth, twinsBefore: st.twinsBefore }));
     check(/^Almost the same\|Alike:\d+$/.test(st.slider || '') && st.lineSlider && st.removeTitle === 'Remove photo from the group' && st.vwRemove === 'Remove photo from the group' && st.vwRemoved && /^Make single\|Choose as the best/.test(st.vwMenu || ''),

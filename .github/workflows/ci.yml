@@ -156,7 +156,13 @@ jobs:
         timeout-minutes: 12
         run: |
           python3 -m pip install --quiet --break-system-packages pillow
-          command -v ffmpeg >/dev/null || { sudo DEBIAN_FRONTEND=noninteractive timeout 240 apt-get install -y -qq --no-install-recommends ffmpeg </dev/null >/dev/null; }
+          # ffmpeg for the videos of the collection: from apt (4 minutes at most — apt can hang on a busy runner),
+          # else the static build of the ffmpeg-static package
+          if ! command -v ffmpeg >/dev/null; then
+            sudo DEBIAN_FRONTEND=noninteractive timeout 240 apt-get install -y -qq --no-install-recommends ffmpeg </dev/null >/dev/null \
+              || { echo "apt-get did not install ffmpeg in time: using ffmpeg-static"; npm install --no-save --no-audit --no-fund ffmpeg-static@5.2.0 >/dev/null && sudo ln -sf "$(node -p "require('ffmpeg-static')")" /usr/local/bin/ffmpeg; }
+          fi
+          ffmpeg -version | head -1
           python3 tools/make-fixtures.py "$RUNNER_TEMP/e2e/Fotos"
           LIONPHOTOS_FOLDER="$RUNNER_TEMP/e2e/Fotos" xvfb-run -a npx electron tools/e2e.js
       - name: Release assets are reproducible

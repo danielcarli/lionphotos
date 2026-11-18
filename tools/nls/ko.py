@@ -563,3 +563,7 @@ _merge(MESSAGES, {'similar': {'sens': {'label': '묶기 위해 필요한 비슷�
 _merge(MESSAGES, {'similar': {'makeSingle': '단독으로 만들기'}})
 
 _merge(MESSAGES, {'labels': {'type': {'person': {'find': '인물 찾기 또는 추가'}, 'pet': {'find': '반려동물 찾기 또는 추가'}, 'place': {'find': '장소 찾기 또는 추가'}, 'album': {'find': '앨범 찾기 또는 추가'}}, 'findOrNew': 'Enter: "{name}" 만들기', 'findNone': '"{name}" 없음 — Enter로 만들기'}})
+
+_merge(MESSAGES, {'similar': {'why': {'content': '내용', 'contentUnread': '아직 내용 모델이 읽지 않음', 'contentAlike': '보여 주는 내용이 {pct} 비슷함(내용 모델)'}}})
+
+_merge(MESSAGES, {'similar': {'mode': {'label': '비슷한 사진 표시 방법', 'all': '모두', 'stacks': '묶음', 'groups': '그룹만', 'allTitle': '모든 사진을 한 장씩', 'stacksTitle': '비슷한 사진 그룹을 가장 좋은 사진 한 장으로, 묶음과 장수와 함께', 'groupsTitle': '비슷한 사진 그룹만(혼자인 사진은 빠짐)', 'groupsOff': '혼자인 사진도 보기'}}})

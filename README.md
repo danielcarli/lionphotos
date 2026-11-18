@@ -28,7 +28,7 @@ Browse, search and organize huge collections of photos and videos right where th
 
 **No import** · **Nothing leaves your computer** · **100,000 photos scroll like 100** · **Free and open source**
 
-![Version 1.64.1](https://img.shields.io/badge/version-1.64.1-161214)
+![Version 1.65.0](https://img.shields.io/badge/version-1.65.0-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -38,6 +38,10 @@ Browse, search and organize huge collections of photos and videos right where th
 </div>
 
 > **Beta test.** LionPhotos is complete for daily use and is tested on a real collection of about 15,000 photos and videos, but it is still in beta: expect rough edges, and keep a backup of your collection before you reorganize it for the first time. [What beta means here](#beta-test).
+
+**Impressive coverage.** LionPhotos already brings together the essentials of Lightroom's Library module (catalog, marks, IPTC, RAW+JPEG, non-destructive adjustments) and the best of Google Photos (people, pets, search by content, stacks of similar photos). And there is more: the Limbo, plugins with their own brand, and 10 languages.
+
+**Made from real use.** Many features were born from the real problems of people who take photos: a slow Google Drive, RAW+JPEG pairs, comparing metadata before throwing a photo away. That tends to make software that is useful, not just good-looking.
 
 ## See it in action
 
@@ -329,7 +333,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.64.1**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.65.0**.
 
 ## Credits
 

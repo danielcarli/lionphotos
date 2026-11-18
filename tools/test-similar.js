@@ -91,6 +91,23 @@ check(groupSimilar(units, 'same').length >= 2 && groupSimilar(units, 'scene').le
   void SimilarService;
 }
 
+// what the pictures show (the content model): it can make two shots alike, never less alike than their pixels
+{
+  const { contentSimilarity, clipVector } = await import('../src/workbench/contrib/similar/similarFinder.js');
+  const r = rand(77);
+  const base = Array.from({ length: 512 }, () => Math.round((r() - 0.5) * 120));
+  const near = base.map((x, i) => (i % 7 ? x : -x));       // a little other
+  const other = Array.from({ length: 512 }, () => Math.round((r() - 0.5) * 120));
+  const bytes = (v) => new Uint8Array(Int8Array.from(v).buffer);
+  const withClip = (f, v) => { const g = { ...f }; Object.defineProperty(g, 'clip', { value: clipVector(bytes(v)), enumerable: false }); return g; };
+  const [u1, u2] = [units[0], units.find((u) => similarity(units[0].f, u.f) < 0.5)];
+  const pixels = similarity(u1.f, u2.f);
+  const same = similarity(withClip(u1.f, base), withClip(u2.f, near));
+  const diff = similarity(withClip(u1.f, base), withClip(u2.f, other));
+  check(contentSimilarity(withClip(u1.f, base), withClip(u2.f, base)) > 0.999 && same > pixels && Math.abs(diff - pixels) < 1e-9 && contentSimilarity(u1.f, u2.f) === null,
+    'the content model raises how alike two shots showing the same things are; other things, or not read: their pixels decide', JSON.stringify({ pixels, same, diff }));
+}
+
 // twins
 const library = new LibraryService({ library: { onProgress: () => {} } });
 const it = (id, path, taken = 0, kind = 1) => {

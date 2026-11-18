@@ -2,6 +2,20 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.65.0] — 2026-11-17
+
+### Added
+- **Grouping similar photos uses what the photos show.** The content model (TinyCLIP) that reads what each photo shows, for the search, now helps the grouping too: two shots of the same moment show the same things even when the person turned or the camera moved, so they are grouped where their pixels alone would keep them apart. It can only make two photos alike, never less alike than their pixels say; photos not read by it yet are compared by their pixels, as before. "Why are these (not) grouped?" says how alike they are in what they show.
+- **One control of three positions for the similar photos in Photos: All · Grouped · Only groups**, in place of the switch "Group similar photos", the switch "Only the grouped photos" of the line under the bar and "Grouped photos" in Filters › Type. *Only groups* shows its chip with the filters, whose × goes back to *Grouped*.
+
+### Fixed
+- The tests of the build (CI) could fail before they started: installing ffmpeg with apt could hang on a busy runner until its 4 minutes ran out. It now falls back to the static build of the ffmpeg-static package.
+
+## [1.64.2] — 2026-11-17
+
+### Changed
+- README, in the 10 languages: two paragraphs under the beta note — *Impressive coverage* (the essentials of Lightroom's Library module and the best of Google Photos in one app, plus the Limbo, plugins with their own brand and 10 languages) and *Made from real use* (features born from real problems: a slow Google Drive, RAW+JPEG, comparing metadata before throwing a photo away).
+
 ## [1.64.1] — 2026-11-17
 
 ### Fixed

@@ -563,3 +563,7 @@ _merge(MESSAGES, {'similar': {'sens': {'label': 'まとめるために必要な�
 _merge(MESSAGES, {'similar': {'makeSingle': '単独にする'}})
 
 _merge(MESSAGES, {'labels': {'type': {'person': {'find': '人物を検索または追加'}, 'pet': {'find': 'ペットを検索または追加'}, 'place': {'find': '場所を検索または追加'}, 'album': {'find': 'アルバムを検索または追加'}}, 'findOrNew': 'Enter：「{name}」を作成', 'findNone': '「{name}」は見つかりません — Enter で作成'}})
+
+_merge(MESSAGES, {'similar': {'why': {'content': '内容', 'contentUnread': '内容モデルでまだ読み込まれていません', 'contentAlike': '写っている内容が {pct} 類似（内容モデル）'}}})
+
+_merge(MESSAGES, {'similar': {'mode': {'label': '似た写真の表示方法', 'all': 'すべて', 'stacks': 'まとめる', 'groups': 'グループのみ', 'allTitle': 'すべての写真を 1 枚ずつ', 'stacksTitle': '似た写真のグループを 1 枚（ベスト）で表示し、スタックと枚数を示します', 'groupsTitle': '似た写真のグループだけ（単独の写真は表示しません）', 'groupsOff': '単独の写真も表示'}}})

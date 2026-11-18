@@ -91,6 +91,7 @@ class LibraryMainService {
         || new Map();
       return rows.map((r) => ({ ...r, source: where.get(r.path) || null }));
     });
+    ipc.handle('library:contentVectors', (_e, mediaIds) => this.db.contentVectors(Array.isArray(mediaIds) ? mediaIds.map(Number).filter(Number.isInteger) : []));
     ipc.handle('library:similarFeatures', (_e, mediaIds) => this.db.similarFeatures(Array.isArray(mediaIds) ? mediaIds.map(Number).filter(Number.isInteger) : []));
     ipc.handle('library:saveSimilarFeatures', (_e, rows) => this.db.saveSimilarFeatures(Array.isArray(rows) ? rows.map((r) => ({ id: Number(r?.id), data: r?.data })) : []));
     ipc.handle('library:similarChoices', () => (this.rootId ? this.db.similarChoices(this.rootId) : { apart: [], best: [] }));

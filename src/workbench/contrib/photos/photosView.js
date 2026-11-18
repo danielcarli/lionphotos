@@ -207,7 +207,7 @@ export class PhotosView extends ViewPane {
       // "all the photos of the day", asked from a photo's panel
       f.day && !this.limbo ? chip('calendar', formatDate(new Date(`${f.day}T12:00:00`).getTime()), t('photos.clearDay'), () => library.setFilter({ day: '' })) : null,
       // only the groups of similar photos: a filter as the others, with its ×
-      !this.limbo && this.services.similar?.active && this.services.similar.onlyGrouped ? chip('stack', t('photos.kind.grouped'), t('photos.clearFilters'), () => this.services.similar.setOnlyGrouped(false)) : null,
+      !this.limbo && this.services.similar?.active && this.services.similar.onlyGrouped ? chip('stack', t('similar.mode.groups'), t('similar.mode.groupsOff'), () => this.services.similar.setMode('stacks')) : null,
       f.kind !== 'all' ? chip(f.kind === 'video' ? 'film' : 'image', f.kind === 'video' ? t('photos.kind.videos') : t('photos.kind.images'), t('photos.clearFilters'), () => library.setFilter({ kind: 'all' })) : null,
       f.mark && !this.limbo ? chip(f.mark === 'great' || f.mark === 'picks' ? 'star' : f.mark === 'ok' ? 'okCircle' : null, t(`marks.${f.mark}`), t('marks.all'), () => library.setFilter({ mark: '' })) : null,
       f.category && !this.limbo ? chip(null, t(`category.${f.category}`), t('photos.clearFilters'), () => library.setFilter({ category: '' }), h('span.swatch', { style: { background: categoryColor(f.category) } })) : null,
@@ -402,18 +402,12 @@ export class PhotosView extends ViewPane {
     const counts = library.markCounts();
     const sim = this.services.similar;
     const grouped = !this.limbo && !!sim?.active && sim.onlyGrouped;
-    // a type picked: "Grouped photos" off
-    const pick = (patch) => () => { if ('kind' in patch && grouped) sim.setOnlyGrouped(false); library.setFilter(patch); };
+    // clearing the filters also leaves "Only the groups" (its chip is with the filters)
+    const pick = (patch) => () => { if (patch.recursive && grouped) sim.setMode('stacks'); library.setFilter(patch); };
     const items = [
       { label: t('list.type'), disabled: true },
       ...[['all', t('photos.kind.all'), 'grid'], ['image', t('photos.kind.images'), 'image'], ['video', t('photos.kind.videos'), 'film']]
-        .map(([k, label, ic]) => ({ label, icon: ic, checked: !grouped && f.kind === k, run: pick({ kind: k }) })),
-      // only the groups of similar photos, each as its best photo ("Group similar photos" turned on with it)
-      !this.limbo && sim ? { label: t('photos.kind.grouped'), icon: 'stack', title: t('similar.onlyTitle'), checked: grouped, run: () => {
-        if (f.kind !== 'all') library.setFilter({ kind: 'all' });
-        if (!sim.active) sim.setActive(true);
-        sim.setOnlyGrouped(true);
-      } } : null,
+        .map(([k, label, ic]) => ({ label, icon: ic, checked: f.kind === k, run: pick({ kind: k }) })),
       '-',
     ].filter(Boolean);
     if (!this.limbo && years.length > 1) {
@@ -1338,14 +1332,20 @@ export class PhotosView extends ViewPane {
   }
 
   /** Next (or previous) photo, keeping the panel as it is — to describe a series one after the other. */
-  /** The switch "Group similar photos". */
+  /**
+   * How Photos shows the similar photos, one control of three positions: every photo · each group as its best
+   * photo, with a stack · only the groups.
+   */
   #stackSwitch() {
     const sim = this.services.similar;
     if (!sim) return null;
-    const on = sim.active;
-    return h(on ? 'label.tb-switch.stack-switch.on' : 'label.tb-switch.stack-switch', { title: t('similar.stackTitle') },
-      h('input', { type: 'checkbox', role: 'switch', checked: on, 'aria-checked': String(on), onchange: (e) => { sim.setActive(e.target.checked); this.#paintStackStatus(); } }),
-      h('span.tb-switch-track', { 'aria-hidden': 'true' }), h('span.tb-switch-text', t('similar.stack')));
+    const mode = sim.mode;
+    return h('div.segmented.stack-mode', { role: 'radiogroup', 'aria-label': t('similar.mode.label'), title: t('similar.stackTitle') },
+      h('span.stack-mode-icon', { html: icon('stack', 14), 'aria-hidden': 'true' }),
+      ['all', 'stacks', 'groups'].map((m) => h('button', {
+        type: 'button', class: `seg${m === mode ? ' active' : ''}`, role: 'radio', 'aria-checked': String(m === mode), title: t(`similar.mode.${m}Title`),
+        onclick: () => { if (m !== sim.mode) { sim.setMode(m); this.#paintStackStatus(); } },
+      }, t(`similar.mode.${m}`))));
   }
 
   /**
@@ -1376,13 +1376,8 @@ export class PhotosView extends ViewPane {
     }
     // how alike photos must be to be grouped (the same three levels as the window of similar photos)
     const levels = h('div.stack-levels', sensitivitySlider(sim, () => this.#paintStackStatus()));
-    // only the groups: a switch at the end of the line (the photos alone out of the way)
-    const only = sim.onlyGrouped;
-    const onlySwitch = h(only ? 'label.tb-switch.stack-only.on' : 'label.tb-switch.stack-only', { title: t('similar.onlyTitle') },
-      h('input', { type: 'checkbox', role: 'switch', checked: only, 'aria-checked': String(only), onchange: (e) => sim.setOnlyGrouped(e.target.checked) }),
-      h('span.tb-switch-track', { 'aria-hidden': 'true' }), h('span.tb-switch-text', t('similar.only')));
     el.hidden = false;
-    el.replaceChildren(h('div.stack-lines', lines), levels, onlySwitch);
+    el.replaceChildren(h('div.stack-lines', lines), levels);
   }
 
   /** A group of similar photos (Photos grouped): it opens on its own, to choose what stays. */

@@ -67,6 +67,7 @@ contextBridge.exposeInMainWorld('host', {
     hideRoot: (rootPath, hidden) => ipcRenderer.invoke('library:hideRoot', rootPath, hidden),
     similarChoices: () => ipcRenderer.invoke('library:similarChoices'),
     similarFeatures: (ids) => ipcRenderer.invoke('library:similarFeatures', ids),
+    contentVectors: (ids) => ipcRenderer.invoke('library:contentVectors', ids),
     saveSimilarFeatures: (rows) => ipcRenderer.invoke('library:saveSimilarFeatures', rows),
     similarApart: (pairs, apart) => ipcRenderer.invoke('library:similarApart', pairs, apart),
     similarBest: (id, group) => ipcRenderer.invoke('library:similarBest', id, group),

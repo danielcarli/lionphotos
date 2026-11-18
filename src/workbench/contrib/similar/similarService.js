@@ -16,7 +16,7 @@ import { Emitter } from '../../../base/common/event.js';
 import { Eta } from '../../../base/common/eta.js';
 import { dateOf, adjustOf, KIND, MARK } from '../../services/library/browser/libraryService.js';
 import { isRawExt } from '../../services/library/common/mediaCategories.js';
-import { featuresOf, groupSimilar, bestOf, similarity, paramsOf, PRESETS, SENSITIVITY_DEFAULT } from './similarFinder.js';
+import { featuresOf, groupSimilar, bestOf, similarity, contentSimilarity, clipVector, paramsOf, PRESETS, SENSITIVITY_DEFAULT } from './similarFinder.js';
 
 const STACK_KEY = 'lionphotos.photos.stacks';
 const ONLY_KEY = 'lionphotos.photos.stacksOnly';
@@ -137,6 +137,7 @@ export class SimilarService {
   onDidChange = this.#onDidChange.event;
   #features = new Map(); // `${id}:${mtime}` → features (null: could not be read)
   #asked = new Set();    // ids asked from the catalog already
+  #clipAsked = new Set(); // shots whose content-model numbers were asked from the catalog
   #who = { face: new Map(), pet: new Map() }; // media id → { scanned, faces }
   #whoAsked = { face: new Set(), pet: new Set() };
   #lookedFor = new Set(); // media ids asked to be looked at (once a session)
@@ -170,6 +171,7 @@ export class SimilarService {
   #reset() {
     this.#root = this.library.root;
     this.#asked.clear();
+    this.#clipAsked.clear();
     this.#lookedFor.clear();
     for (const k of ['face', 'pet']) { this.#who[k].clear(); this.#whoAsked[k].clear(); }
     this.choices = { apart: new Set(), best: new Set() };
@@ -227,6 +229,18 @@ export class SimilarService {
     if (!on) { this.#stackOf.clear(); this.#pairOf.clear(); this.library.refreshView(); this.#onDidChange.fire(); return; }
     this.loadChoices().then(() => this.#regroup());
   }
+  /**
+   * How Photos shows its photos: 'all' (every photo), 'stacks' (each group as its best photo, with a stack) or
+   * 'groups' (only the groups). One control of three positions in the bar of Photos.
+   */
+  get mode() { return !this.active ? 'all' : this.onlyGrouped ? 'groups' : 'stacks'; }
+  setMode(m) {
+    if (m === 'all') { if (this.active) this.setActive(false); return; }
+    savePref(ONLY_KEY, m === 'groups' ? '1' : '0');
+    if (!this.active) this.setActive(true);
+    else this.#regroup();
+  }
+
   /** Only the groups (each as its best photo), the photos alone left out. */
   get onlyGrouped() { return readPref(ONLY_KEY, '0') === '1'; }
   setOnlyGrouped(on) { savePref(ONLY_KEY, on ? '1' : '0'); this.#regroup(); }
@@ -294,6 +308,34 @@ export class SimilarService {
     };
     await Promise.all(Array.from({ length: WORKERS }, worker));
     flush();
+    if (!isCancelled()) await this.readContent(shots);
+  }
+
+  /**
+   * What the content model (TinyCLIP) saw in these shots, from the catalog — read when "what the photos show"
+   * was analysed (Places › scenes): joined to their features, so the grouping compares what the pictures show
+   * too. Shots not read by it are compared by their pixels only. @returns {Promise<boolean>} some were found
+   */
+  async readContent(shots) {
+    if (!this.api.contentVectors) return false;
+    const want = shots.filter((s) => s.f && !s.f.clip && !this.#clipAsked.has(`${s.rep.id}:${s.rep.mtime}`));
+    if (!want.length) return false;
+    let found = false;
+    for (let i = 0; i < want.length; i += 2000) {
+      const part = want.slice(i, i + 2000);
+      part.forEach((s) => this.#clipAsked.add(`${s.rep.id}:${s.rep.mtime}`));
+      // the photo shown, else its raw twin (the content model may have read either)
+      const ids = [...new Set(part.flatMap((s) => s.files.map((f) => f.id)))];
+      const rows = await this.api.contentVectors(ids).catch(() => []) || [];
+      const byId = new Map(rows.map((r) => [r.id, r.vec]));
+      for (const s of part) {
+        const vec = byId.get(s.rep.id) || s.files.map((f) => byId.get(f.id)).find(Boolean);
+        if (!vec?.length) continue;
+        Object.defineProperty(s.f, 'clip', { value: clipVector(vec), enumerable: false, configurable: true });
+        found = true;
+      }
+    }
+    return found;
   }
 
   // what a decoded thumbnail looks like: worked out in a worker (the window's thread stays free); here when
@@ -387,6 +429,7 @@ export class SimilarService {
     for (let i = 1; i < shots.length; i++) {
       const a = shots[i - 1], b = shots[i];
       const sim = a.f && b.f ? similarity(a.f, b.f) : null;
+      const shows = a.f && b.f ? contentSimilarity(a.f, b.f) : null;
       const dt = Math.abs(b.t - a.t);
       const said = a.files.some((f) => b.files.some((g) => this.choices.apart.has(pairKey(f.id, g.id))));
       const face = sameWho(this.whoOf(a, 'face'), this.whoOf(b, 'face'), 'face');
@@ -401,7 +444,7 @@ export class SimilarService {
       // Photos grouped: as it is there; else as the sensitivity used would do it
       const ga = this.groupOf(a.rep.id), gb = this.groupOf(b.rep.id);
       const together = this.active ? !!ga && ga === gb : now.ok;
-      rows.push({ a, b, sim, dt, said, face, pet, seen, now, from, together });
+      rows.push({ a, b, sim, shows, dt, said, face, pet, seen, now, from, together });
     }
     return { rows, level: this.level, reading: !!this.progress };
   }
@@ -432,6 +475,8 @@ export class SimilarService {
     for (const s of shots) s.f = this.known(s) ?? null;
     const missing = shots.filter((s) => this.known(s) === undefined);
     if (missing.length) this.#readForPhotos(missing);
+    // what the content model saw, for photos read in an earlier session: asked once, then grouped again
+    else if (shots.some((s) => s.f && !s.f.clip && !this.#clipAsked.has(`${s.rep.id}:${s.rep.mtime}`))) this.readContent(shots).then((found) => { if (found) this.#maybeRegroup(); });
     const groups = this.groups(shots);
     this.#lastList = list;
     this.#sig = signature(groups);

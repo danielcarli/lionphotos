@@ -566,3 +566,7 @@ _merge(MESSAGES, {'similar': {'sens': {'label': 'How alike photos must be to be 
 _merge(MESSAGES, {'similar': {'makeSingle': 'Make single'}})
 
 _merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Find or add a person'}, 'pet': {'find': 'Find or add a pet'}, 'place': {'find': 'Find or add a place'}, 'album': {'find': 'Find or add an album'}}, 'findOrNew': 'Enter: a new one named “{name}”', 'findNone': 'None with “{name}” — Enter makes it'}})
+
+_merge(MESSAGES, {'similar': {'why': {'content': 'Content', 'contentUnread': 'not read by the content model yet', 'contentAlike': '{pct} alike in what they show (content model)'}}})
+
+_merge(MESSAGES, {'similar': {'mode': {'label': 'How similar photos are shown', 'all': 'All', 'stacks': 'Grouped', 'groups': 'Only groups', 'allTitle': 'Every photo, one by one', 'stacksTitle': 'Each group of similar photos as one photo — its best — with a stack and how many it holds', 'groupsTitle': 'Only the groups of similar photos (the photos alone left out)', 'groupsOff': 'Show the photos alone too'}}})

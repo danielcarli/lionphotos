@@ -2,6 +2,17 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.78.1] — 2026-11-18
+
+### Changed
+- The probable total of unique photos reads as its neighbours, the number first: "1,641 stacks · 2,892 single photos · **4,533 unique photos (probable total)**", in the status bar and beside the title of Photos, in the 10 languages.
+- The end-to-end test waits a moment more for an adjustment and a curve to be kept by the catalog on a busy machine (they could fail now and then).
+
+## [1.78.0] — 2026-11-18
+
+### Added
+- *Stack photos* on: after the stacks and the single photos, their sum — **Probable total of unique photos** — each stack counted as one photo, as each photo alone (a RAW + JPEG is one photo). The same words and numbers in the status bar (bottom left) and beside the title of Photos; the tip says how it is counted.
+
 ## [1.77.1] — 2026-11-18
 
 ### Fixed

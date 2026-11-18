@@ -39,6 +39,7 @@ import { LABEL_ICON } from '../../services/labels/browser/labelsService.js';
 import { applyMark } from '../limbo/sendToLimbo.js';
 import { showSimilar } from '../similar/similarView.js';
 import { showWhyGrouped } from '../similar/similarExplain.js';
+import { stackCounts } from '../similar/similarService.js';
 import { sensitivitySlider } from '../similar/sensitivitySlider.js';
 import { etaText } from '../../browser/parts/statusbarPart.js';
 import { sharpenCover } from '../albums/albumCovers.js';
@@ -196,16 +197,9 @@ export class PhotosView extends ViewPane {
     const f = library.filter;
     const totals = library.totals(library.viewAll(this.scope));
     let count = `${tn('common.items', totals.images + totals.videos)} · ${formatBytes(totals.bytes)}`;
-    // "Stack photos" on: how many stacks, and how many photos alone (a RAW + JPEG counts as one photo)
-    const sim = this.services.similar;
-    if (!this.limbo && sim?.active) {
-      let stacks = 0, singles = 0;
-      for (const it of library.view(this.scope)) {
-        if (it.kind !== KIND.image) continue;
-        if (sim.stackOf(it.id)) stacks++; else singles++;
-      }
-      count += ` · ${tn('photos.stacksCount', stacks)} · ${tn('photos.singlesCount', singles)}`;
-    }
+    // "Stack photos" on: the stacks, the photos alone and their sum (the likely number of different pictures),
+    // the same as in the status bar
+    if (!this.limbo) { library.view(this.scope); const c = stackCounts(this.services.similar); if (c) count += ` · ${c.text}`; }
     // the filters in use, each with its own ×: the year (× = every year again), the type, the mark, the
     // category of the Overview and "this folder only"
     const chip = (ic, text, clearTitle, clear, extra) => h('span.chip.filter-chip', ic ? h('span', { html: icon(ic, 12) }) : extra || null, text,

@@ -924,6 +924,8 @@ app.whenReady().then(async () => {
       range.value = '50'; range.dispatchEvent(new Event('input')); await wait(300);
       const live = !!document.querySelector('.info-thumb canvas.ip-live');
       range.dispatchEvent(new Event('change')); await wait(600);
+      // kept by the catalog's thread: a moment more on a busy machine
+      for (let i = 0; i < 30 && !lib.byId.get(it.id).aj; i++) await wait(100);
       const aj = lib.byId.get(it.id).aj;
       const badge = !!document.querySelector('.view-photos [data-id="' + it.id + '"] .tile-edited, .view-photos [data-id="' + it.id + '"] .row-edited'), edited = !!document.querySelector('.info-panel .ip-edited');
       const summary = document.querySelector('.ip-sec[data-sec="adjust"] .ip-sum')?.textContent || '';
@@ -971,6 +973,8 @@ app.whenReady().then(async () => {
       ev('pointerdown', 0.5, 0.5); await wait(50);
       ev('pointermove', 0.5, 0.3); await wait(50);
       ev('pointerup', 0.5, 0.3); await wait(800);
+      for (let i = 0; i < 30 && !lib.byId.get(it.id).aj; i++) await wait(100); // a busy machine
+      await wait(200);
       const aj = JSON.parse(lib.byId.get(it.id).aj || '{}');
       res.curves = aj.curves;
       res.groupChanged = !!document.querySelector('.ip-adj-group[data-group="curves"] .ip-adj-dot');
@@ -2141,10 +2145,12 @@ app.whenReady().then(async () => {
       // how many items, and how many stacks and single photos
       { const v = lib.view('main').filter((x) => x.kind === 1); const nS = v.filter((x) => s.similar.stackOf(x.id)).length;
         res.meta = document.querySelector('.view-photos .crumb-meta')?.textContent || '';
-        res.metaOk = /^[0-9,]+ items · .+ · [1-9][0-9,]* stacks? · [0-9,]+ single photos?$/.test(res.meta) && nS > 0; }
+        res.metaOk = /^[0-9,]+ items · .+ · [1-9][0-9,]* stacks? · [0-9,]+ single photos? · [0-9,]+ unique photos? \\(probable total\\)$/.test(res.meta) && nS > 0; }
       await wait(200);
       res.bar = document.querySelector('.statusbar .status-left')?.textContent || '';
-      res.barOk = /[0-9,]+ photos · [0-9,]+ videos? · .+[1-9][0-9,]* stacks? · [0-9,]+ single photos?/.test(res.bar);
+      { const m = res.bar.match(/([0-9,]+) stacks? · ([0-9,]+) single photos? · ([0-9,]+) unique photos? \\(probable total\\)/);
+        const n = (x) => Number(String(x).replace(/,/g, ''));
+        res.barOk = /[0-9,]+ photos · [0-9,]+ videos? · /.test(res.bar) && !!m && n(m[1]) > 0 && n(m[3]) === n(m[1]) + n(m[2]); }
       await wait(300);
       res.status = document.querySelector('.view-photos .stack-status:not([hidden])')?.textContent;
       res.lineSlider = !!document.querySelector('.view-photos .stack-status .sens-range');
@@ -2273,7 +2279,7 @@ app.whenReady().then(async () => {
       res.barOff = !/stack/.test(document.querySelector('.statusbar .status-left')?.textContent || '');
       res.off = !document.querySelector('.view-photos .tile-stack') && lib.view('main').length === allBefore;
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(st.metaOk && st.metaOff && st.barOk && st.barOff, 'Stack photos on: beside how many items (in the bar of Photos and in the status bar, bottom left), how many stacks and single photos; off, only the items', JSON.stringify({ meta: st.meta, ok: st.metaOk, off: st.metaOff, bar: st.bar, barOk: st.barOk, barOff: st.barOff }));
+    check(st.metaOk && st.metaOff && st.barOk && st.barOff, 'Stack photos on: beside how many items (in the bar of Photos and in the status bar, bottom left), how many stacks and single photos, and their sum as the probable total of unique photos; off, only the items', JSON.stringify({ meta: st.meta, ok: st.metaOk, off: st.metaOff, bar: st.bar, barOk: st.barOk, barOff: st.barOff }));
     check(st.label === 'Stack photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the stack$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /stacks? of similar photos · \d+ of \d+ photos are in a stack/.test(st.status || ''),
       'the switch "Stack photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && !st.onlyChip && st.onlyMarked && st.onlyBack && st.noOldSwitch && st.noMenuItem,

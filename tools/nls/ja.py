@@ -587,3 +587,7 @@ _merge(MESSAGES, {'similar': {'setCover': 'カバーにする', 'setCoverTitle':
 _merge(MESSAGES, {'similar': {'setBest': 'ベストに設定', 'setCover': 'ベストに設定', 'setCoverTitle': 'このファイルを「写真」に表示する写真にします（RAW + JPEG のベスト）', 'coverTitle': 'ベスト: 「写真」に表示されるファイル'}})
 
 _merge(MESSAGES, {'photos': {'stacksCount': {'one': 'スタック {count} 個', 'other': 'スタック {count} 個'}, 'singlesCount': {'one': '単独の写真 {count} 枚', 'other': '単独の写真 {count} 枚'}}})
+
+_merge(MESSAGES, {'photos': {'uniqueTotal': 'ユニークな写真の推定合計: {count}', 'uniqueTotalTitle': '似た写真のスタックはそれぞれ1枚、単独の写真も1枚として数えます（RAW + JPEG は1枚）'}})
+
+_merge(MESSAGES, {'photos': {'uniqueCount': {'one': 'ユニークな写真 {count} 枚（推定合計）', 'other': 'ユニークな写真 {count} 枚（推定合計）'}}})

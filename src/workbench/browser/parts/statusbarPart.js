@@ -14,6 +14,7 @@ import { Eta, roundEta } from '../../../base/common/eta.js';
 import { t, tn, getLocales, getLocalePreference, setLocalePreference } from '../../../base/common/nls.js';
 import { showContextMenu } from '../contextMenu.js';
 import { showUpdateDialog } from '../../contrib/update/updateDialog.js';
+import { stackCounts } from '../../contrib/similar/similarService.js';
 
 /** "about 38 minutes left", "about 3 h 20 min left", "calculating the time…" (pace not known yet). */
 export function etaText(ms) {
@@ -65,9 +66,10 @@ export class StatusbarPart {
     } else if (library.hasData) {
       const tot = library.totals();
       left.push(item('image', `${tn('common.photos', tot.images)} · ${tn('common.videos', tot.videos)} · ${formatBytes(tot.bytes)}`));
-      // "Stack photos" on: the stacks and the photos alone in Photos (a RAW + JPEG is one photo)
-      const sum = this.similar?.active ? this.similar.summary : null;
-      if (sum?.photos) left.push(item('stack', `${tn('photos.stacksCount', sum.groups)} · ${tn('photos.singlesCount', Math.max(0, sum.photos - sum.grouped))}`));
+      // "Stack photos" on: the stacks, the photos alone in Photos (a RAW + JPEG is one photo) and their sum — the
+      // probable total of unique photos — as in the bar of Photos
+      const c = stackCounts(this.similar);
+      if (c) left.push(item('stack', c.text, { title: c.title }));
     } else {
       left.push(item(null, t('statusbar.ready')));
     }

@@ -590,3 +590,7 @@ _merge(MESSAGES, {'similar': {'setCover': 'Usar como capa', 'setCoverTitle': 'Mo
 _merge(MESSAGES, {'similar': {'setBest': 'Definir como a melhor', 'setCover': 'Definir como a melhor', 'setCoverTitle': 'Mostrar este ficheiro como a fotografia em Fotos (a melhor do RAW + JPEG)', 'coverTitle': 'A melhor: o ficheiro mostrado em Fotos'}})
 
 _merge(MESSAGES, {'photos': {'stacksCount': {'one': '{count} pilha', 'other': '{count} pilhas'}, 'singlesCount': {'one': '{count} fotografia individual', 'other': '{count} fotografias individuais'}}})
+
+_merge(MESSAGES, {'photos': {'uniqueTotal': 'Total provável de fotografias únicas: {count}', 'uniqueTotalTitle': 'Cada pilha de fotografias parecidas conta como uma fotografia, tal como cada fotografia individual (um RAW + JPEG é uma fotografia)'}})
+
+_merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} fotografia única (total provável)', 'other': '{count} fotografias únicas (total provável)'}}})

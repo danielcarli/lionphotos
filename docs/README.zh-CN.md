@@ -28,7 +28,7 @@
 
 **无需导入** · **数据不出本机** · **10 万张照片如 100 张般流畅** · **免费开源**
 
-![版本 1.77.1](https://img.shields.io/badge/version-1.77.1-161214)
+![版本 1.78.1](https://img.shields.io/badge/version-1.78.1-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -336,7 +336,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.77.1**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.78.1**。
 
 ## 致谢
 

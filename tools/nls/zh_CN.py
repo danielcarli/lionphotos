@@ -587,3 +587,7 @@ _merge(MESSAGES, {'similar': {'setCover': '设为封面', 'setCoverTitle': '将�
 _merge(MESSAGES, {'similar': {'setBest': '设为最佳', 'setCover': '设为最佳', 'setCoverTitle': '将此文件作为“照片”中显示的照片（RAW + JPEG 的最佳）', 'coverTitle': '最佳：在“照片”中显示的文件'}})
 
 _merge(MESSAGES, {'photos': {'stacksCount': {'one': '{count} 个堆叠', 'other': '{count} 个堆叠'}, 'singlesCount': {'one': '{count} 张单独照片', 'other': '{count} 张单独照片'}}})
+
+_merge(MESSAGES, {'photos': {'uniqueTotal': '唯一照片的估计总数：{count}', 'uniqueTotalTitle': '每个相似照片堆叠算作一张照片，每张单独照片也算一张（RAW + JPEG 算一张）'}})
+
+_merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} 张不重复照片（估计总数）', 'other': '{count} 张不重复照片（估计总数）'}}})

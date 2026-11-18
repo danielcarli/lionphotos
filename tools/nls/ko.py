@@ -587,3 +587,7 @@ _merge(MESSAGES, {'similar': {'setCover': '커버로 사용', 'setCoverTitle': '
 _merge(MESSAGES, {'similar': {'setBest': '최고로 지정', 'setCover': '최고로 지정', 'setCoverTitle': '이 파일을 사진에서 보이는 사진으로 사용(RAW + JPEG의 최고)', 'coverTitle': '최고: 사진에 보이는 파일'}})
 
 _merge(MESSAGES, {'photos': {'stacksCount': {'one': '스택 {count}개', 'other': '스택 {count}개'}, 'singlesCount': {'one': '단독 사진 {count}장', 'other': '단독 사진 {count}장'}}})
+
+_merge(MESSAGES, {'photos': {'uniqueTotal': '고유한 사진의 예상 합계: {count}', 'uniqueTotalTitle': '비슷한 사진 스택 하나를 한 장으로, 단독 사진도 한 장으로 셉니다(RAW + JPEG는 한 장)'}})
+
+_merge(MESSAGES, {'photos': {'uniqueCount': {'one': '고유 사진 {count}장(예상 합계)', 'other': '고유 사진 {count}장(예상 합계)'}}})

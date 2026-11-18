@@ -12,6 +12,7 @@
 //     alike the pictures — the faces already found are used, and the photos of a group not looked at yet are
 //     looked at first (they then show in People and Pets, as any other).
 // Everything is worked out on the computer, from what the app already has.
+import { t, tn } from '../../../base/common/nls.js';
 import { Emitter } from '../../../base/common/event.js';
 import { Eta } from '../../../base/common/eta.js';
 import { dateOf, adjustOf, KIND, MARK } from '../../services/library/browser/libraryService.js';
@@ -124,6 +125,19 @@ export function sameWho(a, b, kind) {
   const ua = new Set(), ub = new Set();
   for (const [, i, j] of pairs) if (!ua.has(i) && !ub.has(j)) { ua.add(i); ub.add(j); }
   return !(ua.size < A.length && ub.size < B.length);
+}
+
+/**
+ * "Stack photos" on: the stacks, the photos alone (a RAW + JPEG is one photo) and their sum — the likely number of
+ * different pictures — as said in the bar of Photos and in the status bar ('' when off).
+ */
+export function stackCounts(sim) {
+  const sum = sim?.active ? sim.summary : null;
+  if (!sum?.photos) return null;
+  const stacks = sum.groups, singles = Math.max(0, sum.photos - sum.grouped);
+  return { stacks, singles, unique: stacks + singles,
+    text: `${tn('photos.stacksCount', stacks)} · ${tn('photos.singlesCount', singles)} · ${tn('photos.uniqueCount', stacks + singles)}`,
+    title: t('photos.uniqueTotalTitle') };
 }
 
 export class SimilarService {

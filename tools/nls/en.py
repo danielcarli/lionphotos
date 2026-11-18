@@ -590,3 +590,7 @@ _merge(MESSAGES, {'similar': {'setCover': 'Use as cover', 'setCoverTitle': 'Show
 _merge(MESSAGES, {'similar': {'setBest': 'Set as the best', 'setCover': 'Set as the best', 'setCoverTitle': 'Show this file as the photo in Photos (the best of the RAW + JPEG)', 'coverTitle': 'The best: the file shown in Photos'}})
 
 _merge(MESSAGES, {'photos': {'stacksCount': {'one': '{count} stack', 'other': '{count} stacks'}, 'singlesCount': {'one': '{count} single photo', 'other': '{count} single photos'}}})
+
+_merge(MESSAGES, {'photos': {'uniqueTotal': 'Probable total of unique photos: {count}', 'uniqueTotalTitle': 'Each stack of similar photos counts as one photo, as each photo alone (a RAW + JPEG is one photo)'}})
+
+_merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} unique photo (probable total)', 'other': '{count} unique photos (probable total)'}}})

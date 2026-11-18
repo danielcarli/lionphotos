@@ -582,3 +582,9 @@ _merge(MESSAGES, {'similar': {'groupSwitch': 'Fotos stapeln', 'stackTitle': 'Zei
 _merge(MESSAGES, {'similar': {'keepBestTitle': 'Behält das vorgeschlagene Foto jeder Gruppe und schickt die anderen jetzt ins Limbo (in der Meldung rückgängig zu machen)'}})
 
 _merge(MESSAGES, {'photos': {'pairFiles': {'one': '{count} Datei desselben Fotos (als eines gezeigt):', 'other': '{count} Dateien desselben Fotos (als eines gezeigt):'}}})
+
+_merge(MESSAGES, {'similar': {'pairBadge': {'one': '{count} Datei desselben Fotos (RAW+JPG): nebeneinander', 'other': '{count} Dateien desselben Fotos (RAW+JPG): nebeneinander'}}})
+
+_merge(MESSAGES, {'similar': {'setCover': 'Als Titelbild verwenden', 'setCoverTitle': 'Diese Datei als das Foto in Fotos zeigen (das Titelbild von RAW + JPEG)', 'coverTitle': 'Das Titelbild: die in Fotos gezeigte Datei', 'pairBadge': {'one': '{count} Datei desselben Fotos (RAW+JPG): öffnen', 'other': '{count} Dateien desselben Fotos (RAW+JPG): öffnen'}}, 'viewer': {'pairLabel': {'one': '{count} Datei desselben Fotos', 'other': '{count} Dateien desselben Fotos'}}})
+
+_merge(MESSAGES, {'similar': {'setBest': 'Als bestes festlegen', 'setCover': 'Als bestes festlegen', 'setCoverTitle': 'Diese Datei als das Foto in Fotos zeigen (das beste von RAW + JPEG)', 'coverTitle': 'Das beste: die in Fotos gezeigte Datei'}})

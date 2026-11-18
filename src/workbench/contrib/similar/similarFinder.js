@@ -204,13 +204,23 @@ export function groupSimilar(units, level = SENSITIVITY_DEFAULT, apart = null) {
  * @param {(u: object) => boolean} [chosen] the shot the person chose as the best (it wins)
  * @returns {number} its index
  */
+/**
+ * How much a photo asks to be the cover of its stack (or the file shown for a RAW + JPEG): edited and starred 5,
+ * starred 4, edited and OK 3, edited 2, OK 1, nothing 0. @param {{ mark?:number, adjusted?:boolean }} u (mark: 1 ★, 2 OK)
+ */
+export function coverRank(u) {
+  const great = u.mark === 1, ok = u.mark === 2, edited = !!u.adjusted;
+  return great && edited ? 5 : great ? 4 : edited && ok ? 3 : edited ? 2 : ok ? 1 : 0;
+}
+
 export function bestOf(group, chosen = null) {
   const us = group.units;
   const pick = chosen ? us.findIndex(chosen) : -1;
   if (pick >= 0) return pick;
-  const marked = (u) => (u.mark === 1 ? 3 : u.mark === 2 ? 2 : 0) + (u.adjusted ? 1 : 0);
-  const top = Math.max(...us.map(marked));
-  if (top > 0) return us.findIndex((u) => marked(u) === top);
+  // the cover: the photo edited and starred, then starred, then edited (OK first among those), then OK; then the
+  // sharpest and best exposed
+  const top = Math.max(...us.map(coverRank));
+  if (top > 0) return us.findIndex((u) => coverRank(u) === top);
   // sharpness in "times sharper" (log), so a little softer loses to a lot less burnt-out
   const sharp = us.map((u) => Math.log1p(u.f.sharp));
   const max = Math.max(...sharp);

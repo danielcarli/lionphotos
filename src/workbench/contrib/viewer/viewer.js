@@ -200,7 +200,12 @@ export class Viewer {
     const el = this.stackEl;
     const top = this.list[this.index];
     const stack = !this.playing && top ? this.services.similar?.groupOf(top.id) : null;
-    if (!stack || stack.count < 2) { el.hidden = true; el.replaceChildren(); return; }
+    if (!stack || stack.count < 2) {
+      // a RAW and its JPEG shown as one: their files in the strip, the cover chosen there
+      const pair = !this.playing && top ? this.services.similar?.pairOf(top.id) : null;
+      if (pair) { this.#renderPair(it, top, pair); return; }
+      el.hidden = true; el.replaceChildren(); return;
+    }
     const best = stack.top;
     const isShown = (u) => u.files.some((f) => f.id === it.id);
     const pick = (u) => { if (isShown(u)) return; this.stackPick = u.rep; this.stackPickAt = this.index; this.scale = 0; this.#show(); };
@@ -224,6 +229,40 @@ export class Viewer {
         showSimilar(this.services, { items }, { title: tn('similar.stackOpen', stack.count) });
       } }, t('viewer.stackOpen')));
     el.querySelector('.is-shown')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+
+  /**
+   * A RAW and its JPEG shown as one (Photos stacked): the two files in the strip, as a stack's photos — a click
+   * shows one here; its menu (or the button) makes it the cover, the file shown for the photo in Photos.
+   */
+  #renderPair(it, top, pair) {
+    const el = this.stackEl;
+    const sim = this.services.similar;
+    const files = [top, ...pair.files.filter((f) => f.id !== top.id)].map((f) => this.library.byId.get(f.id) || f);
+    const isShown = (f) => f.id === it.id;
+    const pick = (f) => { if (isShown(f)) return; this.stackPick = f.id === top.id ? null : f; this.stackPickAt = this.index; this.scale = 0; this.#show(); };
+    const cover = async (f) => {
+      if (f.id === top.id) return;
+      await sim.setPairCover(f.id);
+      // the photo of the list is now this file: shown as itself
+      this.list = this.list.slice(); this.list[this.index] = f; this.stackPick = null; this.#show();
+    };
+    const menu = (f, x, y) => showContextMenu(x, y, [
+      // a file whose picture cannot be read (no thumbnail) cannot stand for the photo in Photos
+      { label: t('similar.setCover'), icon: 'sparkle', checked: f.id === top.id, disabled: f.thumb === 2, run: () => cover(f) },
+    ]);
+    el.hidden = false;
+    el.setAttribute('aria-label', tn('photos.pairFiles', files.length));
+    setChildren(el,
+      h('span.vw-stack-label', h('span', { html: icon('stack', 14) }), tn('viewer.pairLabel', files.length)),
+      h('div.vw-stack-thumbs', files.map((f) => h('div.vw-stack-cell',
+        h(`button.vw-stack-thumb.vw-pair-thumb${isShown(f) ? '.is-shown' : ''}`, {
+          type: 'button', title: f.name, 'aria-pressed': String(isShown(f)), onclick: () => pick(f),
+          oncontextmenu: (e) => { e.preventDefault(); menu(f, e.clientX, e.clientY); },
+        }, this.thumbs.shown(h('img', { alt: '', draggable: false, decoding: 'async' }), f),
+        h('span.vw-pair-ext', (f.ext === 'jpeg' || f.ext === 'jpe' ? 'JPG' : f.ext.toUpperCase())),
+        f.id === top.id ? h('span.vw-stack-best', { title: t('similar.coverTitle') }, h('span', { html: icon('sparkle', 10) })) : null)))),
+      isShown(top) || it.thumb === 2 ? null : h('button.vw-stack-open.vw-pair-cover', { type: 'button', title: t('similar.setCoverTitle'), onclick: () => cover(it) }, t('similar.setCover')));
   }
 
   /** A photo out of its group (from the strip): said apart from the others of the group, with an undo. */

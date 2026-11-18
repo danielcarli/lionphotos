@@ -579,3 +579,9 @@ _merge(MESSAGES, {'similar': {'groupSwitch': '堆叠照片', 'stackTitle': '将�
 _merge(MESSAGES, {'similar': {'keepBestTitle': '保留每组中建议的照片，并立即将其他照片送去 Limbo（可在通知中撤销）'}})
 
 _merge(MESSAGES, {'photos': {'pairFiles': {'one': '同一张照片的 {count} 个文件（显示为一张）：', 'other': '同一张照片的 {count} 个文件（显示为一张）：'}}})
+
+_merge(MESSAGES, {'similar': {'pairBadge': {'one': '同一张照片的 {count} 个文件（RAW+JPG）：并排查看', 'other': '同一张照片的 {count} 个文件（RAW+JPG）：并排查看'}}})
+
+_merge(MESSAGES, {'similar': {'setCover': '设为封面', 'setCoverTitle': '将此文件作为“照片”中显示的照片（RAW + JPEG 的封面）', 'coverTitle': '封面：在“照片”中显示的文件', 'pairBadge': {'one': '同一张照片的 {count} 个文件（RAW+JPG）：打开', 'other': '同一张照片的 {count} 个文件（RAW+JPG）：打开'}}, 'viewer': {'pairLabel': {'one': '同一张照片的 {count} 个文件', 'other': '同一张照片的 {count} 个文件'}}})
+
+_merge(MESSAGES, {'similar': {'setBest': '设为最佳', 'setCover': '设为最佳', 'setCoverTitle': '将此文件作为“照片”中显示的照片（RAW + JPEG 的最佳）', 'coverTitle': '最佳：在“照片”中显示的文件'}})

@@ -582,3 +582,9 @@ _merge(MESSAGES, {'similar': {'groupSwitch': 'Stack photos', 'stackTitle': 'Show
 _merge(MESSAGES, {'similar': {'keepBestTitle': 'Keeps the suggested photo of each group and sends the others to the Limbo now (undo in the notice)'}})
 
 _merge(MESSAGES, {'photos': {'pairFiles': {'one': '{count} file of the same photo (shown as one):', 'other': '{count} files of the same photo (shown as one):'}}})
+
+_merge(MESSAGES, {'similar': {'pairBadge': {'one': '{count} file of the same photo (RAW+JPG): side by side', 'other': '{count} files of the same photo (RAW+JPG): side by side'}}})
+
+_merge(MESSAGES, {'similar': {'setCover': 'Use as cover', 'setCoverTitle': 'Show this file as the photo in Photos (the cover of the RAW + JPEG)', 'coverTitle': 'The cover: the file shown in Photos', 'pairBadge': {'one': '{count} file of the same photo (RAW+JPG): open', 'other': '{count} files of the same photo (RAW+JPG): open'}}, 'viewer': {'pairLabel': {'one': '{count} file of the same photo', 'other': '{count} files of the same photo'}}})
+
+_merge(MESSAGES, {'similar': {'setBest': 'Set as the best', 'setCover': 'Set as the best', 'setCoverTitle': 'Show this file as the photo in Photos (the best of the RAW + JPEG)', 'coverTitle': 'The best: the file shown in Photos'}})

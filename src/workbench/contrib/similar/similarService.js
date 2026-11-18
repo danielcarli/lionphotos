@@ -16,7 +16,7 @@ import { Emitter } from '../../../base/common/event.js';
 import { Eta } from '../../../base/common/eta.js';
 import { dateOf, adjustOf, KIND, MARK } from '../../services/library/browser/libraryService.js';
 import { isRawExt } from '../../services/library/common/mediaCategories.js';
-import { featuresOf, groupSimilar, bestOf, similarity, contentSimilarity, clipVector, paramsOf, PRESETS, SENSITIVITY_DEFAULT } from './similarFinder.js';
+import { featuresOf, groupSimilar, bestOf, coverRank, similarity, contentSimilarity, clipVector, paramsOf, PRESETS, SENSITIVITY_DEFAULT } from './similarFinder.js';
 
 const STACK_KEY = 'lionphotos.photos.stacks';
 const ONLY_KEY = 'lionphotos.photos.stacksOnly';
@@ -70,7 +70,7 @@ export function unpackFeatures(bytes) {
  * The shots of a list of photos: one per photo, the raw file and its JPEG together, shown by the JPEG, the
  * oldest first. @returns {{ shots: object[], noThumb: number }}
  */
-export function shotsOfItems(library, items) {
+export function shotsOfItems(library, items, chosen = null) {
   const list = items.filter((it) => it.kind === KIND.image && (it.mark || 0) !== MARK.reject).sort((a, b) => dateOf(a) - dateOf(b) || a.id - b.id);
   const inList = new Set(list.map((it) => it.id));
   const twins = library.twinsOf(list);
@@ -81,8 +81,12 @@ export function shotsOfItems(library, items) {
     if (seen.has(it.id)) continue;
     const files = [it, ...(twins.get(it.id) || []).filter((x) => inList.has(x.id) && !seen.has(x.id))];
     files.forEach((x) => seen.add(x.id));
-    // the photo shown for the shot: the one edited (the RAW developed, say), else the JPEG, else any read
-    let rep = files.find((x) => x.thumb === 1 && adjustOf(x)) || files.find((x) => x.thumb === 1 && !isRawExt(x.ext)) || files.find((x) => x.thumb === 1);
+    // the photo shown for the shot (RAW + JPEG): edited and starred, starred, edited, OK (coverRank), else the
+    // JPEG, else any read
+    const readable = files.filter((x) => x.thumb === 1);
+    const rank = (x) => coverRank({ mark: x.mark || 0, adjusted: !!adjustOf(x) }) * 2 + (isRawExt(x.ext) ? 0 : 1);
+    // a file chosen as the cover by hand (the viewer's strip) first
+    let rep = readable.find((x) => chosen?.has(x.id)) || (readable.length ? readable.reduce((a, b) => (rank(b) > rank(a) ? b : a)) : null);
     // a raw file with no thumbnail yet: read from the JPEG the camera put inside it
     let viaRaw = false;
     if (!rep) { rep = files.find((x) => isRawExt(x.ext) && x.thumb !== 2); viaRaw = !!rep; }
@@ -214,7 +218,7 @@ export class SimilarService {
   /** Photos drawn again only when its groups are other now. */
   #maybeRegroup() {
     if (!this.active || !this.#lastList) return;
-    const { shots } = shotsOfItems(this.library, this.#lastList);
+    const { shots } = shotsOfItems(this.library, this.#lastList, this.choices.best);
     for (const x of shots) x.f = this.known(x) ?? null;
     if (signature(this.groups(shots), shots) !== this.#sig) this.#regroup();
   }
@@ -454,7 +458,7 @@ export class SimilarService {
    */
   async explain(items) {
     await this.loadChoices();
-    const { shots } = shotsOfItems(this.library, items);
+    const { shots } = shotsOfItems(this.library, items, this.choices.best);
     await this.read(shots);
     await this.readWho(shots, { look: false });
     const rows = [];
@@ -489,6 +493,15 @@ export class SimilarService {
     ids.forEach((id) => this.choices.best.delete(id));
     this.choices.best.add(u.id);
     this.#later();
+  }
+  /** The file shown for a RAW + JPEG (its cover), chosen by hand; kept as the best photos of stacks are. */
+  async setPairCover(fileId) {
+    const pair = [...this.#pairOf.values()].find((p) => p.files.some((f) => f.id === fileId));
+    const ids = pair ? pair.files.map((f) => f.id) : [fileId];
+    await this.api.similarBest?.(fileId, ids).catch(() => false);
+    ids.forEach((id) => this.choices.best.delete(id));
+    this.choices.best.add(fileId);
+    this.regroupNow();
   }
   async setApart(pairs, apart = true) {
     await this.api.similarApart?.(pairs, apart).catch(() => false);
@@ -577,7 +590,7 @@ export class SimilarService {
     this.#pairOf.clear();
     if (!this.active || !this.library.root) return list;
     if (!this.#choicesLoaded) { this.loadChoices().then(() => this.#regroup()); return list; }
-    const { shots } = shotsOfItems(this.library, list);
+    const { shots } = shotsOfItems(this.library, list, this.choices.best);
     for (const s of shots) s.f = this.known(s) ?? null;
     const missing = shots.filter((s) => this.known(s) === undefined);
     if (missing.length) this.#readForPhotos(missing);
@@ -627,6 +640,8 @@ export class SimilarService {
 
   /** The group a photo of Photos stands for (when it is the one shown). */
   stackOf(id) { const s = this.#stackOf.get(id); return s && s.top === id ? s : null; }
+  /** The RAW + JPEG a photo of Photos stands for (one photo in two files), when it is the one shown. */
+  pairOf(id) { return this.active ? this.#pairOf.get(id) || null : null; }
   /** The group of Photos a photo is in (the one shown or one behind it). */
   groupOf(id) { return this.active ? this.#stackOf.get(id) || null : null; }
 

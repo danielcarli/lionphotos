@@ -886,11 +886,28 @@ export class PhotosView extends ViewPane {
   /** A photo that stands for a group of similar ones (Photos grouped): a little stack of photos and how many. */
   #stackBadge(it) {
     const stack = !this.limbo && this.services.similar?.stackOf(it.id);
-    if (!stack) return null;
+    if (!stack) return this.#pairBadge(it);
     return h('button.tile-stack', {
       type: 'button', title: tn('similar.stackBadge', stack.count), 'aria-label': tn('similar.stackBadge', stack.count),
       onclick: (e) => { e.stopPropagation(); this.#openStack(stack); }, ondblclick: (e) => e.stopPropagation(),
     }, h('span', { html: icon('stack', 15) }), String(stack.count));
+  }
+
+  /**
+   * A RAW and its JPEG shown as one (Photos stacked): the little stack too, with its two files; a click opens the
+   * photo, its files in the strip below.
+   */
+  #pairBadge(it) {
+    const pair = !this.limbo && it.kind === KIND.image ? this.services.similar?.pairOf(it.id) : null;
+    if (!pair) return null;
+    const files = [it, ...pair.files.filter((f) => f.id !== it.id)];
+    const title = tn('similar.pairBadge', files.length);
+    return h('button.tile-stack.tile-stack-pair', {
+      type: 'button', title, 'aria-label': title,
+      // opened as a stack is: in the viewer, its files in the strip below (the cover chosen there)
+      onclick: (e) => { e.stopPropagation(); this.#openViewer(it.id); },
+      ondblclick: (e) => e.stopPropagation(),
+    }, h('span', { html: icon('stack', 15) }), String(files.length));
   }
 
   /**

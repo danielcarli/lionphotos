@@ -3626,3 +3626,6 @@ button.vw-chip:hover { filter: brightness(1.2); }
 .crv-canvas:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .crv-foot { display: flex; align-items: center; justify-content: space-between; min-height: 18px; font-variant-numeric: tabular-nums; }
 .crv-hint, .crv-mixed { margin: 0; }
+
+/* a RAW and its JPEG in the viewer's strip: the kind of each file, the cover marked (1.75.0) */
+.vw-pair-ext { position: absolute; right: 3px; bottom: 3px; padding: 1px 4px; border-radius: 4px; background: rgb(0 0 0 / 0.62); color: #fff; font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.3; }

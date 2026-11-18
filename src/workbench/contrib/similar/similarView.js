@@ -44,10 +44,10 @@ function daysWithPhotos(library) {
  * The shots of a day (or of the photos shown, `ids`): one per photo, the raw file and its JPEG together,
  * shown by the JPEG. @param {string|Set<number>} scope a day 'YYYY-MM-DD' or the ids of the photos shown
  */
-function shotsOf(library, scope) {
+function shotsOf(library, scope, chosen = null) {
   const inScope = typeof scope === 'string' ? (it) => dayOf(it) === scope : (it) => scope.has(it.id);
   const items = library.allItems.filter((it) => it.kind === KIND.image && (it.mark || 0) !== MARK.reject && inScope(it));
-  return { ...shotsOfItems(library, items), photos: items.length };
+  return { ...shotsOfItems(library, items, chosen), photos: items.length };
 }
 
 /** Every pair of files of two sets of shots (the raw file and its JPEG count as the shot). */
@@ -103,7 +103,7 @@ export function showSimilar(services, scope, opts = {}) {
     if (e.key === 'Escape') { e.preventDefault(); close(); }
   };
   // the shots again (after marks changed), with what was read of them
-  const again = () => { data = shotsOf(library, where()); for (const x of data.shots) x.f = sim.known(x) ?? null; };
+  const again = () => { data = shotsOf(library, where(), sim.choices.best); for (const x of data.shots) x.f = sim.known(x) ?? null; };
   const sub = library.onDidChangeMarks(() => { if (!busy && ready) { again(); regroup(true); } });
   // people found or named, a decision taken: the groups may be other
   const subSim = sim.onDidChange(() => { if (!busy && ready) regroup(true); });
@@ -145,7 +145,7 @@ export function showSimilar(services, scope, opts = {}) {
     nextDay.disabled = !day || !days.some((d) => d > day);
     title.textContent = day ? t('similar.title', { day: formatDate(new Date(`${day}T12:00:00`).getTime()) }) : opts.title || t('similar.titleShown');
     ready = false;
-    data = shotsOf(library, where());
+    data = shotsOf(library, where(), sim.choices.best);
     more = PAGE;
     groups = [];
     goes.clear();

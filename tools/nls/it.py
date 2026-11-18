@@ -581,3 +581,9 @@ _merge(MESSAGES, {'similar': {'groupSwitch': 'Impila foto', 'stackTitle': 'Mostr
 _merge(MESSAGES, {'similar': {'keepBestTitle': 'Tiene la foto suggerita di ogni gruppo e manda subito le altre nel Limbo (annullabile dall’avviso)'}})
 
 _merge(MESSAGES, {'photos': {'pairFiles': {'one': '{count} file della stessa foto (mostrati come una):', 'other': '{count} file della stessa foto (mostrati come una):'}}})
+
+_merge(MESSAGES, {'similar': {'pairBadge': {'one': '{count} file della stessa foto (RAW+JPG): affiancati', 'other': '{count} file della stessa foto (RAW+JPG): affiancati'}}})
+
+_merge(MESSAGES, {'similar': {'setCover': 'Usa come copertina', 'setCoverTitle': 'Mostra questo file come la foto in Foto (la copertina di RAW + JPEG)', 'coverTitle': 'La copertina: il file mostrato in Foto', 'pairBadge': {'one': '{count} file della stessa foto (RAW+JPG): apri', 'other': '{count} file della stessa foto (RAW+JPG): apri'}}, 'viewer': {'pairLabel': {'one': '{count} file della stessa foto', 'other': '{count} file della stessa foto'}}})
+
+_merge(MESSAGES, {'similar': {'setBest': 'Imposta come la migliore', 'setCover': 'Imposta come la migliore', 'setCoverTitle': 'Mostra questo file come la foto in Foto (la migliore di RAW + JPEG)', 'coverTitle': 'La migliore: il file mostrato in Foto'}})

@@ -579,3 +579,9 @@ _merge(MESSAGES, {'similar': {'groupSwitch': '写真をスタック', 'stackTitl
 _merge(MESSAGES, {'similar': {'keepBestTitle': '各グループの提案された写真を残し、ほかの写真をすぐに Limbo へ送ります（通知から元に戻せます）'}})
 
 _merge(MESSAGES, {'photos': {'pairFiles': {'one': '同じ写真のファイル {count} 個（1枚として表示）:', 'other': '同じ写真のファイル {count} 個（1枚として表示）:'}}})
+
+_merge(MESSAGES, {'similar': {'pairBadge': {'one': '同じ写真のファイル {count} 個（RAW+JPG）: 並べて表示', 'other': '同じ写真のファイル {count} 個（RAW+JPG）: 並べて表示'}}})
+
+_merge(MESSAGES, {'similar': {'setCover': 'カバーにする', 'setCoverTitle': 'このファイルを「写真」に表示する写真にします（RAW + JPEG のカバー）', 'coverTitle': 'カバー: 「写真」に表示されるファイル', 'pairBadge': {'one': '同じ写真のファイル {count} 個（RAW+JPG）: 開く', 'other': '同じ写真のファイル {count} 個（RAW+JPG）: 開く'}}, 'viewer': {'pairLabel': {'one': '同じ写真のファイル {count} 個', 'other': '同じ写真のファイル {count} 個'}}})
+
+_merge(MESSAGES, {'similar': {'setBest': 'ベストに設定', 'setCover': 'ベストに設定', 'setCoverTitle': 'このファイルを「写真」に表示する写真にします（RAW + JPEG のベスト）', 'coverTitle': 'ベスト: 「写真」に表示されるファイル'}})

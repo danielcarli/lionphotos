@@ -2,6 +2,23 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.75.1] — 2026-11-18
+
+### Changed
+- One name for choosing the photo that stands for the others: **Set as the best** ("Definir como a melhor"), in a stack's menu and for the files of a RAW + JPEG (it was *Choose as the best* and *Use as cover*), in the 10 languages. An album's *Use as cover* keeps its name.
+
+## [1.75.0] — 2026-11-18
+
+### Added
+- A RAW and its JPEG shown as one behave as the other stacks: a click on the little stack opens the photo, and the viewer shows **its files in the strip below** (the kind of each, RAW or JPG, and the cover marked); a click shows another of them.
+- **Use as cover** (a file's menu in the strip, or the button beside it while that file is shown) chooses which file stands for the photo in Photos. The choice is kept in the catalog, as the best photo of a stack is, and goes before the automatic order (edited and starred, starred, edited…). A file whose picture cannot be read cannot be the cover.
+
+## [1.74.0] — 2026-11-18
+
+### Changed
+- Photos › *Stack photos*: a RAW and its JPEG shown as one also have the **little stack** in the corner, with **2**: a click puts the two files side by side.
+- The **cover** of a stack, and the file shown for a RAW + JPEG, follow one order: the photo edited and starred, then starred, then edited (OK first among the edited), then OK, then the sharpest and best exposed, as before. A photo chosen as the best by hand stays the cover.
+
 ## [1.73.0] — 2026-11-18
 
 ### Changed

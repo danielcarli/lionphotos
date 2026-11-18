@@ -2016,7 +2016,7 @@ app.whenReady().then(async () => {
       const other = 1 - Math.min(b, 1);
       grp().querySelectorAll('.sim-menu')[other].click(); await wait(250);
       res.menu = [...document.querySelectorAll('.ctx-menu .ctx-item')].map((x) => x.textContent.trim());
-      [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Choose as the best')).click(); await wait(400);
+      [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Set as the best')).click(); await wait(400);
       res.bestNow = [...grp().querySelectorAll('.sim-tile')].findIndex((x) => x.classList.contains('is-best')) === other;
       const otherId = s.library.items.find((x) => x.name === names[other].split(' + ')[0])?.id;
       res.bestKept = (await s.host.library.similarChoices()).best.includes(otherId);
@@ -2075,7 +2075,7 @@ app.whenReady().then(async () => {
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
     check(kb.none || (kb.label === 'Keep only the suggested' && /sends the others to the Limbo now/.test(kb.title || '') && kb.sent >= 1 && kb.noConfirm && kb.toast && kb.undone),
       '"Keep only the suggested": the others of the group go to the Limbo at once (no question; what they have is offered first when there is something), the notice undoes it', JSON.stringify(kb));
-    check(simAll.count === '2 photos' && ['Choose as the best', 'Keep only this one: the other one to the Limbo', 'Make single', 'Compare side by side'].every((x) => simAll.menu?.includes(x)) && simAll.bestNow && simAll.bestKept,
+    check(simAll.count === '2 photos' && ['Set as the best', 'Keep only this one: the other one to the Limbo', 'Make single', 'Compare side by side'].every((x) => simAll.menu?.includes(x)) && simAll.bestNow && simAll.bestKept,
       'a group of similar photos says how many it has; each photo has a menu (best, keep only it, take it out, compare); the best chosen is kept in the catalog', JSON.stringify({ count: simAll.count, menu: simAll.menu, bestNow: simAll.bestNow, bestKept: simAll.bestKept }));
     check(simAll.apartGone && simAll.apartKept >= 1 && simAll.apartToast && simAll.stillGone && simAll.undone,
       '"Not the same" (alike pictures of different people): the group goes and is not formed again; the notice undoes it', JSON.stringify({ apartGone: simAll.apartGone, apartKept: simAll.apartKept, toast: simAll.apartToast, stillGone: simAll.stillGone, undone: simAll.undone }));
@@ -2170,6 +2170,27 @@ app.whenReady().then(async () => {
         document.querySelector('.view-photos .tile[data-id="' + pairTop.id + '"]')?.scrollIntoView({ block: 'center' }); await wait(300);
         const pb = document.querySelector('.view-photos .tile[data-id="' + pairTop.id + '"] .tile-pair');
         res.pairLabel = pb?.textContent; res.pairTitle = (pb?.title || '').split('\\n')[0];
+        // the little stack too, with its two files; a click puts them side by side
+        const ps = document.querySelector('.view-photos .tile[data-id="' + pairTop.id + '"] .tile-stack-pair');
+        res.pairStack = ps?.textContent; res.pairStackTitle = ps?.title;
+        ps?.click(); await wait(700);
+        res.pairOpened = !!document.querySelector('.viewer');
+        // in the viewer: its files in the strip below, the kind of each, the cover marked; "Set as the best" in a file's menu
+        const strip = document.querySelector('.viewer .vw-stack');
+        res.pairStrip = { shown: !!strip && !strip.hidden, label: strip?.querySelector('.vw-stack-label')?.textContent, thumbs: strip?.querySelectorAll('.vw-pair-thumb').length || 0,
+          exts: [...(strip?.querySelectorAll('.vw-pair-ext') || [])].map((x) => x.textContent).sort().join('|'), cover: strip?.querySelectorAll('.vw-stack-best').length || 0 };
+        const other = strip?.querySelectorAll('.vw-pair-thumb')[1];
+        other?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 300, clientY: 300 })); await wait(250);
+        const useCover = [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Set as the best'));
+        res.pairStrip.menu = useCover ? (useCover.disabled ? 'disabled' : 'on') : 'none';
+        if (useCover && !useCover.disabled) {
+          useCover.click(); await wait(800);
+          res.pairStrip.chosen = s.similar.choices.best.size > 0 && lib.view('main').some((x) => x.id !== pairTop.id && s.similar.pairOf(x.id)?.files.some((f) => f.id === pairTop.id));
+        } else document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+        await wait(150);
+        s.viewer.close(); await wait(300);
+        // the cover back to the JPEG, as before
+        if (res.pairStrip.chosen) { await s.similar.setPairCover(pairTop.id); await wait(500); }
         const raw = (lib.twinsOf([pairTop]).get(pairTop.id) || []).find((x) => x.ext !== pairTop.ext);
         res.rawReadable = raw?.thumb === 1;
         if (raw && res.rawReadable) {
@@ -2247,11 +2268,14 @@ app.whenReady().then(async () => {
       'the switch "Stack photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && !st.onlyChip && st.onlyMarked && st.onlyBack && st.noOldSwitch && st.noMenuItem,
       'Only stacks (in the menu of "Similar photos"): only the groups, each as its best photo, the button marked, no chip nor filter for it; again in the menu, every photo grouped again', JSON.stringify({ onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, chip: st.onlyChip, marked: st.onlyMarked, back: st.onlyBack, noOldSwitch: st.noOldSwitch, noMenuItem: st.noMenuItem }));
+    check(st.pairStack === '2' && st.pairStackTitle === '2 files of the same photo (RAW+JPG): open' && st.pairOpened
+      && st.pairStrip?.shown && st.pairStrip.label === '2 files of the same photo' && st.pairStrip.thumbs === 2 && st.pairStrip.exts === 'CR2|JPG' && st.pairStrip.cover === 1 && st.pairStrip.menu !== 'none' && (st.pairStrip.menu !== 'on' || st.pairStrip.chosen),
+      'Photos stacked: a RAW and its JPEG shown as one have the little stack too (2); opened, the viewer has its files in the strip below (the kind of each, the cover marked) and "Set as the best" in a file\'s menu', JSON.stringify({ stack: st.pairStack, title: st.pairStackTitle, opened: st.pairOpened, strip: st.pairStrip }));
     check(st.pairLabel === 'RAW+JPG' && st.pairTitle === '2 files of the same photo (shown as one):' && (!st.rawReadable || (st.editedShown && st.jpegBack)),
       'Photos stacked: a RAW and its JPEG shown as one say "RAW+JPG" (the two files named); the RAW edited, it is the one shown, and back', JSON.stringify({ found: st.pairFound, label: st.pairLabel, title: st.pairTitle, rawReadable: st.rawReadable, editedShown: st.editedShown, jpegBack: st.jpegBack }));
     check(st.rawOnStack === `RAW${st.rawCount}` && st.twinBoth === 0 && st.twinsBefore > 0,
       'Photos grouped: a group holding raw files says RAW and how many; a raw file alone with its JPEG stays behind it (one photo)', JSON.stringify({ rawOnStack: st.rawOnStack, rawCount: st.rawCount, twinBoth: st.twinBoth, twinsBefore: st.twinsBefore }));
-    check(/^Almost the same\|Alike:\d+$/.test(st.slider || '') && !st.lineSlider && st.removeTitle === 'Remove photo from the group' && st.vwRemove === 'Remove photo from the stack' && st.vwRemoved && /^Make single\|Choose as the best/.test(st.vwMenu || ''),
+    check(/^Almost the same\|Alike:\d+$/.test(st.slider || '') && !st.lineSlider && st.removeTitle === 'Remove photo from the group' && st.vwRemove === 'Remove photo from the stack' && st.vwRemoved && /^Make single\|Set as the best/.test(st.vwMenu || ''),
       'the sensitivity as a slider (Almost the same … Alike), in the menu of "Similar photos" and in the group (no longer on the line under the bar); × on a photo of a group (and of the viewer\'s strip): "Remove photo from the group"; a thumbnail\'s menu: "Make single"', JSON.stringify({ slider: st.slider, line: st.lineSlider, remove: st.removeTitle, vwRemove: st.vwRemove, vwRemoved: st.vwRemoved, vwMenu: st.vwMenu }));
     check(st.vwThumbs === Number(st.badge) && st.vwLabel === `${st.badge} similar photos` && st.vwPicked && st.vwOpen === 'Choose what stays',
       'the viewer, Photos grouped: the photos of the group in a strip below the one shown (as in Google Photos); a click shows another of them', JSON.stringify({ thumbs: st.vwThumbs, label: st.vwLabel, picked: st.vwPicked, open: st.vwOpen }));

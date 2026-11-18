@@ -130,6 +130,19 @@ check(!tw.has(3) && ids(9) === '', 'an edited copy, or a JPEG of the same name i
 check(ids(4) === '5' && ids(6) === '7' && ids(5) === '4', 'renamed by Organize into Raw/ and Img/, taken in the same second and numbered one after the other: twins, in pairs');
 check(!tw.has(8) && !tw.has(10) && !tw.has(11), 'a JPEG of another second, or a PNG, is not a twin');
 
+// the cover of a stack: edited and starred, then starred, then edited, then OK, then the sharpest
+{
+  const { coverRank } = await import('../src/workbench/contrib/similar/similarFinder.js');
+  const u = (id, mark, adjusted, sharp = 1) => ({ id, mark, adjusted, f: { sharp, clip: 0, light: 0.47 } });
+  const cover = (...us) => { const g = { units: us }; return us[bestOf(g)].id; };
+  check(cover(u(1, 0, false, 9), u(2, 1, false), u(3, 1, true), u(4, 0, true)) === 3, 'the cover: the photo edited and starred first');
+  check(cover(u(1, 0, false, 9), u(2, 2, true), u(3, 1, false), u(4, 0, true)) === 3, 'then the one starred (over one edited and OK)');
+  check(cover(u(1, 0, false, 9), u(2, 2, false), u(3, 0, true)) === 3 && cover(u(1, 0, true), u(2, 2, true)) === 2, 'then the one edited (OK first among the edited)');
+  check(cover(u(1, 0, false, 9), u(2, 2, false)) === 2 && cover(u(1, 0, false, 2), u(2, 0, false, 9)) === 2, 'then the one OK; then the sharpest');
+  check(cover(u(1, 1, true), u(2, 0, false)) === 1 && bestOf({ units: [u(1, 1, true), u(2, 0, false)] }, (x) => x.id === 2) === 1, 'the photo chosen as the best by hand is still the cover');
+  check(coverRank({ mark: 1, adjusted: true }) > coverRank({ mark: 1 }) && coverRank({ mark: 1 }) > coverRank({ mark: 2, adjusted: true }), 'the ranks in order');
+}
+
 // the photo shown for a RAW + JPEG: the JPEG, unless the RAW is the one edited
 {
   const { shotsOfItems } = await import('../src/workbench/contrib/similar/similarService.js');
@@ -140,6 +153,12 @@ check(!tw.has(8) && !tw.has(10) && !tw.has(11), 'a JPEG of another second, or a 
   library.byId.get(1).aj = JSON.stringify({ exposure: 0.4 });
   check(pairOf()[0].rep.id === 1, 'the RAW edited (developed in LionPhotos): the RAW is the one shown');
   library.byId.get(1).aj = null; library.byId.get(1).ajParsed = null;
+  library.byId.get(1).mark = 1;
+  check(pairOf()[0].rep.id === 1, 'the RAW starred (the JPEG not): the RAW is the one shown');
+  library.byId.get(2).mark = 1; library.byId.get(2).aj = JSON.stringify({ contrast: 10 });
+  check(pairOf()[0].rep.id === 2, 'both starred, the JPEG edited: the JPEG');
+  library.byId.get(1).mark = 0; library.byId.get(2).mark = 0; library.byId.get(2).aj = null; library.byId.get(2).ajParsed = null;
+  check(shotsOfItems(library, [library.byId.get(1), library.byId.get(2)], new Set([1])).shots[0].rep.id === 1, 'a file chosen as the cover by hand is the one shown');
   library.byId.get(1).thumb = 2; library.byId.get(1).aj = JSON.stringify({ exposure: 0.4 });
   check(pairOf()[0].rep.id === 2, 'a RAW edited but with no thumbnail: the JPEG is still the one shown');
 }

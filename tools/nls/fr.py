@@ -582,3 +582,9 @@ _merge(MESSAGES, {'similar': {'groupSwitch': 'Empiler les photos', 'stackTitle':
 _merge(MESSAGES, {'similar': {'keepBestTitle': 'Garde la photo suggérée de chaque groupe et envoie les autres dans les Limbes maintenant (annulable dans la notification)'}})
 
 _merge(MESSAGES, {'photos': {'pairFiles': {'one': '{count} fichier de la même photo (affichés comme une seule) :', 'other': '{count} fichiers de la même photo (affichés comme une seule) :'}}})
+
+_merge(MESSAGES, {'similar': {'pairBadge': {'one': '{count} fichier de la même photo (RAW+JPG) : côte à côte', 'other': '{count} fichiers de la même photo (RAW+JPG) : côte à côte'}}})
+
+_merge(MESSAGES, {'similar': {'setCover': 'Utiliser comme couverture', 'setCoverTitle': 'Afficher ce fichier comme la photo dans Photos (la couverture du RAW + JPEG)', 'coverTitle': 'La couverture : le fichier affiché dans Photos', 'pairBadge': {'one': '{count} fichier de la même photo (RAW+JPG) : ouvrir', 'other': '{count} fichiers de la même photo (RAW+JPG) : ouvrir'}}, 'viewer': {'pairLabel': {'one': '{count} fichier de la même photo', 'other': '{count} fichiers de la même photo'}}})
+
+_merge(MESSAGES, {'similar': {'setBest': 'Définir comme la meilleure', 'setCover': 'Définir comme la meilleure', 'setCoverTitle': 'Afficher ce fichier comme la photo dans Photos (la meilleure du RAW + JPEG)', 'coverTitle': 'La meilleure : le fichier affiché dans Photos'}})

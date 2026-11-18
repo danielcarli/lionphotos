@@ -195,7 +195,17 @@ export class PhotosView extends ViewPane {
     const { library } = this;
     const f = library.filter;
     const totals = library.totals(library.viewAll(this.scope));
-    const count = `${tn('common.items', totals.images + totals.videos)} · ${formatBytes(totals.bytes)}`;
+    let count = `${tn('common.items', totals.images + totals.videos)} · ${formatBytes(totals.bytes)}`;
+    // "Stack photos" on: how many stacks, and how many photos alone (a RAW + JPEG counts as one photo)
+    const sim = this.services.similar;
+    if (!this.limbo && sim?.active) {
+      let stacks = 0, singles = 0;
+      for (const it of library.view(this.scope)) {
+        if (it.kind !== KIND.image) continue;
+        if (sim.stackOf(it.id)) stacks++; else singles++;
+      }
+      count += ` · ${tn('photos.stacksCount', stacks)} · ${tn('photos.singlesCount', singles)}`;
+    }
     // the filters in use, each with its own ×: the year (× = every year again), the type, the mark, the
     // category of the Overview and "this folder only"
     const chip = (ic, text, clearTitle, clear, extra) => h('span.chip.filter-chip', ic ? h('span', { html: icon(ic, 12) }) : extra || null, text,

@@ -585,3 +585,5 @@ _merge(MESSAGES, {'similar': {'pairBadge': {'one': '같은 사진의 파일 {cou
 _merge(MESSAGES, {'similar': {'setCover': '커버로 사용', 'setCoverTitle': '이 파일을 사진에서 보이는 사진으로 사용(RAW + JPEG의 커버)', 'coverTitle': '커버: 사진에 보이는 파일', 'pairBadge': {'one': '같은 사진의 파일 {count}개(RAW+JPG): 열기', 'other': '같은 사진의 파일 {count}개(RAW+JPG): 열기'}}, 'viewer': {'pairLabel': {'one': '같은 사진의 파일 {count}개', 'other': '같은 사진의 파일 {count}개'}}})
 
 _merge(MESSAGES, {'similar': {'setBest': '최고로 지정', 'setCover': '최고로 지정', 'setCoverTitle': '이 파일을 사진에서 보이는 사진으로 사용(RAW + JPEG의 최고)', 'coverTitle': '최고: 사진에 보이는 파일'}})
+
+_merge(MESSAGES, {'photos': {'stacksCount': {'one': '스택 {count}개', 'other': '스택 {count}개'}, 'singlesCount': {'one': '단독 사진 {count}장', 'other': '단독 사진 {count}장'}}})

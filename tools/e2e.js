@@ -2138,6 +2138,10 @@ app.whenReady().then(async () => {
       for (let i = 0; i < 200 && !document.querySelector('.view-photos .tile-stack'); i++) await wait(100);
       const badge = document.querySelector('.view-photos .tile-stack');
       res.badge = badge?.textContent; res.title = badge?.title; res.on = sw()?.checked === true && sw()?.closest('.tb-switch').classList.contains('on');
+      // how many items, and how many stacks and single photos
+      { const v = lib.view('main').filter((x) => x.kind === 1); const nS = v.filter((x) => s.similar.stackOf(x.id)).length;
+        res.meta = document.querySelector('.view-photos .crumb-meta')?.textContent || '';
+        res.metaOk = /^[0-9,]+ items · .+ · [1-9][0-9,]* stacks? · [0-9,]+ single photos?$/.test(res.meta) && nS > 0; }
       await wait(300);
       res.status = document.querySelector('.view-photos .stack-status:not([hidden])')?.textContent;
       res.lineSlider = !!document.querySelector('.view-photos .stack-status .sens-range');
@@ -2262,8 +2266,10 @@ app.whenReady().then(async () => {
       res.noMenuItem = ![...document.querySelectorAll('.ctx-menu .ctx-item')].some((x) => /Grouped photos|Only groups|Only stacks/.test(x.textContent));
       document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
       sw().click(); await wait(500);
+      res.metaOff = !/stack/.test(document.querySelector('.view-photos .crumb-meta')?.textContent || '');
       res.off = !document.querySelector('.view-photos .tile-stack') && lib.view('main').length === allBefore;
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(st.metaOk && st.metaOff, 'Stack photos on: beside how many items, how many stacks and single photos; off, only the items', JSON.stringify({ meta: st.meta, ok: st.metaOk, off: st.metaOff }));
     check(st.label === 'Stack photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the stack$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /stacks? of similar photos · \d+ of \d+ photos are in a stack/.test(st.status || ''),
       'the switch "Stack photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && !st.onlyChip && st.onlyMarked && st.onlyBack && st.noOldSwitch && st.noMenuItem,
@@ -2281,6 +2287,38 @@ app.whenReady().then(async () => {
       'the viewer, Photos grouped: the photos of the group in a strip below the one shown (as in Google Photos); a click shows another of them', JSON.stringify({ thumbs: st.vwThumbs, label: st.vwLabel, picked: st.vwPicked, open: st.vwOpen }));
     check(st.groups === 1 && st.tiles === Number(st.badge) && /^A stack of \d+ similar photos$/.test(st.groupTitle || '') && st.keep0 === 'Goes to the Limbo' && st.keep1 === 'Stays' && st.out1 === st.out0 - 1 && st.more && /^Space: stays or goes/.test(st.hint || '') && st.outAfter === st.out0 - 1,
       'the stack opens its group; side by side, as in a phone\'s burst: the space bar says whether a photo stays or goes (the strip and the group follow), and the photo\'s menu is there', JSON.stringify(st));
+    // the viewer on a stack: a photo of it sent to the Limbo (asked as always) stays in the strip, marked as gone,
+    // and the next photo of the stack shows; the stack stays on the screen; its menu brings it back
+    const vl = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      lib.setFilter({ day: '', year: 0, folder: '', recursive: true }); s.layout.openView('photos'); lib.clearSelection();
+      if (!s.similar.active) s.similar.setMode('stacks');
+      for (let i = 0; i < 80 && !lib.view('main').some((x) => (s.similar.stackOf(x.id)?.count || 0) >= 3); i++) await wait(100);
+      const list = lib.view('main');
+      const at = list.findIndex((x) => (s.similar.stackOf(x.id)?.count || 0) >= 3);
+      if (at < 0) return { none: true };
+      const st = s.similar.stackOf(list[at].id);
+      s.viewer.open(list, at); await wait(500);
+      const shown0 = s.viewer.current.id;
+      const res = { count: st.count, strip0: document.querySelectorAll('.viewer .vw-stack-cell').length };
+      document.querySelector('.viewer .vw-btn.danger').click(); await wait(300);
+      res.asked = !!document.querySelector('.cm-dialog');
+      document.querySelector('.cm-dialog .btn-primary')?.click(); await wait(900);
+      res.gone = (lib.byId.get(shown0)?.mark || 0) === 3;
+      res.open = !!document.querySelector('.viewer');
+      res.strip = document.querySelectorAll('.viewer .vw-stack-cell').length;
+      res.marked = document.querySelectorAll('.viewer .vw-stack-cell.is-limbo').length;
+      res.next = s.viewer.current?.id !== shown0 && st.units.some((u) => u.files.some((f) => f.id === s.viewer.current?.id));
+      res.shownCell = !!document.querySelector('.viewer .vw-stack-cell:not(.is-limbo) .vw-stack-thumb.is-shown');
+      // its menu: back from the Limbo
+      document.querySelector('.viewer .vw-stack-cell.is-limbo .vw-stack-thumb')?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 300, clientY: 300 })); await wait(250);
+      const back = [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Bring back to Photos'));
+      res.backItem = !!back; back?.click(); await wait(700);
+      res.back = (lib.byId.get(shown0)?.mark || 0) !== 3;
+      s.viewer.close(); await wait(300);
+      s.similar.setMode('all'); await wait(400);
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(vl.none || (vl.asked && vl.gone && vl.open && vl.strip === vl.strip0 && vl.marked === 1 && vl.next && vl.shownCell && vl.backItem && vl.back),
+      'the viewer on a stack: a photo sent to the Limbo (asked as always) stays in the strip, marked as gone, the next photo of the stack shows and the stack stays; its menu brings it back', JSON.stringify(vl));
     // "Stack photos" (Ctrl+G, as in Lightroom): photos selected put in one stack by hand, whatever they look like;
     // kept in the catalog; "Unstack" (Ctrl+Shift+G) undoes it, and the notice's undo brings it back
     const man = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));

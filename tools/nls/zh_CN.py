@@ -585,3 +585,5 @@ _merge(MESSAGES, {'similar': {'pairBadge': {'one': '同一张照片的 {count} �
 _merge(MESSAGES, {'similar': {'setCover': '设为封面', 'setCoverTitle': '将此文件作为“照片”中显示的照片（RAW + JPEG 的封面）', 'coverTitle': '封面：在“照片”中显示的文件', 'pairBadge': {'one': '同一张照片的 {count} 个文件（RAW+JPG）：打开', 'other': '同一张照片的 {count} 个文件（RAW+JPG）：打开'}}, 'viewer': {'pairLabel': {'one': '同一张照片的 {count} 个文件', 'other': '同一张照片的 {count} 个文件'}}})
 
 _merge(MESSAGES, {'similar': {'setBest': '设为最佳', 'setCover': '设为最佳', 'setCoverTitle': '将此文件作为“照片”中显示的照片（RAW + JPEG 的最佳）', 'coverTitle': '最佳：在“照片”中显示的文件'}})
+
+_merge(MESSAGES, {'photos': {'stacksCount': {'one': '{count} 个堆叠', 'other': '{count} 个堆叠'}, 'singlesCount': {'one': '{count} 张单独照片', 'other': '{count} 张单独照片'}}})

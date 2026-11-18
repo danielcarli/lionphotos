@@ -76,6 +76,7 @@ export class Viewer {
     this.title = opts.title || '';
     this.index = Math.max(0, Math.min(index, list.length - 1));
     this.stackPick = null;
+    this.stackSnap = null; // a stack whose photos went to the Limbo here: still shown in the strip
     this.onMove = onMove;
     // a viewer opened again starts fitted to the screen
     this.scale = 0;
@@ -164,6 +165,7 @@ export class Viewer {
     if (next < 0 || next >= this.list.length) return;
     this.index = next;
     this.stackPick = null;
+    this.stackSnap = null;
     this.scale = 0;
     this.#show();
     this.onMove?.(this.current.id);
@@ -199,7 +201,10 @@ export class Viewer {
   #renderStack(it) {
     const el = this.stackEl;
     const top = this.list[this.index];
-    const stack = !this.playing && top ? this.services.similar?.groupOf(top.id) : null;
+    const live = !this.playing && top ? this.services.similar?.groupOf(top.id) : null;
+    // photos of this stack sent to the Limbo here: still in the strip, marked as gone
+    const snap = !this.playing && this.stackSnap?.at === this.index ? this.stackSnap : null;
+    const stack = snap ? { top: live?.top ?? top?.id, count: snap.units.length, units: snap.units } : live;
     if (!stack || stack.count < 2) {
       // a RAW and its JPEG shown as one: their files in the strip, the cover chosen there
       const pair = !this.playing && top ? this.services.similar?.pairOf(top.id) : null;
@@ -213,16 +218,21 @@ export class Viewer {
     el.setAttribute('aria-label', tn('viewer.stackLabel', stack.count));
     setChildren(el,
       h('span.vw-stack-label', h('span', { html: icon('stack', 14) }), tn('viewer.stackLabel', stack.count)),
-      h('div.vw-stack-thumbs', stack.units.map((u) => h('div.vw-stack-cell',
-        h(`button.vw-stack-thumb${isShown(u) ? '.is-shown' : ''}`, {
-          type: 'button', title: u.files.map((f) => f.name).join(' + '), 'aria-pressed': String(isShown(u)), onclick: () => pick(u),
-          // its menu: make it single (out of the group), or the best of the group
-          oncontextmenu: (e) => { e.preventDefault(); this.#stackMenu(stack, u, e.clientX, e.clientY); },
-        }, this.thumbs.shown(h('img', { alt: '', draggable: false, decoding: 'async' }), u.rep),
-        u.rep.id === best ? h('span.vw-stack-best', { title: t('similar.bestTitle') }, h('span', { html: icon('sparkle', 10) })) : null),
-        // × : this photo out of the group (it is not grouped with these again; the notice undoes it)
-        h('button.vw-stack-remove', { type: 'button', title: t('similar.removeFromStack'), 'aria-label': `${t('similar.removeFromStack')} · ${u.rep.name}`, html: icon('close', 11),
-          onclick: (e) => { e.stopPropagation(); this.#removeFromStack(stack, u); } })))),
+      h('div.vw-stack-thumbs', stack.units.map((u) => {
+        // sent to the Limbo from here: still shown, marked as gone (a click shows it; its menu brings it back)
+        const gone = (this.library.byId.get(u.rep.id)?.mark || 0) === 3;
+        return h(`div.vw-stack-cell${gone ? '.is-limbo' : ''}`,
+          h(`button.vw-stack-thumb${isShown(u) ? '.is-shown' : ''}`, {
+            type: 'button', title: gone ? `${u.files.map((f) => f.name).join(' + ')}\n${t('marks.rejectBadge')}` : u.files.map((f) => f.name).join(' + '), 'aria-pressed': String(isShown(u)), onclick: () => pick(u),
+            // its menu: make it single (out of the group), or the best of the group; gone: back from the Limbo
+            oncontextmenu: (e) => { e.preventDefault(); if (gone) this.#limboMenu(u, e.clientX, e.clientY); else this.#stackMenu(stack, u, e.clientX, e.clientY); },
+          }, this.thumbs.shown(h('img', { alt: '', draggable: false, decoding: 'async' }), u.rep),
+          gone ? h('span.vw-stack-limbo', { title: t('marks.rejectBadge') }, h('span', { html: icon('binQuestion', 11) })) : null,
+          !gone && u.rep.id === best ? h('span.vw-stack-best', { title: t('similar.bestTitle') }, h('span', { html: icon('sparkle', 10) })) : null),
+          // × : this photo out of the group (it is not grouped with these again; the notice undoes it)
+          gone ? null : h('button.vw-stack-remove', { type: 'button', title: t('similar.removeFromStack'), 'aria-label': `${t('similar.removeFromStack')} · ${u.rep.name}`, html: icon('close', 11),
+            onclick: (e) => { e.stopPropagation(); this.#removeFromStack(stack, u); } }));
+      })),
       h('button.vw-stack-open', { type: 'button', title: t('viewer.stackOpenTitle'), onclick: () => {
         const items = stack.units.flatMap((u) => u.files);
         this.close();
@@ -274,6 +284,17 @@ export class Viewer {
     await sim.setApart(pairs, true);
     repaint();
     this.notifications?.info(t('similar.removedFromStack', { name: u.rep.name }), 8000, { label: t('ops.undo'), run: async () => { await sim.setApart(pairs, false); repaint(); } });
+  }
+
+  /** A photo of the strip sent to the Limbo here: brought back (it is in its stack again). */
+  #limboMenu(u, x, y) {
+    showContextMenu(x, y, [
+      { label: t('limbo.restoreSelected'), icon: 'undo', title: t('limbo.restoreTitle'), run: async () => {
+        await applyMark(this.library, u.files.map((f) => f.id).filter((id) => (this.library.byId.get(id)?.mark || 0) === 3), 'reject');
+        this.services.similar?.regroupNow();
+        if (this.el && this.current) this.#show();
+      } },
+    ]);
   }
 
   #stackMenu(stack, u, x, y) {
@@ -349,16 +370,52 @@ export class Viewer {
     const it = this.current;
     if (!it) return;
     if ((it.mark || 0) === 3) { this.operations.trash([it.id]); return; }
+    if (await this.#limboInStack(it)) return;
     const done = await applyMark(this.library, [it.id], 'reject');
     if (done === null || !this.el) return;
     if (this.index < this.list.length - 1) this.move(1);
     else this.#renderBar(this.current);
   }
 
+  /**
+   * A photo of a stack sent to the Limbo (the button, Delete or 3): asked as always; then it stays in the strip,
+   * marked as gone, and the next photo of the stack shows — the stack stays on the screen.
+   * @returns {Promise<boolean>} false: not in a stack (the usual way)
+   */
+  async #limboInStack(it) {
+    const top = this.list[this.index];
+    const g = !this.playing && top ? this.services.similar?.groupOf(top.id) : null;
+    if (!g || g.count < 2) return false;
+    const units = this.stackSnap?.at === this.index ? this.stackSnap.units : g.units;
+    const i = units.findIndex((u) => u.files.some((f) => f.id === it.id));
+    const done = await applyMark(this.library, [it.id], 'reject');
+    if (done === null || !this.el) return true;
+    const sim = this.services.similar;
+    sim.regroupNow();
+    const alive = (u) => (this.library.byId.get(u.rep.id)?.mark || 0) !== 3;
+    const next = units.slice(i + 1).find(alive) || units.slice(0, Math.max(0, i)).reverse().find(alive);
+    if (next) {
+      // the photo of the list: the stack's best now (or the one left, when the stack is gone)
+      const g2 = sim.groupOf(next.rep.id);
+      const cover = this.library.byId.get(g2?.top ?? next.rep.id) || next.rep;
+      const at = this.index;
+      this.list = this.list.slice();
+      this.list[at] = cover;
+      this.index = at;
+      this.stackSnap = { at, units };
+      this.stackPick = next.rep.id === cover.id ? null : this.library.byId.get(next.rep.id) || next.rep;
+      this.stackPickAt = at;
+    } else this.stackSnap = { at: this.index, units };
+    this.scale = 0;
+    this.#show();
+    return true;
+  }
+
   /** Great · OK · candidate to delete (the same key again clears it). */
   async #mark(name) {
     const it = this.current;
     if (!it) return;
+    if (name === 'reject' && (it.mark || 0) !== 3 && await this.#limboInStack(it)) return;
     await applyMark(this.library, [it.id], name);
     if (this.current?.id === it.id) this.#renderBar(this.current);
   }

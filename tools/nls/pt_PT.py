@@ -588,3 +588,5 @@ _merge(MESSAGES, {'similar': {'pairBadge': {'one': '{count} ficheiro da mesma fo
 _merge(MESSAGES, {'similar': {'setCover': 'Usar como capa', 'setCoverTitle': 'Mostrar este ficheiro como a fotografia em Fotos (a capa do RAW + JPEG)', 'coverTitle': 'A capa: o ficheiro mostrado em Fotos', 'pairBadge': {'one': '{count} ficheiro da mesma fotografia (RAW+JPG): abrir', 'other': '{count} ficheiros da mesma fotografia (RAW+JPG): abrir'}}, 'viewer': {'pairLabel': {'one': '{count} ficheiro da mesma fotografia', 'other': '{count} ficheiros da mesma fotografia'}}})
 
 _merge(MESSAGES, {'similar': {'setBest': 'Definir como a melhor', 'setCover': 'Definir como a melhor', 'setCoverTitle': 'Mostrar este ficheiro como a fotografia em Fotos (a melhor do RAW + JPEG)', 'coverTitle': 'A melhor: o ficheiro mostrado em Fotos'}})
+
+_merge(MESSAGES, {'photos': {'stacksCount': {'one': '{count} pilha', 'other': '{count} pilhas'}, 'singlesCount': {'one': '{count} fotografia individual', 'other': '{count} fotografias individuais'}}})

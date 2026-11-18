@@ -3629,3 +3629,7 @@ button.vw-chip:hover { filter: brightness(1.2); }
 
 /* a RAW and its JPEG in the viewer's strip: the kind of each file, the cover marked (1.75.0) */
 .vw-pair-ext { position: absolute; right: 3px; bottom: 3px; padding: 1px 4px; border-radius: 4px; background: rgb(0 0 0 / 0.62); color: #fff; font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.3; }
+
+/* a photo of the stack sent to the Limbo from the viewer: still in the strip, marked as gone (1.77.0) */
+.vw-stack-cell.is-limbo .vw-stack-thumb img { filter: grayscale(1); opacity: 0.45; }
+.vw-stack-limbo { position: absolute; right: 3px; bottom: 3px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--danger, #c4314b); color: #fff; line-height: 0; }

@@ -2,6 +2,16 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.77.0] — 2026-11-18
+
+### Changed
+- The viewer on a stack: a photo of it sent to the Limbo (the bin button, Delete or 3) is asked as always; then it stays in the strip below, greyed with the Limbo mark, and **the next photo of the same stack shows**, so the stack stays on the screen until you move on. The strip's menu on a photo sent there brings it back to Photos.
+
+## [1.76.0] — 2026-11-18
+
+### Added
+- Photos › *Stack photos* on: beside how many items there are (and their size), how many **stacks** and how many **single photos** are shown — "15,135 items · 390 GB · 1,643 stacks · 4,112 single photos". A RAW + JPEG counts as one single photo. Off, only the items, as before.
+
 ## [1.75.1] — 2026-11-18
 
 ### Changed

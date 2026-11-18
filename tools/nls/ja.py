@@ -585,3 +585,5 @@ _merge(MESSAGES, {'similar': {'pairBadge': {'one': '同じ写真のファイル 
 _merge(MESSAGES, {'similar': {'setCover': 'カバーにする', 'setCoverTitle': 'このファイルを「写真」に表示する写真にします（RAW + JPEG のカバー）', 'coverTitle': 'カバー: 「写真」に表示されるファイル', 'pairBadge': {'one': '同じ写真のファイル {count} 個（RAW+JPG）: 開く', 'other': '同じ写真のファイル {count} 個（RAW+JPG）: 開く'}}, 'viewer': {'pairLabel': {'one': '同じ写真のファイル {count} 個', 'other': '同じ写真のファイル {count} 個'}}})
 
 _merge(MESSAGES, {'similar': {'setBest': 'ベストに設定', 'setCover': 'ベストに設定', 'setCoverTitle': 'このファイルを「写真」に表示する写真にします（RAW + JPEG のベスト）', 'coverTitle': 'ベスト: 「写真」に表示されるファイル'}})
+
+_merge(MESSAGES, {'photos': {'stacksCount': {'one': 'スタック {count} 個', 'other': 'スタック {count} 個'}, 'singlesCount': {'one': '単独の写真 {count} 枚', 'other': '単独の写真 {count} 枚'}}})

@@ -28,7 +28,7 @@
 
 **가져오기 없음** · **컴퓨터 밖으로 나가는 것 없음** · **10만 장도 100장처럼 매끄럽게** · **무료 오픈 소스**
 
-![버전 1.66.0](https://img.shields.io/badge/version-1.66.0-161214)
+![버전 1.67.0](https://img.shields.io/badge/version-1.67.0-161214)
 ![상태: 베타 테스트](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![라이선스: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![플랫폼: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -42,6 +42,8 @@
 **인상적인 기능 범위.** LionPhotos는 이미 Lightroom 라이브러리 모듈의 핵심(카탈로그, 표시, IPTC, RAW+JPEG, 비파괴 보정)과 Google 포토의 장점(인물, 반려동물, 내용 검색, 비슷한 사진 묶음)을 하나로 모았습니다. 여기에 보류함(Limbo), 자체 브랜드 플러그인, 10개 언어까지 갖추었습니다.
 
 **실제 사용에서 출발했습니다.** 많은 기능이 사진을 찍는 사람들이 실제로 겪는 문제에서 나왔습니다: 느린 Google 드라이브, RAW+JPEG, 사진을 버리기 전 메타데이터 비교. 이렇게 만든 소프트웨어는 보기 좋을 뿐 아니라 쓸모가 있습니다.
+
+**큰 컬렉션으로 테스트 중입니다.** LionPhotos는 USB 3.1 외장 드라이브에 있는 7만 장이 넘는 사진 컬렉션으로 테스트되고 있으며, 전체 컬렉션의 썸네일을 만드는 데는 시간이 더 걸리지만 인터페이스는 탐색하기 쉽고 부드럽게 유지됩니다.
 
 ## 실제 모습
 
@@ -333,7 +335,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 변경 내역
 
-[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.66.0**.
+[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.67.0**.
 
 ## 만든 사람들
 

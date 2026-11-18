@@ -569,3 +569,5 @@ _merge(MESSAGES, {'similar': {'why': {'content': '内容', 'contentUnread': '内
 _merge(MESSAGES, {'similar': {'mode': {'label': '似た写真の表示方法', 'all': 'すべて', 'stacks': 'まとめる', 'groups': 'グループのみ', 'allTitle': 'すべての写真を 1 枚ずつ', 'stacksTitle': '似た写真のグループを 1 枚（ベスト）で表示し、スタックと枚数を示します', 'groupsTitle': '似た写真のグループだけ（単独の写真は表示しません）', 'groupsOff': '単独の写真も表示'}}})
 
 _merge(MESSAGES, {'similar': {'pickAll': 'すべて選択', 'pickNoneBtn': '選択を解除', 'pickedOf': '{total} グループ中 {n} グループを選択', 'pickTitle': '選択中：ここでの操作が適用されます', 'inPicked': '選択したグループで：', 'pickNone': 'グループを選択してください'}})
+
+_merge(MESSAGES, {'adjust': {'group': {'curves': 'トーンカーブ'}}, 'curves': {'canvasLabel': 'カーブ：それぞれの明るさがどうなるか', 'channel': 'チャンネル', 'resetChannel': 'このカーブを直線に戻す', 'hint': 'カーブをクリックして点を追加し、ドラッグします。点を外へドラッグするかダブルクリックすると削除します。矢印キーで選んだ点を動かせます。', 'point': '入力 {x} → 出力 {y}', 'mixed': '選択した写真のカーブが異なります。ここでの設定はすべてに適用されます。', 'ch': {'rgb': 'RGB', 'r': '赤', 'g': '緑', 'b': '青', 'rgbTitle': '画像全体（明るさ）', 'rTitle': '画像の赤', 'gTitle': '画像の緑', 'bTitle': '画像の青'}}})

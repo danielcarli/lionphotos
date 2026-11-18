@@ -569,3 +569,5 @@ _merge(MESSAGES, {'similar': {'why': {'content': '내용', 'contentUnread': '아
 _merge(MESSAGES, {'similar': {'mode': {'label': '비슷한 사진 표시 방법', 'all': '모두', 'stacks': '묶음', 'groups': '그룹만', 'allTitle': '모든 사진을 한 장씩', 'stacksTitle': '비슷한 사진 그룹을 가장 좋은 사진 한 장으로, 묶음과 장수와 함께', 'groupsTitle': '비슷한 사진 그룹만(혼자인 사진은 빠짐)', 'groupsOff': '혼자인 사진도 보기'}}})
 
 _merge(MESSAGES, {'similar': {'pickAll': '모두 선택', 'pickNoneBtn': '선택 해제', 'pickedOf': '그룹 {total}개 중 {n}개 선택됨', 'pickTitle': '선택됨: 여기서 하는 작업이 적용됩니다', 'inPicked': '선택한 그룹에서:', 'pickNone': '그룹을 선택하세요'}})
+
+_merge(MESSAGES, {'adjust': {'group': {'curves': '곡선'}}, 'curves': {'canvasLabel': '곡선: 각 밝기가 어떻게 바뀌는지', 'channel': '채널', 'resetChannel': '이 곡선을 직선으로', 'hint': '곡선을 클릭해 점을 추가하고 끌어 옮깁니다. 점을 밖으로 끌거나 두 번 클릭하면 지워집니다. 화살표 키로 고른 점을 옮깁니다.', 'point': '입력 {x} → 출력 {y}', 'mixed': '선택한 사진들의 곡선이 다릅니다. 여기서 맞춘 값이 모두에 적용됩니다.', 'ch': {'rgb': 'RGB', 'r': '빨강', 'g': '초록', 'b': '파랑', 'rgbTitle': '이미지 전체(밝기)', 'rTitle': '이미지의 빨강', 'gTitle': '이미지의 초록', 'bTitle': '이미지의 파랑'}}})

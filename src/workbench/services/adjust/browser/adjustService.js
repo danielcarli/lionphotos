@@ -27,11 +27,12 @@
 import { ADJUST_KEYS } from '../../library/browser/libraryService.js';
 import { GEO_KEYS, drawGeometry, frameOf, geometryKey, geometryOf, hasGeometry } from '../common/geometry.js';
 import { LENS_KEYS, hasLens, lensUniforms, loadLensDb } from '../common/lens.js';
+import { curvesKey, curvesLut } from '../common/curves.js';
 
 const VS = `attribute vec2 p; varying vec2 uv;
 void main() { uv = vec2((p.x + 1.0) / 2.0, 1.0 - (p.y + 1.0) / 2.0); gl_Position = vec4(p, 0.0, 1.0); }`;
 const FS = `precision highp float;
-varying vec2 uv; uniform sampler2D tex;
+varying vec2 uv; uniform sampler2D tex; uniform sampler2D lut; uniform float lutOn;
 uniform float ev; uniform float con; uniform float sha; uniform float sat; uniform float hi; uniform float bp; uniform float wp;
 uniform float vib; uniform float bw; uniform float vig; uniform float clar; uniform float texr; uniform float shp;
 uniform vec3 wb; uniform vec3 bwW; uniform vec2 px; uniform float rC; uniform float rT; uniform mat3 G;
@@ -80,6 +81,11 @@ void main() {
   c = pow(max(c, 0.0), vec3(1.0 / 2.2)) + detail;
   c = (c - bp) / (wp - bp);
   c = (c - 0.5) * con + 0.5;
+  // the curves (one table: what each brightness of red, green and blue becomes)
+  if (lutOn > 0.5) {
+    vec3 k = clamp(c, 0.0, 1.0) * (255.0 / 256.0) + 0.5 / 256.0;
+    c = vec3(texture2D(lut, vec2(k.r, 0.5)).r, texture2D(lut, vec2(k.g, 0.5)).g, texture2D(lut, vec2(k.b, 0.5)).b);
+  }
   float s = max(c.r, max(c.g, c.b)) - min(c.r, min(c.g, c.b));
   float g = dot(c, W);
   c = mix(vec3(g), c, 1.0 + vib * (1.0 - clamp(s, 0.0, 1.0)) * (vib > 0.0 ? 1.2 : 1.0));
@@ -118,6 +124,7 @@ export function uniformsOf(a = {}) {
  */
 export function adjustPixels(img, adjust) {
   const u = uniformsOf(adjust);
+  const lut = curvesLut(adjust?.curves);
   const gain = 2 ** u.ev;
   const lin = new Float32Array(256);
   for (let i = 0; i < 256; i++) lin[i] = (i / 255) ** 2.2;
@@ -133,6 +140,10 @@ export function adjustPixels(img, adjust) {
     r = Math.max(r * f, 0) ** (1 / 2.2); g = Math.max(g * f, 0) ** (1 / 2.2); b = Math.max(b * f, 0) ** (1 / 2.2);
     r = (r - u.bp) / range; g = (g - u.bp) / range; b = (b - u.bp) / range;
     r = (r - 0.5) * u.con + 0.5; g = (g - 0.5) * u.con + 0.5; b = (b - 0.5) * u.con + 0.5;
+    if (lut) {
+      const at = (x) => Math.round(Math.min(1, Math.max(0, x)) * 255) * 4;
+      r = lut[at(r)] / 255; g = lut[at(g) + 1] / 255; b = lut[at(b) + 2] / 255;
+    }
     const s = Math.min(1, Math.max(0, Math.max(r, g, b) - Math.min(r, g, b)));
     let y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
     const vk = 1 + u.vib * (1 - s) * (u.vib > 0 ? 1.2 : 1);
@@ -200,8 +211,8 @@ const RAW_URL = /^lionmedia:\/\/raw\/(\d+)/;
 export const THUMB_ADJUSTED = 640;
 
 /** No change of the tones (the shape aside). */
-export const isNeutral = (a) => !a || ADJUST_KEYS.every((k) => !a[k]);
-const keyOf = (a) => `v2,${ADJUST_KEYS.map((k) => a?.[k] || 0).join(',')}${hasGeometry(a) ? `,${geometryKey(a)}` : ''}${a?.raw ? ',raw' : ''}`;
+export const isNeutral = (a) => !a || (ADJUST_KEYS.every((k) => !a[k]) && !curvesKey(a.curves));
+const keyOf = (a) => `v2,${ADJUST_KEYS.map((k) => a?.[k] || 0).join(',')}${hasGeometry(a) ? `,${geometryKey(a)}` : ''}${a?.raw ? ',raw' : ''}${curvesKey(a?.curves) ? `,c:${curvesKey(a.curves)}` : ''}`;
 
 /**
  * A picture on a canvas, drawn with adjustments. The picture goes to the graphics card once (setSource); each
@@ -239,7 +250,18 @@ export class PictureView {
     this.tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.tex);
     for (const [k, v] of [[gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE], [gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
-    this.loc = Object.fromEntries(['ev', 'con', 'sha', 'sat', 'hi', 'bp', 'wp', 'vib', 'bw', 'vig', 'clar', 'texr', 'shp', 'wb', 'bwW', 'px', 'rC', 'rT', 'G', 'lensOn', 'sz', 'Rh', 'Rv', 'D0', 'Dk', 'Tr', 'Tb', 'Vk', 'sc', 'Mv', 'Pk', 'Pr'].map((k) => [k, gl.getUniformLocation(prog, k)]));
+    // the curves' table, on the second texture unit
+    this.lutTex = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, this.lutTex);
+    for (const [k, v] of [[gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE], [gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(1024));
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.tex);
+    gl.uniform1i(gl.getUniformLocation(prog, 'tex'), 0);
+    gl.uniform1i(gl.getUniformLocation(prog, 'lut'), 1);
+    this.lutKey = '';
+    this.loc = Object.fromEntries(['lutOn', 'ev', 'con', 'sha', 'sat', 'hi', 'bp', 'wp', 'vib', 'bw', 'vig', 'clar', 'texr', 'shp', 'wb', 'bwW', 'px', 'rC', 'rT', 'G', 'lensOn', 'sz', 'Rh', 'Rv', 'D0', 'Dk', 'Tr', 'Tb', 'Vk', 'sc', 'Mv', 'Pk', 'Pr'].map((k) => [k, gl.getUniformLocation(prog, k)]));
     gl.uniformMatrix3fv(this.loc.G, false, IDENTITY);
     // a shader the driver refused (it would draw nothing): the processor draws instead
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.warn('[adjust] shader', gl.getProgramInfoLog(prog)); this.gl = null; this.canvas = document.createElement('canvas'); }
@@ -311,6 +333,17 @@ export class PictureView {
         gl.uniform4f(this.loc.Dk, ...lens.D); gl.uniform3f(this.loc.Tr, ...lens.Tr); gl.uniform3f(this.loc.Tb, ...lens.Tb); gl.uniform3f(this.loc.Vk, ...lens.V);
         gl.uniform2f(this.loc.Mv, ...lens.M); gl.uniform2f(this.loc.Pk, ...lens.P); gl.uniform1f(this.loc.Pr, lens.Pr);
       }
+      // the curves: their table sent when they change
+      const ck = curvesKey(adjust?.curves);
+      if (ck && ck !== this.lutKey) {
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, this.lutTex);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 256, 1, gl.RGBA, gl.UNSIGNED_BYTE, curvesLut(adjust.curves));
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.tex);
+        this.lutKey = ck;
+      }
+      gl.uniform1f(this.loc.lutOn, ck ? 1 : 0);
       const u = uniformsOf(adjust);
       for (const [k, x] of Object.entries(u)) {
         if (Array.isArray(x)) gl.uniform3f(this.loc[k], x[0], x[1], x[2]); else gl.uniform1f(this.loc[k], x);

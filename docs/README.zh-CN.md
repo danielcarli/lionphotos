@@ -28,7 +28,7 @@
 
 **无需导入** · **数据不出本机** · **10 万张照片如 100 张般流畅** · **免费开源**
 
-![版本 1.66.0](https://img.shields.io/badge/version-1.66.0-161214)
+![版本 1.67.0](https://img.shields.io/badge/version-1.67.0-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -42,6 +42,8 @@
 **功能覆盖令人印象深刻。** LionPhotos 已经把 Lightroom“图库”模块的核心（目录、标记、IPTC、RAW+JPEG、无损调整）与 Google 相册的精华（人物、宠物、按内容搜索、相似照片堆叠）结合在一起。此外还有待删区（Limbo）、自有品牌插件和 10 种语言。
 
 **源自真实使用。** 许多功能都来自拍照者遇到的真实问题：缓慢的 Google 云端硬盘、RAW+JPEG、丢弃照片前比较元数据。这样做出的软件往往实用，而不只是好看。
+
+**在大型照片集上测试。** LionPhotos 正在一个存放于 USB 3.1 外置硬盘、超过 7 万张照片的照片集上测试，界面依然易于浏览、流畅；只是为整个照片集生成缩略图需要更多时间。
 
 ## 实际效果
 
@@ -333,7 +335,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.66.0**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.67.0**。
 
 ## 致谢
 

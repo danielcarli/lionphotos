@@ -28,7 +28,7 @@
 
 **インポート不要** · **何もコンピューターの外に出ない** · **10万枚でも100枚のように軽快** · **無料・オープンソース**
 
-![バージョン 1.66.0](https://img.shields.io/badge/version-1.66.0-161214)
+![バージョン 1.67.0](https://img.shields.io/badge/version-1.67.0-161214)
 ![ステータス：ベータテスト](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![ライセンス: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![対応: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -42,6 +42,8 @@
 **充実した機能。** LionPhotos は、Lightroom のライブラリモジュールの要点（カタログ、マーク、IPTC、RAW+JPEG、非破壊の調整）と、Google フォトの優れた機能（人物、ペット、内容による検索、似た写真のスタック）をすでにひとつにまとめています。さらに保留（Limbo）、独自ブランドのプラグイン、10 言語にも対応しています。
 
 **実際の利用から生まれました。** 多くの機能は、写真を撮る人の実際の悩みから生まれています：遅い Google ドライブ、RAW+JPEG、写真を捨てる前のメタデータの比較。そうして生まれるソフトウェアは、見た目だけでなく役に立つものになりがちです。
+
+**大きなコレクションでテスト中。** LionPhotos は、USB 3.1 の外付けドライブにある 7 万枚以上の写真コレクションでテストされています。コレクション全体のサムネイル作成には時間がかかりますが、インターフェイスは操作しやすく、なめらかなままです。
 
 ## 実際の画面
 
@@ -333,7 +335,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 変更履歴
 
-[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.66.0**。
+[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.67.0**。
 
 ## クレジット
 

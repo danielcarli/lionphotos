@@ -22,6 +22,8 @@ import { showTextDialog } from '../../browser/choiceDialog.js';
 import { geometryOf, hasGeometry, hasShape } from '../../services/adjust/common/geometry.js';
 import { LENS_KEYS, MANUAL_KEYS, PROFILE_KEYS, hasLens, hasManual, hasProfile, loadLensDb, resolveLens } from '../../services/adjust/common/lens.js';
 import { showLensPicker } from './lensPicker.js';
+import { curvesEditor } from './curvesEditor.js';
+import { cleanCurves, curvesKey, hasCurves } from '../../services/adjust/common/curves.js';
 
 // what the app's own engine can draw at full size (others: only their thumbnail)
 export const WEB_IMAGES = new Set(['jpg', 'jpeg', 'jpe', 'jfif', 'png', 'gif', 'webp', 'avif', 'bmp']);
@@ -29,7 +31,9 @@ const MAX_SAVE = 30;
 
 const GROUPS_KEY = 'lionphotos.adjustGroups';
 // one group open at a time (an accordion): Light at first
-const GROUPS_OPEN = { light: true, color: false, detail: false, lens: false, effects: false, lensManual: false };
+const GROUPS_OPEN = { light: true, color: false, curves: false, detail: false, lens: false, effects: false, lensManual: false };
+/** The tones of adjustments (the sliders and the curves), for presets, copy and paste: what they set on a photo. */
+const tonesOf = (a) => ({ ...Object.fromEntries(ADJUST_KEYS.map((k) => [k, a?.[k] || 0])), curves: cleanCurves(a?.curves) || 0 });
 function groupState() { try { return JSON.parse(localStorage.getItem(GROUPS_KEY) || '{}') || {}; } catch { return {}; } }
 const isGroupOpen = (id) => { const st = groupState(); return id in st ? !!st[id] : !!GROUPS_OPEN[id]; };
 function rememberGroup(id, open) { try { localStorage.setItem(GROUPS_KEY, JSON.stringify({ ...groupState(), [id]: open })); } catch { /* storage unavailable */ } }
@@ -63,6 +67,7 @@ export function adjustText(key, v) {
 export function adjustSummary(a) {
   const parts = ADJUST_KEYS.filter((k) => a?.[k] && k !== 'bw' && (a.bw || !k.startsWith('bw'))).map((k) => `${t(`adjust.${k}`)} ${adjustText(k, a[k])}`);
   if (a?.bw) parts.push(t('adjust.bw'));
+  if (hasCurves(a)) parts.push(t('adjust.group.curves'));
   if (hasLens(a)) parts.push(t('lens.summary'));
   if (hasShape(a)) parts.push(geometrySummary(a));
   return parts.join(' · ');
@@ -218,11 +223,10 @@ export function adjustSection(s, items, { live = null, preview: draw = null } = 
     const r = e.currentTarget.getBoundingClientRect();
     const list = loadPresets();
     const cur = one ? adjustOf(items[0]) : null;
-    const tonesOf = (a) => Object.fromEntries(ADJUST_KEYS.map((k) => [k, a?.[k] || 0]));
     showContextMenu(r.left, r.bottom + 4, [
       ...list.map((p) => ({ label: p.name, icon: 'sliders', title: adjustSummary(p.values), run: () => commit(tonesOf(p.values)) })),
       ...(list.length ? ['-'] : []),
-      { label: t('adjust.presetSave'), icon: 'plus', disabled: !cur || !ADJUST_KEYS.some((k) => cur[k]), run: async () => {
+      { label: t('adjust.presetSave'), icon: 'plus', disabled: !cur || (!ADJUST_KEYS.some((k) => cur[k]) && !hasCurves(cur)), run: async () => {
         const res = await showTextDialog({ icon: 'sliders', eyebrow: t('adjust.title'), title: t('adjust.presetSaveTitle'), label: t('adjust.presetName'), confirmLabel: t('adjust.presetSaveConfirm') });
         const name = String(res?.text || '').trim().slice(0, 60);
         if (!name) return;
@@ -355,11 +359,26 @@ export function adjustSection(s, items, { live = null, preview: draw = null } = 
     const profiled = all && photos.some((it) => adjustOf(it)?.lensId);
     return group('lens', t('adjust.group.lens'), profiled ? ['lensDist', 'lensVig', 'lensCa'] : [], manual, box, null, LENS_KEYS);
   };
+  // ---- the curves (RGB, red, green, blue), as in digiKam: the photo follows while a point moves
+  const curvesGroup = () => {
+    if (!adjust) return null;
+    const keys = new Set(items.map((it) => curvesKey(adjustOf(it)?.curves)));
+    const shown = keys.size === 1 ? cleanCurves(adjustOf(items[0])?.curves) : null;
+    const editor = curvesEditor({
+      curves: shown,
+      histogram: one && thumbUrl ? () => adjust.histogram(thumbUrl, { ...(adjustOf(items[0]) || {}), curves: null }) : null,
+      onPreview: (cv) => { if (one) preview({ ...(adjustOf(items[0]) || {}), curves: cv }); },
+      onCommit: (cv) => commit({ curves: cv || 0 }),
+    });
+    const note = keys.size > 1 ? h('p.small.muted.crv-mixed', t('curves.mixed')) : null;
+    return group('curves', t('adjust.group.curves'), [], editor, note, null, ['curves']);
+  };
   const detailNote = gpu ? null : h('p.small.ip-adj-gpu', h('span', { html: icon('alertMark', 13) }), h('span', t('adjust.detailNoGpu')));
   const groups = [
     group('light', t('adjust.group.light'), ['exposure', 'contrast', 'highlights', 'shadows', 'whites', 'blacks']),
     group('color', t('adjust.group.color'), ['temperature', 'tint', 'vibrance', 'saturation'],
       h('div.ip-adj-bw', bwSwitch, bwOn ? h('div.ip-adj-bwmix', ['bwRed', 'bwGreen', 'bwBlue'].map(slider)) : null), null, eyedropper),
+    curvesGroup(),
     group('detail', t('adjust.group.detail'), DETAIL_KEYS, null, detailNote),
     lensGroup(),
     group('effects', t('adjust.group.effects'), ['vignette']),
@@ -379,14 +398,14 @@ export function adjustSection(s, items, { live = null, preview: draw = null } = 
   const buttons = h('div.ip-adj-acts',
     one && has ? h('button.btn.btn-secondary.btn-sm', { onclick: () => { adjust.clipboard = { ...adjustOf(items[0]) }; notifications?.success(t('adjust.copied'), 3000); s.rerenderInfo?.(); } },
       h('span', { html: icon('copy', 13) }), t('adjust.copy')) : null,
-    clip ? h('button.btn.btn-secondary.btn-sm', { title: tn('adjust.pasteTitle', items.length), onclick: () => commit(Object.fromEntries(ADJUST_KEYS.map((k) => [k, clip[k] || 0]))) },
+    clip ? h('button.btn.btn-secondary.btn-sm', { title: tn('adjust.pasteTitle', items.length), onclick: () => commit(tonesOf(clip)) },
       h('span', { html: icon('paste', 13) }), one ? t('adjust.paste') : tn('adjust.pasteMany', items.length)) : null,
     savable.length ? h('button.btn.btn-secondary.btn-sm.ip-save-copy', { title: t('adjust.saveTitle'), onclick: () => saveEditedCopies(s, savable) },
       h('span', { html: icon('disk', 13) }), tn('adjust.save', savable.length)) : null);
 
   // Reset: the tones (the crop has its own "Remove")
-  const toned = items.some((it) => ADJUST_KEYS.some((k) => adjustOf(it)?.[k]));
-  const reset = toned ? h('button.link.ip-sec-act', { onclick: () => commit(Object.fromEntries(ADJUST_KEYS.map((k) => [k, 0]))) }, t('adjust.reset')) : null;
+  const toned = items.some((it) => ADJUST_KEYS.some((k) => adjustOf(it)?.[k]) || hasCurves(adjustOf(it)));
+  const reset = toned ? h('button.link.ip-sec-act', { onclick: () => commit(tonesOf(null)) }, t('adjust.reset')) : null;
   const summary = () => {
     if (one) { const a = adjustOf(items[0]); return a ? h('span', adjustSummary(a)) : h('span.muted', t('adjust.none')); }
     const n = items.filter((it) => adjustOf(it)).length;

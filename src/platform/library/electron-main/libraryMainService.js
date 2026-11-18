@@ -51,6 +51,24 @@ const { t } = require('../../nls/common/nls');
 
 const DELTA_MAX = 4000; // more changes than this: the whole list is sent
 
+/** Curves as the catalog keeps them (the window's adjust/common/curves.js): sound points, straight channels out. */
+function curvesPatch(cv) {
+  if (!cv || typeof cv !== 'object') return 0;
+  const out = {};
+  for (const ch of ['rgb', 'r', 'g', 'b']) {
+    if (!Array.isArray(cv[ch])) continue;
+    const byX = new Map();
+    for (const p of cv[ch].slice(0, 64)) {
+      if (!Array.isArray(p)) continue;
+      const x = Math.round(Number(p[0])), y = Math.round(Number(p[1]));
+      if (Number.isFinite(x) && Number.isFinite(y)) byX.set(Math.max(0, Math.min(255, x)), Math.max(0, Math.min(255, y)));
+    }
+    const pts = [...byX].sort((a, b) => a[0] - b[0]).slice(0, 16);
+    if (pts.length >= 2 && pts.some(([x, y]) => x !== y)) out[ch] = pts;
+  }
+  return Object.keys(out).length ? out : 0;
+}
+
 class LibraryMainService {
   #onDidOpen = new Emitter();
   #onDidScan = new Emitter();
@@ -134,6 +152,8 @@ class LibraryMainService {
           // develop mode of a raw photo: on (1) or off
           if ('raw' in patch.adjust) adj.raw = patch.adjust.raw ? 1 : 0;
           Object.assign(adj, lensPatch(patch.adjust));
+          // the curves: up to 16 points [x, y] (0–255) per channel; straight ones left out, none takes them off
+          if ('curves' in patch.adjust) adj.curves = curvesPatch(patch.adjust.curves);
         }
         rows = this.db.setAdjust(list, adj);
       }

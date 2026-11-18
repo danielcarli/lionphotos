@@ -2,6 +2,18 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.67.0] — 2026-11-18
+
+### Added
+- Adjustments › **Curves**, as in digiKam: a square with the photo's histogram behind and the curve of the whole picture (RGB) or of its red, green or blue. A click on the curve adds a point (up to 16), dragging moves it while the photo follows, dragging it out of the square or a double click takes it off. The arrow keys move the chosen point (Shift: by 10), `[` and `]` choose another, Delete takes it off. Each channel has its own reset; a dot on a channel's tab shows it is changed.
+- Curves are smooth and never turn back between two points (monotone cubic), drawn on the graphics card as one 256-colour table after contrast, and applied the same way when a copy is exported or saved. They are kept in the catalog with the other adjustments: undone with Ctrl+Z, copied and pasted, kept in presets, reset with the others, and shown in the summary of what was changed.
+- `npm run test:curves` and a CI step check the curves; the end-to-end test drags a point and checks the photo, the histogram and the undo.
+
+## [1.66.1] — 2026-11-18
+
+### Changed
+- README, in the 10 languages: *Tested on a large collection* — more than 70,000 photos on an external USB 3.1 drive, the interface easy to browse and fluid, the thumbnails of the whole collection taking longer the first time.
+
 ## [1.66.0] — 2026-11-17
 
 ### Added

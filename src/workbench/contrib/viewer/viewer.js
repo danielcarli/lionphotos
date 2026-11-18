@@ -917,6 +917,7 @@ export class Viewer {
       const adj = adjustOf(it) || {};
       const tones = Object.fromEntries(ADJUST_KEYS.map((k) => [k, adj[k] || 0]));
       if (adj.raw) tones.raw = 1; // developed from the raw data
+      if (adj.curves) tones.curves = adj.curves;
       // the lens corrected: the crop is made on the corrected picture
       for (const k of LENS_KEYS) if (adj[k]) tones[k] = adj[k];
       const bmp = await this.adjust.source(this.#pictureUrl(it), tones, 2400);

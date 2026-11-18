@@ -3614,3 +3614,14 @@ button.vw-chip:hover { filter: brightness(1.2); }
 .sim-pick, .sim-pick-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex: none; }
 .sim-group.is-unpicked .sim-tiles { opacity: 0.45; }
 .sim-group.is-unpicked .sim-group-title { color: var(--text-muted); }
+
+/* the curves of the adjustments, as in digiKam (1.67.0) */
+.crv { display: flex; flex-direction: column; gap: 8px; }
+.crv-tabs { align-self: flex-start; }
+.crv-tabs .seg { display: inline-flex; align-items: center; gap: 5px; position: relative; }
+.crv-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.crv-on { position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+.crv-canvas { display: block; width: 100%; aspect-ratio: 1; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-elevated); cursor: crosshair; touch-action: none; }
+.crv-canvas:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.crv-foot { display: flex; align-items: center; justify-content: space-between; min-height: 18px; font-variant-numeric: tabular-nums; }
+.crv-hint, .crv-mixed { margin: 0; }

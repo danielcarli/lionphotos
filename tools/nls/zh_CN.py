@@ -569,3 +569,5 @@ _merge(MESSAGES, {'similar': {'why': {'content': '内容', 'contentUnread': '尚
 _merge(MESSAGES, {'similar': {'mode': {'label': '相似照片的显示方式', 'all': '全部', 'stacks': '分组', 'groups': '仅分组', 'allTitle': '所有照片，逐张显示', 'stacksTitle': '每组相似照片显示为一张（最佳的那张），并显示堆叠和张数', 'groupsTitle': '只显示相似照片组（不显示单独的照片）', 'groupsOff': '也显示单独的照片'}}})
 
 _merge(MESSAGES, {'similar': {'pickAll': '全选', 'pickNoneBtn': '取消选择', 'pickedOf': '已选择 {n} / {total} 组', 'pickTitle': '已选择：此处的操作将应用于它', 'inPicked': '在所选组中：', 'pickNone': '请选择一个组'}})
+
+_merge(MESSAGES, {'adjust': {'group': {'curves': '曲线'}}, 'curves': {'canvasLabel': '曲线：每种亮度会变成什么', 'channel': '通道', 'resetChannel': '将此曲线恢复为直线', 'hint': '点击曲线添加一个点并拖动；把点拖出方框或双击它即可删除。方向键可移动所选的点。', 'point': '输入 {x} → 输出 {y}', 'mixed': '所选照片的曲线不同：此处的设置将应用于全部照片。', 'ch': {'rgb': 'RGB', 'r': '红', 'g': '绿', 'b': '蓝', 'rgbTitle': '整个画面（亮度）', 'rTitle': '画面的红色', 'gTitle': '画面的绿色', 'bTitle': '画面的蓝色'}}})

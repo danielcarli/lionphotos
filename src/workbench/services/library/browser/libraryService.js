@@ -62,7 +62,8 @@ const patchKeys = (patch) => [...['caption', 'alt', 'author'].filter((k) => k in
 export const ADJUST_KEYS = ['exposure', 'contrast', 'highlights', 'shadows', 'whites', 'blacks', 'temperature', 'tint', 'vibrance', 'saturation', 'bw', 'bwRed', 'bwGreen', 'bwBlue', 'sharpness', 'texture', 'clarity', 'vignette'];
 /** Every key of an item's adjustments: the tones and the shape (turned, straightened, cropped). */
 /** raw: a raw photo drawn from its sensor data, developed in 16 bits (1), not from the camera's JPEG in it. */
-export const EDIT_KEYS = [...ADJUST_KEYS, ...GEO_KEYS, 'raw', ...LENS_KEYS];
+/** curves: { rgb, r, g, b } of points (adjust/common/curves.js). */
+export const EDIT_KEYS = [...ADJUST_KEYS, ...GEO_KEYS, 'raw', ...LENS_KEYS, 'curves'];
 
 /** Whether a set of label ids has one of these. */
 const inAny = (ids, set) => { if (!ids) return false; for (const id of ids) if (set.has(id)) return true; return false; };

@@ -28,7 +28,7 @@ Riesige Foto- und Videosammlungen dort durchsuchen und ordnen, wo sie schon lieg
 
 **Kein Import** · **Nichts verlässt Ihren Computer** · **100.000 Fotos scrollen wie 100** · **Kostenlos und Open Source**
 
-![Version 1.66.0](https://img.shields.io/badge/version-1.66.0-161214)
+![Version 1.67.0](https://img.shields.io/badge/version-1.67.0-161214)
 ![Status: Betatest](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Lizenz: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plattformen: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -42,6 +42,8 @@ Riesige Foto- und Videosammlungen dort durchsuchen und ordnen, wo sie schon lieg
 **Beeindruckender Umfang.** LionPhotos vereint bereits das Wesentliche des Bibliothek-Moduls von Lightroom (Katalog, Markierungen, IPTC, RAW+JPEG, nicht-destruktive Anpassungen) mit dem Besten von Google Fotos (Personen, Haustiere, Suche nach Inhalt, Stapel ähnlicher Fotos). Dazu kommen der Limbo, Plugins mit eigener Marke und 10 Sprachen.
 
 **Aus echter Nutzung entstanden.** Viele Funktionen entstanden aus echten Problemen von Fotografierenden: ein langsames Google Drive, RAW+JPEG, Metadaten vergleichen, bevor man ein Foto verwirft. Das ergibt meist Software, die nützlich ist und nicht nur gut aussieht.
+
+**Getestet mit einer großen Sammlung.** LionPhotos wird mit einer Sammlung von über 70.000 Fotos auf einer externen USB‑3.1‑Festplatte getestet, und die Oberfläche bleibt leicht zu bedienen und flüssig – auch wenn es länger dauert, die Miniaturen der ganzen Sammlung zu erstellen.
 
 ## So sieht es aus
 
@@ -333,7 +335,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\fotos-kopie"; npm run test:e2e
 
 ## Änderungsprotokoll
 
-Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.66.0**.
+Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.67.0**.
 
 ## Mitwirkende
 

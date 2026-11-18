@@ -899,6 +899,41 @@ app.whenReady().then(async () => {
     check(ad.aj === '{"exposure":50}' && ad.badge && ad.edited && /\+1/.test(ad.summary) && ad.stored && !ad.undone && ad.brighter,
       'adjustments: exposure in the catalog only, the tile and the panel say "edited", Ctrl+Z undoes it, the shader brightens', JSON.stringify({ aj: ad.aj, badge: ad.badge, edited: ad.edited, summary: ad.summary, stored: ad.stored, undone: ad.undone, live: ad.live, brighter: ad.brighter }));
     const unc = ad.res.opId ? await op('undo', { opId: ad.res.opId }) : null;
+    // the curves (as in digiKam): a point added on the curve and dragged up brightens the photo; kept in the
+    // catalog, drawn by the shader (and by the processor), the group says it changed; Ctrl+Z undoes it
+    const crv = await js(`(async () => { try {
+      const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const it = lib.items.filter((x) => x.ext === 'jpg' && x.thumb === 1 && !/-edited/.test(x.name))[5];
+      window.__lionphotos.views.photos.focusId = it.id; lib.setSelection([it.id]); window.__lionphotos.views.photos.reveal(it.id); await wait(500);
+      document.querySelectorAll('.ip-sec[data-open="0"] .ip-sec-h').forEach((b) => b.click()); await wait(100);
+      const head = () => document.querySelector('.ip-adj-group[data-group="curves"] .ip-adj-gh');
+      if (head()?.getAttribute('aria-expanded') !== 'true') head().click();
+      await wait(200);
+      const canvas = document.querySelector('.ip-adj-group[data-group="curves"] .crv-canvas');
+      const res = { tabs: [...document.querySelectorAll('.crv-tabs .seg')].map((b) => b.textContent).join('|'), drawn: canvas?.width > 0 };
+      const r = canvas.getBoundingClientRect();
+      const ev = (type, fx, fy) => canvas.dispatchEvent(new PointerEvent(type, { bubbles: true, pointerId: 1, button: 0, clientX: r.left + r.width * fx, clientY: r.top + r.height * fy }));
+      ev('pointerdown', 0.5, 0.5); await wait(50);
+      ev('pointermove', 0.5, 0.3); await wait(50);
+      ev('pointerup', 0.5, 0.3); await wait(800);
+      const aj = JSON.parse(lib.byId.get(it.id).aj || '{}');
+      res.curves = aj.curves;
+      res.groupChanged = !!document.querySelector('.ip-adj-group[data-group="curves"] .ip-adj-dot');
+      const a = s.adjust, url = s.thumbs.mediaUrl(it);
+      const mean = (b) => b ? b.reduce((x, v, i) => x + v * i, 0) / Math.max(1, b.reduce((x, v) => x + v, 0)) : 0;
+      res.brighter = mean(await a.histogram(url, { curves: aj.curves })) > mean(await a.histogram(url, null));
+      // the processor draws the same (no graphics card)
+      const { adjustPixels } = await import('/src/workbench/services/adjust/browser/adjustService.js');
+      const img = new ImageData(new Uint8ClampedArray([128, 128, 128, 255]), 1, 1);
+      res.cpu = adjustPixels(img, { curves: aj.curves }).data[0];
+      document.activeElement?.blur();
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true })); await wait(500);
+      res.undone = !JSON.parse(lib.byId.get(it.id).aj || '{}').curves;
+      lib.clearSelection();
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(crv.tabs === 'RGB|Red|Green|Blue' && crv.drawn && Array.isArray(crv.curves?.rgb) && crv.curves.rgb.length === 3 && crv.curves.rgb[1][1] > crv.curves.rgb[1][0] + 20
+      && crv.groupChanged && crv.brighter && crv.cpu > 150 && crv.undone,
+      'curves (as in digiKam): RGB, red, green, blue; a point added and dragged up brightens the photo (graphics card and processor), kept in the catalog; Ctrl+Z undoes it', JSON.stringify(crv));
     check(ad.res.ok && ad.res.saved === 1 && copyBytes && copyBytes[0] === 0xff && copyBytes.includes(Buffer.from('Exif')) && fs.readFileSync(ad.path).equals(origBytes)
       && unc?.res?.ok && !fs.existsSync(ad.copy),
       'save edited copy: a new JPEG next to the original with its EXIF, found by the scan; the original untouched; undo sends the copy to the Recycle Bin', JSON.stringify({ res: ad.res, copy: ad.copy && path.basename(ad.copy), bytes: ad.bytes, undo: unc?.res }));
@@ -2246,9 +2281,9 @@ app.whenReady().then(async () => {
       await lib.describe([it.id], { adjust: null });
       return { groups, fast, detailOk, sliders, auto, preset, split, splitOff, picking, picked, stillPicking, zoomed };
     })()`);
-    check(et.groups === 'light,color,detail,lens,effects' && et.detailOk && et.sliders >= 14 && 'exposure' in et.auto && et.preset.temperature === 40 && et.preset.vibrance === 20
+    check(et.groups === 'light,color,curves,detail,lens,effects' && et.detailOk && et.sliders >= 14 && 'exposure' in et.auto && et.preset.temperature === 40 && et.preset.vibrance === 20
       && et.split && et.splitOff && et.picking && !et.stillPicking && !et.zoomed && et.picked.temperature !== 40,
-      'editing tools: light, colour, detail, lens, effects; detail needs the graphics card; Auto; a preset; before/after; the eyedropper', JSON.stringify(et));
+      'editing tools: light, colour, curves, detail, lens, effects; detail needs the graphics card; Auto; a preset; before/after; the eyedropper', JSON.stringify(et));
     // an album that mixes categories: an icon for each next to its name; opened with "personal" in the title
     // bar it shows all its photos, a professional one with a pink border, one without category grey
     const mx = await js(`(async () => {

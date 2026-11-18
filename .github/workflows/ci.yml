@@ -148,6 +148,8 @@ jobs:
         run: npm run test:plugins
       - name: Similar photos and raw + JPEG twins
         run: npm run test:similar
+      - name: Curves of the adjustments
+        run: npm run test:curves
       - name: What the photos show (content categories)
         run: npm run test:content
       - name: Where a folder is (disk, external, cloud, network)

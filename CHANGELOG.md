@@ -2,6 +2,11 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.77.1] — 2026-11-18
+
+### Fixed
+- The stacks and single photos (1.76.0) were only beside the title of Photos, which a narrow window cuts off. They are now also in the **status bar, bottom left**, after the photos, videos and size — "14,637 photos · 500 videos · 390 GB · 1,641 stacks · 3,120 single photos" — while *Stack photos* is on, updated as the stacks are made.
+
 ## [1.77.0] — 2026-11-18
 
 ### Changed

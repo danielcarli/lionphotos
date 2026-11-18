@@ -2142,6 +2142,9 @@ app.whenReady().then(async () => {
       { const v = lib.view('main').filter((x) => x.kind === 1); const nS = v.filter((x) => s.similar.stackOf(x.id)).length;
         res.meta = document.querySelector('.view-photos .crumb-meta')?.textContent || '';
         res.metaOk = /^[0-9,]+ items · .+ · [1-9][0-9,]* stacks? · [0-9,]+ single photos?$/.test(res.meta) && nS > 0; }
+      await wait(200);
+      res.bar = document.querySelector('.statusbar .status-left')?.textContent || '';
+      res.barOk = /[0-9,]+ photos · [0-9,]+ videos? · .+[1-9][0-9,]* stacks? · [0-9,]+ single photos?/.test(res.bar);
       await wait(300);
       res.status = document.querySelector('.view-photos .stack-status:not([hidden])')?.textContent;
       res.lineSlider = !!document.querySelector('.view-photos .stack-status .sens-range');
@@ -2267,9 +2270,10 @@ app.whenReady().then(async () => {
       document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
       sw().click(); await wait(500);
       res.metaOff = !/stack/.test(document.querySelector('.view-photos .crumb-meta')?.textContent || '');
+      res.barOff = !/stack/.test(document.querySelector('.statusbar .status-left')?.textContent || '');
       res.off = !document.querySelector('.view-photos .tile-stack') && lib.view('main').length === allBefore;
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(st.metaOk && st.metaOff, 'Stack photos on: beside how many items, how many stacks and single photos; off, only the items', JSON.stringify({ meta: st.meta, ok: st.metaOk, off: st.metaOff }));
+    check(st.metaOk && st.metaOff && st.barOk && st.barOff, 'Stack photos on: beside how many items (in the bar of Photos and in the status bar, bottom left), how many stacks and single photos; off, only the items', JSON.stringify({ meta: st.meta, ok: st.metaOk, off: st.metaOff, bar: st.bar, barOk: st.barOk, barOff: st.barOff }));
     check(st.label === 'Stack photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the stack$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /stacks? of similar photos · \d+ of \d+ photos are in a stack/.test(st.status || ''),
       'the switch "Stack photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && !st.onlyChip && st.onlyMarked && st.onlyBack && st.noOldSwitch && st.noMenuItem,

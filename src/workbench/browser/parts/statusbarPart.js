@@ -43,6 +43,9 @@ export class StatusbarPart {
     this.library.onDidChangeData(r);
     this.library.onDidChangeSelection(r);
     this.thumbs.onDidChangeStatus(r);
+    // "Stack photos": how many stacks and single photos, as the stacks are made
+    this.similar?.onDidChange(r);
+    this.similar?.onDidProgress(r);
     this.render();
   }
 
@@ -62,6 +65,9 @@ export class StatusbarPart {
     } else if (library.hasData) {
       const tot = library.totals();
       left.push(item('image', `${tn('common.photos', tot.images)} · ${tn('common.videos', tot.videos)} · ${formatBytes(tot.bytes)}`));
+      // "Stack photos" on: the stacks and the photos alone in Photos (a RAW + JPEG is one photo)
+      const sum = this.similar?.active ? this.similar.summary : null;
+      if (sum?.photos) left.push(item('stack', `${tn('photos.stacksCount', sum.groups)} · ${tn('photos.singlesCount', Math.max(0, sum.photos - sum.grouped))}`));
     } else {
       left.push(item(null, t('statusbar.ready')));
     }

@@ -596,3 +596,5 @@ _merge(MESSAGES, {'photos': {'uniqueTotal': 'Total probable de photos uniques : 
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} photo unique (total probable)', 'other': '{count} photos uniques (total probable)'}}})
 
 _merge(MESSAGES, {'keys': {'stackNav': 'Les photos d’une pile (la bande du bas) : précédente · suivante'}})
+
+_merge(MESSAGES, {'keys': {'stackNav': 'Les photos d’une pile (la bande du bas) : ↑ suivante · ↓ précédente · B définir comme la meilleure'}, 'similar': {'bestSet': '« {name} » est maintenant la meilleure de la pile.'}})

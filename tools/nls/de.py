@@ -596,3 +596,5 @@ _merge(MESSAGES, {'photos': {'uniqueTotal': 'Wahrscheinliche Gesamtzahl einzigar
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} einzigartiges Foto (wahrscheinliche Summe)', 'other': '{count} einzigartige Fotos (wahrscheinliche Summe)'}}})
 
 _merge(MESSAGES, {'keys': {'stackNav': 'Die Fotos eines Stapels (der Streifen unten): vorheriges · nächstes'}})
+
+_merge(MESSAGES, {'keys': {'stackNav': 'Die Fotos eines Stapels (der Streifen unten): ↑ nächstes · ↓ vorheriges · B als bestes festlegen'}, 'similar': {'bestSet': '„{name}“ ist jetzt das beste des Stapels.'}})

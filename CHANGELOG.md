@@ -2,6 +2,14 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.80.0] — 2026-11-18
+
+### Changed
+- Viewer, on a stack: **↑ goes to the next photo** of the stack and **↓ to the one before** (the other way round in 1.79.0).
+
+### Added
+- Viewer, on a stack: **B** sets the photo shown as the best of the stack (the ✦ moves to it, a notice says so); on a RAW + JPEG, the file shown becomes the one shown in Photos. The menus of the strip show the key. In the shortcuts window and the README.
+
 ## [1.79.0] — 2026-11-18
 
 ### Added

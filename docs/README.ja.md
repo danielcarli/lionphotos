@@ -28,7 +28,7 @@
 
 **インポート不要** · **何もコンピューターの外に出ない** · **10万枚でも100枚のように軽快** · **無料・オープンソース**
 
-![バージョン 1.79.0](https://img.shields.io/badge/version-1.79.0-161214)
+![バージョン 1.80.0](https://img.shields.io/badge/version-1.80.0-161214)
 ![ステータス：ベータテスト](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![ライセンス: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![対応: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -239,7 +239,7 @@ LionOrganizer と同じルールです。
 | `V` · `?` | 並べて比較 · キーボードショートカット |
 | `Ctrl+E` | 写真を書き出す（選択した写真、または表示中の写真） |
 | `←` `→` · `Space` · `Esc` | ビューアー：前/次 · 再生/一時停止 · 閉じる |
-| `↑` `↓` | ビューアー：スタックの写真（下の帯） |
+| `↑` `↓` · `B` | ビューアー：スタックの写真（下の帯）: 次/前 · ベストに設定 |
 | `P` · `F` · `A` | ビューアー：スライドショー · 全画面 · アルバムに追加 |
 
 ## 言語
@@ -337,7 +337,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 変更履歴
 
-[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.79.0**。
+[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.80.0**。
 
 ## クレジット
 

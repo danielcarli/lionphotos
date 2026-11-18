@@ -2312,9 +2312,17 @@ app.whenReady().then(async () => {
       // ↓ ↑: the photos of the stack, one after the other (as a click on the strip)
       const idx = () => [...document.querySelectorAll('.viewer .vw-stack-thumb')].findIndex((b) => b.classList.contains('is-shown'));
       const i0 = idx(), key = (k) => document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
-      key('ArrowDown'); await wait(300); const i1 = idx();
-      key('ArrowUp'); await wait(300); const i2 = idx();
-      res.keys = { i0, i1, i2, ok: i1 === (i0 + 1) % st.count && i2 === i0 && s.viewer.index === at };
+      key('ArrowUp'); await wait(300); const i1 = idx();
+      // B: the one shown is the best of the stack (the ✦ moves to it); then the first best again
+      const best0 = s.similar.groupOf(list[at].id)?.top;
+      key('b'); await wait(600);
+      const bestNow = s.similar.groupOf(list[at].id)?.top, shownNow = s.viewer.current?.id;
+      const bestMarked = [...document.querySelectorAll('.viewer .vw-stack-thumb')].findIndex((b) => b.querySelector('.vw-stack-best')) === idx();
+      key('ArrowDown'); await wait(300); const i2 = idx();
+      key('b'); await wait(600);
+      res.keys = { i0, i1, i2, ok: i1 === (i0 + 1) % st.count && i2 === i0 && s.viewer.index === at,
+        best: { best0, bestNow, shownNow, marked: bestMarked, back: s.similar.groupOf(list[at].id)?.top === best0,
+          ok: bestNow !== best0 && st.units.some((u) => u.rep.id === bestNow && u.files.some((f) => f.id === shownNow)) && bestMarked && s.similar.groupOf(list[at].id)?.top === best0 } };
       const shown0 = s.viewer.current.id;
       document.querySelector('.viewer .vw-btn.danger').click(); await wait(300);
       res.asked = !!document.querySelector('.cm-dialog');
@@ -2333,7 +2341,8 @@ app.whenReady().then(async () => {
       s.viewer.close(); await wait(300);
       s.similar.setMode('all'); await wait(400);
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(vl.none || vl.keys?.ok, 'the viewer on a stack: ↓ and ↑ go round the photos of the stack (the strip below), the photo of the list unchanged', JSON.stringify(vl.keys || vl));
+    check(vl.none || vl.keys?.ok, 'the viewer on a stack: ↑ the next photo of the stack, ↓ the one before (round the strip below), the photo of the list unchanged', JSON.stringify(vl.keys || vl));
+    check(vl.none || vl.keys?.best?.ok, 'the viewer on a stack: B sets the photo shown as the best of the stack (the ✦ moves to it)', JSON.stringify(vl.keys?.best || vl));
     check(vl.none || (vl.asked && vl.gone && vl.open && vl.strip === vl.strip0 && vl.marked === 1 && vl.next && vl.shownCell && vl.backItem && vl.back),
       'the viewer on a stack: a photo sent to the Limbo (asked as always) stays in the strip, marked as gone, the next photo of the stack shows and the stack stays; its menu brings it back', JSON.stringify(vl));
     // "Stack photos" (Ctrl+G, as in Lightroom): photos selected put in one stack by hand, whatever they look like;

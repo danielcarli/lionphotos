@@ -28,7 +28,7 @@ Parcourez, recherchez et organisez d’immenses collections de photos et de vid�
 
 **Aucune importation** · **Rien ne quitte votre ordinateur** · **100 000 photos défilent comme 100** · **Gratuit et open source**
 
-![Version 1.79.0](https://img.shields.io/badge/version-1.79.0-161214)
+![Version 1.80.0](https://img.shields.io/badge/version-1.80.0-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -239,7 +239,7 @@ Les mêmes règles que LionOrganizer :
 | `V` · `?` | Comparer côte à côte · Raccourcis clavier |
 | `Ctrl+E` | Exporter les photos (la sélection, ou les photos affichées) |
 | `←` `→` · `Espace` · `Échap` | Visionneuse : précédente/suivante · lecture/pause · fermer |
-| `↑` `↓` | Visionneuse : les photos d’une pile (la bande du bas) |
+| `↑` `↓` · `B` | Visionneuse : les photos d’une pile (la bande du bas) : suivante/précédente · définir comme la meilleure |
 | `P` · `F` · `A` | Visionneuse : diaporama · plein écran · ajouter à un album |
 
 ## Langues
@@ -337,7 +337,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.79.0**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.80.0**.
 
 ## Crédits
 

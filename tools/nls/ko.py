@@ -593,3 +593,5 @@ _merge(MESSAGES, {'photos': {'uniqueTotal': '고유한 사진의 예상 합계: 
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '고유 사진 {count}장(예상 합계)', 'other': '고유 사진 {count}장(예상 합계)'}}})
 
 _merge(MESSAGES, {'keys': {'stackNav': '스택의 사진(아래 띠): 이전 · 다음'}})
+
+_merge(MESSAGES, {'keys': {'stackNav': '스택의 사진(아래 띠): ↑ 다음 · ↓ 이전 · B 최고로 지정'}, 'similar': {'bestSet': '“{name}”이(가) 이제 스택의 최고입니다.'}})

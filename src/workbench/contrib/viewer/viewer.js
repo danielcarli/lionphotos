@@ -251,15 +251,10 @@ export class Viewer {
     const files = [top, ...pair.files.filter((f) => f.id !== top.id)].map((f) => this.library.byId.get(f.id) || f);
     const isShown = (f) => f.id === it.id;
     const pick = (f) => { if (isShown(f)) return; this.stackPick = f.id === top.id ? null : f; this.stackPickAt = this.index; this.scale = 0; this.#show(); };
-    const cover = async (f) => {
-      if (f.id === top.id) return;
-      await sim.setPairCover(f.id);
-      // the photo of the list is now this file: shown as itself
-      this.list = this.list.slice(); this.list[this.index] = f; this.stackPick = null; this.#show();
-    };
+    const cover = (f) => this.#pairCover(f, top);
     const menu = (f, x, y) => showContextMenu(x, y, [
       // a file whose picture cannot be read (no thumbnail) cannot stand for the photo in Photos
-      { label: t('similar.setCover'), icon: 'sparkle', checked: f.id === top.id, disabled: f.thumb === 2, run: () => cover(f) },
+      { label: t('similar.setCover'), icon: 'sparkle', hint: 'B', checked: f.id === top.id, disabled: f.thumb === 2, run: () => cover(f) },
     ]);
     el.hidden = false;
     el.setAttribute('aria-label', tn('photos.pairFiles', files.length));
@@ -273,6 +268,33 @@ export class Viewer {
         h('span.vw-pair-ext', (f.ext === 'jpeg' || f.ext === 'jpe' ? 'JPG' : f.ext.toUpperCase())),
         f.id === top.id ? h('span.vw-stack-best', { title: t('similar.coverTitle') }, h('span', { html: icon('sparkle', 10) })) : null)))),
       isShown(top) || it.thumb === 2 ? null : h('button.vw-stack-open.vw-pair-cover', { type: 'button', title: t('similar.setCoverTitle'), onclick: () => cover(it) }, t('similar.setCover')));
+  }
+
+  /** A file of a RAW + JPEG as its best (the file shown in Photos); the photo of the list is now that file. */
+  async #pairCover(f, top) {
+    if (f.id === top.id) return;
+    await this.services.similar.setPairCover(f.id);
+    this.list = this.list.slice(); this.list[this.index] = f; this.stackPick = null; this.#show();
+  }
+
+  /** B: the photo shown is the best of its stack (or the file shown for its RAW + JPEG). */
+  async #bestKey() {
+    const sim = this.services.similar, top = this.list[this.index], it = this.current;
+    if (!sim || !top || !it || this.playing) return;
+    const g = sim.groupOf(top.id);
+    if (g && g.count >= 2) {
+      const i = g.units.findIndex((u) => u.files.some((f) => f.id === it.id));
+      if (i < 0 || g.units[i].rep.id === g.top) return;
+      await sim.setBest({ units: g.units }, i);
+      sim.regroupNow();
+      if (this.el && this.current) this.#renderStack(this.current);
+      this.notifications?.info(t('similar.bestSet', { name: it.name }), 4000);
+      return;
+    }
+    if (sim.pairOf(top.id) && it.id !== top.id) {
+      await this.#pairCover(this.library.byId.get(it.id) || it, top);
+      this.notifications?.info(t('similar.bestSet', { name: it.name }), 4000);
+    }
   }
 
   /** The next (or previous) photo of the stack shown, round it, as a click on the strip. @returns {boolean} false: no stack */
@@ -314,7 +336,7 @@ export class Viewer {
     const i = stack.units.indexOf(u);
     showContextMenu(x, y, [
       { label: t('similar.makeSingle'), icon: 'takeOut', title: t('similar.removeFromStack'), run: () => this.#removeFromStack(stack, u) },
-      { label: t('similar.setBest'), icon: 'sparkle', checked: u.rep.id === stack.top, run: async () => {
+      { label: t('similar.setBest'), icon: 'sparkle', hint: 'B', checked: u.rep.id === stack.top, run: async () => {
         if (u.rep.id === stack.top) return;
         await sim.setBest({ units: stack.units }, i);
         sim.regroupNow();
@@ -1153,8 +1175,9 @@ export class Viewer {
     // Ctrl+E: export this photo; V: this photo and the next, side by side
     else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'e') { e.preventDefault(); exportPhotos(this.services, [this.current]); }
     else if ((e.key === 'v' || e.key === 'V') && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); this.#sideBySide(); }
-    // ↑ ↓: the photos of the stack shown (the strip below), one after the other
-    else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey && this.#stackStep(e.key === 'ArrowDown' ? 1 : -1)) e.preventDefault();
+    // ↑ ↓: the photos of the stack shown (the strip below) — ↑ the next, ↓ the one before; B: the one shown is the best
+    else if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey && this.#stackStep(e.key === 'ArrowUp' ? 1 : -1)) e.preventDefault();
+    else if ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); this.#bestKey(); }
     else if (e.key === 'ArrowRight') { e.preventDefault(); this.move(1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); this.move(-1); }
     else if (e.key === 'Delete') { e.preventDefault(); this.#discard(); }

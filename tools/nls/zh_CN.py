@@ -593,3 +593,5 @@ _merge(MESSAGES, {'photos': {'uniqueTotal': '唯一照片的估计总数：{coun
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} 张不重复照片（估计总数）', 'other': '{count} 张不重复照片（估计总数）'}}})
 
 _merge(MESSAGES, {'keys': {'stackNav': '堆叠中的照片（下方条带）：上一张 · 下一张'}})
+
+_merge(MESSAGES, {'keys': {'stackNav': '堆叠中的照片（下方条带）：↑ 下一张 · ↓ 上一张 · B 设为最佳'}, 'similar': {'bestSet': '“{name}”现在是堆叠中的最佳照片。'}})

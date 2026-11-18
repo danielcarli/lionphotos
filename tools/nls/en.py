@@ -596,3 +596,5 @@ _merge(MESSAGES, {'photos': {'uniqueTotal': 'Probable total of unique photos: {c
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': '{count} unique photo (probable total)', 'other': '{count} unique photos (probable total)'}}})
 
 _merge(MESSAGES, {'keys': {'stackNav': 'The photos of a stack (the strip below): previous · next'}})
+
+_merge(MESSAGES, {'keys': {'stackNav': 'The photos of a stack (the strip below): ↑ next · ↓ previous · B set as the best'}, 'similar': {'bestSet': '“{name}” is now the best of its stack.'}})

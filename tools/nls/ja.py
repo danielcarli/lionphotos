@@ -593,3 +593,5 @@ _merge(MESSAGES, {'photos': {'uniqueTotal': 'ユニークな写真の推定合�
 _merge(MESSAGES, {'photos': {'uniqueCount': {'one': 'ユニークな写真 {count} 枚（推定合計）', 'other': 'ユニークな写真 {count} 枚（推定合計）'}}})
 
 _merge(MESSAGES, {'keys': {'stackNav': 'スタックの写真（下の帯）: 前 · 次'}})
+
+_merge(MESSAGES, {'keys': {'stackNav': 'スタックの写真（下の帯）: ↑ 次 · ↓ 前 · B ベストに設定'}, 'similar': {'bestSet': '「{name}」がスタックのベストになりました。'}})

@@ -560,3 +560,9 @@ _merge(MESSAGES, {'similar': {'why': {'menu': 'Why are these (not) grouped?', 't
 _merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} min', 'days': {'one': '{count} day', 'other': '{count} days'}}}})
 
 _merge(MESSAGES, {'photos': {'rawsInGroup': {'one': '{count} raw file in this group', 'other': '{count} raw files in this group'}}})
+
+_merge(MESSAGES, {'similar': {'sens': {'label': 'How alike photos must be to be grouped', 'title': 'Towards "Alike", more photos are grouped; towards "Almost the same", only nearly identical shots', 'value': '{pct}% alike, up to {min} min apart', 'same': 'Almost the same', 'alike': 'Alike'}, 'why': {'alikeSens': '{pct} alike (the sensitivity used asks {need})', 'wouldFrom': 'Together with the sensitivity at {v} or more.', 'useSens': 'Use sensitivity {v}', 'leadSens': 'Each photo beside the next one taken, with what the grouping saw at the sensitivity used now ({v} of 100).'}, 'removeFromGroup': 'Remove photo from the group', 'removedFromGroup': '{name} is out of the group, and is not grouped with these photos again.'}})
+
+_merge(MESSAGES, {'similar': {'makeSingle': 'Make single'}})
+
+_merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Find or add a person'}, 'pet': {'find': 'Find or add a pet'}, 'place': {'find': 'Find or add a place'}, 'album': {'find': 'Find or add an album'}}, 'findOrNew': 'Enter: a new one named “{name}”', 'findNone': 'None with “{name}” — Enter makes it'}})

@@ -39,6 +39,7 @@ import { LABEL_ICON } from '../../services/labels/browser/labelsService.js';
 import { applyMark } from '../limbo/sendToLimbo.js';
 import { showSimilar } from '../similar/similarView.js';
 import { showWhyGrouped } from '../similar/similarExplain.js';
+import { sensitivitySlider } from '../similar/sensitivitySlider.js';
 import { etaText } from '../../browser/parts/statusbarPart.js';
 import { sharpenCover } from '../albums/albumCovers.js';
 import { renderPhotoShowcase } from '../labels/showcase.js';
@@ -1374,9 +1375,7 @@ export class PhotosView extends ViewPane {
         0, 0, !f?.running ? fromCatalog : null));
     }
     // how alike photos must be to be grouped (the same three levels as the window of similar photos)
-    const levels = h('div.segmented.stack-levels', { role: 'radiogroup', 'aria-label': t('similar.levelLabel') },
-      ['same', 'similar', 'scene'].map((k) => h('button', { class: `seg${k === sim.level ? ' active' : ''}`, role: 'radio', 'aria-checked': String(k === sim.level), title: t(`similar.level.${k}Title`),
-        onclick: () => { if (k !== sim.level) { sim.setLevel(k); this.#paintStackStatus(); } } }, t(`similar.level.${k}`))));
+    const levels = h('div.stack-levels', sensitivitySlider(sim, () => this.#paintStackStatus()));
     // only the groups: a switch at the end of the line (the photos alone out of the way)
     const only = sim.onlyGrouped;
     const onlySwitch = h(only ? 'label.tb-switch.stack-only.on' : 'label.tb-switch.stack-only', { title: t('similar.onlyTitle') },

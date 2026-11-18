@@ -22,13 +22,23 @@ const GRAY = 16;
 const COLOR = 4;
 const SHARP_W = 160;
 
-/** How alike photos must be to be grouped, from the strictest. */
-export const SENSITIVITY = {
-  same: { threshold: 0.9, firstSlack: 0.08, windowMs: 2 * 60e3 },   // almost the same picture
-  similar: { threshold: 0.8, firstSlack: 0.12, windowMs: 3 * 60e3 }, // a variation of the same picture (default)
-  scene: { threshold: 0.66, firstSlack: 0.16, windowMs: 10 * 60e3 }, // the same scene
-};
-const OPEN_GROUPS = 8; // groups a photo is compared with (the latest ones)
+/**
+ * How alike photos must be to be grouped: a sensitivity from 0 (almost the same picture) to 100 (alike: the
+ * same scene, other poses), turned into how alike a photo must be to the latest of a group, how much less to
+ * its first, and how far apart in time.
+ * @param {number} v 0–100 @returns {{ threshold:number, firstSlack:number, windowMs:number }}
+ */
+export function paramsOf(v) {
+  const k = Math.max(0, Math.min(100, Number(v) || 0)) / 100;
+  return { threshold: 0.92 - 0.4 * k, firstSlack: 0.08 + 0.16 * k, windowMs: (2 + 18 * k) * 60e3 };
+}
+export const SENSITIVITY_DEFAULT = 60;
+/** The levels named before (1.55–1.62), as sensitivities. */
+export const PRESETS = { same: 8, similar: 30, scene: 75 };
+/** @deprecated the named levels, kept for what reads them */
+export const SENSITIVITY = Object.fromEntries(Object.entries(PRESETS).map(([k, v]) => [k, paramsOf(v)]));
+const OPEN_GROUPS = 12; // groups a photo is compared with (the latest ones)
+const RECENT = 3;       // a photo is compared with the latest few of a group (a pose that comes back)
 
 /**
  * The features of one picture. @param {ImageBitmap|HTMLImageElement|OffscreenCanvas} img
@@ -90,10 +100,33 @@ export function featuresOf(img) {
   return { gray, color, sharp, light: light / L.length / 255, clip: clipped / L.length };
 }
 
-/** How alike two pictures are: about 1 the same, below 0.6 different. */
+/** Light and shade in 8 × 8 squares (from the 16 × 16), normalized: a coarser look, kinder to a small move. */
+function coarse(f) {
+  if (f.gray8) return f.gray8;
+  const g = new Float32Array(64);
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) g[(y >> 1) * 8 + (x >> 1)] += f.gray[y * 16 + x];
+  let mean = 0;
+  for (const v of g) mean += v;
+  mean /= 64;
+  let norm = 0;
+  for (let i = 0; i < 64; i++) { g[i] -= mean; norm += g[i] * g[i]; }
+  norm = Math.sqrt(norm) || 1;
+  for (let i = 0; i < 64; i++) g[i] /= norm;
+  Object.defineProperty(f, 'gray8', { value: g, enumerable: false });
+  return g;
+}
+
+/**
+ * How alike two pictures are: about 1 the same, below 0.5 different. The fine look (16 × 16) and the coarse
+ * one (8 × 8) count half each: a person who moved a little, or a camera that moved, still looks alike.
+ */
 export function similarity(a, b) {
-  let dot = 0;
-  for (let i = 0; i < a.gray.length; i++) dot += a.gray[i] * b.gray[i];
+  let fine = 0;
+  for (let i = 0; i < a.gray.length; i++) fine += a.gray[i] * b.gray[i];
+  const ca = coarse(a), cb = coarse(b);
+  let rough = 0;
+  for (let i = 0; i < 64; i++) rough += ca[i] * cb[i];
+  const dot = 0.5 * fine + 0.5 * rough;
   let cd = 0;
   for (let i = 0; i < a.color.length; i++) cd += Math.abs(a.color[i] - b.color[i]);
   cd /= a.color.length;
@@ -104,12 +137,12 @@ export function similarity(a, b) {
 /**
  * Groups photos taken in sequence that look alike.
  * @param {{ id:number, t:number, f:object }[]} units one per shot (twins together), with their features
- * @param {keyof SENSITIVITY} level
+ * @param {number|keyof PRESETS} level the sensitivity, 0–100 (or a level named before)
  * @param {(a: object, b: object) => boolean} [apart] two shots the person said are not of the same group
  * @returns {{ units: object[] }[]} the groups of two or more, in the order they were taken
  */
-export function groupSimilar(units, level = 'similar', apart = null) {
-  const { threshold, firstSlack, windowMs } = SENSITIVITY[level] || SENSITIVITY.similar;
+export function groupSimilar(units, level = SENSITIVITY_DEFAULT, apart = null) {
+  const { threshold, firstSlack, windowMs } = paramsOf(typeof level === 'number' ? level : PRESETS[level] ?? SENSITIVITY_DEFAULT);
   const sorted = [...units].filter((u) => u.f).sort((a, b) => a.t - b.t || a.id - b.id);
   const groups = [];
   for (const u of sorted) {
@@ -118,7 +151,9 @@ export function groupSimilar(units, level = 'similar', apart = null) {
       const g = groups[k];
       if (u.t - g.last.t > windowMs) continue;
       if (apart && g.units.some((x) => apart(u, x))) continue;
-      const toLast = similarity(u.f, g.last.f);
+      // like one of the latest of the group (a pose that comes back after another)
+      let toLast = -Infinity;
+      for (let j = Math.max(0, g.units.length - RECENT); j < g.units.length; j++) toLast = Math.max(toLast, similarity(u.f, g.units[j].f));
       if (toLast < threshold || toLast <= bestScore) continue;
       if (similarity(u.f, g.first.f) < threshold - firstSlack) continue;
       best = g; bestScore = toLast;

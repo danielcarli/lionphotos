@@ -16,11 +16,12 @@ import { Emitter } from '../../../base/common/event.js';
 import { Eta } from '../../../base/common/eta.js';
 import { dateOf, adjustOf, KIND, MARK } from '../../services/library/browser/libraryService.js';
 import { isRawExt } from '../../services/library/common/mediaCategories.js';
-import { featuresOf, groupSimilar, bestOf, similarity, SENSITIVITY } from './similarFinder.js';
+import { featuresOf, groupSimilar, bestOf, similarity, paramsOf, PRESETS, SENSITIVITY_DEFAULT } from './similarFinder.js';
 
 const STACK_KEY = 'lionphotos.photos.stacks';
 const ONLY_KEY = 'lionphotos.photos.stacksOnly';
-const LEVEL_KEY = 'lionphotos.similar.level';
+const LEVEL_KEY = 'lionphotos.similar.level'; // the level named before (1.55–1.62)
+const SENS_KEY = 'lionphotos.similar.sensitivity';
 const WORKERS = 6;
 const SAVE_EVERY = 100;
 const WHO_EVERY = 15000; // who is in the photos read again at most this often while faces are looked for
@@ -193,6 +194,13 @@ export class SimilarService {
     this.#onDidProgress.fire(this.progress);
     this.#maybeRegroup();
   }
+  /** Grouped again at once (a decision taken where the groups are shown: the viewer's strip). */
+  regroupNow() {
+    clearTimeout(this.#timer);
+    if (this.active) { this.library.refreshView(); this.library.view('main'); }
+    this.#onDidChange.fire();
+  }
+
   /** Photos drawn again only when its groups are other now. */
   #maybeRegroup() {
     if (!this.active || !this.#lastList) return;
@@ -222,8 +230,20 @@ export class SimilarService {
   /** Only the groups (each as its best photo), the photos alone left out. */
   get onlyGrouped() { return readPref(ONLY_KEY, '0') === '1'; }
   setOnlyGrouped(on) { savePref(ONLY_KEY, on ? '1' : '0'); this.#regroup(); }
-  get level() { const l = readPref(LEVEL_KEY, 'similar'); return SENSITIVITY[l] ? l : 'similar'; }
-  setLevel(l) { if (!SENSITIVITY[l]) return; savePref(LEVEL_KEY, l); this.#regroup(); }
+  /** How alike photos must be to be grouped: 0 almost the same picture … 100 alike (the same scene). */
+  get level() {
+    const v = Number(readPref(SENS_KEY, ''));
+    if (readPref(SENS_KEY, '') !== '' && Number.isFinite(v)) return Math.max(0, Math.min(100, Math.round(v)));
+    // a level chosen before: no stricter than it was, else the default (which groups more)
+    const old = PRESETS[readPref(LEVEL_KEY, '')];
+    return old != null ? Math.max(old, SENSITIVITY_DEFAULT) : SENSITIVITY_DEFAULT;
+  }
+  setLevel(v) {
+    const n = typeof v === 'number' ? v : PRESETS[v];
+    if (!Number.isFinite(n)) return;
+    savePref(SENS_KEY, String(Math.max(0, Math.min(100, Math.round(n)))));
+    this.#regroup();
+  }
 
   // ------------------------------------------------------------------ what the photos look like
   /** The features already known of a shot (null: unreadable; undefined: not read yet). */
@@ -372,11 +392,16 @@ export class SimilarService {
       const face = sameWho(this.whoOf(a, 'face'), this.whoOf(b, 'face'), 'face');
       const pet = sameWho(this.whoOf(a, 'pet'), this.whoOf(b, 'pet'), 'pet');
       const seen = !!this.whoOf(a, 'face') && !!this.whoOf(b, 'face');
-      const levels = Object.entries(SENSITIVITY).map(([level, v]) => ({ level, ok: sim != null && sim >= v.threshold && dt <= v.windowMs && !said && face !== false && pet !== false, threshold: v.threshold, windowMs: v.windowMs }));
-      // Photos grouped: as it is there; else as the level used would do it
+      const blocked = said || face === false || pet === false;
+      const okAt = (v) => { const p = paramsOf(v); return sim != null && sim >= p.threshold && dt <= p.windowMs && !blocked; };
+      const now = { ...paramsOf(this.level), ok: okAt(this.level) };
+      // the least sensitivity at which they would be together (null: none)
+      let from = null;
+      for (let v = 0; v <= 100; v++) if (okAt(v)) { from = v; break; }
+      // Photos grouped: as it is there; else as the sensitivity used would do it
       const ga = this.groupOf(a.rep.id), gb = this.groupOf(b.rep.id);
-      const together = this.active ? !!ga && ga === gb : !!levels.find((x) => x.level === this.level)?.ok;
-      rows.push({ a, b, sim, dt, said, face, pet, seen, levels, together });
+      const together = this.active ? !!ga && ga === gb : now.ok;
+      rows.push({ a, b, sim, dt, said, face, pet, seen, now, from, together });
     }
     return { rows, level: this.level, reading: !!this.progress };
   }

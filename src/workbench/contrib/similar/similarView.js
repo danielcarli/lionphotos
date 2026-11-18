@@ -22,7 +22,8 @@ import { showCompare } from '../compare/compareView.js';
 import { showContextMenu } from '../../browser/contextMenu.js';
 import { Eta } from '../../../base/common/eta.js';
 import { etaText } from '../../browser/parts/statusbarPart.js';
-import { SENSITIVITY } from './similarFinder.js';
+import { sensitivitySlider } from './sensitivitySlider.js';
+import { SENSITIVITY_DEFAULT } from './similarFinder.js';
 import { shotsOfItems } from './similarService.js';
 import { carryMetadata } from './carryMetadata.js';
 
@@ -77,7 +78,7 @@ export function showSimilar(services, scope, opts = {}) {
   const days = daysWithPhotos(library);
   const title = h('h2.sim-title');
   const summary = h('p.sim-summary');
-  const levels = h('div.segmented.sim-levels', { role: 'radiogroup', 'aria-label': t('similar.levelLabel') });
+  const levels = h('div.sim-levels');
   const body = h('div.sim-body', { tabindex: '-1' });
   const footNote = h('span.sim-foot-note');
   const send = h('button.btn.btn-primary', { onclick: () => sendToLimbo() });
@@ -117,10 +118,8 @@ export function showSimilar(services, scope, opts = {}) {
     if (next) { day = next; load(); }
   };
 
-  const paintLevels = () => setChildren(levels, Object.keys(SENSITIVITY).map((k) => h('button', {
-    class: `seg${k === level ? ' active' : ''}`, role: 'radio', 'aria-checked': String(k === level), title: t(`similar.level.${k}Title`),
-    onclick: () => { if (k === level) return; level = k; sim.setLevel(k); paintLevels(); regroup(false); },
-  }, t(`similar.level.${k}`))));
+  // the sensitivity: a slider from "Almost the same" to "Alike" (the photos grouped again when let go)
+  const paintLevels = () => setChildren(levels, sensitivitySlider(sim, (v) => { level = v; regroup(false); }));
 
   /** Groups again (after a change of level, or of marks); `keep` keeps the choices made where it can. */
   const regroup = (keep) => {
@@ -182,8 +181,8 @@ export function showSimilar(services, scope, opts = {}) {
     footNote.textContent = groups.length ? t('similar.footNote', { keep: formatNumber(inGroups - going.length), go: formatNumber(going.length) }) + (files > going.length ? ` ${tn('similar.withTwins', files - going.length)}` : '') : '';
     if (!groups.length) {
       setChildren(body, h('div.empty-state.sim-empty', h('span', { html: icon('similar', 30) }), h('h3', t('similar.none')),
-        h('p.muted', level === 'scene' ? t('similar.noneScene') : t('similar.noneTry')),
-        level !== 'scene' ? h('button.btn.btn-secondary', { onclick: () => { level = 'scene'; sim.setLevel(level); paintLevels(); regroup(false); } }, t('similar.tryScene')) : null));
+        h('p.muted', level >= 90 ? t('similar.noneScene') : t('similar.noneTry')),
+        level < 90 ? h('button.btn.btn-secondary', { onclick: () => { level = Math.max(90, SENSITIVITY_DEFAULT); sim.setLevel(level); paintLevels(); regroup(false); } }, t('similar.tryScene')) : null));
       return;
     }
     const top = body.scrollTop;
@@ -228,7 +227,11 @@ export function showSimilar(services, scope, opts = {}) {
       u.mark === MARK.great ? h('span.sim-mark', { html: icon('star', 12), title: t('marks.great') }) : u.mark === MARK.ok ? h('span.sim-mark', { html: icon('okCircle', 12), title: t('marks.ok') }) : null,
       raw && u.files.length > 1 ? h('span.sim-twin', 'RAW+JPG') : null,
       h('span.sim-state', { html: icon(out ? 'binQuestion' : 'check', 13) }));
-    return h('div.sim-cell', btn, who(u),
+    return h('div.sim-cell', btn,
+      // × : this photo out of the group
+      h('button.sim-remove', { type: 'button', title: t('similar.removeFromGroup'), 'aria-label': `${t('similar.removeFromGroup')} · ${name}`, html: icon('close', 12),
+        onclick: (e) => { e.stopPropagation(); takeOut(g, i); } }),
+      who(u),
       h('button.sim-menu', { type: 'button', title: t('similar.photoMenu'), 'aria-label': `${t('similar.photoMenu')} · ${name}`, 'aria-haspopup': 'menu', html: icon('more', 16),
         onclick: (e) => { const r = e.currentTarget.getBoundingClientRect(); menu(g, i, r.left, r.bottom + 4); } }));
   };
@@ -273,7 +276,7 @@ export function showSimilar(services, scope, opts = {}) {
   const menu = (g, i, x, y) => showContextMenu(x, y, [
     { label: t('similar.setBest'), icon: 'sparkle', checked: i === g.best, run: () => { if (i !== g.best) setBest(g, i); } },
     { label: tn('similar.keepOnly', g.units.length - 1), icon: 'binQuestion', run: () => keepOnly(g, i) },
-    { label: t('similar.takeOut'), icon: 'takeOut', run: () => takeOut(g, i) },
+    { label: t('similar.makeSingle'), icon: 'takeOut', title: t('similar.removeFromGroup'), run: () => takeOut(g, i) },
     '-',
     { label: t('similar.compareThis'), icon: 'compare', run: () => compare(g, i) },
   ]);
@@ -334,7 +337,7 @@ export function showSimilar(services, scope, opts = {}) {
       actions: (it) => [
         { label: t('similar.setBest'), icon: 'sparkle', checked: unitOf(it) === g.best, run: () => { if (unitOf(it) !== g.best) setBest(g, unitOf(it)); } },
         { label: tn('similar.keepOnly', g.units.length - 1), icon: 'binQuestion', close: true, run: () => keepOnly(g, unitOf(it)) },
-        { label: t('similar.takeOut'), icon: 'takeOut', close: true, run: () => takeOut(g, unitOf(it)) },
+        { label: t('similar.makeSingle'), icon: 'takeOut', close: true, run: () => takeOut(g, unitOf(it)) },
       ],
       onClose: () => render(),
     });

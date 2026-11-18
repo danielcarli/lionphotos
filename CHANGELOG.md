@@ -2,6 +2,21 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.64.1] — 2026-11-17
+
+### Fixed
+- **The Windows setup check of the build (CI) ran out of time.** It first installs the latest published release, to see the new setup replace the earlier one; it gave that setup the quiet switches of the earlier setup (Inno Setup), but the latest release now has the new setup (NSIS), which then opened its window and waited for a click until the job's 15 minutes ran out. The check now tells the two apart and gives each its own quiet switch, and every setup and uninstaller it starts is waited for 5 minutes at most, failing with a message instead of holding the job.
+
+## [1.64.0] — 2026-11-17
+
+### Added
+- **How alike photos must be to be grouped, as a slider** — "Almost the same" on one end, "Alike" on the other — on the line under the bar of Photos (Group similar photos) and in the window of similar photos. Towards "Alike", more photos are grouped; the slider says what it asks (how alike, how far apart in time). "Why are these (not) grouped?" now says from which sensitivity two photos would be together, with a button to use it.
+- **× on each photo of a group** — in the window of similar photos and in the viewer's strip — "Remove photo from the group" (with an undo); and the menu of a photo of the strip (right button): *Make single*, *Choose as the best*. *Make single* is also the name in the menu of a photo of a group.
+- **Labels dialog: find an album as you type.** The field of albums (and of people, pets and places) is now "Find or add an album": the chips are filtered as one types (those chosen stay), Enter chooses the one with that name or the only one found, or names a new one, as the line under it says. Esc clears it.
+
+### Changed
+- **The grouping groups more.** It is more tolerant of a person who moved or a camera that moved (the picture is compared both finely and coarsely), a photo is compared with the latest few of a group (a pose that comes back), and the default sensitivity is looser than the "Similar" level was (a level chosen before is kept, never stricter than the new default).
+
 ## [1.63.0] — 2026-11-17
 
 ### Added

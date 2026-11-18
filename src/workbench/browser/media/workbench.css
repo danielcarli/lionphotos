@@ -1252,7 +1252,9 @@ video.vw-media { background: #000; border-radius: 6px; }
 .lbl-chip.on { background: var(--accent-soft); border-color: var(--brand-magenta); color: var(--text-primary); }
 .lbl-chip.small { height: 22px; padding: 0 8px; font-size: 11.5px; }
 .lbl-chip.inherited { border-style: dashed; }
-.lbl-add { width: 170px; height: 26px; border-radius: 99px; font-size: 12px; }
+.lbl-add { width: 210px; height: 26px; border-radius: 99px; font-size: 12px; }
+.lbl-find-hint { flex-basis: 100%; min-height: 0; }
+.lbl-find-hint:empty { display: none; }
 .lbl-inherited { margin: 0; }
 .info-title .info-edit { margin-left: auto; font: 500 11.5px var(--font-ui); letter-spacing: 0; text-transform: none; }
 .info-chips { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -3557,8 +3559,7 @@ button.vw-chip:hover { filter: brightness(1.2); }
 .viewer.vw-playing .vw-stack { display: none; }
 
 /* the levels of "Group similar photos" on its line, and "why (not) grouped" (1.62.5) */
-.stack-levels { flex: none; background: var(--bg-elevated); }
-.stack-levels .seg { height: 24px; padding: 0 9px; font-size: 11.5px; }
+.stack-levels { flex: none; }
 .why-dialog { width: min(760px, 100%); max-height: calc(100vh - 48px); display: flex; flex-direction: column; }
 .why-body { overflow: auto; min-height: 0; }
 .why-row { padding: 12px 0; border-top: 1px solid var(--border); display: grid; grid-template-columns: 236px 1fr; gap: 6px 16px; align-items: start; }
@@ -3581,3 +3582,23 @@ button.vw-chip:hover { filter: brightness(1.2); }
 
 /* Photos grouped: how many raw files a group holds, beside its RAW label (1.63.0) */
 .tile-raw-count { display: inline-grid; place-items: center; min-width: 16px; height: 15px; margin-left: 5px; padding: 0 4px; border-radius: 99px; background: #fff; color: #141012; font-size: 10px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* the sensitivity of the grouping: a slider from "Almost the same" to "Alike" (1.64.0) */
+.sens { display: inline-flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--text-secondary); white-space: nowrap; }
+.sens-range { -webkit-appearance: none; appearance: none; width: 150px; height: 18px; background: transparent; cursor: pointer; }
+.sens-range::-webkit-slider-runnable-track { height: 4px; border-radius: 99px; background: linear-gradient(to right, var(--accent) 0 var(--sens, 50%), var(--border-strong, var(--border)) var(--sens, 50%) 100%); }
+.sens-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -5px; border-radius: 50%; background: var(--bg-elevated); border: 2px solid var(--accent); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+.sens-range:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.sim-levels .sens { font-size: 12px; }
+/* × on a photo of a group: out of the group */
+.sim-remove { position: absolute; right: 6px; top: 6px; z-index: 2; display: grid; place-items: center; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: rgba(0, 0, 0, 0.6); color: #fff; cursor: pointer; line-height: 0; opacity: 0; }
+.sim-cell:hover .sim-remove, .sim-remove:focus-visible { opacity: 1; }
+.sim-remove:hover { background: var(--danger, #c4314b); }
+.sim-cell:hover .sim-twin { opacity: 0; }
+.vw-stack-cell { position: relative; flex: none; }
+.vw-stack-remove { position: absolute; right: -5px; top: -5px; z-index: 2; display: grid; place-items: center; width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%; background: #3a3136; color: #fff; cursor: pointer; line-height: 0; opacity: 0; box-shadow: 0 0 0 2px rgba(14, 11, 13, 0.9); }
+.vw-stack-cell:hover .vw-stack-remove, .vw-stack-remove:focus-visible { opacity: 1; }
+.vw-stack-remove:hover { background: var(--danger, #c4314b); }
+.vw-stack-remove:focus-visible, .sim-remove:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+@media (hover: none) { .sim-remove, .vw-stack-remove { opacity: 1; } }
+.vw-stack-thumbs { padding: 5px 5px 0 0; }

@@ -557,3 +557,9 @@ _merge(MESSAGES, {'similar': {'why': {'menu': '왜 묶였나요(묶이지 않았
 _merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m}분', 'days': {'one': '{count}일', 'other': '{count}일'}}}})
 
 _merge(MESSAGES, {'photos': {'rawsInGroup': {'one': '이 그룹의 RAW 파일 {count}개', 'other': '이 그룹의 RAW 파일 {count}개'}}})
+
+_merge(MESSAGES, {'similar': {'sens': {'label': '묶기 위해 필요한 비슷한 정도', 'title': '"비슷함" 쪽일수록 더 많이 묶이고, "거의 같음" 쪽일수록 거의 같은 사진만 묶입니다', 'value': '{pct}% 비슷함, 최대 {min}분 차이', 'same': '거의 같음', 'alike': '비슷함'}, 'why': {'alikeSens': '{pct} 비슷함(현재 감도의 기준은 {need})', 'wouldFrom': '감도를 {v} 이상으로 하면 함께 묶입니다.', 'useSens': '감도 {v} 사용', 'leadSens': '찍은 순서대로 각 사진과 다음 사진을, 지금 감도(100 중 {v})에서 본 내용과 함께 보여 줍니다.'}, 'removeFromGroup': '사진을 그룹에서 빼기', 'removedFromGroup': '{name}을(를) 그룹에서 뺐습니다. 이 사진들과 다시 묶이지 않습니다.'}})
+
+_merge(MESSAGES, {'similar': {'makeSingle': '단독으로 만들기'}})
+
+_merge(MESSAGES, {'labels': {'type': {'person': {'find': '인물 찾기 또는 추가'}, 'pet': {'find': '반려동물 찾기 또는 추가'}, 'place': {'find': '장소 찾기 또는 추가'}, 'album': {'find': '앨범 찾기 또는 추가'}}, 'findOrNew': 'Enter: "{name}" 만들기', 'findNone': '"{name}" 없음 — Enter로 만들기'}})

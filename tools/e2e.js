@@ -1934,10 +1934,30 @@ app.whenReady().then(async () => {
     check(simAll.near && simAll.label === 'Similar photos' && simAll.title === 'Similar photos among those shown' && simAll.groups >= 1 && simAll.prevHidden && /\d{4}/.test(simAll.meta || ''),
       'similar photos from the Photos bar, beside "Photos in no album": the photos shown, across days (dated groups, no day arrows)', JSON.stringify(simAll));
     check(simAll.cmp?.ok, 'comparing a group of similar photos keeps the order of the group, names the best on its side and starts on the other photo', JSON.stringify(simAll.cmp));
-    check(simAll.count === '2 photos' && ['Choose as the best', 'Keep only this one: the other one to the Limbo', 'Take out of the group', 'Compare side by side'].every((x) => simAll.menu?.includes(x)) && simAll.bestNow && simAll.bestKept,
+    check(simAll.count === '2 photos' && ['Choose as the best', 'Keep only this one: the other one to the Limbo', 'Make single', 'Compare side by side'].every((x) => simAll.menu?.includes(x)) && simAll.bestNow && simAll.bestKept,
       'a group of similar photos says how many it has; each photo has a menu (best, keep only it, take it out, compare); the best chosen is kept in the catalog', JSON.stringify({ count: simAll.count, menu: simAll.menu, bestNow: simAll.bestNow, bestKept: simAll.bestKept }));
     check(simAll.apartGone && simAll.apartKept >= 1 && simAll.apartToast && simAll.stillGone && simAll.undone,
       '"Not the same" (alike pictures of different people): the group goes and is not formed again; the notice undoes it', JSON.stringify({ apartGone: simAll.apartGone, apartKept: simAll.apartKept, toast: simAll.apartToast, stillGone: simAll.stillGone, undone: simAll.undone }));
+    // the dialog of labels: the albums found as one types (those chosen stay), Enter chooses the one found or names a new one
+    const lbf = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      for (const n of ['Praia de Torres', 'Praia do Rosa', 'Serra Gaúcha']) if (!s.labels.ofType('album').some((l) => l.name === n)) await s.labels.save({ type: 'album', name: n });
+      const it = lib.allItems.find((x) => x.kind === 1);
+      (await import('/src/workbench/contrib/labels/labelsDialog.js')).showLabelsDialog(s, { ids: [it.id], title: it.name });
+      await wait(300);
+      const field = document.querySelector('.labels-dialog .lbl-add[data-label-type="album"]');
+      const shown = () => [...field.closest('.lbl-chips').querySelectorAll('.lbl-chip')].filter((c) => !c.hidden).map((c) => c.textContent);
+      const res = { placeholder: field.placeholder };
+      field.value = 'praia'; field.dispatchEvent(new Event('input')); await wait(50);
+      res.found = shown().filter((x) => !x.startsWith('Férias'));
+      res.foundAll = shown();
+      field.value = 'serra ga'; field.dispatchEvent(new Event('input')); await wait(50);
+      field.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); await wait(200);
+      res.chosen = [...document.querySelectorAll('.labels-dialog .lbl-chip.on')].map((c) => c.textContent);
+      res.cleared = document.querySelector('.labels-dialog .lbl-add[data-label-type="album"]').value === '' && document.activeElement?.dataset?.labelType === 'album';
+      document.querySelector('.labels-dialog .btn-secondary').click(); await wait(150);
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(lbf.placeholder === 'Find or add an album' && lbf.found?.length === 2 && lbf.found.every((x) => /Praia/.test(x)) && lbf.chosen?.includes('Serra Gaúcha') && lbf.cleared,
+      'labels dialog: one field finds the albums as one types (the chips filtered), Enter chooses the only one found (or names a new one)', JSON.stringify(lbf));
     // "Why (not) grouped?": two photos of a group and a photo of another scene, each beside the next
     const why = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
       const a = lib.allItems.find((x) => x.name === 'IMG_1014-Edit.jpg'), b = lib.allItems.find((x) => x.name === 'IMG_1014.JPG');
@@ -1961,7 +1981,7 @@ app.whenReady().then(async () => {
       document.querySelector('.why-dialog .btn-primary')?.click(); await wait(200);
       lib.clearSelection();
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(why.menu && why.rows === 2 && /Grouped together\.|Together at the level/.test(why.first || '') && /Not together at any level\.|Together at the level/.test(why.second || '') && /Picture.*alike.*Time.*apart.*People/.test(why.facts || ''),
+    check(why.menu && why.rows === 2 && /Grouped together\.|Together with the sensitivity at/.test(why.first || '') && /Not together at any level\.|Together with the sensitivity at/.test(why.second || '') && /Picture.*alike.*Time.*apart.*People/.test(why.facts || ''),
       '"Why are these (not) grouped?" (two or more photos selected): each beside the next, how alike, how far apart in time, the people, and at which level they would be together', JSON.stringify(why));
     // "Group similar photos", beside "Similar photos": each group as its best photo, a stack with how many; the
     // stack opens its group; side by side, the space bar says whether a photo stays or goes
@@ -1976,6 +1996,7 @@ app.whenReady().then(async () => {
       res.badge = badge?.textContent; res.title = badge?.title; res.on = sw()?.classList.contains('on');
       await wait(300);
       res.status = document.querySelector('.view-photos .stack-status:not([hidden])')?.textContent;
+      res.lineSlider = !!document.querySelector('.view-photos .stack-status .sens-range');
       res.shown = lib.view('main').length; res.all = lib.viewAll('main').length;
       res.tileHasBadge = !!badge?.closest('.tile');
       // the raw files come with their group (RAW and how many on it), and a raw twin behind its JPEG
@@ -1998,11 +2019,30 @@ app.whenReady().then(async () => {
       other?.click(); await wait(500);
       res.vwPicked = s.viewer.current?.name === otherName && !!document.querySelector('.viewer .vw-stack-thumb.is-shown');
       res.vwOpen = document.querySelector('.viewer .vw-stack-open')?.textContent;
+      // × in the strip: the photo out of the group (the strip has one photo less), and undone
+      res.vwRemove = document.querySelector('.viewer .vw-stack-remove')?.title;
+      const before = document.querySelectorAll('.viewer .vw-stack-thumb').length;
+      // a photo that is not the one standing for the group
+      const cells = [...document.querySelectorAll('.viewer .vw-stack-cell')];
+      const gone = cells.find((c) => !c.querySelector('.vw-stack-best')) || cells.at(-1);
+      const goneName = gone.querySelector('.vw-stack-thumb').title;
+      gone.querySelector('.vw-stack-remove').click(); await wait(800);
+      const after = [...document.querySelectorAll('.viewer .vw-stack:not([hidden]) .vw-stack-thumb')].map((x) => x.title);
+      res.vwRemoved = !after.includes(goneName) && (before > 2 ? after.length === before - 1 : after.length === 0);
+      res.vwAfter = { before, after: after.length };
+      [...document.querySelectorAll('.toast')].find((x) => x.textContent.includes('out of the group'))?.querySelector('.toast-actions button')?.click(); await wait(1200);
+      // a thumbnail's menu (right button): "Make single"
+      document.querySelector('.viewer .vw-stack-thumb')?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 600, clientY: 600 })); await wait(300);
+      res.vwMenu = [...document.querySelectorAll('.ctx-menu .ctx-item')].map((x) => x.textContent.trim()).join('|');
+      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
       s.viewer.close(); await wait(200);
       badge.click();
       for (let i = 0; i < 100 && !document.querySelector('.sim-group, .sim-empty'); i++) await wait(100);
       res.groupTitle = document.querySelector('.sim-title')?.textContent; res.groups = document.querySelectorAll('.sim-group').length; res.tiles = document.querySelectorAll('.sim-group .sim-tile').length;
       res.who = document.querySelector('.sim-who')?.textContent;
+      // the sensitivity, a slider from "Almost the same" to "Alike"; × on a photo: out of the group
+      res.slider = [...document.querySelectorAll('.sim-levels .sens-end')].map((x) => x.textContent).join('|') + ':' + document.querySelector('.sim-levels .sens-range')?.value;
+      res.removeTitle = document.querySelector('.sim-cell .sim-remove')?.title;
       [...document.querySelectorAll('.sim-group-head .btn')][0].click(); await wait(400);
       res.keep0 = document.querySelector('.cmp-side.is-active .cmp-keep')?.textContent;
       res.out0 = document.querySelectorAll('.cmp-thumb.is-out').length;
@@ -2041,6 +2081,8 @@ app.whenReady().then(async () => {
       '"Grouped photos" (on the line under the bar, and in Filters › Type, with its chip): only the groups, each as its best photo; off, or "All", the photos alone again', JSON.stringify({ label: st.onlyLabel, onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, back: st.onlyBack, chip: st.onlyChip, fromMenu: st.fromMenu, menuChecked: st.menuChecked, menuBack: st.menuBack }));
     check(st.rawOnStack === `RAW${st.rawCount}` && st.twinBoth === 0 && st.twinsBefore > 0,
       'Photos grouped: a group holding raw files says RAW and how many; a raw file alone with its JPEG stays behind it (one photo)', JSON.stringify({ rawOnStack: st.rawOnStack, rawCount: st.rawCount, twinBoth: st.twinBoth, twinsBefore: st.twinsBefore }));
+    check(/^Almost the same\|Alike:\d+$/.test(st.slider || '') && st.lineSlider && st.removeTitle === 'Remove photo from the group' && st.vwRemove === 'Remove photo from the group' && st.vwRemoved && /^Make single\|Choose as the best/.test(st.vwMenu || ''),
+      'the sensitivity as a slider (Almost the same … Alike), on the line under the bar and in the group; × on a photo of a group (and of the viewer\'s strip): "Remove photo from the group"; a thumbnail\'s menu: "Make single"', JSON.stringify({ slider: st.slider, line: st.lineSlider, remove: st.removeTitle, vwRemove: st.vwRemove, vwRemoved: st.vwRemoved, vwMenu: st.vwMenu }));
     check(st.vwThumbs === Number(st.badge) && st.vwLabel === `${st.badge} similar photos` && st.vwPicked && st.vwOpen === 'Choose what stays',
       'the viewer, Photos grouped: the photos of the group in a strip below the one shown (as in Google Photos); a click shows another of them', JSON.stringify({ thumbs: st.vwThumbs, label: st.vwLabel, picked: st.vwPicked, open: st.vwOpen }));
     check(st.groups === 1 && st.tiles === Number(st.badge) && /^A group of \d+ similar photos$/.test(st.groupTitle || '') && st.keep0 === 'Goes to the Limbo' && st.keep1 === 'Stays' && st.out1 === st.out0 - 1 && st.more && /^Space: stays or goes/.test(st.hint || '') && st.outAfter === st.out0 - 1,

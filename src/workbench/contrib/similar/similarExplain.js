@@ -36,32 +36,30 @@ export async function showWhyGrouped(services, items) {
 
   const paint = async () => {
     const res = await sim.explain(items);
-    const levelName = (l) => t(`similar.level.${l}`);
     const row = (r) => {
-      const now = r.levels.find((x) => x.level === res.level);
+      const now = r.now;
       const facts = [];
       if (r.sim == null) facts.push([t('similar.why.picture'), t('similar.why.unread'), 'bad']);
-      else facts.push([t('similar.why.picture'), t('similar.why.alike', { pct: pct(r.sim), need: pct(now.threshold), level: levelName(res.level) }), r.sim >= now.threshold ? 'ok' : 'bad']);
+      else facts.push([t('similar.why.picture'), t('similar.why.alikeSens', { pct: pct(r.sim), need: pct(now.threshold) }), r.sim >= now.threshold ? 'ok' : 'bad']);
       facts.push([t('similar.why.time'), t('similar.why.apart', { span: span(r.dt), max: span(now.windowMs) }), r.dt <= now.windowMs ? 'ok' : 'bad']);
       const who = r.face === false || r.pet === false ? ['bad', t('similar.why.others')] : !r.seen ? ['wait', t('similar.why.notSeen')] : ['ok', t('similar.why.same')];
       facts.push([t('similar.why.people'), who[1], who[0]]);
       if (r.said) facts.push([t('similar.why.decision'), t('similar.why.said'), 'bad']);
-      const where = r.levels.filter((x) => x.ok).map((x) => x.level);
       const verdict = r.together ? t('similar.why.together')
         : now.ok ? t('similar.why.firstPhoto')
-          : where.length ? t('similar.why.wouldAt', { levels: where.map(levelName).join(', ') }) : t('similar.why.never');
+          : r.from != null ? t('similar.why.wouldFrom', { v: r.from }) : t('similar.why.never');
       return h('section.why-row',
         h('div.why-pair', [r.a, r.b].map((s) => h('figure', services.thumbs.shown(h('img', { alt: '', draggable: false }), s.rep), h('figcaption.small', s.rep.name)))),
         h('dl.why-facts', facts.flatMap(([k, v, st]) => [h('dt', k), h(`dd.is-${st}`, h('span', { html: icon(st === 'ok' ? 'check' : st === 'wait' ? 'history' : 'close', 12) }), v)])),
         h(`p.why-verdict${r.together || now.ok ? '.is-ok' : ''}`, verdict),
-        !r.together && !now.ok && where.length && !r.said ? h('button.btn.btn-secondary.btn-sm', { onclick: () => { sim.setLevel(where[0]); paint(); } }, t('similar.why.useLevel', { level: levelName(where[0]) })) : null,
+        !r.together && !now.ok && r.from != null && !r.said ? h('button.btn.btn-secondary.btn-sm', { onclick: () => { sim.setLevel(r.from); paint(); } }, t('similar.why.useSens', { v: r.from })) : null,
         r.said ? h('button.btn.btn-secondary.btn-sm', { onclick: async () => {
           await sim.setApart(r.a.files.flatMap((f) => r.b.files.map((g) => [f.id, g.id])), false); paint();
         } }, t('similar.why.unsay')) : null);
     };
     setChildren(body,
       res.reading ? h('p.why-note', h('span', { html: icon('history', 13) }), t('similar.why.stillReading')) : null,
-      h('p.cm-message', t('similar.why.lead', { level: levelName(res.level) })),
+      h('p.cm-message', t('similar.why.leadSens', { v: res.level })),
       res.rows.map(row));
   };
   paint().catch((err) => setChildren(body, h('p', String(err?.message || err))));

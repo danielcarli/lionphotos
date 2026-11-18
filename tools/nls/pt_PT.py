@@ -560,3 +560,9 @@ _merge(MESSAGES, {'similar': {'why': {'menu': 'Porque (não) estão agrupadas?',
 _merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} min', 'days': {'one': '{count} dia', 'other': '{count} dias'}}}})
 
 _merge(MESSAGES, {'photos': {'rawsInGroup': {'one': '{count} ficheiro raw neste grupo', 'other': '{count} ficheiros raw neste grupo'}}})
+
+_merge(MESSAGES, {'similar': {'sens': {'label': 'Quão parecidas as fotografias têm de ser para agrupar', 'title': 'Mais para "Parecidas", mais fotografias agrupadas; mais para "Quase iguais", só as quase idênticas', 'value': '{pct}% parecidas, até {min} min de diferença', 'same': 'Quase iguais', 'alike': 'Parecidas'}, 'why': {'alikeSens': '{pct} parecidas (a sensibilidade usada pede {need})', 'wouldFrom': 'Ficariam juntas com a sensibilidade em {v} ou mais.', 'useSens': 'Usar sensibilidade {v}', 'leadSens': 'Cada fotografia ao lado da seguinte, com o que o agrupamento viu na sensibilidade usada agora ({v} de 100).'}, 'removeFromGroup': 'Remover fotografia do agrupamento', 'removedFromGroup': '{name} saiu do agrupamento e deixa de ser agrupada com estas fotografias.'}})
+
+_merge(MESSAGES, {'similar': {'makeSingle': 'Tornar única'}})
+
+_merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Pesquisar ou criar pessoa'}, 'pet': {'find': 'Pesquisar ou criar animal'}, 'place': {'find': 'Pesquisar ou criar lugar'}, 'album': {'find': 'Pesquisar ou criar álbum'}}, 'findOrNew': 'Enter: criar “{name}”', 'findNone': 'Nenhum com “{name}” — Enter cria'}})

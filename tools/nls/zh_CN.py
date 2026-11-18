@@ -557,3 +557,9 @@ _merge(MESSAGES, {'similar': {'why': {'menu': '为什么（没有）分组？', 
 _merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} 分', 'days': {'one': '{count} 天', 'other': '{count} 天'}}}})
 
 _merge(MESSAGES, {'photos': {'rawsInGroup': {'one': '此组中有 {count} 个 RAW 文件', 'other': '此组中有 {count} 个 RAW 文件'}}})
+
+_merge(MESSAGES, {'similar': {'sens': {'label': '照片需要多相似才会分组', 'title': '越靠近“相似”，分组的照片越多；越靠近“几乎相同”，只有几乎一样的照片', 'value': '相似度 {pct}%，最多相隔 {min} 分钟', 'same': '几乎相同', 'alike': '相似'}, 'why': {'alikeSens': '相似度 {pct}（当前灵敏度要求 {need}）', 'wouldFrom': '灵敏度为 {v} 或更高时会分在一起。', 'useSens': '使用灵敏度 {v}', 'leadSens': '按拍摄顺序，每张照片与下一张并列，显示当前灵敏度（{v}/100）下的判断。'}, 'removeFromGroup': '从分组中移除照片', 'removedFromGroup': '已将 {name} 移出分组，之后不会再与这些照片分在一起。'}})
+
+_merge(MESSAGES, {'similar': {'makeSingle': '设为单独照片'}})
+
+_merge(MESSAGES, {'labels': {'type': {'person': {'find': '查找或添加人物'}, 'pet': {'find': '查找或添加宠物'}, 'place': {'find': '查找或添加地点'}, 'album': {'find': '查找或添加相册'}}, 'findOrNew': '回车：新建“{name}”', 'findNone': '没有“{name}”— 回车新建'}})

@@ -560,3 +560,9 @@ _merge(MESSAGES, {'similar': {'why': {'menu': 'Pourquoi (pas) regroupées ?', 't
 _merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} min', 'days': {'one': '{count} jour', 'other': '{count} jours'}}}})
 
 _merge(MESSAGES, {'photos': {'rawsInGroup': {'one': '{count} fichier raw dans ce groupe', 'other': '{count} fichiers raw dans ce groupe'}}})
+
+_merge(MESSAGES, {'similar': {'sens': {'label': 'À quel point les photos doivent se ressembler pour être regroupées', 'title': 'Vers « Semblables », plus de photos regroupées ; vers « Presque identiques », seulement les quasi identiques', 'value': 'semblables à {pct} %, jusqu’à {min} min d’écart', 'same': 'Presque identiques', 'alike': 'Semblables'}, 'why': {'alikeSens': 'semblables à {pct} (la sensibilité utilisée demande {need})', 'wouldFrom': 'Ensemble avec la sensibilité à {v} ou plus.', 'useSens': 'Utiliser la sensibilité {v}', 'leadSens': 'Chaque photo à côté de la suivante, avec ce que le regroupement a vu à la sensibilité utilisée ({v} sur 100).'}, 'removeFromGroup': 'Retirer la photo du regroupement', 'removedFromGroup': '{name} est sortie du regroupement et n’est plus regroupée avec ces photos.'}})
+
+_merge(MESSAGES, {'similar': {'makeSingle': 'Rendre unique'}})
+
+_merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Chercher ou ajouter une personne'}, 'pet': {'find': 'Chercher ou ajouter un animal'}, 'place': {'find': 'Chercher ou ajouter un lieu'}, 'album': {'find': 'Chercher ou ajouter un album'}}, 'findOrNew': 'Entrée : créer « {name} »', 'findNone': 'Aucun avec « {name} » — Entrée le crée'}})

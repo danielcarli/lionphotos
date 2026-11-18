@@ -560,3 +560,9 @@ _merge(MESSAGES, {'similar': {'why': {'menu': 'Warum (nicht) gruppiert?', 'title
 _merge(MESSAGES, {'similar': {'why': {'minutesOnly': '{m} min', 'days': {'one': '{count} Tag', 'other': '{count} Tage'}}}})
 
 _merge(MESSAGES, {'photos': {'rawsInGroup': {'one': '{count} Raw-Datei in dieser Gruppe', 'other': '{count} Raw-Dateien in dieser Gruppe'}}})
+
+_merge(MESSAGES, {'similar': {'sens': {'label': 'Wie ähnlich Fotos sein müssen, um gruppiert zu werden', 'title': 'Richtung „Ähnlich“ werden mehr Fotos gruppiert; Richtung „Fast gleich“ nur nahezu identische', 'value': 'zu {pct} % ähnlich, bis {min} Min. Abstand', 'same': 'Fast gleich', 'alike': 'Ähnlich'}, 'why': {'alikeSens': 'zu {pct} ähnlich (die Empfindlichkeit verlangt {need})', 'wouldFrom': 'Zusammen ab einer Empfindlichkeit von {v}.', 'useSens': 'Empfindlichkeit {v} verwenden', 'leadSens': 'Jedes Foto neben dem nächsten, mit dem, was die Gruppierung bei der jetzigen Empfindlichkeit ({v} von 100) sah.'}, 'removeFromGroup': 'Foto aus der Gruppierung entfernen', 'removedFromGroup': '{name} ist aus der Gruppierung genommen und wird nicht mehr mit diesen Fotos gruppiert.'}})
+
+_merge(MESSAGES, {'similar': {'makeSingle': 'Einzeln machen'}})
+
+_merge(MESSAGES, {'labels': {'type': {'person': {'find': 'Person suchen oder hinzufügen'}, 'pet': {'find': 'Haustier suchen oder hinzufügen'}, 'place': {'find': 'Ort suchen oder hinzufügen'}, 'album': {'find': 'Album suchen oder hinzufügen'}}, 'findOrNew': 'Eingabe: „{name}“ anlegen', 'findNone': 'Keines mit „{name}“ — Eingabe legt es an'}})

@@ -17,6 +17,7 @@ import { h, setChildren } from '../../../base/browser/dom.js';
 import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { showSimilar } from '../similar/similarView.js';
+import { showContextMenu } from '../../browser/contextMenu.js';
 import { formatBytes, formatDateTime, formatNumber } from '../../../base/common/format.js';
 import { KIND, dateOf, MARK_NAMES } from '../../services/library/browser/libraryService.js';
 import { detailsLine } from '../info/infoPanel.js';
@@ -207,16 +208,47 @@ export class Viewer {
     el.setAttribute('aria-label', tn('viewer.stackLabel', stack.count));
     setChildren(el,
       h('span.vw-stack-label', h('span', { html: icon('stack', 14) }), tn('viewer.stackLabel', stack.count)),
-      h('div.vw-stack-thumbs', stack.units.map((u) => h(`button.vw-stack-thumb${isShown(u) ? '.is-shown' : ''}`, {
-        type: 'button', title: u.files.map((f) => f.name).join(' + '), 'aria-pressed': String(isShown(u)), onclick: () => pick(u),
-      }, this.thumbs.shown(h('img', { alt: '', draggable: false, decoding: 'async' }), u.rep),
-      u.rep.id === best ? h('span.vw-stack-best', { title: t('similar.bestTitle') }, h('span', { html: icon('sparkle', 10) })) : null))),
+      h('div.vw-stack-thumbs', stack.units.map((u) => h('div.vw-stack-cell',
+        h(`button.vw-stack-thumb${isShown(u) ? '.is-shown' : ''}`, {
+          type: 'button', title: u.files.map((f) => f.name).join(' + '), 'aria-pressed': String(isShown(u)), onclick: () => pick(u),
+          // its menu: make it single (out of the group), or the best of the group
+          oncontextmenu: (e) => { e.preventDefault(); this.#stackMenu(stack, u, e.clientX, e.clientY); },
+        }, this.thumbs.shown(h('img', { alt: '', draggable: false, decoding: 'async' }), u.rep),
+        u.rep.id === best ? h('span.vw-stack-best', { title: t('similar.bestTitle') }, h('span', { html: icon('sparkle', 10) })) : null),
+        // × : this photo out of the group (it is not grouped with these again; the notice undoes it)
+        h('button.vw-stack-remove', { type: 'button', title: t('similar.removeFromGroup'), 'aria-label': `${t('similar.removeFromGroup')} · ${u.rep.name}`, html: icon('close', 11),
+          onclick: (e) => { e.stopPropagation(); this.#removeFromStack(stack, u); } })))),
       h('button.vw-stack-open', { type: 'button', title: t('viewer.stackOpenTitle'), onclick: () => {
         const items = stack.units.flatMap((u) => u.files);
         this.close();
         showSimilar(this.services, { items }, { title: tn('similar.stackOpen', stack.count) });
       } }, t('viewer.stackOpen')));
     el.querySelector('.is-shown')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+
+  /** A photo out of its group (from the strip): said apart from the others of the group, with an undo. */
+  async #removeFromStack(stack, u) {
+    const sim = this.services.similar;
+    const others = stack.units.filter((x) => x !== u);
+    const pairs = u.files.flatMap((f) => others.flatMap((x) => x.files.map((g) => [f.id, g.id])));
+    const repaint = () => { sim.regroupNow(); if (this.el && this.current) this.#renderStack(this.current); };
+    await sim.setApart(pairs, true);
+    repaint();
+    this.notifications?.info(t('similar.removedFromGroup', { name: u.rep.name }), 8000, { label: t('ops.undo'), run: async () => { await sim.setApart(pairs, false); repaint(); } });
+  }
+
+  #stackMenu(stack, u, x, y) {
+    const sim = this.services.similar;
+    const i = stack.units.indexOf(u);
+    showContextMenu(x, y, [
+      { label: t('similar.makeSingle'), icon: 'takeOut', title: t('similar.removeFromGroup'), run: () => this.#removeFromStack(stack, u) },
+      { label: t('similar.setBest'), icon: 'sparkle', checked: u.rep.id === stack.top, run: async () => {
+        if (u.rep.id === stack.top) return;
+        await sim.setBest({ units: stack.units }, i);
+        sim.regroupNow();
+        if (this.el && this.current) this.#renderStack(this.current);
+      } },
+    ]);
   }
 
   // ------------------------------------------------------------------ slideshow

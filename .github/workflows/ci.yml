@@ -257,14 +257,26 @@ jobs:
           }
           function Wait-Gone([string] $path) { for ($i = 0; $i -lt 120 -and (Test-Path $path); $i++) { Start-Sleep -Seconds 1 }; -not (Test-Path $path) }
           function Get-AppEntry { Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall' | Get-ItemProperty | Where-Object { $_.DisplayName -eq 'LionPhotos' } | Select-Object -First 1 }
-          function Invoke-Setup([string[]] $arguments) { (Start-Process $setup -ArgumentList $arguments -Wait -PassThru).ExitCode }
+          # a setup waited for at most 5 minutes: one that shows a window (it did not take the quiet switch) fails
+          # here, with a message, instead of holding the job until its time runs out
+          function Wait-Exit($p, [string] $what) {
+            if (-not $p.WaitForExit(300000)) { $p | Stop-Process -Force -ErrorAction SilentlyContinue; throw "FAILED: $what did not finish in 5 minutes (a window waiting for a click?)" }
+            $p.ExitCode
+          }
+          function Invoke-Setup([string[]] $arguments) { Wait-Exit (Start-Process $setup -ArgumentList $arguments -PassThru) "LionPhotos-Setup.exe $arguments" }
 
           # 0. a LionPhotos installed by the earlier setup (Inno Setup, up to 1.53), when the latest published
           #    release still has it: the new setup must replace it, keeping the settings and the catalog
           $earlier = Join-Path $env:RUNNER_TEMP 'earlier-setup.exe'
           try { Invoke-WebRequest -UseBasicParsing "https://github.com/$env:GITHUB_REPOSITORY/releases/latest/download/LionPhotos-Setup.exe" -OutFile $earlier } catch { Write-Host "no earlier setup to try: $_" }
           if (Test-Path $earlier) {
-            Start-Process $earlier -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART' -Wait | Out-Null
+            # the latest release's setup: the earlier one (Inno Setup, quiet with /VERYSILENT) or already the new one
+            # (NSIS, quiet with /S — given /VERYSILENT it opens its window and waits for a click)
+            $bytes = [IO.File]::ReadAllBytes($earlier)
+            $isInno = [Text.Encoding]::ASCII.GetString($bytes, 0, [Math]::Min($bytes.Length, 4MB)).Contains('Inno Setup')
+            $quiet = if ($isInno) { @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART') } else { @('/S') }
+            Write-Host "the latest release's setup is $(if ($isInno) { 'the earlier one (Inno Setup)' } else { 'already the new one (NSIS)' })"
+            $null = Wait-Exit (Start-Process $earlier -ArgumentList $quiet -PassThru) 'the latest release''s setup'
             Start-Sleep -Seconds 5
           }
           $hadInno = Test-Path $innoKey
@@ -296,7 +308,7 @@ jobs:
           # 3. uninstall, with the app open: the uninstaller closes it, removes the app, keeps the settings and the catalog
           Start-Process (Join-Path $app 'LionPhotos.exe') | Out-Null
           Start-Sleep -Seconds 8
-          Start-Process (Join-Path $app 'Uninstall LionPhotos.exe') -ArgumentList '/S' -Wait | Out-Null
+          $null = Wait-Exit (Start-Process (Join-Path $app 'Uninstall LionPhotos.exe') -ArgumentList '/S' -PassThru) 'the uninstaller'
           Assert-True (Wait-Gone "$app\LionPhotos.exe") 'the uninstaller closed the app and removed it'
           for ($i = 0; $i -lt 60 -and (Get-AppEntry); $i++) { Start-Sleep -Seconds 1 }
           Assert-True (-not (Get-AppEntry)) 'the entry in Settings > Apps is gone'

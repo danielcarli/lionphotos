@@ -214,6 +214,7 @@ export class PhotosView extends ViewPane {
       f.mark && !this.limbo ? chip(f.mark === 'great' || f.mark === 'picks' ? 'star' : f.mark === 'ok' ? 'okCircle' : null, t(`marks.${f.mark}`), t('marks.all'), () => library.setFilter({ mark: '' })) : null,
       f.category && !this.limbo ? chip(null, t(`category.${f.category}`), t('photos.clearFilters'), () => library.setFilter({ category: '' }), h('span.swatch', { style: { background: categoryColor(f.category) } })) : null,
       !f.recursive && !this.limbo ? chip('folder', t('photos.thisFolderOnly'), t('photos.subfoldersHint'), () => library.setFilter({ recursive: true })) : null,
+      f.noAlbum && !this.limbo && !f.labelId ? chip('albumRemove', t('photos.noAlbum'), t('photos.clearFilters'), () => library.setFilter({ noAlbum: false })) : null,
     ].filter(Boolean);
 
     const sorts = [['date', t('photos.sort.newest')], ['dateAsc', t('photos.sort.oldest')], ['name', t('photos.sort.name')], ['size', t('photos.sort.size')]];
@@ -222,10 +223,6 @@ export class PhotosView extends ViewPane {
       // where: the start page, the folders down to the one in focus, and how many items are shown
       this.#crumbs(count),
       h('span.toolbar-spacer'),
-      // "Photos in no album": a switch beside the filters (not in an album, nor in the Limbo)
-      !this.limbo && !f.labelId ? h(f.noAlbum ? 'label.tb-switch.on' : 'label.tb-switch', { title: t('photos.noAlbumTitle') },
-        h('input', { type: 'checkbox', role: 'switch', checked: !!f.noAlbum, 'aria-checked': String(!!f.noAlbum), onchange: (e) => library.setFilter({ noAlbum: e.target.checked }) }),
-        h('span.tb-switch-track', { 'aria-hidden': 'true' }), h('span.tb-switch-text', t('photos.noAlbum'))) : null,
       // "Stack photos": each stack of similar photos shown as its best photo, with a little stack and how many it holds
       !this.limbo ? this.#stackSwitch() : null,
       // "Similar photos ▾": how alike, only the groups, reviewing them (to keep the best of each sequence), and why (not) together
@@ -233,38 +230,49 @@ export class PhotosView extends ViewPane {
       h('button.btn.btn-secondary.btn-sm.filters-btn', { class: `btn btn-secondary btn-sm filters-btn${chips.length ? ' is-active' : ''}`, title: t('photos.filtersTitle'), 'aria-haspopup': 'menu', onclick: (e) => this.#filtersMenu(e.currentTarget) },
         h('span', { html: icon('filter', 14) }), t('photos.filters'), chips.length ? h('span.filters-count', String(chips.length)) : null),
       chips.length ? h('div.filter-chips', chips) : null,
-      this.#viewControls(false),
-      // how the photos are shown: at the end of the row, as on every page (left: where and what to do; right: how it is seen) — the info panel's switch after it, beside the panel
-      h('div.view-mode', { role: 'radiogroup', 'aria-label': t('photos.modeLabel') },
-        // inside a label, as the Albums page: mosaic, even grid, list and its highlights (only the photos marked great or OK)
-        (this.#labelType()
-          ? [['mosaic', 'mosaic', t('albums.modeMosaic')], ['grid', 'grid', t('albums.modeEven')], ['list', 'list', t('photos.modeList')], ['spot', 'showcase', t('photos.spotOn')]]
-          : [['grid', 'grid', t('photos.modeGrid')], ['list', 'list', t('photos.modeList')]]).map(([m, ic, label]) => {
-          const now = this.#spotOn() ? 'spot' : this.#mosaicOn() ? 'mosaic' : this.mode;
-          const on = m === now;
-          return h('button', { class: `view-mode-btn${on ? ' active' : ''}`, role: 'radio', 'aria-checked': String(on), title: label, 'aria-label': label, 'data-mode': m, onclick: () => this.#setMode(m) },
-            h('span', { html: icon(ic, 16) }));
-        })),
+      // how the photos are shown (grid or list, their size, the order): one menu at the end of the row, beside the panel
+      this.#viewButton(),
       this.#infoToggle());
   }
 
-  /** Sort, zoom and the info panel: in the bar of the view (it stays while photos are selected). */
-  #viewControls(withInfo = true) {
+  /** The modes this place offers: inside a label mosaic, even grid, list and highlights; elsewhere grid and list. */
+  #modes() {
+    return this.#labelType()
+      ? [['mosaic', 'mosaic', t('albums.modeMosaic')], ['grid', 'grid', t('albums.modeEven')], ['list', 'list', t('photos.modeList')], ['spot', 'showcase', t('photos.spotOn')]]
+      : [['grid', 'grid', t('photos.modeGrid')], ['list', 'list', t('photos.modeList')]];
+  }
+
+  /** The mode shown now: 'spot', 'mosaic', 'grid' or 'list'. */
+  get viewModes() { return this.#modes().map(([m]) => m); }
+  get viewMode() { return this.#spotOn() ? 'spot' : this.#mosaicOn() ? 'mosaic' : this.mode; }
+  setViewMode(m) { this.#setMode(m); }
+
+  /** "View ▾": grid or list (mosaic and highlights inside a label), the size of the photos and the order. */
+  #viewButton() {
+    const now = this.#modes().find(([m]) => m === this.viewMode) || this.#modes()[0];
+    return h('button.btn.btn-secondary.btn-sm.view-btn', { title: t('photos.viewTitle'), 'aria-haspopup': 'menu', onclick: (e) => this.#viewMenu(e.currentTarget) },
+      h('span', { html: icon(now[1], 14) }), t('photos.view'), h('span.btn-chevron', { html: icon('chevronDown', 12) }));
+  }
+
+  #viewMenu(button) {
     const { library } = this;
     const f = library.filter;
+    const r = button.getBoundingClientRect();
     const sorts = [['date', t('photos.sort.newest')], ['dateAsc', t('photos.sort.oldest')], ['name', t('photos.sort.name')], ['size', t('photos.sort.size')]];
     const sortName = (sorts.find(([v]) => v === f.sort) || sorts[0])[1];
-    return h('span.view-controls',
-      h('button.icon-button.sort-btn', { title: `${t('photos.sort')}: ${sortName}`, 'aria-label': `${t('photos.sort')}: ${sortName}`, 'aria-haspopup': 'menu', html: icon('sort', 16),
-        onclick: (e) => { const r = e.currentTarget.getBoundingClientRect(); showContextMenu(Math.max(8, r.right - 200), r.bottom + 4, sorts.map(([v, l]) => ({ label: l, checked: f.sort === v, run: () => library.setFilter({ sort: v }) }))); } }),
-      this.mode === 'grid' && !this.#mosaicOn() && !this.#spotOn()
-        ? h('input.zoom', {
-            type: 'range', min: '96', max: '320', step: '8', value: String(library.settings.tileSize), 'aria-label': t('photos.zoom'), title: t('photos.zoom'),
-            oninput: (e) => { library.settings.tileSize = Number(e.target.value); this.#layout(true); this.element.querySelectorAll('input.zoom').forEach((z) => { if (z !== e.target) z.value = e.target.value; }); },
-            onchange: (e) => library.setSetting('tileSize', Number(e.target.value)),
-          })
-        : null,
-      withInfo ? this.#infoToggle() : null);
+    const zoom = this.mode === 'grid' && !this.#mosaicOn() && !this.#spotOn()
+      ? h('label.ctx-zoom', h('span', t('photos.zoom')), h('input.zoom', {
+          type: 'range', min: '96', max: '320', step: '8', value: String(library.settings.tileSize), 'aria-label': t('photos.zoom'),
+          oninput: (e) => { library.settings.tileSize = Number(e.target.value); this.#layout(true); },
+          onchange: (e) => library.setSetting('tileSize', Number(e.target.value)),
+        }))
+      : null;
+    showContextMenu(Math.max(8, r.right - 260), r.bottom + 4, [
+      ...this.#modes().map(([m, ic, label]) => ({ label, icon: ic, checked: m === this.viewMode, run: () => this.#setMode(m) })),
+      ...(zoom ? ['-', { element: zoom }] : []),
+      '-',
+      { label: `${t('photos.sort')}: ${sortName}`, icon: 'sort', submenu: sorts.map(([v, l]) => ({ label: l, checked: f.sort === v, run: () => library.setFilter({ sort: v }) })) },
+    ]);
   }
 
   #infoToggle() {
@@ -418,6 +426,7 @@ export class PhotosView extends ViewPane {
         { label: t('marks.all'), checked: !f.mark, run: pick({ mark: '' }) }, '-',
         ...['picks', 'great', 'ok', 'none'].map((m) => ({ label: t('marks.option', { name: t(`marks.${m}`), count: formatNumber(counts[m]) }), checked: f.mark === m, run: pick({ mark: m }) }))] });
     }
+    if (!this.limbo && !f.labelId) items.push('-', { label: t('photos.noAlbumOnly'), icon: 'albumRemove', title: t('photos.noAlbumTitle'), checked: !!f.noAlbum, run: pick({ noAlbum: !f.noAlbum }) });
     if (!this.limbo) items.push({ label: t('photos.subfolders'), icon: 'folder', title: t('photos.subfoldersHint'), checked: !!f.recursive, run: pick({ recursive: !f.recursive }) });
     const any = f.kind !== 'all' || (!this.limbo && (f.year || f.day || f.mark || f.category || f.noAlbum || !f.recursive));
     if (any) items.push('-', { label: t('photos.clearFilters'), icon: 'close', run: pick({ kind: 'all', year: 0, day: '', mark: '', category: '', noAlbum: false, recursive: true }) });
@@ -481,8 +490,6 @@ export class PhotosView extends ViewPane {
     }
     if (!sel.length) return;
     const bytes = sel.reduce((s, it) => s + it.size, 0);
-    const videos = sel.filter((it) => it.kind === KIND.video);
-    const heics = sel.filter((it) => it.ext === 'heic' || it.ext === 'heif' || it.ext === 'hif');
     const label = library.filter.labelId ? this.labels.get(library.filter.labelId) : null;
     const album = label?.type === 'album' ? label : null;
     const ids = [...library.selection];
@@ -495,54 +502,101 @@ export class PhotosView extends ViewPane {
       // in an album: taking the selection out of it (only the album changes; the files stay)
       album && !this.limbo ? h('button.btn.btn-sm.selbar-unalbum', { title: t('albums.removeTitle', { name: album.name }), onclick: () => removeFromAlbum(this, album.id, sel) },
         h('span', { html: icon('albumRemove', 14) }), tn('albums.removeMany', sel.length)) : null,
-      // before the Recycle Bin, the Limbo: the selection leaves Photos and waits there (asks first); in the
-      // Limbo itself, the way back
+      // the everyday actions in sight (mark, album, compare, export); the rest under "More"; the Limbo last, apart
+      ...(this.limbo ? [] : [
+        h('button.btn.btn-secondary.btn-sm.selbar-mark', { title: t('marks.label'), 'aria-haspopup': 'menu', onclick: (e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          showContextMenu(r.left, r.bottom + 4, this.#markItems(sel, ids));
+        } }, h('span', { html: icon('star', 13) }), t('selbar.mark'), h('span.btn-chevron', { html: icon('chevronDown', 11) })),
+        h('button.btn.btn-secondary.btn-sm.selbar-album', { title: t('contextMenu.addToAlbum'), 'aria-haspopup': 'menu', onclick: (e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          const item = albumMenuItem(this.services, ids);
+          showContextMenu(r.left, r.bottom + 4, item.submenu || [item]);
+        } }, h('span', { html: icon('albumAdd', 13) }), t('selbar.album'), h('span.btn-chevron', { html: icon('chevronDown', 11) })),
+        h('button.btn.btn-secondary.btn-sm.selbar-compare', { title: `${t('compare.menu')} (V)`, disabled: !comparable(this.services, sel).length, onclick: () => this.compareSelection() },
+          h('span', { html: icon('columns', 13) }), t('selbar.compare')),
+        h('button.btn.btn-secondary.btn-sm.selbar-export', { title: `${t('export.menu')} (Ctrl+E)`, onclick: () => exportMenuItem(this.services, sel).run() },
+          h('span', { html: icon('export', 13) }), t('selbar.export')),
+      ]),
       this.limbo
         ? h('button.btn.btn-secondary.btn-sm', { title: t('limbo.restoreTitle'), onclick: () => library.setMark(ids, 0) }, h('span', { html: icon('undo', 13) }), t('limbo.restoreSelected'))
-        : h('button.btn.btn-sm.limbo-send', { title: t('limbo.sendTitle'), onclick: () => applyMark(library, ids, 'reject') }, h('span', { html: icon('binQuestion', 13) }), t('limbo.send')),
-      // everything else, less frequent, in one menu
+        : null,
+      // everything else, in the same menu as the right click
       h('button.btn.btn-secondary.btn-sm.more-btn', { title: t('photos.moreTitle'), 'aria-haspopup': 'menu', onclick: async (e) => {
         const r = e.currentTarget.getBoundingClientRect();
-        const openWith = await openWithItem(this.services, sel);
-        const common = sel.every((x) => this.labels.sphereOf(x) === this.labels.sphereOf(sel[0])) ? (this.labels.sphereOf(sel[0]) || 'none') : null;
-        // marks, category, albums and labels are in the info panel on the right too; here for when it is closed
-        showContextMenu(Math.max(8, r.right - 260), r.bottom + 4, [
-          { label: t('photos.open'), icon: 'image', hint: 'Enter', run: () => this.#openViewer(this.focusId && library.selection.has(this.focusId) ? this.focusId : sel[0].id) },
-          openWith,
-          '-',
-          { label: t('contextMenu.category'), icon: 'sphere', submenu: ['personal', 'professional', 'none'].map((key) => ({
-            label: t(`sphere.${key}`), icon: key === 'personal' ? 'home' : key === 'professional' ? 'briefcase' : 'sphere', checked: common === key,
-            run: () => this.labels.link({ ids, set: [{ type: 'sphere', labelId: key === 'none' ? null : this.labels.sphere(key)?.id || null }] }),
-          })) },
-          { label: t('marks.label'), icon: 'star', submenu: [['great', 'star', '1'], ['ok', 'okCircle', '2']].map(([m, ic, key]) => ({
-            label: t(`marks.${m}`), icon: ic, hint: key, checked: sel.every((x) => MARK_NAMES[x.mark || 0] === m), run: () => applyMark(library, ids, m),
-          })).concat([{ label: t('marks.none'), hint: '0', run: () => library.setMark(ids, 0) }]) },
-          albumMenuItem(this.services, ids),
-          { label: t('labels.button'), icon: 'tag', run: () => showLabelsDialog(this, { ids, title: tn('labels.forFiles', sel.length) }) },
-          '-',
-          { label: t('contextMenu.rename'), icon: 'rename', hint: 'F2', disabled: sel.length !== 1, title: sel.length !== 1 ? t('contextMenu.renameOne') : '', run: () => this.operations.renameFile(sel[0]) },
-          { label: t('photos.moveTo'), icon: 'folder', run: () => showMoveDialog(this, ids) },
-          { label: t('photos.duplicate'), icon: 'copy', hint: 'Ctrl+D', run: () => this.operations.duplicate(ids) },
-          exportMenuItem(this.services, sel),
-          { label: t('compare.menu'), icon: 'columns', hint: 'V', disabled: !comparable(this.services, sel).length, run: () => this.compareSelection() },
-          ...this.#stackItems(sel, this.limbo),
-          // why the photos selected are (not) stacked (2 to 12 photos)
-          ...(!this.limbo && this.services.similar ? [this.#whyItem(sel)] : []),
-          { label: t('photos.organize'), icon: 'calendar', run: () => this.layout.openView('organize') },
-          ...(videos.length ? [{ label: t('previews.generate'), icon: 'film', run: () => this.thumbs.generatePreviews({ ids: videos.map((v) => v.id) }, tn('previews.scope.selected', videos.length)) }] : []),
-          ...(heics.length ? [{ label: t('convert.button'), icon: 'image', title: t('convert.buttonTitle'), run: () => this.operations.convertHeic(heics.map((it) => it.id)) }] : []),
-          ...(label && !album ? ['-',
-            { label: t('labels.removeFrom', { name: label.name }), icon: 'close', title: t('labels.removeFromTitle', { name: label.name }), run: () => removeFromLabel(this, label.id, sel) }] : []),
-          ...(album ? ['-',
-            { label: t('albums.remove'), icon: 'close', title: t('albums.removeTitle', { name: album.name }), run: () => removeFromAlbum(this, album.id, sel) },
-            ...this.#coverItem(album, sel)] : []),
-          '-',
-          // outside the Limbo a photo goes to the Limbo first (a confirmation); from the Limbo, to the Recycle Bin (typed code)
-          this.limbo
-            ? { label: t('photos.trash'), icon: 'trash', danger: true, run: () => this.operations.trash(ids) }
-            : { label: t('limbo.send'), icon: 'binQuestion', danger: true, run: () => applyMark(library, ids, 'reject') },
-        ]);
-      } }, h('span', { html: icon('more', 14) }), t('photos.more')));
+        showContextMenu(Math.max(8, r.right - 280), r.bottom + 4, await this.#actionMenu(sel));
+      } }, h('span', { html: icon('more', 14) }), t('photos.more')),
+      // before the Recycle Bin, the Limbo: the selection leaves Photos and waits there (asks first)
+      this.limbo ? null : h('span.selbar-sep', { 'aria-hidden': 'true' }),
+      this.limbo ? null : h('button.btn.btn-ghost.btn-sm.limbo-send', { title: `${t('limbo.sendTitle')} (Delete)`, onclick: () => applyMark(library, ids, 'reject') }, h('span', { html: icon('binQuestion', 13) }), t('selbar.limbo')));
+  }
+
+  /** Great, OK, no mark — for the selection. */
+  #markItems(sel, ids) {
+    return [['great', 'star', '1'], ['ok', 'okCircle', '2']].map(([m, ic, key]) => ({
+      label: t(`marks.${m}`), icon: ic, hint: key, checked: sel.every((x) => MARK_NAMES[x.mark || 0] === m), run: () => applyMark(this.library, ids, m),
+    })).concat([{ label: t('marks.none'), hint: '0', run: () => this.library.setMark(ids, 0) }]);
+  }
+
+  /**
+   * The one menu of a selection — the same under "More", on the right click and (its part for one photo) in the
+   * viewer: open · in the catalog (mark, album, category, labels) · see (compare, similar) · the files · export ·
+   * the Limbo. A disabled item says why.
+   */
+  async #actionMenu(sel, { header = false, focusId = null } = {}) {
+    const { library, labels } = this;
+    const ids = sel.map((x) => x.id);
+    const inLimbo = this.limbo || sel.every((x) => (x.mark || 0) === MARK.reject);
+    const label = library.filter.labelId && !this.limbo ? labels.get(library.filter.labelId) : null;
+    const album = label?.type === 'album' ? label : null;
+    const common = sel.every((x) => labels.sphereOf(x) === labels.sphereOf(sel[0])) ? (labels.sphereOf(sel[0]) || 'none') : null;
+    const openWith = await openWithItem(this.services, sel);
+    const videos = sel.filter((it) => it.kind === KIND.video);
+    const heics = sel.filter((it) => it.ext === 'heic' || it.ext === 'heif' || it.ext === 'hif');
+    const one = sel.length === 1;
+    const canCompare = comparable(this.services, sel).length > 0;
+    const sameDay = sel.every((x) => x.kind === KIND.image && dayOf(x) === dayOf(sel[0]));
+    const similar = !inLimbo && this.services.similar ? [
+      ...this.#stackItems(sel, inLimbo),
+      ...(sameDay ? [{ label: t('similar.menu'), icon: 'similar', run: () => showSimilar(this.services, dayOf(sel[0])) }] : []),
+      this.#whyItem(sel),
+    ] : [];
+    const why = (item) => (item.disabled && item.title ? { ...item, why: item.title } : item);
+    return [
+      ...(header ? [{ label: tn('contextMenu.selected', sel.length), disabled: true }, '-'] : []),
+      { label: t('photos.open'), icon: 'image', hint: 'Enter', run: () => this.#openViewer(focusId && library.selection.has(focusId) ? focusId : sel[0].id) },
+      openWith,
+      '-',
+      ...(inLimbo ? [] : [{ label: t('marks.label'), icon: 'star', submenu: this.#markItems(sel, ids) }]),
+      albumMenuItem(this.services, ids),
+      { label: t('contextMenu.category'), icon: 'sphere', submenu: ['personal', 'professional', 'none'].map((key) => ({
+        label: t(`sphere.${key}`), icon: key === 'personal' ? 'home' : key === 'professional' ? 'briefcase' : 'sphere', checked: common === key,
+        run: () => labels.link({ ids, set: [{ type: 'sphere', labelId: key === 'none' ? null : labels.sphere(key)?.id || null }] }),
+      })) },
+      { label: t('labels.button'), icon: 'tag', run: () => showLabelsDialog(this, { ids, title: tn('labels.forFiles', sel.length) }) },
+      ...(label && !album ? [{ label: t('labels.removeFrom', { name: label.name }), icon: 'close', title: t('labels.removeFromTitle', { name: label.name }), run: () => removeFromLabel(this, label.id, sel) }] : []),
+      ...(album ? [{ label: t('albums.remove'), icon: 'close', title: t('albums.removeTitle', { name: album.name }), run: () => removeFromAlbum(this, album.id, sel) }, ...this.#coverItem(album, sel)] : []),
+      '-',
+      why({ label: t('compare.menu'), icon: 'columns', hint: 'V', disabled: !canCompare, title: canCompare ? '' : t('compare.needTwo'), run: () => this.compareSelection() }),
+      ...(similar.length ? [{ label: t('similar.button'), icon: 'similar', submenu: similar.map(why) }] : []),
+      '-',
+      { label: t('actions.files'), icon: 'folder', submenu: [
+        why({ label: t('contextMenu.rename'), icon: 'rename', hint: 'F2', disabled: !one, title: one ? '' : t('contextMenu.renameOne'), run: () => this.operations.renameFile(sel[0]) }),
+        { label: t('photos.duplicate'), icon: 'copy', hint: 'Ctrl+D', run: () => this.operations.duplicate(ids) },
+        { label: t('photos.moveTo'), icon: 'folderOpen', run: () => showMoveDialog(this, ids) },
+        { label: t('actions.moveByDate'), icon: 'calendar', title: t('actions.moveByDateTitle'), run: () => this.layout.openView('organize') },
+        '-',
+        { label: t('common.showIn', { explorer: this.actions.explorerName }), icon: 'reveal', run: () => this.actions.reveal(sel[0]) },
+        ...(heics.length ? [{ label: t('convert.button'), icon: 'image', title: t('convert.buttonTitle'), run: () => this.operations.convertHeic(heics.map((it) => it.id)) }] : []),
+        ...(videos.length ? [{ label: t('previews.generate'), icon: 'film', run: () => this.thumbs.generatePreviews({ ids: videos.map((v) => v.id) }, tn('previews.scope.selected', videos.length)) }] : []),
+      ] },
+      exportMenuItem(this.services, sel),
+      '-',
+      ...(inLimbo
+        ? [{ label: t('contextMenu.restore'), icon: 'undo', run: () => library.setMark(ids, 0) },
+          { label: t('photos.trash'), icon: 'trash', danger: true, run: () => this.operations.trash(ids) }]
+        : [{ label: t('contextMenu.sendLimbo'), icon: 'binQuestion', hint: 'Delete', danger: true, run: () => applyMark(library, ids, 'reject') }]),
+    ];
   }
 
   // ------------------------------------------------------------------ layout (virtual rows)
@@ -869,7 +923,7 @@ export class PhotosView extends ViewPane {
     },
       this.#thumb(it, 'tile-img'),
       h('button.tile-check', { 'aria-label': t('photos.select'), html: icon('check', 14), onclick: (e) => { e.stopPropagation(); this.anchorId = it.id; this.picking = true; this.library.toggle(it.id); } }),
-      this.#itemActions(it, 'tile-actions'),
+      this.#tileActions(it),
       this.#marks([it.id], MARK_NAMES[it.mark || 0], 'tile-marks'),
       this.#stackBadge(it),
       // bottom right: personal or professional (nothing when not categorized), then the kind of file —
@@ -956,48 +1010,12 @@ export class PhotosView extends ViewPane {
 
   async #contextMenu(e, it) {
     e.preventDefault();
-    const { library, labels } = this;
+    const { library } = this;
     if (!library.selection.has(it.id)) { this.anchorId = it.id; library.setSelection([it.id]); }
     this.focusId = it.id;
     this.#paintSelection();
     const sel = library.selectedItems();
-    const ids = sel.map((x) => x.id);
-    const common = sel.every((x) => labels.sphereOf(x) === labels.sphereOf(sel[0])) ? (labels.sphereOf(sel[0]) || 'none') : null;
-    const setSphere = (key) => () => {
-      const l = key === 'none' ? null : labels.sphere(key);
-      labels.link({ ids, set: [{ type: 'sphere', labelId: l ? l.id : null }] });
-    };
-    const inLimbo = sel.every((x) => (x.mark || 0) === MARK.reject);
-    const label = library.filter.labelId ? labels.get(library.filter.labelId) : null;
-    const openWith = await openWithItem(this.services, sel);
-    showContextMenu(e.clientX, e.clientY, [
-      { label: tn('contextMenu.selected', sel.length), disabled: true },
-      '-',
-      { label: t('photos.open'), icon: 'image', hint: 'Enter', disabled: sel.length !== 1, run: () => this.#openViewer(it.id) },
-      openWith,
-      '-',
-      { label: t('contextMenu.rename'), icon: 'rename', hint: 'F2', disabled: sel.length !== 1, title: sel.length !== 1 ? t('contextMenu.renameOne') : '', run: () => this.operations.renameFile(sel[0]) },
-      { label: t('photos.duplicate'), icon: 'copy', hint: 'Ctrl+D', run: () => this.operations.duplicate(ids) },
-      { label: t('contextMenu.category'), icon: 'sphere', submenu: ['personal', 'professional', 'none'].map((key) => ({
-        label: t(`sphere.${key}`), icon: key === 'personal' ? 'home' : key === 'professional' ? 'briefcase' : 'sphere', checked: common === key, run: setSphere(key),
-      })) },
-      albumMenuItem(this.services, ids),
-      ...(label ? [{ label: label.type === 'album' ? t('albums.remove') : t('labels.removeFrom', { name: label.name }), icon: 'close',
-        title: label.type === 'album' ? t('albums.removeTitle', { name: label.name }) : t('labels.removeFromTitle', { name: label.name }), run: () => removeFromLabel(this, label.id, sel) }] : []),
-      // inside an album: this photo as its cover
-      ...this.#coverItem(label, sel),
-      // the similar photos of the day these were taken
-      ...(!inLimbo && sel.every((x) => x.kind === KIND.image && dayOf(x) === dayOf(sel[0]))
-        ? [{ label: t('similar.menu'), icon: 'similar', run: () => showSimilar(this.services, dayOf(sel[0])) }] : []),
-      // stack the photos selected (whatever they look like), or unstack the stacks they stand for
-      ...this.#stackItems(sel, inLimbo),
-        // a few photos expected together: why they are (not) stacked
-      ...(!inLimbo && this.services.similar && sel.length >= 2 ? [this.#whyItem(sel)] : []),
-      '-',
-      inLimbo
-        ? { label: t('contextMenu.restore'), icon: 'undo', run: () => library.setMark(ids, 0) }
-        : { label: t('contextMenu.sendLimbo'), icon: 'binQuestion', danger: true, run: () => applyMark(library, ids, 'reject') },
-    ]);
+    showContextMenu(e.clientX, e.clientY, await this.#actionMenu(sel, { header: true, focusId: it.id }));
   }
 
   /** Personal (a house) or professional (a briefcase) — nothing for a photo not categorized. */
@@ -1050,6 +1068,14 @@ export class PhotosView extends ViewPane {
       this.limbo
         ? h('button.icon-button.danger', { title: t('photos.trash'), 'aria-label': t('photos.trash'), html: icon('trash', 15), onclick: stop(() => this.operations.trash([it.id])), ondblclick: (e) => e.stopPropagation() })
         : h('button.icon-button.danger', { title: t('limbo.send'), 'aria-label': t('limbo.send'), html: icon('binQuestion', 15), onclick: stop(() => applyMark(this.library, [it.id], 'reject')), ondblclick: (e) => e.stopPropagation() }));
+  }
+
+  /** The corner of a tile: out of the label open (an album…), or, in the Limbo, to the Recycle Bin. */
+  #tileActions(it) {
+    const stop = (fn) => (e) => { e.stopPropagation(); fn(); };
+    const unlink = this.#labelRemoveButton(it, stop);
+    const trash = this.limbo ? h('button.icon-button.danger', { title: t('photos.trash'), 'aria-label': t('photos.trash'), html: icon('trash', 15), onclick: stop(() => this.operations.trash([it.id])), ondblclick: (e) => e.stopPropagation() }) : null;
+    return unlink || trash ? h('span.tile-actions', unlink, trash) : null;
   }
 
   #labelRemoveButton(it, stop) {

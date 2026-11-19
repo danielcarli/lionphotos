@@ -472,22 +472,39 @@ export class Viewer {
         this.#slideControls(),
         h('span.vw-marks', [['great', 'star', '1'], ['ok', 'okCircle', '2'], ['reject', 'binQuestion', '3']].map(([name, ic, key]) => {
           const on = MARK_NAMES[it.mark || 0] === name;
-          return h('button', { class: `vw-btn mark-btn mark-${name}${on ? ' on' : ''}`, title: t(`marks.${name}Title`, { key }), 'aria-pressed': String(on), onclick: () => this.#mark(name) },
+          return h('button', { class: `vw-btn mark-btn mark-${name}${on ? ' on' : ''}`, title: t(`marks.${name}Title`, { key: name === 'reject' ? `${key} · Delete` : key }), 'aria-pressed': String(on), onclick: () => this.#mark(name) },
             h('span.mark-icon', { html: icon(ic, 16) }), name === 'reject' && on ? h('span.mark-text', t('marks.rejectBadge')) : null);
         })),
         it.kind === KIND.video
           ? h('button.vw-btn', { title: t('previews.one'), onclick: () => this.thumbs.generatePreviews({ ids: [it.id] }, t('previews.scope.one')) }, h('span', { html: icon('film', 16) }), t('previews.generate'))
           : this.#zoomControls(),
-        h('button.vw-btn', { title: t('albums.addKey', { key: 'A' }), onclick: () => addToAlbum(this, [it.id]) }, h('span', { html: icon('albumAdd', 16) })),
-        h('button.vw-btn', { title: t('common.showIn', { explorer: this.actions.explorerName }), onclick: () => this.actions.reveal(it) }, h('span', { html: icon('reveal', 16) })),
-        h('button.vw-btn', { title: t('info.openDefault'), onclick: () => this.actions.openExternal(it) }, h('span', { html: icon('external', 16) })),
         it.kind === KIND.image && adjustOf(it) ? h(this.comparing ? 'button.vw-btn.vw-compare.active' : 'button.vw-btn.vw-compare', { title: `${t('adjust.compareTitle')} (Y)`, 'aria-pressed': String(!!this.comparing), onclick: () => this.toggleCompare() }, h('span', { html: icon('compare', 16) })) : null,
-        it.kind === KIND.image && this.list.length > 1 ? h('button.vw-btn.vw-side', { title: `${t('compare.viewerTitle')} (V)`, 'aria-label': t('compare.viewerTitle'), onclick: () => this.#sideBySide() }, h('span', { html: icon('columns', 16) })) : null,
-        h('button.vw-btn.vw-export', { title: `${t('export.menu')} (Ctrl+E)`, 'aria-label': t('export.menu'), onclick: () => exportPhotos(this.services, [it]) }, h('span', { html: icon('export', 16) })),
         this.#canCrop(it) ? h('button.vw-btn.vw-crop', { title: `${t('crop.title')} (C)`, onclick: () => this.openCrop() }, h('span', { html: icon('crop', 16) })) : null,
         h('button.vw-btn.vw-edit', { class: `vw-btn vw-edit${this.infoOpen ? ' active' : ''}`, title: t('viewer.editTitle'), 'aria-pressed': String(!!this.infoOpen), onclick: () => this.#toggleInfo() }, h('span', { html: icon('rename', 16) }), t('viewer.edit')),
-        h('button.vw-btn.danger', { title: `${t((it.mark || 0) === 3 ? 'photos.trash' : 'limbo.send')} (Delete)`, onclick: () => this.#discard() }, h('span', { html: icon((it.mark || 0) === 3 ? 'trash' : 'binQuestion', 16) })),
+        // the less used actions of this photo, with the names of the photos' menu
+        h('button.vw-btn.vw-more', { title: t('photos.moreTitle'), 'aria-label': t('photos.more'), 'aria-haspopup': 'menu', onclick: (e) => this.#moreMenu(e.currentTarget, it) }, h('span', { html: icon('more', 16) })),
+        // one Limbo button (the "3" among the marks, also Delete); in the Limbo, the way to the Recycle Bin
+        (it.mark || 0) === 3 ? h('button.vw-btn.danger', { title: `${t('photos.trash')} (Delete)`, onclick: () => this.#discard() }, h('span', { html: icon('trash', 16) })) : null,
         h('button.vw-btn', { title: t('common.close') + ' (Esc)', onclick: () => this.close() }, h('span', { html: icon('close', 18) }))));
+  }
+
+  /** "More" of the viewer: the part of the photos' menu that fits one photo, in the same order and words. */
+  #moreMenu(button, it) {
+    const r = button.getBoundingClientRect();
+    const image = it.kind === KIND.image;
+    showContextMenu(Math.max(8, r.right - 280), r.bottom + 6, [
+      { label: t('info.openDefault'), icon: 'external', run: () => this.actions.openExternal(it) },
+      '-',
+      { label: t('contextMenu.addToAlbum'), icon: 'albumAdd', hint: 'A', run: () => addToAlbum(this, [it.id]) },
+      '-',
+      { label: t('compare.viewerTitle'), icon: 'columns', hint: 'V', disabled: !image || this.list.length < 2, why: t('compare.needTwo'), run: () => this.#sideBySide() },
+      '-',
+      { label: t('actions.files'), icon: 'folder', submenu: [
+        { label: t('contextMenu.rename'), icon: 'rename', run: () => this.operations.renameFile(it) },
+        { label: t('common.showIn', { explorer: this.actions.explorerName }), icon: 'reveal', run: () => this.actions.reveal(it) },
+      ] },
+      { label: t('export.menu'), icon: 'export', hint: 'Ctrl+E', run: () => exportPhotos(this.services, [it]) },
+    ]);
   }
 
   #renderStage(it) {

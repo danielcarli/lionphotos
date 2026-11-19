@@ -13,6 +13,7 @@ import { icon } from '../../../base/browser/icons.js';
 import { t, tn } from '../../../base/common/nls.js';
 import { formatBytes, bytesParts, formatNumber, formatDate, formatDateTime } from '../../../base/common/format.js';
 import { ViewPane } from '../../browser/viewPane.js';
+import { xmpCard, openConflicts } from './xmpCard.js';
 
 const PAGE = 400;
 
@@ -24,6 +25,8 @@ export class BackupView extends ViewPane {
     super(services, 'backup');
     this.backup.onDidChange(() => this.invalidate());
     this.portable?.onDidChange(() => this.invalidate());
+    this.xmp?.onDidChange(() => this.invalidate());
+    if (this.xmp) this.xmp.resolver = () => openConflicts(services);
   }
 
   render() {
@@ -32,6 +35,7 @@ export class BackupView extends ViewPane {
     if (r && !this.tab) this.tab = r.onlyMaster.length ? 'onlyMaster' : r.onlyBackup.length ? 'onlyBackup' : 'both';
     setChildren(this.element,
       this.#portableCard(),
+      xmpCard(this.services),
       this.#intro(),
       b.copying ? this.#copyProgress(b.copying) : null,
       r ? this.#summary(r) : null,

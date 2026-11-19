@@ -167,6 +167,18 @@ CREATE TABLE IF NOT EXISTS similar_stack (
   media_id INTEGER PRIMARY KEY REFERENCES media(id) ON DELETE CASCADE,
   stack INTEGER NOT NULL
 );
+-- metadata kept in step with the photos' .xmp sidecars (1.81.0): for each photo, its sidecar as last seen (time,
+-- size), the fields both sides agreed on then (the base of the next comparison), and the fields changed on both
+-- sides since (a conflict, the person chooses)
+CREATE TABLE IF NOT EXISTS xmp_sync (
+  media_id INTEGER PRIMARY KEY REFERENCES media(id) ON DELETE CASCADE,
+  mtime INTEGER,
+  size INTEGER,
+  base TEXT,
+  conflict TEXT
+);
+-- photos whose metadata changed in the catalog while the sync is on: their sidecars are written soon
+CREATE TABLE IF NOT EXISTS xmp_dirty (media_id INTEGER PRIMARY KEY REFERENCES media(id) ON DELETE CASCADE);
 -- what each photo looks like, for the similar photos (light and shade, colours, sharpness, exposure: 320
 -- bytes, read from its thumbnail), so a collection is not read again at each start
 CREATE TABLE IF NOT EXISTS similar_features (
@@ -319,6 +331,9 @@ class LibraryDatabase {
       CREATE TRIGGER IF NOT EXISTS portable_faces_i AFTER INSERT ON faces BEGIN ${dirty('portable.facesDirty')} END;
       CREATE TRIGGER IF NOT EXISTS portable_faces_u AFTER UPDATE OF person_id, status, rejected ON faces BEGIN ${dirty('portable.facesDirty')} END;
       CREATE TRIGGER IF NOT EXISTS portable_faces_d AFTER DELETE ON faces BEGIN ${dirty('portable.facesDirty')} END;
+      CREATE TRIGGER IF NOT EXISTS xmp_media_u AFTER UPDATE OF mark, caption, alt_text, credit, meta_edit ON media
+        WHEN (SELECT value FROM meta WHERE key = 'xmp.sync') = '1'
+        BEGIN INSERT OR IGNORE INTO xmp_dirty(media_id) VALUES (NEW.id); END;
     `);
     this.db.prepare("INSERT OR IGNORE INTO meta(key, value) VALUES ('schema', ?)").run(String(SCHEMA_VERSION));
     const p = (sql) => this.db.prepare(sql);
@@ -1176,6 +1191,31 @@ class LibraryDatabase {
   // ------------------------------------------------------------------ settings kept with the catalog
   setting(key) { return this.db.prepare('SELECT value FROM meta WHERE key = ?').get(key)?.value ?? null; }
   setSetting(key, value) { this.db.prepare('INSERT OR REPLACE INTO meta(key, value) VALUES (?, ?)').run(key, String(value)); }
+
+  // ------------------------------------------------------------------ .xmp sidecars kept in step (1.81.0)
+  /** The photos of a collection, with what is compared with their sidecars. */
+  xmpRows(rootId) {
+    return this.db.prepare('SELECT m.id, m.path, m.name, m.ext, m.size, m.folder, m.mark, m.caption, m.alt_text, m.credit, m.meta_edit, x.mtime AS xmtime, x.size AS xsize, x.base AS xbase, x.conflict AS xconflict FROM media m LEFT JOIN xmp_sync x ON x.media_id = m.id WHERE m.root_id = ? AND m.kind = 1').all(rootId);
+  }
+  /** One photo, as xmpRows gives it. */
+  xmpRow(id) {
+    return this.db.prepare('SELECT m.id, m.root_id, m.path, m.name, m.ext, m.size, m.folder, m.mark, m.caption, m.alt_text, m.credit, m.meta_edit, x.mtime AS xmtime, x.size AS xsize, x.base AS xbase, x.conflict AS xconflict FROM media m LEFT JOIN xmp_sync x ON x.media_id = m.id WHERE m.id = ?').get(id) || null;
+  }
+  xmpPut(id, { mtime = null, size = null, base = null, conflict = null }) {
+    this.db.prepare('INSERT OR REPLACE INTO xmp_sync(media_id, mtime, size, base, conflict) VALUES (?, ?, ?, ?, ?)').run(id, mtime, size, base, conflict);
+  }
+  /** Photos changed in the catalog since their sidecars were written (taken off the list). */
+  xmpTakeDirty(limit = 200) {
+    const ids = this.db.prepare('SELECT media_id FROM xmp_dirty LIMIT ?').all(limit).map((r) => r.media_id);
+    if (ids.length) this.db.prepare(`DELETE FROM xmp_dirty WHERE media_id IN (${ids.map(() => '?').join(',')})`).run(...ids);
+    return ids;
+  }
+  xmpUndirty(ids) { const q = this.db.prepare('DELETE FROM xmp_dirty WHERE media_id = ?'); for (const id of ids) q.run(id); }
+  xmpConflicts(rootId) {
+    return this.db.prepare('SELECT m.id, m.name, m.path, x.conflict FROM xmp_sync x JOIN media m ON m.id = x.media_id WHERE m.root_id = ? AND x.conflict IS NOT NULL').all(rootId);
+  }
+  /** The sync turned off: its bookkeeping goes (turned on again, every photo is compared afresh). */
+  xmpClear() { this.db.exec('DELETE FROM xmp_dirty; DELETE FROM xmp_sync;'); }
 
   // ------------------------------------------------------------------ faces and pets (kind: 'face' | 'pet')
   /** Photos of a collection not looked at yet (or changed since), newest first. */

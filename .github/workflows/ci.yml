@@ -148,6 +148,8 @@ jobs:
         run: npm run test:plugins
       - name: Similar photos and raw + JPEG twins
         run: npm run test:similar
+      - name: Metadata kept in step with the .xmp sidecars
+        run: npm run test:xmp
       - name: Curves of the adjustments
         run: npm run test:curves
       - name: What the photos show (content categories)

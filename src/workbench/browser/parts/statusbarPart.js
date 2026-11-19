@@ -135,7 +135,7 @@ export class StatusbarPart {
     const current = this.layout.themePreference;
     const now = THEMES.find((th) => th.id === current) || THEMES[0];
     const all = THEMES.map((th) => t(th.label)).join(' · ');
-    setChildren(this.themeSwitch, h('button.theme-option.active.theme-menu-btn', {
+    setChildren(this.themeSwitch, h('button.theme-option.theme-menu-btn', {
       type: 'button', 'aria-haspopup': 'menu', title: `${t('statusbar.theme')}: ${all}`, 'aria-label': `${t('statusbar.theme')}: ${t(now.label)}`,
       onclick: (e) => {
         const r = e.currentTarget.getBoundingClientRect();

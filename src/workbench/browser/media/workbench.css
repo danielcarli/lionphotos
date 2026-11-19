@@ -1875,7 +1875,7 @@ button.person-pending { border: 0; cursor: pointer; z-index: 1; }
 .ctx-item { display: grid; grid-template-columns: 16px 18px 1fr auto auto auto auto; align-items: center; gap: 6px; width: 100%; height: 30px; padding: 0 8px 0 6px; border-radius: 6px; font-size: 13px; color: var(--text-primary); text-align: left; outline: none; }
 .ctx-item:hover:not(:disabled), .ctx-item:focus-visible:not(:disabled), .ctx-item:focus:not(:disabled) { background: var(--accent-soft); }
 .ctx-item:disabled { color: var(--text-muted); cursor: default; }
-.ctx-item:first-child:disabled { font: 600 11px var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+.ctx-item:first-child:disabled:not(.has-why) { font: 600 11px var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; }
 .ctx-item.danger { color: #c8104f; }
 .ctx-img { width: 16px; height: 16px; object-fit: contain; display: block; }
 .ctx-check { color: var(--brand-magenta); display: grid; place-items: center; }
@@ -3536,6 +3536,14 @@ button.vw-chip:hover { filter: brightness(1.2); }
 .carry-theirs { display: flex; flex-direction: column; gap: 2px; }
 .carry-from { color: var(--text-muted); }
 @media (max-width: 640px) { .carry-row { grid-template-columns: 22px 1fr; } .carry-mine, .carry-theirs { grid-column: 2; } .carry-head span:nth-child(n+3) { display: none; } }
+/* the .xmp conflicts: for each field, the catalog's value or the file's (1.81.0) */
+.xmp-row { grid-template-columns: minmax(90px, 0.6fr) 1fr 1fr; cursor: default; }
+.xmp-choice { display: flex; align-items: flex-start; gap: 8px; padding: 4px 6px; border-radius: 6px; cursor: pointer; overflow-wrap: anywhere; }
+.xmp-choice:hover { background: var(--hover); }
+.xmp-choice:has(input:checked) { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.xmp-choice input { margin-top: 2px; flex: none; }
+.xmp-all { display: flex; gap: 6px; margin: -4px 0 6px; }
+@media (max-width: 640px) { .xmp-row { grid-template-columns: 1fr; } }
 
 /* the viewer, Photos grouped: the photos of the group of the one shown, in a strip below it (1.62.4) */
 .vw-stack { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 3; display: flex; align-items: center; gap: 10px; max-width: calc(100% - 140px);
@@ -3633,3 +3641,51 @@ button.vw-chip:hover { filter: brightness(1.2); }
 /* a photo of the stack sent to the Limbo from the viewer: still in the strip, marked as gone (1.77.0) */
 .vw-stack-cell.is-limbo .vw-stack-thumb img { filter: grayscale(1); opacity: 0.45; }
 .vw-stack-limbo { position: absolute; right: 3px; bottom: 3px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--danger, #c4314b); color: #fff; line-height: 0; }
+
+/* ---------- 1.82.0: a calmer Photos screen ---------- */
+/* the selection band in neutral colors, whatever the theme: what stands out is what was chosen, not an alarm;
+   the everyday actions in sight, the Limbo last and apart, in red text */
+html:root:root .selection-bar { background: color-mix(in srgb, var(--accent) 7%, var(--bg-elevated)); color: var(--text-primary); border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
+html:root:root .selection-bar .selbar-count, html:root:root .selection-bar .icon-button, html:root:root .selection-bar .selbar-unalbum { color: var(--text-primary); }
+html:root:root .selection-bar .icon-button:hover, html:root:root .selection-bar .selbar-unalbum:hover { background: var(--hover); color: var(--text-primary); }
+html:root:root .selection-bar .selbar-bytes { color: var(--text-secondary); }
+html:root:root .selbar-badge { background: var(--accent); color: #fff; }
+html:root:root .selection-bar .btn-secondary { background: var(--bg-elevated); color: var(--text-primary); border: 1px solid var(--border); }
+html:root:root .selection-bar .btn-secondary:hover { background: var(--hover); }
+html:root:root .selection-bar .btn-secondary:disabled { opacity: 0.5; }
+html:root:root .selection-bar .limbo-send { background: transparent; color: var(--danger-ink); border-color: transparent; }
+html:root:root .selection-bar .limbo-send:hover { background: color-mix(in srgb, var(--danger-ink) 10%, transparent); }
+.selbar-sep { width: 1px; height: 20px; background: var(--border); flex: none; }
+.btn-chevron { display: inline-flex; opacity: 0.7; margin-left: -2px; }
+/* a disabled item says why, under its name */
+.ctx-why { display: block; font-size: 11.5px; line-height: 1.3; color: var(--text-muted); white-space: normal; max-width: 260px; margin-top: 1px; }
+/* the size of the photos, inside "View ▾" */
+.ctx-zoom { display: flex; align-items: center; gap: 10px; padding: 6px 12px 8px 34px; font-size: 13px; color: var(--text-primary); }
+.ctx-zoom input { flex: 1; min-width: 150px; }
+/* the theme in the status bar: a plain button (a colored pill read as a warning) */
+.statusbar .theme-menu-btn { background: transparent; color: inherit; box-shadow: none; }
+.statusbar .theme-menu-btn:hover { background: var(--hover); }
+/* the choice before mixing events in month folders */
+.mix-dialog { width: min(620px, calc(100vw - 32px)); }
+.mix-rows { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px 10px; align-items: center; margin: 2px 0 14px; padding: 10px 12px; border-radius: 10px; background: var(--bg-subtle); font-size: 12.5px; }
+.mix-rows .mix-row { display: contents; }
+.mix-rows code { overflow-wrap: anywhere; }
+.mix-arrow { color: var(--text-muted); }
+.mix-opts { display: grid; gap: 10px; }
+.mix-opt { display: flex; gap: 12px; align-items: flex-start; text-align: left; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text-primary); font: inherit; cursor: pointer; }
+.mix-opt:hover { background: var(--hover); }
+.mix-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mix-opt.is-rec { border: 1.5px solid var(--accent); }
+.mix-opt.is-risk strong { color: var(--danger-ink); }
+.mix-opt-text { display: flex; flex-direction: column; gap: 2px; }
+.mix-opt-text .muted { font-size: 12.5px; }
+.mix-opt-icon { flex: none; margin-top: 1px; color: var(--accent); }
+.mix-opt.is-risk .mix-opt-icon { color: var(--danger-ink); }
+/* Organize (1.82.0): Reorganize is the road for the whole collection; the folder tools wait for a selection */
+.reorg-hero { border: 1.5px solid var(--accent); }
+.reorg-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--accent); color: #fff; margin-left: 4px; }
+.org-tools-title { margin-top: 22px; }
+.org-tools-lead { margin: -4px 0 12px; max-width: 75ch; }
+.organize-grid .card.is-locked { border-style: dashed; }
+.org-pick-first { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-radius: 8px; background: var(--bg-subtle); color: var(--text-secondary); font-size: 13px; }
+.org-pick-first .btn { margin-left: auto; }

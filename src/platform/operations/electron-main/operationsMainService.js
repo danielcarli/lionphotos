@@ -70,6 +70,22 @@ const inside = (root, p) => p === root || p.startsWith(root + path.sep);
  * Organizing by year or month gathers photos of many events into one folder: how many named folders (not a
  * year, a month or a Raw/ part) the files leave, to warn before that grouping is lost.
  */
+/** The named folders a move empties, each with where its files go: [[from, count, [to…]]] (for the choice shown first). */
+function eventFolderMoves(root, moves) {
+  const by = new Map();
+  for (const m of moves) {
+    const parts = path.relative(root, path.dirname(m.src)).split(path.sep).filter(Boolean);
+    const named = parts.filter((p) => !/^(19|20)\d{2}([-_. ]?\d{2})?$/.test(p) && !/^(raw|img|jpe?g|cr[23]|hif|video|videos)\b/i.test(p));
+    if (!named.length) continue;
+    const key = parts.slice(0, parts.indexOf(named.at(-1)) + 1).join('/');
+    const e = by.get(key) || { n: 0, to: new Set() };
+    e.n++;
+    e.to.add(path.relative(root, path.dirname(m.dst)).split(path.sep).filter((p) => !/^(raw|img)$/i.test(p)).join('/'));
+    by.set(key, e);
+  }
+  return [...by].sort((a, b) => b[1].n - a[1].n).map(([from, e]) => [from, e.n, [...e.to].slice(0, 3)]);
+}
+
 function eventFoldersLeft(root, moves) {
   const named = new Set();
   for (const m of moves) {
@@ -462,6 +478,8 @@ class OperationsMainService {
         skipped: already,
         skippedText: already ? tn('main.ops.organize.already', already) : null,
         note: MIXING.has(pattern) && eventFoldersLeft(root, moves) >= 3 ? tn('main.ops.organize.mixNote', eventFoldersLeft(root, moves)) : undefined,
+        // events mixed in month folders (13/11): a choice before the code, with where the first folders go
+        mix: MIXING.has(pattern) && eventFoldersLeft(root, moves) >= 3 ? { folders: eventFoldersLeft(root, moves), files: moves.length, rows: eventFolderMoves(root, moves).slice(0, 4) } : undefined,
       },
     };
   }

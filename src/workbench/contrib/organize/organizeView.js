@@ -105,10 +105,27 @@ export class OrganizeView extends ViewPane {
     return box;
   }
 
-  /** The selection, or everything the grid shows right now. */
+  /**
+   * The photos selected — never "everything shown" (on 13/11 that was the whole collection, 15,206 photos, in
+   * month folders): the whole collection has one road, Reorganize, with its review.
+   */
   #scope() {
     const sel = this.library.selectedItems();
-    return sel.length ? { items: sel, label: tn('organize.scope.selected', sel.length) } : { items: this.library.viewAll(), label: tn('organize.scope.view', this.library.viewAll().length) };
+    return { items: sel, label: sel.length ? tn('organize.scope.selected', sel.length) : t('organize.scope.none') };
+  }
+
+  /** A folder tool with nothing selected: why, and the way to Photos. */
+  #pickFirst() {
+    return h('div.org-pick-first',
+      h('span', { html: icon('select', 14) }), h('span', t('organize.pickFirst')),
+      h('button.btn.btn-ghost.btn-sm', { onclick: () => this.layout.openView('photos') }, t('organize.goPhotos')));
+  }
+
+  /** The organizing of the selection: when it would mix events, the person may choose Reorganize instead. */
+  async #run(kind, payload) {
+    const r = await this.operations.run(kind, payload);
+    if (r?.redirect === 'reorganize') { this.element.scrollTop = 0; this.#analyze(); }
+    return r;
   }
 
   /** The proposal for the whole collection, from the main process (nothing moves yet). */
@@ -170,15 +187,16 @@ export class OrganizeView extends ViewPane {
 
     this.planList = h('ul.org-plan', plan.slice(0, 12).map(([f, n]) => h('li', h('span', { html: icon('folder', 14) }), h('span.org-folder', f), h('span.org-count', formatNumber(n)))),
       plan.length > 12 ? h('li.muted', tn('organize.moreFolders', plan.length - 12)) : null);
-    this.runDate = h('button.btn.btn-primary', { disabled: !ids.length || needTheme, onclick: () => this.operations.run('organize', { ids, pattern: this.pattern, theme: this.theme, split: this.split,
+    this.runDate = h('button.btn.btn-primary', { disabled: !ids.length || needTheme, onclick: () => this.#run('organize', { ids, pattern: this.pattern, theme: this.theme, split: this.split,
       rename: this.rename ? { pattern: this.namePattern, ascii: this.nameAscii } : null, work: this.pattern === 'dayTheme' ? '' : this.work }) },
-      h('span', { html: icon('organize', 14) }), this.pattern === 'same' ? tn('organize.runRename', ids.length) : tn('organize.run', ids.length));
+      h('span', { html: icon('organize', 14) }), !ids.length ? t('organize.pickFirstShort') : this.pattern === 'same' ? tn('organize.runRename', ids.length) : tn('organize.run', ids.length));
 
     setChildren(this.element,
-      h('div.view-header', h('div.eyebrow', t('organize.eyebrow')), h('h1.view-title', t('organize.title')), h('p.muted', t('organize.lead'))),
-      h('div.card.reorg-intro',
+      h('div.view-header', h('div.eyebrow', t('organize.eyebrow')), h('h1.view-title', t('organize.title')), h('p.muted', t('organize.leadSafe'))),
+      // the one road for the whole collection: a proposal reviewed before anything moves
+      h('div.card.reorg-intro.reorg-hero',
         h('div.reorg-intro-text',
-          h('h2', h('span', { html: icon('wand', 16) }), t('reorganize.introTitle')),
+          h('h2', h('span', { html: icon('wand', 16) }), t('reorganize.introTitle'), h('span.reorg-badge', t('organize.wholeCollection'))),
           h('p.muted', t('reorganize.introLead')),
           h('code.reorg-intro-sample', t('reorganize.introSample'))),
         h('button.btn.btn-primary', { disabled: this.reorgBusy || !library.root, onclick: () => this.#analyze() },
@@ -190,22 +208,26 @@ export class OrganizeView extends ViewPane {
           h('p.muted', t('regroup.lead'))),
         h('button.btn.btn-secondary', { disabled: !library.root, onclick: () => this.operations.run('regroup', {}) },
           h('span', { html: icon('search', 14) }), t('regroup.run'))),
+      // the folder tools: the photos selected (dates, a folder) or the albums ticked — never the whole collection
+      h('h2.section-title.org-tools-title', t('organize.toolsTitle')),
+      h('p.muted.small.org-tools-lead', t('organize.toolsLead')),
       h('div.organize-grid',
-        h('div.card',
+        h('div.card', { class: `card${ids.length ? '' : ' is-locked'}` },
           h('div.card-header', h('h2', h('span', { html: icon('calendar', 16) }), t('organize.byDate')), h('p', label)),
           h('div.segmented.org-patterns', PATTERNS.map((p) => h('button.seg', { class: `seg${p === this.pattern ? ' active' : ''}`, onclick: () => { this.pattern = p; this.render(); } }, t(`organize.pattern.${p}`)))),
           this.pattern === 'dayTheme' ? h('label.form-field', h('span.field-label', t('organize.theme')), themeInput) : null,
           h('p.field-hint', this.pattern === 'same' ? t('organize.sameHint') : t('organize.byDateHint')),
           this.pattern === 'same' ? null : splitBox(this.split, (v) => { this.split = v; }),
           this.#renameBox(sample, work, { workField: this.pattern !== 'dayTheme' }),
-          this.planList,
+          ids.length ? this.planList : this.#pickFirst(),
           this.runDate),
         this.#albumsCard(),
-        h('div.card',
+        h('div.card', { class: `card${ids.length ? '' : ' is-locked'}` },
           h('div.card-header', h('h2', h('span', { html: icon('folder', 16) }), t('organize.moveTitle')), h('p', label)),
           h('p.muted', t('organize.moveLead')),
           h('ul.org-kinds',
             ['raw', 'original', 'edited', 'video'].map((k) => h('li', h('code.hash', t(`move.sub.${k}`)), h('span.muted', t(`move.subHint.${k}`))))),
+          ids.length ? null : this.#pickFirst(),
           h('button.btn.btn-primary', { disabled: !ids.length, onclick: () => showMoveDialog(this, ids) }, h('span', { html: icon('folderOpen', 14) }), t('organize.moveRun')))),
       h('h2.section-title', t('organize.history')),
       this.history = h('div.card.org-history', h('p.muted', '…')));
@@ -241,7 +263,7 @@ export class OrganizeView extends ViewPane {
         h('span', h('strong', t('organize.split')), h('span.muted.small', t('organize.splitHint')))),
       this.#renameBox(chosen[0]?.items[0] || albums[0]?.items[0] || null, () => (chosen[0] || albums[0])?.a.name || ''),
       h('button.btn.btn-primary', {
-        disabled: !n, onclick: () => this.operations.run('organize', { albums: chosen.map((x) => ({ id: x.a.id, name: x.a.name, ids: x.items.map((it) => it.id) })), split: this.albumSplit,
+        disabled: !n, onclick: () => this.#run('organize', { albums: chosen.map((x) => ({ id: x.a.id, name: x.a.name, ids: x.items.map((it) => it.id) })), split: this.albumSplit,
           rename: this.rename ? { pattern: this.namePattern, ascii: this.nameAscii } : null }),
       }, h('span', { html: icon('organize', 14) }), tn('organize.runAlbums', chosen.length, { photos: tn('organize.photos', n) })));
   }

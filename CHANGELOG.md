@@ -2,6 +2,36 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.82.0] — 2026-11-18
+
+From the interface review of 18/11 (proposal B, and the changes for the 13/11 incident and the repeated paths).
+
+### Changed
+- **Photos bar:** *Stack photos* and *Similar photos ▾* stay as they were. Grid or list (mosaic and highlights inside a label), the size of the photos and the order are now under one **View ▾** button; *Only photos in no album* moved into **Filters** (with a chip while on). The bar goes from 11 controls to 7.
+- **Selection band** in neutral colors in every theme, with the everyday actions in sight: **Mark ▾**, **Album ▾**, **Compare**, **Export…**, **More**, and the **Limbo** last, apart, in red text.
+- **One menu for a selection:** *More* and the right click list the same actions in the same order: Open, Open with · Mark, Add to album, Category, Labels… · Compare side by side, Similar photos ▸ (Stack the selected, Similar photos of this day, Why are these (not) stacked?) · **File ▸** (Rename…, Duplicate, Move to folder…, Move to folders by date…, Show in the file manager, convert HEIC, video previews) · Export… · Send to the Limbo. Marking, Compare and Export are now on the right click too.
+- A disabled menu item says why, under its name (Rename with more than one photo, Compare with one).
+- The selection action is now called **Stack the selected** (Ctrl+G), so it is not confused with the *Stack photos* switch.
+- **Tiles:** the corner no longer has "show in the file manager" and a second Limbo button (the marks under the photo have it); inside a label the × to take a photo out stays, and in the Limbo the Recycle Bin button.
+- **Viewer:** one Limbo button (the "3" among the marks, also Delete; in the Limbo, the Recycle Bin); album, compare with the next photo, open in the default app, rename, show in the file manager and export moved into a **More** menu with the same names as the photos' menu. 18 controls become 13.
+- The theme button in the status bar is a plain button (the colored pill read as a warning).
+
+### Organize (the 13/11 incident)
+- *Folders by date* and *Move to a folder* work **only on the photos selected**, never on "everything shown". With nothing selected their cards say so, with a button to go to Photos, and their buttons read "Select photos first". *Folders by album* keeps working on the albums ticked.
+- **Reorganize the collection** is marked as the road for the whole collection, and the page opens by saying the tools below only act on what is selected or ticked.
+- When folders by date would empty event folders into date folders, a **choice comes before the typed code**: where the first folders would go, then *Reorganize the collection (recommended)* — which opens its proposal, nothing moves — or *Mix them in date folders anyway*, which goes on to the usual confirmation.
+- *Organize by date* left the selection's menu: it is now *File ▸ Move to folders by date…*, which opens Organize with the selection.
+- End-to-end checks for the bar, the band, the one menu, the reason on a disabled item, the locked tools and the choice before mixing.
+
+## [1.81.0] — 2026-11-18
+
+### Added
+- **Metadata kept in step with the `.xmp` sidecars**, as Lightroom, digiKam and darktable keep them. On the Backup page, *Metadata in the .xmp files* is turned on with the typed code (the dialog says how many sidecars are read and how many are made). From then on, what is written in LionPhotos (headline, caption, audio description, author and role, place, keywords, instructions, and the mark as stars: great 5, OK 3, to delete −1) goes to the `.xmp` next to each photo a moment later, and what another program wrote in it comes back to the catalog when the window comes to the front, after a refresh or with *Compare now*.
+- For each photo, the values both sides last agreed on are kept: a field changed only in LionPhotos goes to the file, only in the file goes to the catalog. Changed on both sides, it is a **conflict**: nothing is overwritten, a notice says so, and *Resolve conflicts* shows each field with the value in LionPhotos and the value in the file to choose from (or all from one side).
+- Only the properties LionPhotos knows are replaced in a sidecar; what other programs wrote there (develop settings, history, their own tags) stays. A sidecar is written aside and renamed over at once; the first time LionPhotos changes one it did not make, the original is kept in LionPhotos' data folder. A sidecar deleted by hand is made again from the catalog. The photos themselves are never touched.
+- Turning it off stops all writing; nothing already written is removed.
+- Unit tests (`npm run test:xmp`, in CI) and end-to-end checks: the typed code, a change here reaching the sidecar, one from another program coming back, a conflict settled in the dialog, turned off.
+
 ## [1.80.0] — 2026-11-18
 
 ### Changed

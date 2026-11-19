@@ -86,6 +86,16 @@ contextBridge.exposeInMainWorld('host', {
     takeOver: () => ipcRenderer.invoke('portable:takeOver'),
     onStatus: on('portable:status'),
   },
+  // metadata kept in step with the photos' .xmp sidecars
+  xmp: {
+    status: () => ipcRenderer.invoke('xmp:status'),
+    check: () => ipcRenderer.invoke('xmp:check'),
+    off: () => ipcRenderer.invoke('xmp:off'),
+    conflicts: () => ipcRenderer.invoke('xmp:conflicts'),
+    resolve: (id, choices) => ipcRenderer.invoke('xmp:resolve', id, choices),
+    focus: () => ipcRenderer.invoke('xmp:focus'),
+    onStatus: on('xmp:status'),
+  },
   thumbs: {
     visible: (ids) => ipcRenderer.invoke('thumbs:visible', ids),
     repair: (ids) => ipcRenderer.invoke('thumbs:repair', ids),

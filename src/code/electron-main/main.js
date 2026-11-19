@@ -21,6 +21,7 @@ const { ShellMainService } = require('../../platform/shell/electron-main/shellMa
 const { OpenWithMainService } = require('../../platform/openWith/electron-main/openWithMainService');
 const { PluginsMainService } = require('../../platform/plugins/electron-main/pluginsMainService');
 const { MetadataWriteMainService } = require('../../platform/library/electron-main/metadataWriteMainService');
+const { XmpSyncMainService } = require('../../platform/library/electron-main/xmpSyncMainService');
 const { EditedCopyMainService } = require('../../platform/library/electron-main/editedCopyMainService');
 const { DuplicateMainService } = require('../../platform/library/electron-main/duplicateMainService');
 const { PortableCatalogMainService } = require('../../platform/library/electron-main/portableCatalogMainService');
@@ -242,11 +243,13 @@ if (gotTheLock) app.whenReady().then(() => {
   // the catalog kept with the collection, in its .lionphotos folder
   const portable = new PortableCatalogMainService(library, () => mainWindow?.webContents, app.getVersion());
   const labels = new LabelsMainService(library);
+  // the photos' .xmp sidecars kept in step with the catalog (when turned on)
+  const xmp = new XmpSyncMainService(library, ops, () => mainWindow?.webContents);
   labels.recognizers = [faces, pets];
   // the tests (and benchmarks in tools/) reach the main services
   const update = new UpdateMainService(APP_ROOT, () => mainWindow?.webContents);
   setTimeout(() => update.removeUsedSetups(), 30000); // the setup of an update, once its version runs
-  if (process.env.LIONPHOTOS_E2E) globalThis.__lionphotosMain = { library, thumbs, faces, pets, scenes, labels, portable, update };
+  if (process.env.LIONPHOTOS_E2E) globalThis.__lionphotosMain = { library, thumbs, faces, pets, scenes, labels, portable, xmp, update };
   const services = [
     new DialogMainService(),
     library,
@@ -257,6 +260,7 @@ if (gotTheLock) app.whenReady().then(() => {
     new OpenWithMainService(library),
     new PluginsMainService(library, thumbs, ops, () => mainWindow?.webContents),
     new MetadataWriteMainService(library, ops),
+    xmp,
     new EditedCopyMainService(library, ops),
     new DuplicateMainService(library, ops),
     portable,
@@ -272,7 +276,7 @@ if (gotTheLock) app.whenReady().then(() => {
   services.forEach((s) => s.registerChannels(ipcMain));
   // closing: first stop the thumbnail work (nothing more is written), then close the catalog
   app.on('before-quit', () => { thumbs.dispose(); faces.dispose(); pets.dispose(); scenes.dispose(); });
-  app.on('will-quit', () => { thumbs.dispose(); faces.dispose(); pets.dispose(); scenes.dispose(); portable.dispose(); library.close(); });
+  app.on('will-quit', () => { thumbs.dispose(); faces.dispose(); pets.dispose(); scenes.dispose(); portable.dispose(); xmp.dispose(); library.close(); });
 
   // Reload asked by the UI (after changing the language): the window blocks navigations started by the page.
   ipcMain.on('window:reload', (event) => event.sender.reload());

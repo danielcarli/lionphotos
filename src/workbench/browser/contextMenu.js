@@ -18,6 +18,7 @@ export function closeContextMenu() { open?.close(); }
  *   tag: a short word after the label (where a folder is: "Google Drive", "External")
  *   remove: { title, run } — an × at the end of the item (also Delete on it): takes the item off a list, and off the menu
  *   element: a control of its own (a slider) shown as it is, in place of an item
+ *   why: on a disabled item, why it cannot be used now (a second line under its name)
  */
 export function showContextMenu(x, y, items) {
   closeContextMenu();
@@ -41,12 +42,12 @@ export function showContextMenu(x, y, items) {
       // a control of its own inside the menu (a slider): not an item, the menu stays open while it is used
       if (it.element) { menu.append(h('div.ctx-custom', it.element)); continue; }
       const btn = h('button.ctx-item', {
-        role: 'menuitem', class: `ctx-item${it.danger ? ' danger' : ''}${it.submenu ? ' has-sub' : ''}`, disabled: !!it.disabled, title: it.title || '',
+        role: 'menuitem', class: `ctx-item${it.danger ? ' danger' : ''}${it.submenu ? ' has-sub' : ''}${it.disabled && it.why ? ' has-why' : ''}`, disabled: !!it.disabled, title: it.title || '',
         'aria-checked': it.checked === undefined ? undefined : String(!!it.checked),
       },
         h('span.ctx-check', { html: it.checked ? icon('check', 13) : '' }),
         it.img ? h('span.ctx-icon', h('img.ctx-img', { src: it.img, alt: '', draggable: false })) : it.icon ? h('span.ctx-icon', { html: icon(it.icon, 14) }) : h('span.ctx-icon'),
-        h('span.ctx-label', it.label),
+        h('span.ctx-label', it.label, it.disabled && it.why ? h('span.ctx-why', it.why) : null),
         it.tag ? h('span.ctx-tag', it.tag) : null,
         it.hint ? h('span.ctx-hint', it.hint) : null,
         it.submenu ? h('span.ctx-arrow', { html: icon('chevronRight', 12) }) : null,

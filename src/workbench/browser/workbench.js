@@ -43,6 +43,7 @@ import { UpdateService } from '../services/update/browser/updateService.js';
 import { PluginView } from '../contrib/plugins/pluginView.js';
 import { BackupService } from '../services/backup/browser/backupService.js';
 import { PortableService } from '../services/portable/browser/portableService.js';
+import { XmpSyncService } from '../services/xmp/browser/xmpSyncService.js';
 import { h } from '../../base/browser/dom.js';
 import { t } from '../../base/common/nls.js';
 import { baseName } from '../../base/common/format.js';
@@ -75,6 +76,7 @@ services.pets = new FacesService(services, { api: 'pets' });
 services.similar = new SimilarService(services); // similar photos: the window, and Photos grouped
 services.backup = new BackupService(services);
 services.portable = new PortableService(services);
+services.xmp = new XmpSyncService(services);
 services.plugins = new PluginsService(services);
 // a plugin turned on can give the app its name and logo (plugin.json "brand"): the first one that does
 const pluginBrand = () => {

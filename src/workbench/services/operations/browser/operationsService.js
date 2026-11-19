@@ -68,6 +68,12 @@ export class OperationsService {
       this.notifications.warn(String(err?.message || err).replace(/^Error invoking remote method '[^']+': (Error: )?/, ''));
       return null;
     }
+    // event folders emptied into month folders: first a choice (Reorganize is the road for the whole collection)
+    if (view.mix) {
+      const { showMixChoice } = await import('../../../browser/choiceDialog.js');
+      const choice = await showMixChoice(view.mix);
+      if (choice !== 'mix') { this.host.ops.cancel(view.id); return choice === 'reorganize' ? { redirect: 'reorganize' } : null; }
+    }
     // a long run (moving or sending thousands of files) shows its progress in the dialog, and can be stopped
     const long = ['organize', 'move', 'undo', 'reorganize', 'trash', 'regroup'].includes(kind);
     const result = await this.confirmation.confirm(view, (code) => this.host.ops.commit(view.id, code),
@@ -165,6 +171,8 @@ export class OperationsService {
       const msg = `${tn('ops.writeMeta.done', r.written)} ${parts}`.trim();
       if (r.failed?.length) this.notifications.warn(`${msg} ${tn('ops.failed', r.failed.length)} ${r.failed.slice(0, 3).map((f) => `${f.name}: ${f.error}`).join('; ')}`);
       else this.notifications.success(msg, 6000, r.opId ? { label: t('ops.undo'), run: () => this.run('undo', { opId: r.opId }) } : null);
+    } else if (kind === 'xmpSyncOn') {
+      this.notifications.success(r.read || r.written ? `${t('ops.xmpOn.done')} ${tn('ops.xmpOn.read', r.read || 0)} ${tn('ops.xmpOn.written', r.written || 0)}` : t('ops.xmpOn.done'));
     } else if (kind === 'clearCache') {
       this.notifications.success(t('ops.clearCache.done'));
       if (this.library.root) await this.library.open(this.library.root, { scan: true });

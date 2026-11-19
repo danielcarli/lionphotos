@@ -311,9 +311,16 @@ export class LibraryService {
     if (rows.length > fresh.length) this.updateItems(rows.filter((r) => !fresh.includes(r)));
   }
 
-  async reloadItems(ids) {
+  async reloadItems(ids, { regroup = false } = {}) {
     const list = (ids || []).filter((id) => this.byId.has(id));
-    if (list.length) this.updateItems(await this.host.library.items(list));
+    if (!list.length) return;
+    const rows = await this.host.library.items(list);
+    if (!regroup) return this.updateItems(rows);
+    // changed elsewhere (a mark from a sidecar): the filters and the Limbo see them again
+    for (const r of rows) Object.assign(this.byId.get(r.id) || {}, r);
+    this.#views.clear();
+    this.#onDidChangeData.fire();
+    this.#onDidChangeMarks.fire(list);
   }
 
   /** New details for items already listed (thumbnail made, dimensions, date taken). */

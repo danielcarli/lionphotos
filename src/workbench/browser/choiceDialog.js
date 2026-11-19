@@ -7,7 +7,7 @@
 // Actions that change files use the typed confirmation code instead (confirmationService.js).
 import { h } from '../../base/browser/dom.js';
 import { icon } from '../../base/browser/icons.js';
-import { t } from '../../base/common/nls.js';
+import { t, tn } from '../../base/common/nls.js';
 
 /** @returns {Promise<boolean>} */
 /**
@@ -107,5 +107,36 @@ export function showPickDialog({ icon: iconName = 'info', eyebrow, title, messag
     document.addEventListener('keydown', onKey, true);
     document.body.append(overlay);
     requestAnimationFrame(() => confirm.focus());
+  });
+}
+
+/**
+ * Before a move that empties event folders into month folders (the 13/11 incident): a choice, not a footnote.
+ * Shows where the first folders go; "Reorganize the collection" (recommended) or "Mix them anyway" (then the
+ * usual confirmation with the typed code). Resolves 'reorganize', 'mix' or null.
+ */
+export function showMixChoice({ folders, files, rows = [] }) {
+  return new Promise((resolve) => {
+    const option = (value, ic, title, detail, cls) => h(`button.mix-opt${cls ? '.' + cls : ''}`, { type: 'button', 'data-choice': value, onclick: () => close(value) },
+      h('span.mix-opt-icon', { html: icon(ic, 18) }), h('span.mix-opt-text', h('strong', title), h('span.muted', detail)));
+    const cancel = h('button.btn.btn-secondary', t('common.cancel'));
+    const dialog = h('div.cm-dialog.choice-dialog.mix-dialog', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'mix-title' },
+      h('header.cm-head', h('span.cm-icon', { html: icon('warning', 20) }),
+        h('div', h('div.eyebrow', tn('mix.eyebrow', files)), h('h2#mix-title', tn('mix.title', folders)))),
+      h('p.cm-message', t('mix.message')),
+      rows.length ? h('div.mix-rows', rows.map(([from, n, to]) => h('div.mix-row',
+        h('code.mix-from', `${from}/ (${n})`), h('span.mix-arrow', { 'aria-hidden': 'true' }, '→'), h('code.mix-to', to.map((x) => `${x}/`).join(', '))))) : null,
+      h('div.mix-opts',
+        option('reorganize', 'wand', t('mix.reorganize'), t('mix.reorganizeDetail'), 'is-rec'),
+        option('mix', 'calendar', t('mix.anyway'), t('mix.anywayDetail'), 'is-risk')),
+      h('footer.cm-actions', cancel));
+    const overlay = h('div.cm-overlay', dialog);
+    const close = (v) => { document.removeEventListener('keydown', onKey, true); overlay.remove(); resolve(v); };
+    const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(null); } };
+    cancel.addEventListener('click', () => close(null));
+    overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) close(null); });
+    document.addEventListener('keydown', onKey, true);
+    document.body.append(overlay);
+    requestAnimationFrame(() => dialog.querySelector('.mix-opt.is-rec')?.focus());
   });
 }

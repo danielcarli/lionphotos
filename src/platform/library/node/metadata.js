@@ -327,6 +327,8 @@ function xmpMeta(input) {
     keywords: list('dc:subject'),
     altText: list('Iptc4xmpCore:AltTextAccessibility')[0] || null,
     extDescription: list('Iptc4xmpCore:ExtDescrAccessibility')[0] || null,
+    // the stars Lightroom, Bridge and digiKam give (-1: rejected)
+    rating: one('xmp:Rating'),
   };
   return out;
 }

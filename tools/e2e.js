@@ -74,6 +74,26 @@ app.whenReady().then(async () => {
   const S = 'window.__lionphotos.services';
   // the side panel shows every section at once here (its tabs are checked on their own, below)
   await js(`localStorage.setItem('lionphotos.panel.tab', 'all'), true`);
+  // an item of the menus open, also inside their submenus (1.82.0: one menu, its file actions under "File")
+  await js(`window.__ctxFind = async (text, exact = false) => {
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const name = (b) => b.querySelector('.ctx-label')?.firstChild?.textContent || '';
+    const match = (b) => (exact ? name(b) === text : b.textContent.includes(text));
+    for (const m of document.querySelectorAll('.ctx-menu')) { const f = [...m.querySelectorAll(':scope > .ctx-item')].find(match); if (f) return f; }
+    const visit = async (level) => {
+      const m = [...document.querySelectorAll('.ctx-menu')][level];
+      if (!m) return null;
+      for (const b of [...m.querySelectorAll(':scope > .ctx-item.has-sub')]) {
+        b.dispatchEvent(new MouseEvent('mouseenter')); await wait(120);
+        const sub = [...document.querySelectorAll('.ctx-menu')][level + 1];
+        const f = sub && [...sub.querySelectorAll(':scope > .ctx-item')].find(match);
+        if (f) return f;
+        if (level < 1) { const d = await visit(level + 1); if (d) return d; }
+      }
+      return null;
+    };
+    return visit(0);
+  }, true`);
   const idle = async () => {
     for (let i = 0; i < 600; i++) {
       if (await js(`${S}.library.state === 'idle' && ${S}.thumbs.status.thumbPending === 0`)) return;
@@ -554,8 +574,8 @@ app.whenReady().then(async () => {
     await wait(150);
     // the view modes at the end of the row, as on every page; nothing that leads back to all the photos inside a label
     const row = await js(`(() => { const tb = document.querySelector('.view-photos .photos-toolbar') || document.querySelector('.photos-toolbar'); const kids = [...(tb?.children || [])].filter((x) => !x.hidden); return { last: kids.slice(-2).map((x) => x.className), first: kids[0]?.className || '' }; })()`);
-    check(/view-mode/.test(row.last[0] || '') && /info-toggle/.test(row.last[1] || '') && /photos-crumbs/.test(row.first),
-      'Photos: where you are first in the row; the view modes at its end, before the info panel switch (as on the other pages)', JSON.stringify(row));
+    check(/view-btn/.test(row.last[0] || '') && /info-toggle/.test(row.last[1] || '') && /photos-crumbs/.test(row.first),
+      'Photos: where you are first in the row; "View ▾" (grid or list, size, order) at its end, before the info panel switch', JSON.stringify(row));
     // photos selected: the bar of the view stays (filters, sort, zoom), the selection's band right under it, and
     // the photos do not move when it comes or goes
     const sb = await js(`(async () => {
@@ -582,8 +602,10 @@ app.whenReady().then(async () => {
       const imgs = lib.view('main').filter((x) => x.kind === 1).slice(0, 2);
       lib.setSelection(imgs.map((x) => x.id)); await wait(300);
       document.querySelector('.view-photos .selection-bar .more-btn').click(); await wait(300);
-      const why = [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Why are these (not) stacked?'));
+      const why = await window.__ctxFind('Why are these (not) stacked?');
       const whyOn = !!why && !why.disabled;
+      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(100);
+      document.querySelector('.view-photos .selection-bar .more-btn').click(); await wait(300);
       const item = [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.querySelector('.ctx-arrow'));
       item.dispatchEvent(new MouseEvent('mouseenter')); await wait(200);
       const menus = [...document.querySelectorAll('.ctx-menu')];
@@ -593,7 +615,7 @@ app.whenReady().then(async () => {
       // the item opens the window that says why
       lib.setSelection(imgs.map((x) => x.id)); await wait(200);
       document.querySelector('.view-photos .selection-bar .more-btn').click(); await wait(300);
-      [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Why are these (not) stacked?'))?.click();
+      (await window.__ctxFind('Why are these (not) stacked?'))?.click();
       for (let i = 0; i < 40 && !document.querySelector('.why-dialog, .sim-why'); i++) await wait(100);
       res.whyOpened = !!document.querySelector('.why-dialog, .sim-why');
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(200);
@@ -725,10 +747,10 @@ app.whenReady().then(async () => {
       // the list
       s.layout.openView('photos'); lib.goHome(); lib.clearSelection(); await wait(300);
       const pv = window.__lionphotos.views.photos;
-      document.querySelector('.photos-toolbar .view-mode-btn[data-mode="list"]').click(); await wait(500);
+      pv.setViewMode('list'); await wait(500);
       const sc = pv.scroller, row = document.querySelector('.list-row');
       out.list = { fits: sc.scrollWidth <= sc.clientWidth + 1, name: Math.round(row.querySelector('.row-name').getBoundingClientRect().width), category: row.querySelector('.row-sphere').textContent.trim(), date: (() => { const d = row.querySelector('.row-date'); return d.scrollWidth <= d.clientWidth + 1; })() };
-      document.querySelector('.photos-toolbar .view-mode-btn[data-mode="grid"]').click(); await wait(300);
+      pv.setViewMode('grid'); await wait(300);
       // an album of three photos
       const three = lib.items.filter((x) => x.kind === 1).slice(0, 3);
       const id = await L.save({ type: 'album', name: 'E2E small album' });
@@ -1956,7 +1978,7 @@ app.whenReady().then(async () => {
       lib.showDay(jpg.id); s.layout.openView('photos'); await wait(400);
       const tile = document.querySelector('.view-photos .tile[data-id="' + jpg.id + '"]');
       tile.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 300, clientY: 300 })); await wait(900);
-      res.menuSimilar = [...document.querySelectorAll('.ctx-item .ctx-label')].some((x) => x.textContent === 'Similar photos of this day');
+      res.menuSimilar = !!(await window.__ctxFind('Similar photos of this day', true));
       [...document.querySelectorAll('.ctx-item')].find((b) => b.querySelector('.ctx-label')?.textContent === 'Send to the Limbo')?.click(); await wait(300);
       res.check = document.querySelector('.cm-overlay .choice-check span')?.textContent;
       res.checked = document.querySelector('.cm-overlay .choice-check input')?.checked;
@@ -2112,7 +2134,7 @@ app.whenReady().then(async () => {
       const tiles = [...document.querySelectorAll('.view-photos .tile[data-id]')].slice(0, 2);
       lib.setSelection(tiles.map((x) => Number(x.dataset.id))); await wait(100);
       tiles[0].dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 300, clientY: 300 })); await wait(500);
-      const item = [...document.querySelectorAll('.ctx-item')].find((x) => x.textContent.includes('Why are these (not) stacked?'));
+      const item = await window.__ctxFind('Why are these (not) stacked?');
       const res = { menu: !!item };
       document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(200);
       lib.setFilter({ kind: 'all' }); await wait(200);
@@ -2324,7 +2346,7 @@ app.whenReady().then(async () => {
         best: { best0, bestNow, shownNow, marked: bestMarked, back: s.similar.groupOf(list[at].id)?.top === best0,
           ok: bestNow !== best0 && st.units.some((u) => u.rep.id === bestNow && u.files.some((f) => f.id === shownNow)) && bestMarked && s.similar.groupOf(list[at].id)?.top === best0 } };
       const shown0 = s.viewer.current.id;
-      document.querySelector('.viewer .vw-btn.danger').click(); await wait(300);
+      document.querySelector('.viewer .mark-btn.mark-reject').click(); await wait(300);
       res.asked = !!document.querySelector('.cm-dialog');
       document.querySelector('.cm-dialog .btn-primary')?.click(); await wait(900);
       res.gone = (lib.byId.get(shown0)?.mark || 0) === 3;
@@ -2355,8 +2377,8 @@ app.whenReady().then(async () => {
       lib.setSelection([a.id, b.id]); await wait(150);
       const tile = document.querySelector('.view-photos .tile[data-id="' + a.id + '"]');
       tile?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 400, clientY: 400 })); await wait(300);
-      const item = [...document.querySelectorAll('.ctx-menu .ctx-item')].find((x) => x.textContent.includes('Stack photos'));
-      res.item = item?.textContent.trim();
+      const item = await window.__ctxFind('Stack the selected');
+      res.item = item?.querySelector('.ctx-label')?.textContent.trim();
       item?.click();
       for (let i = 0; i < 60 && !s.similar.groupOf(a.id); i++) await wait(100);
       await wait(300);
@@ -2383,7 +2405,7 @@ app.whenReady().then(async () => {
       lib.setSelection([a.id]); await s.similar.unstackPhotos([a]); lib.clearSelection();
       s.similar.setMode('all'); await wait(400);
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(man.off && man.apart && man.item === 'Stack photosCtrl+G' && man.on && man.together && man.count === 2 && man.badge && man.kept === 2 && man.toast && man.unstacked && man.toast2 && man.back && man.few,
+    check(man.off && man.apart && man.item === 'Stack the selected' && man.on && man.together && man.count === 2 && man.badge && man.kept === 2 && man.toast && man.unstacked && man.toast2 && man.back && man.few,
       '"Stack photos" (menu and Ctrl+G): two photos far apart put in one stack by hand (stacking turned on, kept in the catalog); Ctrl+Shift+G unstacks it, the notice brings it back; one photo alone: a word on what to do', JSON.stringify(man));
     // the viewer's editing panel: the same sections; typing in a field does not reach the viewer's keys; a
     // photo moved to a category the filter does not show stays in view, greyed, with a note naming it
@@ -2568,9 +2590,10 @@ app.whenReady().then(async () => {
       const albumIds = new Set(L.labels.filter((l) => l.type === 'album').map((l) => l.id));
       const free = lib.view().filter((x) => ![...(lib.assignmentOf(x)?.ids || [])].some((i) => albumIds.has(i))).length;
       await wait(200);
-      const sw = document.querySelector('.view-photos .tb-switch input');
-      sw.click(); await wait(300);
-      const noAlbum = { n: lib.view().length, free, none: !lib.view().some((x) => its.includes(x.id)), chip: !!document.querySelector('.view-photos .tb-switch.on') };
+      // in "Filters" (1.82.0), with a chip while on
+      document.querySelector('.view-photos .filters-btn').click(); await wait(250);
+      (await window.__ctxFind('Only photos in no album', true))?.click(); await wait(300);
+      const noAlbum = { n: lib.view().length, free, none: !lib.view().some((x) => its.includes(x.id)), chip: [...document.querySelectorAll('.view-photos .filter-chip')].some((c) => c.textContent.includes('Only photos in no album')) };
       lib.setFilter({ noAlbum: false });
       await L.link({ ids: its, set: [{ type: 'sphere', labelId: null }] });
       await L.remove?.(id);
@@ -2786,9 +2809,9 @@ app.whenReady().then(async () => {
       // inside the album: its highlights — the chosen photos, large, one per row — and back to the grid
       lib.setFilter({ mark: '' }); await wait(300);
       const pv = document.querySelector('.view-photos');
-      pv.querySelector('.view-mode-btn[data-mode="spot"]').click(); await wait(400);
+      window.__lionphotos.views.photos.setViewMode('spot'); await wait(400);
       out.inside = { rows: pv.querySelectorAll('.sc-photo-row').length, grid: !!pv.querySelector('.vs-scroller')?.offsetParent, title: pv.querySelector('.sc-photo-row .sc-name')?.textContent || '', day: pv.querySelector('.sc-photo-row .sc-eyebrow')?.textContent || '' };
-      pv.querySelector('.view-mode-btn[data-mode="grid"]').click(); await wait(300);
+      window.__lionphotos.views.photos.setViewMode('grid'); await wait(300);
       out.inside.back = !!pv.querySelector('.vs-scroller')?.offsetParent && !pv.querySelector('.sc-photo-row');
       try { localStorage.removeItem('lionphotos.labelHighlights'); } catch {}
       lib.closeLabel(); out.after = lib.filter.mark;
@@ -2862,10 +2885,11 @@ app.whenReady().then(async () => {
       const v = document.querySelector('.view-photos');
       const tiles = [...v.querySelectorAll('.grid-row.is-mosaic .tile')].map((x) => { const r = x.getBoundingClientRect(); return Math.round(r.width / 10) + 'x' + Math.round(r.height / 10); });
       const out = { tiles: tiles.length, sizes: new Set(tiles).size, year: v.querySelector('.grid-year .gy-label')?.textContent || '', month: v.querySelector('.grid-header .gh-label')?.textContent || '', days: v.querySelector('.grid-header .gh-days')?.textContent || '' };
-      out.modes = [...v.querySelectorAll('.view-mode-btn')].map((b) => b.dataset.mode + (b.classList.contains('active') ? '*' : '')).join(' ');
-      v.querySelector('.view-mode-btn[data-mode="grid"]').click(); await wait(300);
-      out.grid = !v.querySelector('.grid-row.is-mosaic') && v.querySelectorAll('.grid-row .tile').length > 0 && !!v.querySelector('input.zoom') && v.querySelector('.view-mode-btn.active')?.dataset.mode === 'grid';
-      v.querySelector('.view-mode-btn[data-mode="mosaic"]').click(); await wait(300);
+      out.modes = window.__lionphotos.views.photos.viewModes.map((m) => m + (m === window.__lionphotos.views.photos.viewMode ? '*' : '')).join(' ');
+      window.__lionphotos.views.photos.setViewMode('grid'); await wait(300);
+      v.querySelector('.view-btn').click(); await wait(200); const zoomIn = !!document.querySelector('.ctx-menu input.zoom'); document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(100);
+      out.grid = !v.querySelector('.grid-row.is-mosaic') && v.querySelectorAll('.grid-row .tile').length > 0 && zoomIn && window.__lionphotos.views.photos.viewMode === 'grid';
+      window.__lionphotos.views.photos.setViewMode('mosaic'); await wait(300);
       out.back = !!v.querySelector('.grid-row.is-mosaic');
       lib.closeLabel(); s.layout.openView('photos'); await wait(200);
       // a person (as a pet, a place, a project): the same four ways, opening as the even grid; the mosaic kept for persons
@@ -2873,11 +2897,11 @@ app.whenReady().then(async () => {
       await L.link({ folders: [folder], add: [pid] });
       try { localStorage.removeItem('lionphotos.mosaic.person'); } catch {}
       lib.openLabel(pid, 'person'); s.layout.openView('photos'); await wait(500);
-      out.person = [...v.querySelectorAll('.view-mode-btn')].map((b) => b.dataset.mode + (b.classList.contains('active') ? '*' : '')).join(' ') + (v.querySelector('.grid-row.is-mosaic') ? ' M' : '');
-      v.querySelector('.view-mode-btn[data-mode="mosaic"]').click(); await wait(300);
+      out.person = window.__lionphotos.views.photos.viewModes.map((m) => m + (m === window.__lionphotos.views.photos.viewMode ? '*' : '')).join(' ') + (v.querySelector('.grid-row.is-mosaic') ? ' M' : '');
+      window.__lionphotos.views.photos.setViewMode('mosaic'); await wait(300);
       out.personMosaic = !!v.querySelector('.grid-row.is-mosaic');
       lib.closeLabel(); s.layout.openView('photos'); await wait(200);
-      out.photos = [...v.querySelectorAll('.view-mode-btn')].map((b) => b.dataset.mode).join(' ') + (v.querySelector('.grid-row.is-mosaic') ? ' M' : '');
+      out.photos = window.__lionphotos.views.photos.viewModes.join(' ') + (v.querySelector('.grid-row.is-mosaic') ? ' M' : '');
       try { localStorage.removeItem('lionphotos.mosaic.person'); } catch {}
       await L.remove(pid);
       await L.remove(id);
@@ -3193,6 +3217,116 @@ app.whenReady().then(async () => {
       // about 190 grey; made ordinary it is near white, and its top (dark tones) stays dark
       check(sdr.full === '1200x800' && sdr.src === 'heif' && !sdr.unsupported && pq.full === '1200x800' && pq.bottom > 225 && pq.top < 60 && pq.thumbBottom > 225 && heifDisk >= 2,
         'HEIC/HIF in the viewer at full size, kept on disk for the next time; an HDR (PQ) photo made ordinary — full size and thumbnail', JSON.stringify({ ...hf, heifDisk }));
+    }
+
+    // 1.82.0: a calmer Photos screen, one menu for a selection, and Organize by one road for the whole collection
+    const calm = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      lib.setFilter({ day: '', year: 0, folder: '', recursive: true, labelId: 0 }); lib.clearSelection(); s.layout.openView('photos'); await wait(400);
+      const tb = document.querySelector('.view-photos .photos-toolbar');
+      const res = { switches: [...tb.querySelectorAll('.tb-switch')].map((x) => x.textContent.trim()), similar: !!tb.querySelector('.similar-btn'), sort: !!tb.querySelector('.sort-btn'), zoom: !!tb.querySelector('input.zoom') };
+      const imgs = lib.view('main').filter((x) => x.kind === 1 && !x.mark).slice(0, 2);
+      lib.setSelection(imgs.map((x) => x.id)); await wait(300);
+      const bar = document.querySelector('.view-photos .selection-bar');
+      res.bar = [...bar.querySelectorAll('button')].map((b) => b.className.match(/selbar-[a-z]+|more-btn|limbo-send/)?.[0]).filter(Boolean).join(' ');
+      res.limboLast = bar.lastElementChild?.classList.contains('limbo-send');
+      const top = () => [...document.querySelector('.ctx-menu').querySelectorAll(':scope > .ctx-item')].map((b) => b.querySelector('.ctx-label')?.firstChild?.textContent).filter(Boolean);
+      bar.querySelector('.more-btn').click(); await wait(300);
+      res.more = top();
+      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(150);
+      const tile = document.querySelector('.view-photos .tile[data-id="' + imgs[0].id + '"]');
+      tile.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, clientX: 300, clientY: 300 })); await wait(300);
+      res.ctx = top().slice(1);
+      const rename = await window.__ctxFind('Rename…', true);
+      res.renameWhy = rename?.disabled && rename.querySelector('.ctx-why')?.textContent;
+      res.byDate = !!(await window.__ctxFind('Move to folders by date…', true));
+      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await wait(150);
+      res.corner = [...tile.querySelectorAll('.tile-actions button')].length;
+      // Organize with nothing selected: the folder tools wait for a selection
+      lib.clearSelection(); s.layout.openView('organize'); await wait(500);
+      const run = [...document.querySelectorAll('.view-organize .organize-grid .btn-primary')][0];
+      res.locked = run.disabled && /Select photos first/.test(run.textContent) && !!document.querySelector('.view-organize .org-pick-first') && !!document.querySelector('.view-organize .reorg-hero .reorg-badge');
+      // everything selected, by month: a choice first; "Reorganize" opens its proposal, nothing moves
+      s.layout.openView('photos'); await wait(200);
+      lib.setSelection(lib.view('main').map((x) => x.id)); await wait(200);
+      s.layout.openView('organize'); await wait(500);
+      document.querySelector('.view-organize .org-patterns .seg')?.click(); await wait(300);
+      const before = (await s.host.ops.history()).length;
+      [...document.querySelectorAll('.view-organize .organize-grid .btn-primary')][0].click();
+      let dlg = null; for (let i = 0; i < 60 && !(dlg = document.querySelector('.mix-dialog')); i++) await wait(100);
+      res.mix = dlg ? { title: dlg.querySelector('h2')?.textContent, rows: dlg.querySelectorAll('.mix-row').length, code: !!document.querySelector('.cm-code, .code-input, input.cm-code-input') } : null;
+      dlg?.querySelector('.mix-opt.is-rec').click();
+      for (let i = 0; i < 80 && !document.querySelector('.view-organize .reorg-tree, .view-organize .reorg-groups, .view-organize .reorg-group'); i++) await wait(100);
+      res.reorg = !!document.querySelector('.view-organize .reorg-tree, .view-organize .reorg-groups, .view-organize .reorg-group');
+      res.nothingRan = (await s.host.ops.history()).length === before;
+      document.querySelector('.view-organize .reorg-close, .view-organize .reorg-head .btn-secondary')?.click(); await wait(200);
+      lib.clearSelection(); s.layout.openView('photos'); await wait(200);
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(calm.switches?.length === 1 && /Stack photos/.test(calm.switches[0]) && calm.similar && !calm.sort && !calm.zoom,
+      'Photos bar: "Stack photos" and "Similar photos" as they were; sort, size and grid/list under "View"; "Only photos in no album" in Filters', JSON.stringify(calm));
+    check(calm.bar === 'selbar-clear selbar-count selbar-mark selbar-album selbar-compare selbar-export more-btn limbo-send' && calm.limboLast && calm.corner === 0,
+      'the selection band: Mark, Album, Compare, Export, More and the Limbo last; no Limbo nor "show in folder" in a tile\'s corner', JSON.stringify(calm));
+    check(calm.more?.join('|') === calm.ctx?.join('|') && (calm.more || []).filter((x) => x !== 'Open with').join('|') === 'Open|Mark|Add to album|Category|Labels…|Compare side by side|Similar photos|File|Export photos…|Send to the Limbo',
+      'one menu: "More" and the right click list the same actions in the same order', JSON.stringify({ more: calm.more, ctx: calm.ctx }));
+    check(calm.renameWhy === 'Rename works on one file at a time' && calm.byDate, 'File ▸ holds what changes the disk; a disabled item says why (Rename with 2 photos)', JSON.stringify(calm));
+    check(calm.locked, 'Organize: with nothing selected, Folders by date and Move wait for a selection; Reorganize is marked as the road for the whole collection', JSON.stringify(calm));
+    check(calm.mix?.rows > 0 && /event folder/.test(calm.mix.title || '') && !calm.mix.code && calm.reorg && calm.nothingRan,
+      'Organize by month mixing events: a choice before the typed code; "Reorganize the collection" opens its proposal and nothing moves', JSON.stringify(calm));
+
+    // the .xmp sidecars kept in step (1.81.0): turned on with the typed code; a change here reaches the sidecar on its
+    // own, one made in another program comes back; changed on both sides, the person chooses
+    {
+      const M = globalThis.__lionphotosMain;
+      const xd = path.join(FOLDER, 'XMP');
+      fs.mkdirSync(xd, { recursive: true });
+      fs.copyFileSync(md.jpg.path, path.join(xd, 'xmp-one.jpg'));
+      const sideX = path.join(xd, 'xmp-one.xmp');
+      await js(`${S}.library.scan().then(() => true)`);
+      const xid = await id('xmp-one.jpg');
+      const refused = await js(`${S}.host.ops.prepare('xmpSyncOn', {}).then((v) => ${S}.host.ops.commit(v.id, 'ZZZ')).then((r) => (r?.ok ? 'accepted' : 'refused'), () => 'refused')`);
+      const on = await op('xmpSyncOn', {});
+      const st0 = await js(`${S}.xmp.status`);
+      await js(`${S}.library.describe([${xid}], { caption: 'XMP e2e' }).then(() => true)`);
+      let sideText = '';
+      for (let i = 0; i < 40 && !(sideText = fs.existsSync(sideX) ? fs.readFileSync(sideX, 'utf8') : '').includes('XMP e2e'); i++) await wait(200);
+      check(refused === 'refused' && on.res?.xmp && on.view?.code && st0.enabled && sideText.includes('XMP e2e'),
+        'xmp: turned on only with the typed code; a description written here reaches the .xmp next to the photo on its own', JSON.stringify({ refused, res: on.res, st0, side: sideText.slice(0, 80) }));
+      await wait(30);
+      fs.writeFileSync(sideX, sideText.replace('XMP e2e', 'XMP from Lightroom'));
+      await js(`${S}.xmp.check().then(() => true)`);
+      let cap = '';
+      for (let i = 0; i < 25 && (cap = await js(`${S}.library.byId.get(${xid})?.cap || ''`)) !== 'XMP from Lightroom'; i++) await wait(200);
+      check(cap === 'XMP from Lightroom', 'xmp: a description changed in the .xmp by another program comes back to the catalog and to what is shown', cap);
+      // changed on both sides: a conflict, chosen in the dialog
+      M.library.db.setDescriptions([xid], { caption: 'catalog side', alt: null, author: null });
+      M.library.db.db.exec('DELETE FROM xmp_dirty');
+      await wait(30);
+      fs.writeFileSync(sideX, fs.readFileSync(sideX, 'utf8').replace('XMP from Lightroom', 'file side'));
+      await js(`${S}.xmp.check().then(() => true)`);
+      const cf = await js(`(async () => {
+        const x = ${S}.xmp, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+        ${S}.layout.openView('backup'); await wait(300);
+        const card = !!document.querySelector('.xmp-card .tb-switch.on');
+        const btn = document.querySelector('.xmp-card .xmp-resolve');
+        const conflicts = x.status.conflicts;
+        btn?.click();
+        let dlg = null;
+        for (let i = 0; i < 30 && !(dlg = document.querySelector('.xmp-dialog')); i++) await wait(100);
+        const rows = dlg ? dlg.querySelectorAll('.xmp-row:not(.carry-head)').length : 0;
+        const both = dlg ? [...dlg.querySelectorAll('.xmp-choice')].map((c) => c.textContent).join('|') : '';
+        dlg?.querySelector('input[value=file]')?.click();
+        dlg?.querySelector('.cm-actions .btn-primary')?.click();
+        for (let i = 0; i < 30 && document.querySelector('.xmp-dialog'); i++) await wait(100);
+        await wait(300);
+        ${S}.layout.openView('photos');
+        return { card, conflicts, rows, both, after: x.status.conflicts, cap: ${S}.library.byId.get(${xid})?.cap };
+      })()`);
+      const sideAfter = fs.readFileSync(sideX, 'utf8');
+      check(cf.card && cf.conflicts === 1 && cf.rows === 1 && cf.both === 'catalog side|file side' && cf.after === 0 && cf.cap === 'file side' && sideAfter.includes('file side'),
+        'xmp: changed on both sides, nothing is overwritten until the person chooses (Backup page, conflicts dialog); the choice goes to both', JSON.stringify(cf));
+      await js(`${S}.xmp.off().then(() => true)`);
+      await js(`${S}.library.describe([${xid}], { caption: 'after off' }).then(() => true)`);
+      await wait(2600);
+      check(!(await js(`${S}.xmp.status.enabled`)) && fs.readFileSync(sideX, 'utf8').includes('file side'), 'xmp: turned off, nothing more is written to the sidecars');
     }
   } catch (err) {
     console.error(err);

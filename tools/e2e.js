@@ -196,11 +196,72 @@ app.whenReady().then(async () => {
         res.compare = !!document.querySelector('.cmp');
         document.querySelector('.cmp') && document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
         res.compareClosed = !document.querySelector('.cmp');
+        // where the copies are (1.83.0): the folders that repeat each other, in full; "Keep here" for all their files
+        const sets = s.duplicates.folderSets();
+        res.sets = { n: sets.length, shown: document.querySelectorAll('.dup-sets .dup-set').length };
+        if (sets.length) {
+          const set = sets[0];
+          const idx = set.folders.findIndex((f) => set.groups.some((g) => s.duplicates.keptFolder(g) !== f));
+          document.querySelectorAll('.dup-sets .dup-set')[0].querySelectorAll('.dup-set-keep')[idx].click(); await wait(400);
+          res.sets.allKept = set.groups.every((g) => s.duplicates.keptFolder(g) === set.folders[idx]);
+          res.sets.marked = document.querySelectorAll('.dup-sets .dup-set')[0].querySelectorAll('.dup-set-folder')[idx].classList.contains('is-kept');
+          res.sets.path = document.querySelectorAll('.dup-sets .dup-set-path')[0].textContent;
+        }
+        // selection (1.83.1): nothing selected, the bar's send is off; one selected, it sends only its extra copies
+        {
+          const bar = () => document.querySelector('.view-duplicates .dup-bar');
+          const t0 = { off: bar()?.querySelector('.dup-send-checked')?.disabled };
+          document.querySelector('.view-duplicates .dup-group .dup-check input').click(); await wait(200);
+          const one = s.duplicates.groups.filter((g) => document.querySelector('.view-duplicates .dup-group[data-hash="' + g.hash + '"]')?.classList.contains('is-checked'));
+          t0.one = { n: one.length, label: bar().querySelector('.dup-send-checked').textContent, extra: s.duplicates.extraIds(one).length, count: bar().querySelector('.dup-bar-count').textContent };
+          bar().querySelector('.dup-all').click(); await wait(200);
+          t0.all = document.querySelectorAll('.view-duplicates .dup-group.is-checked').length === document.querySelectorAll('.view-duplicates .dup-group').length;
+          bar().querySelector('.dup-none').click(); await wait(200);
+          t0.none = !document.querySelector('.view-duplicates .dup-group.is-checked') && bar().querySelector('.dup-send-checked').disabled;
+          const setBox = document.querySelector('.view-duplicates .dup-set .dup-check input');
+          if (setBox) { setBox.click(); await wait(200); t0.set = document.querySelectorAll('.view-duplicates .dup-group.is-checked').length > 0; bar().querySelector('.dup-none').click(); await wait(150); }
+          res.ticks = t0;
+        }
+        // "Show more": the next groups added below, nothing above drawn again
+        const dv = window.__lionphotos.views.duplicates || Object.values(window.__lionphotos.views).find((x) => x.element?.classList.contains('view-duplicates'));
+        if (s.duplicates.groups.length > 1) {
+          dv.shown = 1; dv.render(); await wait(200);
+          const intro = dv.element.querySelector('.dup-intro');
+          dv.element.querySelector('.dup-more').click(); await wait(300);
+          res.more = { groups: dv.element.querySelectorAll('.dup-group').length, total: s.duplicates.groups.length, same: dv.element.querySelector('.dup-intro') === intro };
+          dv.shown = 60; dv.render(); await wait(200);
+        }
+        // sent to the Limbo, never to the Recycle Bin: the button at the end of the page, the Limbo's own question
+        // (no typed code), the extra copies marked for the Limbo and still on the disk, their group gone
+        {
+          const g = s.duplicates.groups[0];
+          dv.element.querySelector('.dup-group[data-hash="' + g.hash + '"] .dup-check input').click(); await wait(200);
+          const foot = () => dv.element.querySelector('.dup-foot .dup-send-checked');
+          const lim = { foot: foot()?.textContent, bar: dv.element.querySelector('.dup-bar .dup-send-checked')?.textContent, extra: s.duplicates.extraIds([g]) };
+          lim.paths = lim.extra.map((id) => s.library.byId.get(id)?.path);
+          foot().click();
+          let ov; for (let i = 0; i < 30 && !(ov = document.querySelector('.cm-overlay')); i++) await wait(100);
+          lim.dialog = { title: ov?.querySelector('h2')?.textContent, code: !!ov?.querySelector('.cm-code') };
+          ov?.querySelector('.cm-actions .btn-primary').click(); await wait(600);
+          lim.marked = lim.extra.every((id) => s.library.byId.get(id)?.mark === 3);
+          lim.gone = !s.duplicates.groups.some((x) => x.hash === g.hash) && !dv.element.querySelector('.dup-group[data-hash="' + g.hash + '"]');
+          lim.footAfter = foot()?.disabled;
+          await s.library.setMark(lim.extra, 'none'); // back from the Limbo for the checks after this one
+          res.limbo = lim;
+        }
         s.layout.openView('photos');
         return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
       check(!dup.error && !dup.none && JSON.stringify(dup.before) === JSON.stringify(dup.after) && dup.keptAfter === dup.other && dup.tools === 4
-        && dup.path.startsWith(FOLDER) && dup.viewer && dup.compare,
+        && dup.path.startsWith(path.basename(FOLDER)) && dup.viewer && dup.compare,
         'repeated files: choosing another copy moves the mark, not the copies; each copy shows its folder and opens, shows in its folder or copies its path; the group compares side by side', JSON.stringify(dup));
+      check(dup.ticks && dup.ticks.off === true && dup.ticks.one.n === 1 && new RegExp('Send ' + dup.ticks.one.extra + ' cop[a-z]+ of the selected to the Limbo').test(dup.ticks.one.label) && /^1 of [0-9]+ repeated/.test(dup.ticks.one.count) && dup.ticks.all && dup.ticks.none && dup.ticks.set !== false,
+        'repeated files: tick boxes, Select all and Deselect all; the send acts only on the selected files (off with none)', JSON.stringify(dup.ticks));
+      const lim = dup.limbo || {};
+      check(lim.foot && lim.foot === lim.bar && /Limbo/.test(lim.dialog?.title || '') && lim.dialog.code === false && lim.marked && lim.gone && lim.footAfter === true
+        && lim.paths.length > 0 && lim.paths.every((p) => fs.existsSync(p)),
+        'repeated files: the extra copies of the selected go to the Limbo (button at the end too, the Limbo\'s question, no typed code), not to the Recycle Bin; their group leaves the list', JSON.stringify(lim));
+      check(dup.sets && (dup.sets.n === 0 || (dup.sets.shown > 0 && dup.sets.allKept && dup.sets.marked && dup.sets.path.startsWith(path.basename(FOLDER)))) && (!dup.more || (dup.more.groups === Math.min(dup.more.total, 61) && dup.more.same)),
+        'repeated files: the folders that repeat each other are shown in full, and "Keep here" keeps that folder\'s copy in all their files; "Show more" adds the next groups without drawing the page again', JSON.stringify({ sets: dup.sets, more: dup.more }));
     }
 
     // 3) a changed file gets a new thumbnail, and only it
@@ -3228,6 +3289,24 @@ app.whenReady().then(async () => {
       check(sdr.full === '1200x800' && sdr.src === 'heif' && !sdr.unsupported && pq.full === '1200x800' && pq.bottom > 225 && pq.top < 60 && pq.thumbBottom > 225 && heifDisk >= 2,
         'HEIC/HIF in the viewer at full size, kept on disk for the next time; an HDR (PQ) photo made ordinary — full size and thumbnail', JSON.stringify({ ...hf, heifDisk }));
     }
+
+    // 1.82.5: a field filled in the panel (the city…) draws it again — it stays where it was scrolled to
+    const keepTop = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const pv = window.__lionphotos.views.photos;
+      lib.setFilter({ day: '', year: 0, folder: '', recursive: true, labelId: 0, query: '' }); s.layout.openView('photos'); await wait(300);
+      if (!pv.infoOpen) document.querySelector('.view-photos .info-toggle')?.click();
+      try { localStorage.setItem('lionphotos.panel.tab', 'describe'); } catch {}
+      const imgs = lib.view('main').filter((x) => x.kind === 1).slice(0, 3);
+      const panel = document.querySelector('.view-photos .info-panel');
+      const one = async (ids) => { lib.setSelection(ids); await wait(700); panel.scrollTop = panel.scrollHeight; await wait(100); const at = panel.scrollTop; pv.rerenderInfo(); await wait(700); return [at, panel.scrollTop]; };
+      const single = await one([imgs[0].id]);
+      const many = await one(imgs.map((x) => x.id));
+      lib.setSelection([imgs[1].id]); await wait(700);
+      const other = panel.scrollTop;
+      lib.clearSelection(); try { localStorage.setItem('lionphotos.panel.tab', 'all'); } catch {}
+      return { single, many, other }; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(keepTop.single?.[0] > 0 && keepTop.single[0] === keepTop.single[1] && keepTop.many?.[0] > 0 && keepTop.many[0] === keepTop.many[1] && keepTop.other === 0,
+      'the panel drawn again for the same photo or selection (a field filled) stays where it was scrolled to; another photo starts at the top', JSON.stringify(keepTop));
 
     // 1.82.4: no face or pet recognition on this computer — the stacks go on by likeness, and Photos says so quietly
     const whoOff = await js(`(async () => { try { const s = ${S}, lib = s.library, sim = s.similar, wait = (ms) => new Promise((r) => setTimeout(r, ms));

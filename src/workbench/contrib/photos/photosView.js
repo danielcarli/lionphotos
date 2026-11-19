@@ -112,6 +112,8 @@ export class PhotosView extends ViewPane {
     this.rail = h('div.date-rail', { hidden: true, role: 'scrollbar', 'aria-orientation': 'vertical', 'aria-label': t('photos.timeline'), 'aria-controls': '' }, this.railMarks, this.railNow, this.railTip);
     this.#railEvents();
     this.info = h('aside.info-panel');
+    // where the panel is scrolled to, as the person scrolls it (kept across its redraws: see #renderInfo)
+    this.info.addEventListener('scroll', () => { if (!this.infoDrawing) this.infoTop = this.info.scrollTop; }, { passive: true });
     // its left edge is dragged to make it wider (300–480 px, remembered)
     this.infoGrip = attachResizer(this.info, 'grid', 'right');
     // Alt+↓ / Alt+↑ in the panel (even in a field): the next / previous photo, the same field keeps the focus
@@ -1262,6 +1264,20 @@ export class PhotosView extends ViewPane {
     const id = this.focusId && sel.has(this.focusId) ? this.focusId : sel.size === 1 ? [...sel][0] : null;
     const token = (this.infoToken = (this.infoToken || 0) + 1);
     const rerender = () => this.#renderInfo();
+    // the same photo (or selection) and tab drawn again — a field filled, a place picked: the panel stays where
+    // it was scrolled to (as in the viewer); another photo or tab starts at the top
+    // (the place is noted as the person scrolls, so a redraw that passes through an empty or shorter panel
+    // first — the photo reloaded after a save — still comes back to it)
+    const keepScroll = (key) => {
+      const top = key === this.infoKey ? this.infoTop || 0 : 0;
+      this.infoKey = key;
+      this.infoDrawing = true;
+      return () => {
+        this.info.scrollTop = top;
+        this.infoTop = top;
+        requestAnimationFrame(() => { this.infoDrawing = false; });
+      };
+    };
     if (sel.size > 1) {
       const items = this.library.selectedItems();
       const images = items.filter((x) => x.kind === KIND.image);
@@ -1271,6 +1287,7 @@ export class PhotosView extends ViewPane {
       const shown = items.slice(0, items.length > 4 ? 3 : 4);
       const marks = Object.entries(f.marks).filter(([k, n]) => n && k !== 'none');
       const same = MARK_NAMES[items[0].mark || 0];
+      const restore = keepScroll(`many:${items.length}:${items[0].id}:${items.at(-1).id}:${tab}`);
       setChildren(this.info, this.#infoClose(), this.#tabs(tab, images.length > 0),
         h('div.ip-head.ip-head-many',
           h('div.ip-head-top',
@@ -1289,6 +1306,7 @@ export class PhotosView extends ViewPane {
           file: () => collapsible({ id: 'files', icon: 'folder', title: t('info.selectionFiles'), summary: h('span', selectionFacts(this, items).fmtText), body: selectionList(this, items) }),
         })),
         infoFooter(this, items));
+      restore();
       return;
     }
     if (!id) {
@@ -1305,6 +1323,7 @@ export class PhotosView extends ViewPane {
     const tab = usableTab(panelTab(), { adjust: image });
     const index = this.indexOf.get(id);
     const hasNext = index !== undefined && index < this.list.length - 1;
+    const restore = keepScroll(`one:${id}:${tab}`);
     setChildren(this.info, this.#infoClose(), this.#tabs(tab, image),
       h('div.ip-head',
         h('div.info-thumb', this.#thumb(it, 'info-img')),
@@ -1325,6 +1344,7 @@ export class PhotosView extends ViewPane {
         file: () => fileSection(d),
       })),
       infoFooter(this, [it], { pending: md.pending, onNext: hasNext ? () => this.#stepInfo(1) : null }));
+    restore();
     // after "Next photo": the same field takes the focus again
     if (this.refocus) {
       const el = this.info.querySelector(`[data-desc="${this.refocus}"]`);

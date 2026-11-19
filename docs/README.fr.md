@@ -28,7 +28,7 @@ Parcourez, recherchez et organisez d’immenses collections de photos et de vid�
 
 **Aucune importation** · **Rien ne quitte votre ordinateur** · **100 000 photos défilent comme 100** · **Gratuit et open source**
 
-![Version 1.82.4](https://img.shields.io/badge/version-1.82.4-161214)
+![Version 1.83.1](https://img.shields.io/badge/version-1.83.1-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -57,9 +57,9 @@ Pas d’import, pas de copie de vos photos : LionPhotos parcourt les dossiers te
 
 Albums, personnes, marques, descriptions, réglages et recadrages sont aussi gardés dans un dossier caché au sein de la collection : le même disque externe s’ouvre avec tout cela sur un autre ordinateur, quelle que soit la lettre de lecteur.
 
-<p align="center"><img src="screenshots/photos-list.webp" alt="Liste" width="860"><br><sub><b>Liste</b> — dossier, type, dimensions, taille, date</sub></p>
+<p align="center"><img src="screenshots/photos-timeline.webp" alt="Photos" width="860"><br><sub><b>Photos</b> — une grille par mois, les années à portée de main sur le côté</sub></p>
 
-<p align="center"><img src="screenshots/photos-menu.webp" alt="Un seul menu" width="860"><br><sub><b>Un seul menu</b> — le même sous Plus et au clic droit ; Fichier ▸ regroupe ce qui modifie le disque</sub></p>
+<p align="center"><img src="screenshots/photos-list.webp" alt="Liste" width="49%"> <img src="screenshots/photos-menu.webp" alt="Un seul menu" width="49%"><br><sub><b>Liste</b> — dossier, type, dimensions, taille, date · <b>Un seul menu</b> — le même sous Plus et au clic droit ; Fichier ▸ regroupe ce qui modifie le disque</sub></p>
 
 ### N’importe quelle photo en quelques secondes
 
@@ -69,11 +69,11 @@ Recherche par nom, dossier, appareil, auteur, description, album, projet, person
 
 <p align="center"><img src="screenshots/search.webp" alt="Recherche" width="860"><br><sub><b>Recherche</b> — dans la barre de titre, sur toute la collection</sub></p>
 
-### Chaque voyage sur une carte du monde
+### Retouche rapide, original intact
 
-Les lieux se remplissent seuls à partir du GPS ou du lieu écrit dans chaque photo, et apparaissent sur une carte du monde dessinée sur votre ordinateur. Cliquez sur un point : les photos de ce lieu sont là.
+Exposition, couleur, noir et blanc, recadrage, redressement, corrections d’objectif et de perspective, développement RAW — en direct, sur la carte graphique. Tout reste dans le catalogue : le fichier ne change jamais, et `\` montre l’original à tout moment.
 
-<p align="center"><img src="screenshots/places-map.webp" alt="Lieux" width="860"><br><sub><b>Lieux</b> — sur une carte du monde dessinée sur l’ordinateur</sub></p>
+<p align="center"><img src="screenshots/viewer.webp" alt="Visionneuse" width="49%"> <img src="screenshots/lens.webp" alt="Correction d’objectif" width="49%"><br><sub><b>Visionneuse</b> — avec le panneau de retouche (noir et blanc) · <b>Correction d’objectif</b> — perspective redressée à la main</sub></p>
 
 ### Des albums qui se font presque seuls
 
@@ -87,11 +87,11 @@ Marquez les excellentes photos et les bonnes avec `1` et `2` en parcourant. *Sé
 
 <p align="center"><img src="screenshots/highlights.webp" alt="Sélection" width="860"><br><sub><b>Sélection</b> — seulement les photos marquées étoile ou OK, comme un portfolio</sub></p>
 
-### Retouche rapide, original intact
+### Chaque voyage sur une carte du monde
 
-Exposition, couleur, noir et blanc, recadrage, redressement, corrections d’objectif et de perspective, développement RAW — en direct, sur la carte graphique. Tout reste dans le catalogue : le fichier ne change jamais, et `\` montre l’original à tout moment.
+Les lieux se remplissent seuls à partir du GPS ou du lieu écrit dans chaque photo, et apparaissent sur une carte du monde dessinée sur votre ordinateur. Cliquez sur un point : les photos de ce lieu sont là.
 
-<p align="center"><img src="screenshots/viewer.webp" alt="Visionneuse" width="49%"> <img src="screenshots/lens.webp" alt="Correction d’objectif" width="49%"><br><sub><b>Visionneuse</b> — avec le panneau de retouche (noir et blanc) · <b>Correction d’objectif</b> — perspective redressée à la main</sub></p>
+<p align="center"><img src="screenshots/places-map.webp" alt="Lieux" width="860"><br><sub><b>Lieux</b> — sur une carte du monde dessinée sur l’ordinateur</sub></p>
 
 ### Prêt pour chaque réseau
 
@@ -111,7 +111,7 @@ Titre, légende, audiodescription, auteur et lieu pour une photo ou cent à la f
 
 > *« Le disque est plein de choses inutiles. »*
 
-Marquez les rebuts au fil de l’eau et envoyez-les dans les Limbes ; trouvez les fichiers en double par leur contenu. Tout part par la Corbeille, jamais supprimé définitivement.
+Marquez les rebuts au fil de l’eau et envoyez-les dans les Limbes ; trouvez les fichiers en double par leur contenu et envoyez-y aussi leurs copies en trop. Seules les Limbes envoient des fichiers à la Corbeille ; rien n’est supprimé définitivement.
 
 <p align="center"><img src="screenshots/duplicates.webp" alt="Fichiers en double" width="860"><br><sub><b>Fichiers en double</b> — trouvés par leur contenu</sub></p>
 
@@ -202,7 +202,7 @@ LionPhotos est en **bêta**. Cela signifie :
 | **Extensions** | Installez des paquets `.lionplugin` qui exportent albums et projets sous forme de page (HTML, CSS et JavaScript), avec les noms de fichiers, les descriptions et les audiodescriptions ; rien ne s’y exécute dans LionPhotos. Voir [PLUGINS.md](PLUGINS.md) (en anglais). Chaque extension activée a son onglet après À traiter, avec sa page : choisissez les albums et projets et exportez. |
 | **Vue d'ensemble** | Éléments, photos, vidéos, taille et période ; fichiers par genre, par année, formats, appareils, codecs ; le cache des miniatures. |
 | **Ranger** | Dossiers par date (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` ou `2024-07-14-thème`), dossiers par album (`2024/2024-07-14-album`), avec `Raw/` et `Img/` dedans si souhaité ; *Déplacer vers un dossier* avec sous-dossiers par genre ; les fichiers de la même prise suivent ; opérations récentes avec annulation. Les fichiers sont vraiment déplacés sur le disque et peuvent aussi être **renommés** (`{data}-{álbum}-{fotógrafo}-{nº}` par défaut, numérotés par date ; le RAW, le JPEG et le `.xmp` d'une vue gardent le même nom), ou seulement renommés sur place. **Réorganiser la collection** lit les dossiers tels qu'ils sont et propose une structure unique sur le disque — `2025/2025-12-24-Noel`, thèmes longs dans `Thèmes/`, ce qui attend le tri dans `_A-trier/`, essais de matériel dans `_Materiel/` — à vérifier (renommer ou écarter un dossier, voir l'arbre final) avant de déplacer des dossiers entiers, avec annulation. **Fichiers associés laissés seuls** (un `.xmp` ou `.dop` resté seul après le déplacement de sa photo) retournent à côté de leur photo, sous son nom. **Dupliquer** (Ctrl+D) : une copie à côté de la photo, avec ses réglages, son recadrage, ses marques et ses albums, avec le code saisi et l’annulation. Dossiers par date et *Déplacer* n’agissent que sur les photos sélectionnées ; toute la collection a un seul chemin, **Réorganiser**, vérifié avant que rien ne bouge. Quand des dossiers par date videraient des dossiers d’événement dans des dossiers de mois, LionPhotos demande d’abord et propose Réorganiser. |
-| **Fichiers en double** | SHA-256 en trois étapes (taille → premiers/derniers 64 Ko → fichier entier), côte à côte avec leurs miniatures. Chaque copie montre le dossier où elle est enregistrée, s’ouvre dans LionPhotos ou dans le logiciel de l’ordinateur, se montre dans son dossier ou copie son chemin ; *Comparer côte à côte* place la copie gardée à côté d’une autre (les vidéos s’ouvrent dans le logiciel de l’ordinateur). Choisir une autre copie déplace la marque, pas les copies. |
+| **Fichiers en double** | SHA-256 en trois étapes (taille → premiers/derniers 64 Ko → fichier entier), côte à côte avec leurs miniatures. Chaque copie montre le dossier où elle est enregistrée, s’ouvre dans LionPhotos ou dans le logiciel de l’ordinateur, se montre dans son dossier ou copie son chemin ; *Comparer côte à côte* place la copie gardée à côté d’une autre (les vidéos s’ouvrent dans le logiciel de l’ordinateur). Choisir une autre copie déplace la marque, pas les copies. Les dossiers qui se répètent sont montrés en entier, avec *Garder ici* pour tous leurs fichiers. Sélectionnez des fichiers en double (un par un, un ensemble de dossiers ou tous) et envoyez leurs copies en trop aux Limbes, depuis la barre du haut ou le bouton à la fin. |
 | **Photos similaires** | Pour chaque jour, les prises qui sont en pratique la même image (une rafale, la même pose plusieurs fois) sont regroupées à partir des miniatures, sur l’ordinateur, la plus nette et la mieux exposée étant suggérée. Un clic garde ou laisse partir chaque photo ; les autres vont ensemble dans les Limbes, le RAW et son JPG comme une seule. Trois niveaux : presque identiques, similaires, même scène. Aussi depuis la barre de Photos, à côté de *Seulement les photos sans album* : les photos affichées — un dossier, une année, un album — sur plusieurs jours. |
 | **Recherche par ce que montre la photo** | Tapez *plage*, *chien*, *anniversaire* ou *coucher de soleil* et trouvez les photos qui le montrent, quel que soit leur nom. Un petit modèle (TinyCLIP, MIT) lit chaque miniature sur l’ordinateur, avec le processeur, pendant l’analyse de « ce que montrent les photos », et la compare à 605 types de scènes, d’événements, d’objets et de lieux, nommés dans les dix langues de l’application. Le panneau d’informations montre ce que montre la photo ; chaque nom le recherche. Rien n’est téléchargé ni envoyé. |
 | **Sauvegarde** | Un dossier maître et un dossier de sauvegarde comparés par leur contenu ; copies vérifiées de ce qui manque, dans les mêmes sous-dossiers ou dans des dossiers par date. |
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.82.4**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.83.1**.
 
 ## Crédits
 

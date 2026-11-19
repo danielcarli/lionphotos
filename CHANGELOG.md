@@ -2,6 +2,29 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.83.1] — 2026-11-19
+
+### Changed
+- **Repeated files go to the Limbo, never straight to the Recycle Bin.** The extra copies are sent to the Limbo, with the Limbo's own question (no typed code), and wait there to be deleted for good or brought back; the Limbo is the only place in LionPhotos that sends files to the Recycle Bin. A copy in the Limbo is decided and leaves its group. Labels, tags (*Limbo* instead of *Recycle Bin*) and texts follow, in the 10 languages.
+- **Repeated files: selection.** Each repeated file has a box, and each set of folders in *Where the copies are* one that selects all its files. A bar over the groups, in sight while scrolling, says how many are selected and has **Select all**, **Deselect all** and **Send N copies of the selected to the Limbo…**; the same button comes again **at the end of the page**. Both act only on the selected files (off with none). They replace the move of every extra copy at once at the top of the page; each group keeps its own button.
+- README: Repeated files describes the folder sets, the selection and the send to the Limbo, in the 10 languages.
+- End-to-end checks: the send acts only on the selected files, asks the Limbo's question, marks the copies for the Limbo, leaves them on the disk and takes their group off the list.
+
+## [1.83.0] — 2026-11-18
+
+### Added
+- **Repeated files: where the copies are.** A new card above the groups lists the folders that repeat each other (a card and its backup, the same videos in two projects), each folder **in full** from the collection's name, with how many repeated files they share and how much space they would free. **Keep here** keeps the copy in that folder in all those files at once; each folder says whether it is kept in all, in some, or goes to the Recycle Bin. The six largest sets first, *Show all* for the rest.
+- In each group, **Same choice for N more** repeats the copy chosen (its folder) in the other repeated files of the same folders.
+- Under each copy, its folder is shown in full (wrapped), no longer cut at the start.
+
+### Fixed
+- Repeated files: **Show more** adds the next groups below the ones on screen instead of drawing the page again, so it no longer jumps to the top; any redraw (a copy chosen, a thumbnail made) keeps the page where it was scrolled to.
+- Filling a field in the side panel of Photos (the city, the state, a place, a keyword…) no longer sends the panel back to the top: drawn again for the same photo or selection and tab, it stays where it was scrolled to — also when the redraw goes through a shorter panel first. Another photo or tab starts at the top.
+- End-to-end checks for both.
+
+### Documentation
+- *See it in action* opens with the grid by month (a new screenshot, the panel closed); the list and the one menu follow side by side, smaller. *Quick edits*, *Albums* and *Your best photos* now come before the world map; the rest keeps its order. In the 10 languages.
+
 ## [1.82.4] — 2026-11-18
 
 ### Changed

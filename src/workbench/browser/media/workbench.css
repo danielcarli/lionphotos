@@ -3692,3 +3692,28 @@ html:root:root .selection-bar .limbo-send:hover { background: color-mix(in srgb,
 /* faces or pets that cannot be used on this computer: a quiet note under the stacks line */
 .stack-line.stack-note { color: var(--text-muted); }
 .stack-line.stack-note .stack-line-text { white-space: normal; }
+
+/* Repeated files (1.83.0): where the copies are, folder by folder, each folder in full */
+.dup-path { white-space: normal; overflow: visible; text-overflow: clip; direction: ltr; overflow-wrap: anywhere; }
+.dup-sets { margin-bottom: 14px; display: grid; gap: 12px; }
+.dup-sets-head h2 { font-size: 15px; margin: 0 0 2px; display: flex; align-items: center; gap: 8px; }
+.dup-sets-head p { margin: 0; max-width: 80ch; }
+.dup-set { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; background: var(--bg-editor); }
+.dup-set-head { display: flex; gap: 10px; align-items: baseline; font-size: 13px; flex-wrap: wrap; }
+.dup-set-folders { display: grid; gap: 6px; }
+.dup-set-folder { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 8px; border: 1px solid transparent; }
+.dup-set-folder.is-kept { border-color: var(--series-7); background: color-mix(in srgb, var(--series-7) 8%, transparent); }
+.dup-set-path { font: 12px/1.4 var(--font-mono); overflow-wrap: anywhere; color: var(--text-primary); }
+.dup-set-state { color: var(--text-muted); white-space: nowrap; }
+.dup-set-folder.is-kept .dup-set-state { color: var(--series-7); font-weight: 600; }
+.dup-sets-all { justify-self: start; }
+@media (max-width: 720px) { .dup-set-folder { grid-template-columns: 1fr; } }
+/* Repeated files (1.83.1): ticks, and the bar that acts only on the ticked files */
+.dup-bar { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 12px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-elevated); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); font-size: 13px; }
+.dup-bar-count { color: var(--text-secondary); }
+.dup-check { display: inline-flex; align-items: center; cursor: pointer; }
+.dup-check input { width: 16px; height: 16px; margin: 0; cursor: pointer; accent-color: var(--accent); }
+.dup-group.is-checked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.dup-set-head .dup-check { margin-right: 2px; }
+/* 1.83.1: at the end of Repeated files, the same send to the Limbo as on the bar */
+.dup-foot { display: flex; justify-content: center; margin: 20px 0 8px; padding-top: 16px; border-top: 1px solid var(--border); }

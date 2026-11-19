@@ -28,7 +28,7 @@ Sfoglia, cerca e organizza enormi raccolte di foto e video là dove sono già: s
 
 **Nessuna importazione** · **Nulla lascia il tuo computer** · **100.000 foto scorrono come 100** · **Gratuito e open source**
 
-![Versione 1.82.4](https://img.shields.io/badge/version-1.82.4-161214)
+![Versione 1.83.1](https://img.shields.io/badge/version-1.83.1-161214)
 ![Stato: versione beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licenza: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Piattaforme: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -57,9 +57,9 @@ Nessuna importazione, nessuna copia delle foto: LionPhotos sfoglia le cartelle c
 
 Album, persone, contrassegni, descrizioni, regolazioni e ritagli sono conservati anche in una cartella nascosta dentro la raccolta: lo stesso disco esterno si apre con tutto questo su un altro computer, con qualunque lettera di unità.
 
-<p align="center"><img src="screenshots/photos-list.webp" alt="Elenco" width="860"><br><sub><b>Elenco</b> — cartella, tipo, dimensioni, peso, data</sub></p>
+<p align="center"><img src="screenshots/photos-timeline.webp" alt="Foto" width="860"><br><sub><b>Foto</b> — griglia per mese, con gli anni a portata di mano sul lato</sub></p>
 
-<p align="center"><img src="screenshots/photos-menu.webp" alt="Un solo menu" width="860"><br><sub><b>Un solo menu</b> — lo stesso in Altro e con il clic destro; File ▸ raccoglie ciò che cambia il disco</sub></p>
+<p align="center"><img src="screenshots/photos-list.webp" alt="Elenco" width="49%"> <img src="screenshots/photos-menu.webp" alt="Un solo menu" width="49%"><br><sub><b>Elenco</b> — cartella, tipo, dimensioni, peso, data · <b>Un solo menu</b> — lo stesso in Altro e con il clic destro; File ▸ raccoglie ciò che cambia il disco</sub></p>
 
 ### Qualsiasi foto in pochi secondi
 
@@ -69,11 +69,11 @@ Ricerca per nome, cartella, fotocamera, autore, descrizione, album, progetto, pe
 
 <p align="center"><img src="screenshots/search.webp" alt="Ricerca" width="860"><br><sub><b>Ricerca</b> — nella barra del titolo, in tutta la raccolta</sub></p>
 
-### Ogni viaggio su una mappa del mondo
+### Modifiche rapide, originale intatto
 
-I luoghi si compilano da soli dal GPS o dal luogo scritto in ogni foto e compaiono su una mappa del mondo disegnata sul tuo computer. Clicca su un punto e le foto di quel luogo sono lì.
+Esposizione, colore, bianco e nero, ritaglio, raddrizzamento, correzione dell’obiettivo e della prospettiva, sviluppo RAW — dal vivo, sulla scheda grafica. Tutto resta nel catalogo: il file non cambia mai, e `\` mostra l’originale in qualsiasi momento.
 
-<p align="center"><img src="screenshots/places-map.webp" alt="Luoghi" width="860"><br><sub><b>Luoghi</b> — su un planisfero disegnato sul computer</sub></p>
+<p align="center"><img src="screenshots/viewer.webp" alt="Visualizzatore" width="49%"> <img src="screenshots/lens.webp" alt="Correzione dell’obiettivo" width="49%"><br><sub><b>Visualizzatore</b> — con il pannello di modifica (bianco e nero) · <b>Correzione dell’obiettivo</b> — prospettiva raddrizzata a mano</sub></p>
 
 ### Album che si fanno quasi da soli
 
@@ -87,11 +87,11 @@ Segna le foto ottime e quelle buone con `1` e `2` mentre sfogli. *In evidenza* m
 
 <p align="center"><img src="screenshots/highlights.webp" alt="In evidenza" width="860"><br><sub><b>In evidenza</b> — solo le foto con stella o OK, come un portfolio</sub></p>
 
-### Modifiche rapide, originale intatto
+### Ogni viaggio su una mappa del mondo
 
-Esposizione, colore, bianco e nero, ritaglio, raddrizzamento, correzione dell’obiettivo e della prospettiva, sviluppo RAW — dal vivo, sulla scheda grafica. Tutto resta nel catalogo: il file non cambia mai, e `\` mostra l’originale in qualsiasi momento.
+I luoghi si compilano da soli dal GPS o dal luogo scritto in ogni foto e compaiono su una mappa del mondo disegnata sul tuo computer. Clicca su un punto e le foto di quel luogo sono lì.
 
-<p align="center"><img src="screenshots/viewer.webp" alt="Visualizzatore" width="49%"> <img src="screenshots/lens.webp" alt="Correzione dell’obiettivo" width="49%"><br><sub><b>Visualizzatore</b> — con il pannello di modifica (bianco e nero) · <b>Correzione dell’obiettivo</b> — prospettiva raddrizzata a mano</sub></p>
+<p align="center"><img src="screenshots/places-map.webp" alt="Luoghi" width="860"><br><sub><b>Luoghi</b> — su un planisfero disegnato sul computer</sub></p>
 
 ### Pronto per ogni social
 
@@ -111,7 +111,7 @@ Titolo, didascalia, audiodescrizione, autore e luogo per una foto o cento insiem
 
 > *«Il disco è pieno di cose che non mi servono.»*
 
-Segna gli scarti mentre guardi e mandali nel Limbo; trova i file ripetuti dal contenuto. Tutto esce dal Cestino, niente viene eliminato per sempre.
+Segna gli scarti mentre guardi e mandali nel Limbo; trova i file ripetuti dal contenuto e manda lì anche le copie in più. Solo il Limbo manda i file nel Cestino; niente viene eliminato per sempre.
 
 <p align="center"><img src="screenshots/duplicates.webp" alt="File ripetuti" width="860"><br><sub><b>File ripetuti</b> — trovati dal contenuto</sub></p>
 
@@ -202,7 +202,7 @@ LionPhotos è in **beta**. Significa che:
 | **Plugin** | Installa pacchetti `.lionplugin` che esportano album e progetti come pagina (HTML, CSS e JavaScript), con nomi dei file, descrizioni e audiodescrizioni; niente viene eseguito dentro LionPhotos. Vedi [PLUGINS.md](PLUGINS.md) (in inglese). Ogni plugin attivo ha la sua scheda dopo Da modificare, con la sua pagina: scegli album e progetti ed esporta. |
 | **Panoramica** | Elementi, foto, video, peso e periodo; file per tipo, per anno, formati, fotocamere, codec; la cache delle miniature. |
 | **Organizza** | Cartelle per data (`2024/2024-07`, `2024-07`, `2024`, `2024/2024-07-14` o `2024-07-14-tema`), cartelle per album (`2024/2024-07-14-album`), con `Raw/` e `Img/` dentro se si vuole; *Sposta in cartella* con sottocartelle per tipo; i file dello stesso scatto vanno insieme; operazioni recenti con annullamento. I file si spostano davvero sul disco e possono anche essere **rinominati** (`{data}-{álbum}-{fotógrafo}-{nº}` per impostazione predefinita, numerati per data; il RAW, il JPEG e l'`.xmp` di uno scatto tengono lo stesso nome), o solo rinominati dove sono. **Riorganizza la raccolta** legge le cartelle come sono e propone un'unica struttura sul disco — `2025/2025-12-24-Natale`, temi lunghi in `Temi/`, ciò che aspetta in `_Da-smistare/`, prove di fotocamere in `_Attrezzatura/` — da rivedere (rinominare o escludere qualsiasi cartella, vedere l'albero finale) prima di spostare cartelle intere, con annulla. **File collegati rimasti soli** (un `.xmp` o `.dop` rimasto solo dopo lo spostamento della foto) tornano accanto alla foto, con il suo nome. **Duplica** (Ctrl+D): una copia accanto alla foto, con regolazioni, ritaglio, segni e album, con codice digitato e annullabile. Cartelle per data e *Sposta* agiscono solo sulle foto selezionate; tutta la raccolta ha una strada, **Riorganizza**, rivista prima che qualcosa si sposti. Quando le cartelle per data svuoterebbero cartelle di evento in cartelle di mese, LionPhotos chiede prima e propone Riorganizza. |
-| **File ripetuti** | SHA-256 in tre fasi (dimensione → primi/ultimi 64 KB → file intero), affiancati con le loro miniature. Ogni copia mostra la cartella dove è salvata, si apre in LionPhotos o nel programma del computer, si mostra nella sua cartella o ne copia il percorso; *Confronta affiancate* mette la copia tenuta accanto a un’altra (i video si aprono nel programma del computer). Scegliere un’altra copia sposta il segno, non le copie. |
+| **File ripetuti** | SHA-256 in tre fasi (dimensione → primi/ultimi 64 KB → file intero), affiancati con le loro miniature. Ogni copia mostra la cartella dove è salvata, si apre in LionPhotos o nel programma del computer, si mostra nella sua cartella o ne copia il percorso; *Confronta affiancate* mette la copia tenuta accanto a un’altra (i video si aprono nel programma del computer). Scegliere un’altra copia sposta il segno, non le copie. Le cartelle che si ripetono sono mostrate per intero, con *Tieni qui* per tutti i loro file. Seleziona i file ripetuti (uno per uno, un insieme di cartelle o tutti) e manda le copie in più nel Limbo, dalla barra in alto o dal pulsante in fondo. |
 | **Foto simili** | Per ogni giorno, gli scatti che in pratica sono la stessa immagine (una raffica, la stessa posa più volte) vengono raggruppati dalle miniature, sul computer, con la più nitida e meglio esposta suggerita da tenere. Un clic tiene o lascia andare ogni foto; le altre vanno insieme nel Limbo, il RAW e il suo JPG come una sola. Tre livelli: quasi uguali, simili, stessa scena. Anche dalla barra di Foto, accanto a *Solo foto senza album*: le foto mostrate — una cartella, un anno, un album — su più giorni. |
 | **Ricerca per ciò che mostra la foto** | Scrivi *spiaggia*, *cane*, *compleanno* o *tramonto* e trova le foto che lo mostrano, qualunque sia il loro nome. Un piccolo modello (TinyCLIP, MIT) legge ogni miniatura sul computer, con il processore, mentre si analizza «cosa mostrano le foto», e la confronta con 605 tipi di scene, eventi, oggetti e luoghi, con nomi nelle dieci lingue dell’app. Il pannello informazioni mostra cosa mostra la foto; ogni nome lo cerca. Niente viene scaricato o inviato. |
 | **Backup** | Una cartella principale e una di backup confrontate per contenuto; copie verificate di ciò che manca, nelle stesse sottocartelle o in cartelle per data. |
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-foto"; npm run test:e2e
 
 ## Registro delle modifiche
 
-Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.82.4**.
+Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.83.1**.
 
 ## Riconoscimenti
 

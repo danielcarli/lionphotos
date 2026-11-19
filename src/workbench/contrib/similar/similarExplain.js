@@ -44,7 +44,8 @@ export async function showWhyGrouped(services, items) {
       // what they show (the content model), when both were read by it
       facts.push([t('similar.why.content'), r.shows == null ? t('similar.why.contentUnread') : t('similar.why.contentAlike', { pct: pct(0.6 + 0.4 * r.shows) }), r.shows == null ? 'wait' : r.shows >= 0.5 ? 'ok' : 'bad']);
       facts.push([t('similar.why.time'), t('similar.why.apart', { span: span(r.dt), max: span(now.windowMs) }), r.dt <= now.windowMs ? 'ok' : 'bad']);
-      const who = r.face === false || r.pet === false ? ['bad', t('similar.why.others')] : !r.seen ? ['wait', t('similar.why.notSeen')] : ['ok', t('similar.why.same')];
+      const who = sim.whoOff.includes('face') ? ['wait', t('similar.why.whoOff')]
+        : r.face === false || r.pet === false ? ['bad', t('similar.why.others')] : !r.seen ? ['wait', t('similar.why.notSeen')] : ['ok', t('similar.why.same')];
       facts.push([t('similar.why.people'), who[1], who[0]]);
       if (r.said) facts.push([t('similar.why.decision'), t('similar.why.said'), 'bad']);
       const verdict = r.together ? t('similar.why.together')

@@ -28,7 +28,7 @@ Explora, busca y organiza colecciones enormes de fotos y vídeos allí donde ya 
 
 **Sin importar nada** · **Nada sale de tu ordenador** · **100 000 fotos se desplazan como 100** · **Gratuito y de código abierto**
 
-![Versión 1.82.0](https://img.shields.io/badge/version-1.82.0-161214)
+![Versión 1.82.4](https://img.shields.io/badge/version-1.82.4-161214)
 ![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -58,6 +58,8 @@ Sin importar y sin copiar sus fotos: LionPhotos recorre las carpetas tal como es
 Álbumes, personas, marcas, descripciones, ajustes y recortes también se guardan en una carpeta oculta dentro de la colección, así que el mismo disco externo se abre con todo ello en otro ordenador, con cualquier letra de unidad.
 
 <p align="center"><img src="screenshots/photos-list.webp" alt="Lista" width="860"><br><sub><b>Lista</b> — carpeta, tipo, dimensiones, tamaño, fecha</sub></p>
+
+<p align="center"><img src="screenshots/photos-menu.webp" alt="Un solo menú" width="860"><br><sub><b>Un solo menú</b> — el mismo en Más y en el clic derecho; Archivo ▸ reúne lo que cambia el disco</sub></p>
 
 ### Cualquier foto en segundos
 
@@ -337,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Historial de cambios
 
-Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.82.0**.
+Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.82.4**.
 
 ## Créditos
 

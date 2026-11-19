@@ -28,7 +28,7 @@ Navegue, pesquise e organize coleções enormes de fotos e vídeos onde elas já
 
 **Sem importar nada** · **Nada sai do seu computador** · **100 mil fotos rolam como 100** · **Gratuito e de código aberto**
 
-![Versão 1.82.0](https://img.shields.io/badge/version-1.82.0-161214)
+![Versão 1.82.4](https://img.shields.io/badge/version-1.82.4-161214)
 ![Status: teste beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licença: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -58,6 +58,8 @@ Sem importar e sem copiar suas fotos: o LionPhotos navega pelas pastas como elas
 Álbuns, pessoas, marcações, descrições, ajustes e recortes também ficam numa pasta oculta dentro da coleção, e o mesmo HD externo abre com tudo isso em outro computador, com qualquer letra de unidade.
 
 <p align="center"><img src="screenshots/photos-list.webp" alt="Lista" width="860"><br><sub><b>Lista</b> — pasta, tipo, dimensões, tamanho, data</sub></p>
+
+<p align="center"><img src="screenshots/photos-menu.webp" alt="Um menu só" width="860"><br><sub><b>Um menu só</b> — o mesmo no Mais e no clique direito; Arquivo ▸ reúne o que mexe no disco</sub></p>
 
 ### Qualquer foto em segundos
 
@@ -337,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Histórico de versões
 
-Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.82.0**.
+Veja o [CHANGELOG.md](../CHANGELOG.md) (em inglês) — versão atual: **1.82.4**.
 
 ## Créditos
 

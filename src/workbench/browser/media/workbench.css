@@ -3689,3 +3689,6 @@ html:root:root .selection-bar .limbo-send:hover { background: color-mix(in srgb,
 .organize-grid .card.is-locked { border-style: dashed; }
 .org-pick-first { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-radius: 8px; background: var(--bg-subtle); color: var(--text-secondary); font-size: 13px; }
 .org-pick-first .btn { margin-left: auto; }
+/* faces or pets that cannot be used on this computer: a quiet note under the stacks line */
+.stack-line.stack-note { color: var(--text-muted); }
+.stack-line.stack-note .stack-line-text { white-space: normal; }

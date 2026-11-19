@@ -28,7 +28,7 @@
 
 **インポート不要** · **何もコンピューターの外に出ない** · **10万枚でも100枚のように軽快** · **無料・オープンソース**
 
-![バージョン 1.82.0](https://img.shields.io/badge/version-1.82.0-161214)
+![バージョン 1.82.4](https://img.shields.io/badge/version-1.82.4-161214)
 ![ステータス：ベータテスト](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![ライセンス: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![対応: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -58,6 +58,8 @@
 アルバム、人物、マーク、説明、調整、トリミングはコレクション内の隠しフォルダーにも保存されるので、同じ外付けドライブを別のパソコンで、どのドライブ文字でも、すべてそのまま開けます。
 
 <p align="center"><img src="screenshots/photos-list.webp" alt="リスト" width="860"><br><sub><b>リスト</b> — フォルダー、種類、サイズ、容量、日付</sub></p>
+
+<p align="center"><img src="screenshots/photos-menu.webp" alt="ひとつのメニュー" width="860"><br><sub><b>ひとつのメニュー</b> — 「その他」と右クリックで同じ。ディスクを変える操作は「ファイル」▸ に</sub></p>
 
 ### どんな写真も数秒で
 
@@ -337,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 変更履歴
 
-[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.82.0**。
+[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.82.4**。
 
 ## クレジット
 

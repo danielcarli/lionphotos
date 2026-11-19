@@ -28,7 +28,7 @@
 
 **无需导入** · **数据不出本机** · **10 万张照片如 100 张般流畅** · **免费开源**
 
-![版本 1.82.0](https://img.shields.io/badge/version-1.82.0-161214)
+![版本 1.82.4](https://img.shields.io/badge/version-1.82.4-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -58,6 +58,8 @@
 相册、人物、标记、描述、调整和裁剪也保存在收藏内的一个隐藏文件夹中，同一块移动硬盘在另一台电脑上、无论盘符是什么，打开后一切都在。
 
 <p align="center"><img src="screenshots/photos-list.webp" alt="列表" width="860"><br><sub><b>列表</b> — 文件夹、类型、尺寸、大小、日期</sub></p>
+
+<p align="center"><img src="screenshots/photos-menu.webp" alt="同一个菜单" width="860"><br><sub><b>同一个菜单</b> — “更多”和右键相同；改动磁盘的操作在“文件”▸ 中</sub></p>
 
 ### 任何照片，几秒找到
 
@@ -337,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.82.0**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.82.4**。
 
 ## 致谢
 

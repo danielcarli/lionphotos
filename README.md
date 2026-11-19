@@ -28,7 +28,7 @@ Browse, search and organize huge collections of photos and videos right where th
 
 **No import** · **Nothing leaves your computer** · **100,000 photos scroll like 100** · **Free and open source**
 
-![Version 1.82.0](https://img.shields.io/badge/version-1.82.0-161214)
+![Version 1.82.4](https://img.shields.io/badge/version-1.82.4-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -58,6 +58,8 @@ No import, no copy of your photos: LionPhotos browses the folders as they are, m
 Albums, people, marks, descriptions, adjustments and crops are also kept in a hidden folder inside the collection, so the same external drive opens with all of it on another computer, under any drive letter.
 
 <p align="center"><img src="docs/screenshots/photos-list.webp" alt="List" width="860"><br><sub><b>List</b> — folder, type, dimensions, size, date</sub></p>
+
+<p align="center"><img src="docs/screenshots/photos-menu.webp" alt="One menu" width="860"><br><sub><b>One menu</b> — the same under More and on the right click; File ▸ holds what changes the disk</sub></p>
 
 ### Find any photo in seconds
 
@@ -337,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.82.0**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.82.4**.
 
 ## Credits
 

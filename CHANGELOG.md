@@ -2,6 +2,32 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.82.4] — 2026-11-18
+
+### Changed
+- **Stacks without face or pet recognition.** When this computer cannot run the recognition of faces or pets (no graphics card able to, or too little memory — the same check as People and Pets), they are no longer used to tell stacks apart, nor asked for: similar photos are still stacked by how alike they are. A quiet line under the bar of Photos says so ("Faces and pets could not be used on this computer to tell stacks apart more precisely; similar photos are still stacked by how alike they are"), with the reason on hover. *Why are these (not) stacked?* says the people were not used on this computer.
+- If the recognition becomes available (the graphics card turned on, *Try anyway* in People), the stacks are made again with faces and pets.
+- End-to-end check of the stacks with recognition unavailable.
+
+## [1.82.3] — 2026-11-18
+
+### Changed
+- The count of stacks, single photos and unique photos is said **once, in the status bar** (bottom left). The bar of Photos keeps only how many items it shows and their size, and the line under it says how many photos are in stacks, without repeating the number of stacks.
+
+## [1.82.2] — 2026-11-18
+
+### Changed
+- **List rows** follow the tiles: no "show in the file manager" and no second Limbo button at the end of a row (the marks of the row have it; *File ▸ Show in the file manager* in the menu). Inside a label the × to take a photo out stays, and in the Limbo the Recycle Bin button.
+
+### Documentation
+- New screenshots for the README in every language, taken with this version: the Photos bar with *View ▾*, the neutral selection band, the viewer with its *More* menu, the list, the album, search, places, crop, lens, description, export, repeated files and Reorganize.
+- New screenshot and caption, in 10 languages: **One menu** — the same under *More* and on the right click, with *File ▸* for what changes the disk.
+
+## [1.82.1] — 2026-11-18
+
+### Fixed
+- The count of stacks and single photos in the status bar (bottom left) could stay on an older list — after a search, a day or a folder and back it could say "0 stacks · 10 single photos" while the bar of Photos said 1,641 stacks. It now always counts what Photos shows: it follows the filters, and it is said again whenever the stacks of Photos change. The two places always agree (end-to-end check).
+
 ## [1.82.0] — 2026-11-18
 
 From the interface review of 18/11 (proposal B, and the changes for the 13/11 incident and the repeated paths).

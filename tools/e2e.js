@@ -2167,12 +2167,22 @@ app.whenReady().then(async () => {
       // how many items, and how many stacks and single photos
       { const v = lib.view('main').filter((x) => x.kind === 1); const nS = v.filter((x) => s.similar.stackOf(x.id)).length;
         res.meta = document.querySelector('.view-photos .crumb-meta')?.textContent || '';
-        res.metaOk = /^[0-9,]+ items · .+ · [1-9][0-9,]* stacks? · [0-9,]+ single photos? · [0-9,]+ unique photos? \\(probable total\\)$/.test(res.meta) && nS > 0; }
+        // said once, in the status bar: the bar of Photos keeps only how many items it shows (1.82.3)
+        res.metaOk = /^[0-9,]+ items · [0-9.,]+ [KMGT]?B$/.test(res.meta) && nS > 0; }
       await wait(200);
       res.bar = document.querySelector('.statusbar .status-left')?.textContent || '';
       { const m = res.bar.match(/([0-9,]+) stacks? · ([0-9,]+) single photos? · ([0-9,]+) unique photos? \\(probable total\\)/);
         const n = (x) => Number(String(x).replace(/,/g, ''));
         res.barOk = /[0-9,]+ photos · [0-9,]+ videos? · /.test(res.bar) && !!m && n(m[1]) > 0 && n(m[3]) === n(m[1]) + n(m[2]); }
+      // the status bar says the stacks of what Photos shows now: after a search and back, the same as the bar of Photos (1.82.1)
+      { const counts = (txt) => (txt.match(/([0-9,]+) stacks? · ([0-9,]+) single photos?/) || []).slice(1).map((x) => x.replace(/,/g, '')).join('/');
+        const both = () => [counts(document.querySelector('.statusbar .status-left')?.textContent || ''), ((x) => x ? x.groups + '/' + (x.photos - x.grouped) : '')(s.similar.summary)];
+        lib.setFilter({ query: 'IMG_1014' }); await wait(600);
+        const narrow = both();
+        lib.setFilter({ query: '' }); await wait(600);
+        const back = both();
+        res.follow = { narrow, back };
+        res.followOk = narrow[0] === narrow[1] && back[0] === back[1] && back[0] !== narrow[0] && !!back[0]; }
       await wait(300);
       res.status = document.querySelector('.view-photos .stack-status:not([hidden])')?.textContent;
       res.lineSlider = !!document.querySelector('.view-photos .stack-status .sens-range');
@@ -2301,8 +2311,8 @@ app.whenReady().then(async () => {
       res.barOff = !/stack/.test(document.querySelector('.statusbar .status-left')?.textContent || '');
       res.off = !document.querySelector('.view-photos .tile-stack') && lib.view('main').length === allBefore;
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
-    check(st.metaOk && st.metaOff && st.barOk && st.barOff, 'Stack photos on: beside how many items (in the bar of Photos and in the status bar, bottom left), how many stacks and single photos, and their sum as the probable total of unique photos; off, only the items', JSON.stringify({ meta: st.meta, ok: st.metaOk, off: st.metaOff, bar: st.bar, barOk: st.barOk, barOff: st.barOff }));
-    check(st.label === 'Stack photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the stack$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /stacks? of similar photos · \d+ of \d+ photos are in a stack/.test(st.status || ''),
+    check(st.metaOk && st.metaOff && st.barOk && st.barOff && st.followOk, 'Stack photos on: beside how many items (in the bar of Photos and in the status bar, bottom left), how many stacks and single photos, and their sum as the probable total of unique photos; off, only the items', JSON.stringify({ meta: st.meta, ok: st.metaOk, off: st.metaOff, bar: st.bar, barOk: st.barOk, barOff: st.barOff, follow: st.follow }));
+    check(st.label === 'Stack photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the stack$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /^\d+ of \d+ photos are in a stack/.test(st.status || ''),
       'the switch "Stack photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && !st.onlyChip && st.onlyMarked && st.onlyBack && st.noOldSwitch && st.noMenuItem,
       'Only stacks (in the menu of "Similar photos"): only the groups, each as its best photo, the button marked, no chip nor filter for it; again in the menu, every photo grouped again', JSON.stringify({ onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, chip: st.onlyChip, marked: st.onlyMarked, back: st.onlyBack, noOldSwitch: st.noOldSwitch, noMenuItem: st.noMenuItem }));
@@ -3218,6 +3228,26 @@ app.whenReady().then(async () => {
       check(sdr.full === '1200x800' && sdr.src === 'heif' && !sdr.unsupported && pq.full === '1200x800' && pq.bottom > 225 && pq.top < 60 && pq.thumbBottom > 225 && heifDisk >= 2,
         'HEIC/HIF in the viewer at full size, kept on disk for the next time; an HDR (PQ) photo made ordinary — full size and thumbnail', JSON.stringify({ ...hf, heifDisk }));
     }
+
+    // 1.82.4: no face or pet recognition on this computer — the stacks go on by likeness, and Photos says so quietly
+    const whoOff = await js(`(async () => { try { const s = ${S}, lib = s.library, sim = s.similar, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      lib.setFilter({ day: '', year: 0, folder: '', recursive: true, labelId: 0, query: '' }); lib.clearSelection(); s.layout.openView('photos');
+      const mode = sim.mode; sim.setMode('stacks'); await wait(600);
+      const before = { off: sim.whoOff.join(), note: !!document.querySelector('.view-photos .stack-note') };
+      const keep = [s.faces.state, s.pets.state];
+      s.faces.state = { ...keep[0], support: { supported: false, reason: 'gpu', detail: 'WebGL: off' } };
+      s.pets.state = { ...keep[1], support: { supported: false, reason: 'gpu', detail: 'WebGL: off' } };
+      sim.regroupNow(); await wait(900);
+      const note = document.querySelector('.view-photos .stack-note');
+      const res = { before, off: sim.whoOff.join(), note: note?.textContent || '', title: note?.title || '', stacks: !!document.querySelector('.view-photos .tile-stack'), who: sim.whoCounts() };
+      s.faces.state = keep[0]; s.pets.state = keep[1];
+      sim.regroupNow(); await wait(600);
+      res.back = !document.querySelector('.view-photos .stack-note');
+      sim.setMode(mode); await wait(300);
+      return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
+    check(whoOff.before?.off === '' && !whoOff.before.note && whoOff.off === 'face,pet' && /could not be used on this computer/.test(whoOff.note) && /still stacked/.test(whoOff.note) && /WebGL/.test(whoOff.title)
+      && whoOff.stacks && whoOff.who?.known === 0 && whoOff.back,
+      'no face or pet recognition on this computer: they are not used for the stacks, photos still stack by likeness, and a quiet line says so (the reason on hover)', JSON.stringify(whoOff));
 
     // 1.82.0: a calmer Photos screen, one menu for a selection, and Organize by one road for the whole collection
     const calm = await js(`(async () => { try { const s = ${S}, lib = s.library, wait = (ms) => new Promise((r) => setTimeout(r, ms));

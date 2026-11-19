@@ -28,7 +28,7 @@ Riesige Foto- und Videosammlungen dort durchsuchen und ordnen, wo sie schon lieg
 
 **Kein Import** · **Nichts verlässt Ihren Computer** · **100.000 Fotos scrollen wie 100** · **Kostenlos und Open Source**
 
-![Version 1.82.0](https://img.shields.io/badge/version-1.82.0-161214)
+![Version 1.82.4](https://img.shields.io/badge/version-1.82.4-161214)
 ![Status: Betatest](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Lizenz: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plattformen: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -58,6 +58,8 @@ Kein Import, keine Kopie Ihrer Fotos: LionPhotos durchsucht die Ordner, wie sie 
 Alben, Personen, Markierungen, Beschreibungen, Anpassungen und Zuschnitte liegen auch in einem versteckten Ordner in der Sammlung: Dasselbe externe Laufwerk öffnet sich auf einem anderen Computer mit allem – unter jedem Laufwerksbuchstaben.
 
 <p align="center"><img src="screenshots/photos-list.webp" alt="Liste" width="860"><br><sub><b>Liste</b> — Ordner, Typ, Abmessungen, Größe, Datum</sub></p>
+
+<p align="center"><img src="screenshots/photos-menu.webp" alt="Ein Menü" width="860"><br><sub><b>Ein Menü</b> — dasselbe unter Mehr und beim Rechtsklick; Datei ▸ sammelt, was die Festplatte ändert</sub></p>
 
 ### Jedes Foto in Sekunden
 
@@ -337,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\fotos-kopie"; npm run test:e2e
 
 ## Änderungsprotokoll
 
-Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.82.0**.
+Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.82.4**.
 
 ## Mitwirkende
 

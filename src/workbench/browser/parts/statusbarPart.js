@@ -47,6 +47,9 @@ export class StatusbarPart {
     // "Stack photos": how many stacks and single photos, as the stacks are made
     this.similar?.onDidChange(r);
     this.similar?.onDidProgress(r);
+    this.similar?.onDidChangeSummary?.(r);
+    // another folder, day, search or filter in Photos: other stacks and single photos
+    this.library.onDidChangeFilter(r);
     this.render();
   }
 
@@ -68,6 +71,8 @@ export class StatusbarPart {
       left.push(item('image', `${tn('common.photos', tot.images)} · ${tn('common.videos', tot.videos)} · ${formatBytes(tot.bytes)}`));
       // "Stack photos" on: the stacks, the photos alone in Photos (a RAW + JPEG is one photo) and their sum — the
       // probable total of unique photos — as in the bar of Photos
+      // of what Photos shows now (made here if Photos has not made it yet: the count is never of an older list)
+      if (this.similar?.active) library.view('main');
       const c = stackCounts(this.similar);
       if (c) left.push(item('stack', c.text, { title: c.title }));
     } else {

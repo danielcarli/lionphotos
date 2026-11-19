@@ -39,7 +39,6 @@ import { LABEL_ICON } from '../../services/labels/browser/labelsService.js';
 import { applyMark } from '../limbo/sendToLimbo.js';
 import { showSimilar } from '../similar/similarView.js';
 import { showWhyGrouped } from '../similar/similarExplain.js';
-import { stackCounts } from '../similar/similarService.js';
 import { sensitivitySlider } from '../similar/sensitivitySlider.js';
 import { etaText } from '../../browser/parts/statusbarPart.js';
 import { sharpenCover } from '../albums/albumCovers.js';
@@ -196,10 +195,8 @@ export class PhotosView extends ViewPane {
     const { library } = this;
     const f = library.filter;
     const totals = library.totals(library.viewAll(this.scope));
-    let count = `${tn('common.items', totals.images + totals.videos)} · ${formatBytes(totals.bytes)}`;
-    // "Stack photos" on: the stacks, the photos alone and their sum (the likely number of different pictures),
-    // the same as in the status bar
-    if (!this.limbo) { library.view(this.scope); const c = stackCounts(this.services.similar); if (c) count += ` · ${c.text}`; }
+    // how many items this view shows; the stacks, single photos and unique photos are said once, in the status bar
+    const count = `${tn('common.items', totals.images + totals.videos)} · ${formatBytes(totals.bytes)}`;
     // the filters in use, each with its own ×: the year (× = every year again), the type, the mark, the
     // category of the Overview and "this folder only"
     const chip = (ic, text, clearTitle, clear, extra) => h('span.chip.filter-chip', ic ? h('span', { html: icon(ic, 12) }) : extra || null, text,
@@ -1059,23 +1056,12 @@ export class PhotosView extends ViewPane {
    * "Show in folder" and, for one item beside it in the grid and the list: "Send to the Limbo" (a confirmation)
    * — in the Limbo, "Move to Recycle Bin" (typed code).
    */
-  #itemActions(it, cls) {
-    const stop = (fn) => (e) => { e.stopPropagation(); fn(); };
-    return h(`span.${cls}`,
-      h('button.icon-button', { title: t('common.showIn', { explorer: this.actions.explorerName }), 'aria-label': t('common.showIn', { explorer: this.actions.explorerName }), html: icon('reveal', 15), onclick: stop(() => this.actions.reveal(it)), ondblclick: (e) => e.stopPropagation() }),
-      // in a project's (album's, person's…) photos: out of it, one click
-      this.#labelRemoveButton(it, stop),
-      this.limbo
-        ? h('button.icon-button.danger', { title: t('photos.trash'), 'aria-label': t('photos.trash'), html: icon('trash', 15), onclick: stop(() => this.operations.trash([it.id])), ondblclick: (e) => e.stopPropagation() })
-        : h('button.icon-button.danger', { title: t('limbo.send'), 'aria-label': t('limbo.send'), html: icon('binQuestion', 15), onclick: stop(() => applyMark(this.library, [it.id], 'reject')), ondblclick: (e) => e.stopPropagation() }));
-  }
-
-  /** The corner of a tile: out of the label open (an album…), or, in the Limbo, to the Recycle Bin. */
-  #tileActions(it) {
+  /** The corner of a tile (or the end of a list row): out of the label open (an album…), or, in the Limbo, to the Recycle Bin. */
+  #tileActions(it, cls = 'tile-actions') {
     const stop = (fn) => (e) => { e.stopPropagation(); fn(); };
     const unlink = this.#labelRemoveButton(it, stop);
     const trash = this.limbo ? h('button.icon-button.danger', { title: t('photos.trash'), 'aria-label': t('photos.trash'), html: icon('trash', 15), onclick: stop(() => this.operations.trash([it.id])), ondblclick: (e) => e.stopPropagation() }) : null;
-    return unlink || trash ? h('span.tile-actions', unlink, trash) : null;
+    return unlink || trash ? h(`span.${cls}`, unlink, trash) : (cls === 'row-actions' ? h('span.row-actions') : null);
   }
 
   #labelRemoveButton(it, stop) {
@@ -1121,7 +1107,7 @@ export class PhotosView extends ViewPane {
       h('span.row-camera', { title: [it.camera, it.by || it.author, it.codec].filter(Boolean).join(' · ') },
         (it.kind === KIND.video ? [it.codec, it.dur ? formatClock(it.dur) : null] : [it.camera, it.by || it.author]).filter(Boolean).join(' · ') || '—'),
       this.#marks([it.id], MARK_NAMES[it.mark || 0], 'row-marks'),
-      this.#itemActions(it, 'row-actions'));
+      this.#tileActions(it, 'row-actions'));
     if (it.mark) row.classList.add(`mark-${MARK_NAMES[it.mark]}`);
     this.#markSphere(row, it);
     this.#paintTile(row, it.id);
@@ -1488,8 +1474,17 @@ export class PhotosView extends ViewPane {
     if (f?.running && f.total) lines.push(line('face', t('similar.statusFaces', { done: formatNumber(f.done), total: formatNumber(f.total) }), f.done, f.total, f.paused ? t('similar.statusPaused') : fromCatalog));
     if (!p && sim.summary) {
       const s = sim.summary;
-      lines.push(line('stack', s.groups ? t('similar.statusDone', { groups: tn('similar.statusGroups', s.groups), grouped: formatNumber(s.grouped), photos: formatNumber(s.photos) }) : t('similar.statusNone', { photos: formatNumber(s.photos) }),
+      lines.push(line('stack', s.groups ? t('similar.statusIn', { grouped: formatNumber(s.grouped), photos: formatNumber(s.photos) }) : t('similar.statusNone', { photos: formatNumber(s.photos) }),
         0, 0, !f?.running ? fromCatalog : null));
+    }
+    // faces or pets that cannot be looked for on this computer: said once, quietly (the stacks go on, by likeness)
+    const off = sim.whoOff;
+    if (off.length) {
+      const sup = (off.includes('face') ? this.services.faces : this.services.pets)?.state?.support;
+      const why = sup ? t(sup.reason === 'memory' ? 'faces.unsupportedMemory' : 'faces.unsupportedGpu', { detail: sup.detail || '' }) : '';
+      lines.push(h('div.stack-line.stack-note', { title: why },
+        h('span.stack-line-icon', { html: icon('info', 14) }),
+        h('span.stack-line-text', t(off.length === 2 ? 'similar.whoOffBoth' : off[0] === 'face' ? 'similar.whoOffFaces' : 'similar.whoOffPets'))));
     }
     // how alike photos must be to be grouped: in the menu of "Similar photos"
     el.hidden = false;

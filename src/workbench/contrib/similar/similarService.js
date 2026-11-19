@@ -147,9 +147,13 @@ export class SimilarService {
   /** Who is in the photos was read again (faces found or named): the window groups again. */
   onDidChangeWho = this.#onDidChangeWho.event;
   #whoTimer = null;
+  #whoOffWas = '';
   #lastList = null;  // what Photos showed last, and its groups (to know whether they change)
   #inGroups = [];
   #sig = '';
+  #onDidChangeSummary = new Emitter();
+  /** The count of stacks and single photos of Photos changed (its filter, the stacks): the status bar says it again. */
+  onDidChangeSummary = this.#onDidChangeSummary.event;
   /** How far the photos of Photos are read (to group them): { done, total, left } or null when done. */
   onDidProgress = this.#onDidProgress.event;
   /** The groups may be other now (photos read, people found, a decision taken): Photos and the window redraw. */
@@ -184,6 +188,18 @@ export class SimilarService {
       clearTimeout(this.#updTimer);
       this.#updTimer = setTimeout(() => this.#maybeRegroup(), 400);
     });
+    // the recognition of faces or pets cannot run on this computer (no graphics card able to, too little
+    // memory): the stacks are made from how alike the photos are alone, and Photos says so, quietly
+    for (const kind of ['face', 'pet']) {
+      this.services[kind === 'face' ? 'faces' : 'pets']?.onDidChangeState?.(() => {
+        const off = this.whoOff.join();
+        if (off === this.#whoOffWas) return;
+        this.#whoOffWas = off;
+        for (const k of this.whoOff) { this.#who[k].clear(); this.#whoAsked[k].clear(); }
+        this.#onDidProgress.fire(this.progress);
+        if (this.active && this.#lastList) this.regroupNow();
+      });
+    }
     // people or pets found or named: who is in the photos may have changed
     for (const kind of ['face', 'pet']) {
       // while faces are being looked for, news comes every few seconds: who is in the photos is read again
@@ -389,13 +405,21 @@ export class SimilarService {
   }
 
   // ------------------------------------------------------------------ who is in the photos
+  /** Faces (or pets) can be used here: not when their recognition cannot run on this computer (yes while unknown). */
+  whoUsable(kind) {
+    const svc = this.services[kind === 'face' ? 'faces' : 'pets'];
+    return svc?.state?.support?.supported !== false;
+  }
+  /** What cannot be used on this computer to tell stacks apart: [] | ['face'] | ['pet'] | ['face', 'pet']. */
+  get whoOff() { return ['face', 'pet'].filter((k) => !this.whoUsable(k)); }
+
   /** Who is in these shots (faces and pets), from the catalog; those not looked at yet are looked at first. */
   async readWho(shots, { look = true } = {}) {
     const ids = shots.map((s) => s.rep.id);
     let asked = false;
     for (const kind of ['face', 'pet']) {
       const api = this.host[kind === 'face' ? 'faces' : 'pets'];
-      if (!api?.of) continue;
+      if (!api?.of || !this.whoUsable(kind)) continue;
       const want = ids.filter((id) => !this.#whoAsked[kind].has(id));
       if (!want.length) continue;
       want.forEach((id) => this.#whoAsked[kind].add(id));
@@ -420,6 +444,7 @@ export class SimilarService {
    * looked at again) and how many are not yet. @returns {{ known:number, todo:number }}
    */
   whoCounts() {
+    if (!this.whoUsable('face')) return { known: 0, todo: 0 };
     let known = 0;
     for (const s of this.#inGroups) if (this.#who.face.has(s.rep.id)) known++;
     return { known, todo: this.#inGroups.length - known };
@@ -431,7 +456,7 @@ export class SimilarService {
   /** Two shots that are not of the same group: the person said so, or different people (or pets) are in them. */
   apart = (u, x) => {
     if (u.files.some((f) => x.files.some((g) => this.choices.apart.has(pairKey(f.id, g.id))))) return true;
-    for (const kind of ['face', 'pet']) if (sameWho(this.whoOf(u, kind), this.whoOf(x, kind), kind) === false) return true;
+    for (const kind of ['face', 'pet']) if (this.whoUsable(kind) && sameWho(this.whoOf(u, kind), this.whoOf(x, kind), kind) === false) return true;
     return false;
   };
   chosen = (u) => u.files.some((f) => this.choices.best.has(f.id));
@@ -614,7 +639,10 @@ export class SimilarService {
     this.#lastList = list;
     this.#sig = signature(groups, shots);
     this.#inGroups = groups.flatMap((g) => g.units);
+    const was = this.summary;
     this.summary = { groups: groups.length, grouped: this.#inGroups.length, photos: shots.length };
+    // said after this view is made (never from inside it)
+    if (!was || was.groups !== this.summary.groups || was.grouped !== this.summary.grouped || was.photos !== this.summary.photos) queueMicrotask(() => this.#onDidChangeSummary.fire(this.summary));
     // who is in the photos of the groups (once): groups of different people come apart
     const inGroups = this.#inGroups;
     if (inGroups.some((s) => !this.#whoAsked.face.has(s.rep.id))) this.readWho(inGroups).then((asked) => { if (asked) { this.#onDidProgress.fire(this.progress); this.#maybeRegroup(); } });

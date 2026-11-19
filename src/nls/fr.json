@@ -2555,6 +2555,7 @@
   "similar.whoOffBoth": "Les visages et les animaux n’ont pas pu être utilisés sur cet ordinateur pour séparer les piles plus précisément ; les photos semblables sont toujours empilées selon leur ressemblance.",
   "similar.whoOffFaces": "Les visages n’ont pas pu être utilisés sur cet ordinateur pour séparer les piles plus précisément ; les photos semblables sont toujours empilées selon leur ressemblance.",
   "similar.whoOffPets": "Les animaux n’ont pas pu être utilisés sur cet ordinateur pour séparer les piles plus précisément ; les photos semblables sont toujours empilées selon leur ressemblance.",
+  "similar.statusPreparing": "Préparation des piles…",
   "content.shows": "Montre",
   "content.searchTitle": "Rechercher « {name} » dans Photos",
   "source.local": "Sur le disque de cet ordinateur",

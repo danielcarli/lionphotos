@@ -2555,6 +2555,7 @@
   "similar.whoOffBoth": "Faces and pets could not be used on this computer to tell stacks apart more precisely; similar photos are still stacked by how alike they are.",
   "similar.whoOffFaces": "Faces could not be used on this computer to tell stacks apart more precisely; similar photos are still stacked by how alike they are.",
   "similar.whoOffPets": "Pets could not be used on this computer to tell stacks apart more precisely; similar photos are still stacked by how alike they are.",
+  "similar.statusPreparing": "Preparing the stacks…",
   "content.shows": "Shows",
   "content.searchTitle": "Search Photos for “{name}”",
   "source.local": "On this computer's disk",

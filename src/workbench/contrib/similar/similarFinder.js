@@ -145,13 +145,13 @@ function cdOf(a, b) {
 }
 
 /**
- * How alike two pictures are in what they show, from the content model's numbers (`clip`, normalized): its
+ * How alike two pictures are in what they show, from the content model's numbers (`vec`, normalized): its
  * cosine, put on the scale of the pixels (0.6 or less: other things → 0; the same → 1). null: not known.
  */
 export function contentSimilarity(a, b) {
-  if (!a.clip || !b.clip || a.clip.length !== b.clip.length) return null;
+  if (!a.vec || !b.vec || a.vec.length !== b.vec.length) return null;
   let c = 0;
-  for (let i = 0; i < a.clip.length; i++) c += a.clip[i] * b.clip[i];
+  for (let i = 0; i < a.vec.length; i++) c += a.vec[i] * b.vec[i];
   return Math.max(0, Math.min(1, (c - 0.6) / 0.4));
 }
 
@@ -222,8 +222,10 @@ export function bestOf(group, chosen = null) {
   const top = Math.max(...us.map(coverRank));
   if (top > 0) return us.findIndex((u) => coverRank(u) === top);
   // sharpness in "times sharper" (log), so a little softer loses to a lot less burnt-out
-  const sharp = us.map((u) => Math.log1p(u.f.sharp));
+  // (a number that is not one counts as nothing: the index returned is always one of the group's)
+  const num = (v) => (Number.isFinite(v) ? v : 0);
+  const sharp = us.map((u) => Math.log1p(Math.max(0, num(u.f?.sharp))));
   const max = Math.max(...sharp);
-  const score = us.map((u, i) => sharp[i] - max - 2.5 * Math.max(0, u.f.clip - 0.02) - 1.5 * Math.max(0, Math.abs(u.f.light - 0.47) - 0.25));
-  return score.indexOf(Math.max(...score));
+  const score = us.map((u, i) => sharp[i] - max - 2.5 * Math.max(0, num(u.f?.clip) - 0.02) - 1.5 * Math.max(0, Math.abs(num(u.f?.light) - 0.47) - 0.25));
+  return Math.max(0, score.indexOf(Math.max(...score)));
 }

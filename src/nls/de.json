@@ -2555,6 +2555,7 @@
   "similar.whoOffBoth": "Gesichter und Haustiere konnten auf diesem Computer nicht genutzt werden, um Stapel genauer zu trennen; ähnliche Fotos werden weiter nach ihrer Ähnlichkeit gestapelt.",
   "similar.whoOffFaces": "Gesichter konnten auf diesem Computer nicht genutzt werden, um Stapel genauer zu trennen; ähnliche Fotos werden weiter nach ihrer Ähnlichkeit gestapelt.",
   "similar.whoOffPets": "Haustiere konnten auf diesem Computer nicht genutzt werden, um Stapel genauer zu trennen; ähnliche Fotos werden weiter nach ihrer Ähnlichkeit gestapelt.",
+  "similar.statusPreparing": "Stapel werden vorbereitet…",
   "content.shows": "Zeigt",
   "content.searchTitle": "„{name}“ in Fotos suchen",
   "source.local": "Auf der Festplatte dieses Computers",

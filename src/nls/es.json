@@ -2555,6 +2555,7 @@
   "similar.whoOffBoth": "No se pudieron usar caras ni mascotas en este equipo para separar las pilas con más precisión; las fotos parecidas se siguen apilando por su parecido.",
   "similar.whoOffFaces": "No se pudieron usar caras en este equipo para separar las pilas con más precisión; las fotos parecidas se siguen apilando por su parecido.",
   "similar.whoOffPets": "No se pudieron usar mascotas en este equipo para separar las pilas con más precisión; las fotos parecidas se siguen apilando por su parecido.",
+  "similar.statusPreparing": "Preparando las pilas…",
   "content.shows": "Muestra",
   "content.searchTitle": "Buscar “{name}” en Fotos",
   "source.local": "En el disco de este ordenador",

@@ -2,6 +2,22 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.83.3] — 2026-11-19
+
+### Fixed
+- **Stack photos, off and on again, with "what the photos show" analysed** (Places › scenes): the stacks did not come back and the status bar lost its counts of stacks, single and unique photos. What the content model saw in each photo, read from the catalog a few moments after Photos opens, was put where the features keep how much of the picture is burnt out; the choice of the best photo of a stack then failed, and with it Photos and the status bar each time the stacks were made again (turned on, a filter, a decision). It now has a place of its own: the stacks, the counts and the line under the bar come back, and the burnt-out share counts again in the choice of the best photo.
+- What the content model saw is now also asked for photos with some burnt-out light (before, only for photos with none), so they too are compared by what they show.
+- A failure making the stacks no longer takes Photos and the status bar with it: the photos are shown unstacked, and the error goes to the log.
+- Unit checks: with what the content model saw, the best photo of a stack is one of its photos and the burnt-out share stays a number; a photo with a number missing never puts the best outside its stack.
+
+## [1.83.2] — 2026-11-19
+
+### Fixed
+- **Stack photos, off and on again:** the switch now turns on at the click and the line under the bar says what happens. When the main process was slow to answer (just after an update was installed, a large collection opening), turning it back on left the switch drawn off, the photos unstacked and the previous count under the bar; the stacks came only after the program was closed and opened again. While the stacks are being prepared, the line says *Preparing the stacks…*, and they show as soon as they are ready.
+- Turned off while the photos were being read and on again before that reading stopped, the old reading went on and worked out, from the thumbnails, photos whose numbers were still to come from the catalog (hours of work on a large collection). It now stops for good; the new reading asks the catalog first and reads only what is missing.
+- The person's decisions on stacks (made by hand, kept apart, best photo) are asked again for the collection just opened, also when Photos was drawn before the program heard of the new folder; an error answering them no longer leaves the stacks waiting forever.
+- End-to-end check: off and on again, the switch and the line follow at once and the stacks come back.
+
 ## [1.83.1] — 2026-11-19
 
 ### Changed

@@ -99,13 +99,20 @@ check(groupSimilar(units, 'same').length >= 2 && groupSimilar(units, 'scene').le
   const near = base.map((x, i) => (i % 7 ? x : -x));       // a little other
   const other = Array.from({ length: 512 }, () => Math.round((r() - 0.5) * 120));
   const bytes = (v) => new Uint8Array(Int8Array.from(v).buffer);
-  const withClip = (f, v) => { const g = { ...f }; Object.defineProperty(g, 'clip', { value: clipVector(bytes(v)), enumerable: false }); return g; };
+  const withClip = (f, v) => { const g = { ...f }; Object.defineProperty(g, 'vec', { value: clipVector(bytes(v)), enumerable: false }); return g; };
   const [u1, u2] = [units[0], units.find((u) => similarity(units[0].f, u.f) < 0.5)];
   const pixels = similarity(u1.f, u2.f);
   const same = similarity(withClip(u1.f, base), withClip(u2.f, near));
   const diff = similarity(withClip(u1.f, base), withClip(u2.f, other));
   check(contentSimilarity(withClip(u1.f, base), withClip(u2.f, base)) > 0.999 && same > pixels && Math.abs(diff - pixels) < 1e-9 && contentSimilarity(u1.f, u2.f) === null,
     'the content model raises how alike two shots showing the same things are; other things, or not read: their pixels decide', JSON.stringify({ pixels, same, diff }));
+  // 1.83.3: the content model's numbers sit beside the features; the burnt-out share (clip) stays a number, so
+  // the best photo of a stack is still one of its photos (it came out -1, and Photos failed to draw the stacks)
+  const g = { units: [shot(1, 0, withClip(feat(1, 0, { sharp: 80, clip: 0.01 }), base)), shot(2, 0, withClip(feat(1, 0.1, { sharp: 300, clip: 0 }), near))] };
+  const best = bestOf(g);
+  check(best === 1 && typeof g.units[0].f.clip === 'number' && contentSimilarity(feat(1, 0, { clip: 0.3 }), feat(2, 0, { clip: 0.2 })) === null,
+    'with what the content model saw: the best photo of a stack is one of its photos (the sharpest), the burnt-out share stays a number, and no numbers mean "not known"', JSON.stringify({ best }));
+  check(bestOf({ units: [shot(1, 0, { ...feat(1), sharp: NaN }), shot(2, 0, { ...feat(1), light: undefined })] }) >= 0, 'a photo with a number missing never makes the best of its stack fall outside it');
 }
 
 // twins

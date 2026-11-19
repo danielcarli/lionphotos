@@ -1432,7 +1432,14 @@ export class PhotosView extends ViewPane {
     const on = sim.active;
     return h(on ? 'label.tb-switch.stack-switch.on' : 'label.tb-switch.stack-switch', { title: t('similar.stackTitle') },
       h('input', { type: 'checkbox', role: 'switch', checked: on, 'aria-checked': String(on),
-        onchange: (e) => { sim.setMode(e.target.checked ? 'stacks' : 'all'); this.#paintStackStatus(); } }),
+        // the switch follows the click at once, whatever the stacks still need (drawn again when they come)
+        onchange: (e) => {
+          const label = e.target.closest('.tb-switch');
+          label?.classList.toggle('on', e.target.checked);
+          e.target.setAttribute('aria-checked', String(e.target.checked));
+          sim.setMode(e.target.checked ? 'stacks' : 'all');
+          this.#paintStackStatus();
+        } }),
       h('span.tb-switch-track', { 'aria-hidden': 'true' }), h('span.tb-switch-text', t('similar.groupSwitch')));
   }
 
@@ -1492,7 +1499,9 @@ export class PhotosView extends ViewPane {
     const who = sim.whoCounts();
     const fromCatalog = who.known ? tn('similar.statusFromCatalog', who.known) : null;
     if (f?.running && f.total) lines.push(line('face', t('similar.statusFaces', { done: formatNumber(f.done), total: formatNumber(f.total) }), f.done, f.total, f.paused ? t('similar.statusPaused') : fromCatalog));
-    if (!p && sim.summary) {
+    // just turned on, the decisions of the person still on their way from the catalog: said, not left blank
+    if (!p && sim.preparing) lines.push(line('stack', t('similar.statusPreparing')));
+    else if (!p && sim.summary) {
       const s = sim.summary;
       lines.push(line('stack', s.groups ? t('similar.statusIn', { grouped: formatNumber(s.grouped), photos: formatNumber(s.photos) }) : t('similar.statusNone', { photos: formatNumber(s.photos) }),
         0, 0, !f?.running ? fromCatalog : null));

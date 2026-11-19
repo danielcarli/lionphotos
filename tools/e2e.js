@@ -2249,6 +2249,14 @@ app.whenReady().then(async () => {
       res.lineSlider = !!document.querySelector('.view-photos .stack-status .sens-range');
       res.shown = lib.view('main').length; res.all = lib.viewAll('main').length;
       res.tileHasBadge = !!badge?.closest('.tile');
+      // off and on again (1.83.2): the switch and the line under the bar follow the click at once, and the stacks
+      // come back (they stayed off, the switch drawn off, while the main process was slow to answer)
+      { sw().click(); await wait(300);
+        const off = { tiles: document.querySelectorAll('.view-photos .tile-stack:not(.tile-stack-pair)').length, hidden: document.querySelector('.view-photos .stack-status')?.hidden };
+        sw().click();
+        const at = { on: sw().closest('.tb-switch').classList.contains('on'), status: !document.querySelector('.view-photos .stack-status')?.hidden };
+        let back = false; for (let i = 0; i < 30 && !(back = !!document.querySelector('.view-photos .tile-stack:not(.tile-stack-pair)')); i++) await wait(100);
+        res.again = { off, at, back, reading: !!s.similar.progress }; }
       // the raw files come with their group (RAW and how many on it), and a raw twin behind its JPEG
       const withRaw = lib.view('main').find((x) => s.similar.stackOf(x.id)?.raws > 0);
       res.rawCount = withRaw && s.similar.stackOf(withRaw.id).raws;
@@ -2375,6 +2383,9 @@ app.whenReady().then(async () => {
     check(st.metaOk && st.metaOff && st.barOk && st.barOff && st.followOk, 'Stack photos on: beside how many items (in the bar of Photos and in the status bar, bottom left), how many stacks and single photos, and their sum as the probable total of unique photos; off, only the items', JSON.stringify({ meta: st.meta, ok: st.metaOk, off: st.metaOff, bar: st.bar, barOk: st.barOk, barOff: st.barOff, follow: st.follow }));
     check(st.label === 'Stack photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the stack$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /^\d+ of \d+ photos are in a stack/.test(st.status || ''),
       'the switch "Stack photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
+    { const g = st.again || {};
+      check(g.off?.tiles === 0 && g.off?.hidden === true && g.at?.on && g.at?.status && g.back,
+        'stacks off and on again: the switch and the line under the bar follow the click at once, and the stacks come back', JSON.stringify(g)); }
     check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && !st.onlyChip && st.onlyMarked && st.onlyBack && st.noOldSwitch && st.noMenuItem,
       'Only stacks (in the menu of "Similar photos"): only the groups, each as its best photo, the button marked, no chip nor filter for it; again in the menu, every photo grouped again', JSON.stringify({ onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, chip: st.onlyChip, marked: st.onlyMarked, back: st.onlyBack, noOldSwitch: st.noOldSwitch, noMenuItem: st.noMenuItem }));
     check(st.pairStack === '2' && st.pairStackTitle === '2 files of the same photo (RAW+JPG): open' && st.pairOpened

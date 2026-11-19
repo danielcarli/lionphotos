@@ -2555,6 +2555,7 @@
   "similar.whoOffBoth": "이 컴퓨터에서는 얼굴과 반려동물을 사용해 스택을 더 정확하게 나눌 수 없었습니다. 비슷한 사진은 계속 유사도로 쌓입니다.",
   "similar.whoOffFaces": "이 컴퓨터에서는 얼굴을 사용해 스택을 더 정확하게 나눌 수 없었습니다. 비슷한 사진은 계속 유사도로 쌓입니다.",
   "similar.whoOffPets": "이 컴퓨터에서는 반려동물을 사용해 스택을 더 정확하게 나눌 수 없었습니다. 비슷한 사진은 계속 유사도로 쌓입니다.",
+  "similar.statusPreparing": "스택 준비 중…",
   "content.shows": "담긴 것",
   "content.searchTitle": "사진에서 “{name}” 검색",
   "source.local": "이 컴퓨터의 디스크",

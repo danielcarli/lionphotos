@@ -2555,6 +2555,7 @@
   "similar.whoOffBoth": "此电脑无法使用人脸和宠物来更准确地区分堆叠；相似的照片仍会按相似度堆叠。",
   "similar.whoOffFaces": "此电脑无法使用人脸来更准确地区分堆叠；相似的照片仍会按相似度堆叠。",
   "similar.whoOffPets": "此电脑无法使用宠物来更准确地区分堆叠；相似的照片仍会按相似度堆叠。",
+  "similar.statusPreparing": "正在准备堆叠…",
   "content.shows": "内容",
   "content.searchTitle": "在“照片”中搜索“{name}”",
   "source.local": "在本机磁盘上",

@@ -2555,6 +2555,7 @@
   "similar.whoOffBoth": "Non è stato possibile usare volti e animali su questo computer per separare le pile con più precisione; le foto simili continuano a essere impilate in base alla somiglianza.",
   "similar.whoOffFaces": "Non è stato possibile usare i volti su questo computer per separare le pile con più precisione; le foto simili continuano a essere impilate in base alla somiglianza.",
   "similar.whoOffPets": "Non è stato possibile usare gli animali su questo computer per separare le pile con più precisione; le foto simili continuano a essere impilate in base alla somiglianza.",
+  "similar.statusPreparing": "Preparazione delle pile…",
   "content.shows": "Mostra",
   "content.searchTitle": "Cerca “{name}” in Foto",
   "source.local": "Sul disco di questo computer",

@@ -2555,6 +2555,7 @@
   "similar.whoOffBoth": "Não foi possível usar rostos e pets neste computador para separar as pilhas com mais precisão; as fotos parecidas continuam sendo empilhadas pela semelhança.",
   "similar.whoOffFaces": "Não foi possível usar rostos neste computador para separar as pilhas com mais precisão; as fotos parecidas continuam sendo empilhadas pela semelhança.",
   "similar.whoOffPets": "Não foi possível usar pets neste computador para separar as pilhas com mais precisão; as fotos parecidas continuam sendo empilhadas pela semelhança.",
+  "similar.statusPreparing": "Preparando as pilhas…",
   "content.shows": "Mostra",
   "content.searchTitle": "Buscar “{name}” em Fotos",
   "source.local": "No disco deste computador",

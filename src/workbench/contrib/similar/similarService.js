@@ -167,6 +167,7 @@ export class SimilarService {
   #stackOf = new Map();  // item id → its stack (Photos, grouped)
   #pairOf = new Map();   // the JPEG of a shot alone → its files (the raw one behind it)
   #reading = null;       // the photos being read for Photos
+  #gen = 0;              // turned off and on again: what was being read for the last time stops for good
   #root = null;
   #timer = null;
   choices = { apart: new Set(), best: new Set(), stacks: new Map() };
@@ -218,18 +219,34 @@ export class SimilarService {
     for (const k of ['face', 'pet']) { this.#who[k].clear(); this.#whoAsked[k].clear(); }
     this.choices = { apart: new Set(), best: new Set(), stacks: new Map() };
     this.#choicesLoaded = null;
+    this.#choicesReady = false;
+    // asked again for this collection now: Photos may have been drawn for it before this (the order of who hears
+    // of the new folder first), asking for the decisions of the one before
+    if (this.active && this.library.root) this.loadChoices();
   }
 
   #choicesLoaded = null;
+  #choicesReady = false;
   /** What the person decided, from the catalog (once per collection). */
   loadChoices() {
     if (this.#choicesLoaded) return this.#choicesLoaded;
-    this.#choicesLoaded = (async () => {
-      const ch = await this.api.similarChoices?.().catch(() => null);
+    const root = this.library.root;
+    const p = this.#choicesLoaded = (async () => {
+      let ch = null;
+      try { ch = await this.api.similarChoices?.(); } catch { /* none kept: the stacks found by likeness alone */ }
+      if (this.#choicesLoaded !== p || this.library.root !== root) return; // another collection meanwhile
       this.choices = { apart: new Set((ch?.apart || []).map(([a, b]) => pairKey(a, b))), best: new Set(ch?.best || []), stacks: new Map(ch?.stacks || []) };
+      this.#choicesReady = true;
+      // Photos waiting for them (stacks just turned on): stacked now
+      if (this.active) this.#regroup();
     })();
-    return this.#choicesLoaded;
+    return p;
   }
+  /**
+   * Stacks turned on, the decisions of the person still on their way from the catalog (the main process busy:
+   * just updated, a large collection opening): Photos says it is preparing them, instead of showing nothing.
+   */
+  get preparing() { return this.active && !!this.library.root && !this.#choicesReady; }
 
   async #refreshWho() {
     for (const k of ['face', 'pet']) { this.#who[k].clear(); this.#whoAsked[k].clear(); }
@@ -247,6 +264,9 @@ export class SimilarService {
 
   /** Photos drawn again only when its groups are other now. */
   #maybeRegroup() {
+    try { this.#maybeRegroupNow(); } catch (err) { console.error('[similar] stacks', err); }
+  }
+  #maybeRegroupNow() {
     if (!this.active || !this.#lastList) return;
     const { shots } = shotsOfItems(this.library, this.#lastList, this.choices.best);
     for (const x of shots) x.f = this.known(x) ?? null;
@@ -268,8 +288,15 @@ export class SimilarService {
   get active() { return readPref(STACK_KEY, '0') === '1'; }
   setActive(on) {
     savePref(STACK_KEY, on ? '1' : '0');
-    if (!on) { this.#stackOf.clear(); this.#pairOf.clear(); this.library.refreshView(); this.#onDidChange.fire(); return; }
-    this.loadChoices().then(() => this.#regroup());
+    // what was being read stops for good (turned on again before it noticed, it went on reading the thumbnails
+    // of photos whose numbers were still to come from the catalog: hours of work for nothing on a large collection)
+    this.#gen++;
+    this.#reading = null;
+    this.progress = null;
+    if (!on) { this.#stackOf.clear(); this.#pairOf.clear(); this.library.refreshView(); this.#onDidChange.fire(); this.#onDidProgress.fire(null); return; }
+    // at once: Photos (the switch, the line under the bar) says so now; the stacks come as soon as they are ready
+    this.loadChoices();
+    this.#regroup();
   }
   /**
    * How Photos shows its photos: 'all' (every photo), 'stacks' (each group as its best photo, with a stack) or
@@ -324,6 +351,8 @@ export class SimilarService {
         if (f) { this.#features.set(`${s.rep.id}:${s.rep.mtime}`, f); s.f = f; }
       }
     }
+    // what came from the catalog meanwhile (also for a reading stopped before this one) is not read again
+    for (const s of todo) if (!s.f) s.f = this.known(s) || null;
     todo = todo.filter((s) => !s.f);
     done = shots.length - todo.length;
     onProgress(done, shots.length);
@@ -360,7 +389,7 @@ export class SimilarService {
    */
   async readContent(shots) {
     if (!this.api.contentVectors) return false;
-    const want = shots.filter((s) => s.f && !s.f.clip && !this.#clipAsked.has(`${s.rep.id}:${s.rep.mtime}`));
+    const want = shots.filter((s) => s.f && !s.f.vec && !this.#clipAsked.has(`${s.rep.id}:${s.rep.mtime}`));
     if (!want.length) return false;
     let found = false;
     for (let i = 0; i < want.length; i += 2000) {
@@ -373,7 +402,10 @@ export class SimilarService {
       for (const s of part) {
         const vec = byId.get(s.rep.id) || s.files.map((f) => byId.get(f.id)).find(Boolean);
         if (!vec?.length) continue;
-        Object.defineProperty(s.f, 'clip', { value: clipVector(vec), enumerable: false, configurable: true });
+        // beside the features, never over them: `clip` is how much of the picture is burnt out (a number the
+        // choice of the best photo uses); the content model's numbers put there made that choice fail and,
+        // with it, the stacks of Photos (turned off and on again, they did not come back)
+        Object.defineProperty(s.f, 'vec', { value: clipVector(vec), enumerable: false, configurable: true });
         found = true;
       }
     }
@@ -623,18 +655,28 @@ export class SimilarService {
   }
 
   // ------------------------------------------------------------------ Photos, grouped
-  /** Photos' list with each group as its best photo (the others hidden behind it). Called by library.view. */
+  /**
+   * Photos' list with each group as its best photo (the others hidden behind it). Called by library.view — also by
+   * the status bar: a failure here must never take Photos with it, so the photos are then shown unstacked.
+   */
   collapse(list) {
+    try { return this.#collapse(list); } catch (err) {
+      console.error('[similar] stacks', err);
+      this.#stackOf.clear(); this.#pairOf.clear(); this.#behind = new Set();
+      return list;
+    }
+  }
+  #collapse(list) {
     this.#stackOf.clear();
     this.#pairOf.clear();
     if (!this.active || !this.library.root) return list;
-    if (!this.#choicesLoaded) { this.loadChoices().then(() => this.#regroup()); return list; }
+    if (!this.#choicesReady) { this.loadChoices(); return list; } // stacked when they come (loadChoices)
     const { shots } = shotsOfItems(this.library, list, this.choices.best);
     for (const s of shots) s.f = this.known(s) ?? null;
     const missing = shots.filter((s) => this.known(s) === undefined);
     if (missing.length) this.#readForPhotos(missing);
     // what the content model saw, for photos read in an earlier session: asked once, then grouped again
-    else if (shots.some((s) => s.f && !s.f.clip && !this.#clipAsked.has(`${s.rep.id}:${s.rep.mtime}`))) this.readContent(shots).then((found) => { if (found) this.#maybeRegroup(); });
+    else if (shots.some((s) => s.f && !s.f.vec && !this.#clipAsked.has(`${s.rep.id}:${s.rep.mtime}`))) this.readContent(shots).then((found) => { if (found) this.#maybeRegroup(); });
     const groups = this.groups(shots);
     this.#lastList = list;
     this.#sig = signature(groups, shots);
@@ -693,7 +735,8 @@ export class SimilarService {
    */
   #readForPhotos(shots) {
     if (this.#reading) { this.#reading.more = true; return; }
-    this.#reading = { more: false };
+    const reading = this.#reading = { more: false };
+    const gen = this.#gen;
     const root = this.library.root;
     const todo = [...shots].sort((a, b) => b.t - a.t);
     const eta = new Eta();
@@ -701,12 +744,14 @@ export class SimilarService {
     this.progress = { done: 0, total: todo.length, left: null };
     this.#onDidProgress.fire(this.progress);
     this.read(todo, (done, total) => {
+      if (this.#gen !== gen) return; // stopped: its progress is no longer what Photos shows
       eta.update(done, total);
       this.progress = { done, total, left: eta.remaining() }; // ms (null while estimating)
       if (Date.now() - last > 250 || done === total) { last = Date.now(); this.#onDidProgress.fire(this.progress); }
       // the newest photos read: the top of the grid grouped already
       if (!early && done >= Math.min(EARLY, total) && done < total) { early = true; this.#regroup(); }
-    }, () => !this.active || this.library.root !== root).finally(() => {
+    }, () => !this.active || this.library.root !== root || this.#gen !== gen).finally(() => {
+      if (this.#reading !== reading) return; // stopped for good (turned off): a newer reading may be on its way
       this.#reading = null;
       this.progress = null;
       this.#onDidProgress.fire(null);

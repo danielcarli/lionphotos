@@ -1,0 +1,21 @@
+{
+  "id": "coordenadoria-ufsm",
+  "version": "1.0.0",
+  "kind": "publish",
+  "name": { "en": "UFSM Communication office (Mercúrio)", "pt-BR": "Coordenadoria de Comunicação UFSM (Mercúrio)", "pt-PT": "Coordenadoria de Comunicação UFSM (Mercúrio)" },
+  "shortName": { "en": "Mercúrio", "pt-BR": "Mercúrio" },
+  "description": {
+    "en": "Publishes albums and projects straight to the photo catalog of the UFSM Communication office, with authors, captions and credits. They arrive as drafts; publishing them is decided in the system.",
+    "pt-BR": "Publica álbuns e projetos direto no catálogo de fotos da Coordenadoria de Comunicação da UFSM, com autores, legendas e créditos. Chegam como rascunho; quem publica decide no sistema."
+  },
+  "author": "Coordenadoria de Comunicação UFSM",
+  "accepts": ["album", "project"],
+  "icon": "assets/icon.svg",
+  "photo": { "sizes": [2048, 3000], "thumb": 560, "web": 1600 },
+  "publish": {
+    "protocol": "lionphotos-publish-v1",
+    "path": "/api/catalogo/publicar",
+    "url": "http://localhost:8080",
+    "site": { "en": "Mercúrio", "pt-BR": "Mercúrio" }
+  }
+}

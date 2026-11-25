@@ -2,6 +2,13 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [Unreleased]
+
+### Added
+- **Publishing plugins** (`"kind": "publish"`): albums and projects go straight to a site — a photo catalog, an agency's archive — instead of a folder. The export dialog asks for the site's address and an upload key, checks the connection (whose key it is, on which site) and publishes with the typed code; the photos are made as for an export, in a temporary folder, sent and the folder removed. Photos the site already has with the same picture are not sent again, and the ones taken out of the album leave the site. The key is kept encrypted by the system and never goes back to the window; `https://` only, or `http://` for this computer and the local network. Protocol `lionphotos-publish-v1`, described in docs/PLUGINS.md.
+- Plugin **Coordenadoria de Comunicação UFSM (Mercúrio)** (`plugins/coordenadoria-ufsm`): publishes to the photo catalog of the UFSM Communication office.
+- Texts in the 10 languages; unit checks for the manifest, the address rule and the protocol against a site in memory (only the files asked are sent, nothing twice, nothing from outside the export folder, a refused key stops at once).
+
 ## [1.83.3] — 2026-11-19
 
 ### Fixed

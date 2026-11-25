@@ -2233,6 +2233,11 @@ input.desc-input { min-height: 32px; resize: none; }
 .exp-opt { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
 .exp-opt.col { flex-direction: column; align-items: stretch; gap: 4px; }
 .exp-opt.col .small { color: var(--text-secondary); }
+.exp-site { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.exp-site .text-input { width: 100%; }
+.exp-site-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.exp-site-status.is-ok { color: var(--success, #12807e); }
+.exp-site-status.is-error { color: var(--danger, #c2410c); }
 .exp-empty { display: grid; justify-items: center; gap: 6px; padding: 18px 8px; text-align: center; color: var(--text-secondary); }
 .exp-empty p { margin: 0; }
 .exp-summary { align-self: center; }

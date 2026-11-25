@@ -76,7 +76,7 @@ export class PluginView extends ViewPane {
         el.querySelector('.plg-check').innerHTML = on ? icon('check', 14) : '';
       }
       const photos = [...chosen].reduce((a, id) => a + plugins.itemsOf(id).length, 0);
-      exportLabel.textContent = chosen.size ? tn('plugins.view.exportChosen', chosen.size) : t('plugins.export.button');
+      exportLabel.textContent = chosen.size ? tn(p.kind === 'publish' ? 'plugins.publish.chosen' : 'plugins.view.exportChosen', chosen.size) : t(p.kind === 'publish' ? 'plugins.publish.button' : 'plugins.export.button');
       if (pick) pick.textContent = chosen.size === all.length ? t('plugins.view.clear') : t('plugins.view.selectAll');
       summary.textContent = chosen.size ? tn('plugins.export.count', photos, { collections: tn('plugins.export.collections', chosen.size) }) : (all.length ? t('plugins.view.pickHint') : '');
     };
@@ -135,7 +135,7 @@ export class PluginView extends ViewPane {
           h('div.coll-year', h('span.coll-year-label', t(`views.${g.type}`)), h('span.coll-year-count', formatNumber(g.list.length)), h('span.coll-year-line')),
           h('div.lbl-grid', g.list.map(card))))
         : h('div.empty-state', h('span', { html: icon('package', 28) }), h('h3', t('plugins.view.empty')), h('p.muted', t('plugins.view.emptyHint', { types: types.map((ty) => t(`views.${ty}`)).join(', ') }))),
-      h('p.choice-note.plg-note', h('span', { html: icon('info', 14) }), h('span', t('plugins.export.note'))));
+      h('p.choice-note.plg-note', h('span', { html: icon('info', 14) }), h('span', t(p.kind === 'publish' ? 'plugins.publish.note' : 'plugins.export.note'))));
     sync();
     this.element.scrollTop = scroll;
   }

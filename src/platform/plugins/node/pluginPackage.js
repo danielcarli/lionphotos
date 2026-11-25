@@ -4,7 +4,8 @@
  *  Licensed under the MIT License. See LICENSE in the project root.
  *--------------------------------------------------------------------------------------------*/
 // A plugin package (.lionplugin): a ZIP with a plugin.json and the files of a page model — no code that
-// runs in LionPhotos. This reads the ZIP (stored or deflated entries, no other library) and checks it
+// runs in LionPhotos. A "publish" plugin brings no page: it sends the albums to a site that speaks the
+// publish protocol (docs/PLUGINS.md), at the address and with the key the person gives. This reads the ZIP (stored or deflated entries, no other library) and checks it
 // strictly: only the expected kinds of files, no path that leaves the package, sizes bounded.
 'use strict';
 
@@ -17,6 +18,8 @@ const ALLOWED_EXT = new Set(['html', 'htm', 'css', 'js', 'mjs', 'json', 'txt', '
 const TOP = /^(plugin\.json|README(\.[a-z-]+)?\.md|LICENSE(\.[a-z]+)?|template\/.+|assets\/.+)$/i;
 const ID = /^[a-z0-9][a-z0-9.-]{1,63}$/;
 const VERSION = /^\d+\.\d+\.\d+([-.+][0-9A-Za-z.-]+)?$/;
+/** The publish protocols LionPhotos speaks. */
+const PROTOCOLS = ['lionphotos-publish-v1'];
 
 class PackageError extends Error {
   constructor(code, detail = '') { super(detail ? `${code}: ${detail}` : code); this.code = code; this.detail = detail; }
@@ -94,7 +97,8 @@ function parseManifest(json) {
   if (!m || typeof m !== 'object') throw new PackageError('manifest');
   if (!ID.test(m.id || '')) throw new PackageError('manifest', 'id');
   if (!VERSION.test(m.version || '')) throw new PackageError('manifest', 'version');
-  if (m.kind !== 'export') throw new PackageError('manifest', 'kind');
+  if (m.kind !== 'export' && m.kind !== 'publish') throw new PackageError('manifest', 'kind');
+  const publish = m.kind === 'publish' ? publishOf(m.publish) : null;
   const accepts = (Array.isArray(m.accepts) ? m.accepts : ['album', 'project']).filter((x) => ['album', 'project', 'person', 'pet', 'place'].includes(x));
   if (!accepts.length) throw new PackageError('manifest', 'accepts');
   const options = (Array.isArray(m.options) ? m.options : []).slice(0, 12).map((o) => {
@@ -106,7 +110,9 @@ function parseManifest(json) {
   });
   const sizes = (Array.isArray(m.photo?.sizes) ? m.photo.sizes : [1600, 2048]).map(Number).filter((n) => Number.isInteger(n) && n >= 320 && n <= 8000).slice(0, 6);
   return {
-    id: m.id, version: m.version, kind: 'export',
+    id: m.id, version: m.version, kind: m.kind,
+    // publish: where the albums go ({ protocol, path, url, site }); null for an export to a folder
+    publish,
     name: localized(m.name, 80) || m.id,
     // the name under its icon in the activity bar (the full name when it has none)
     shortName: localized(m.shortName, 24),
@@ -127,6 +133,33 @@ function parseManifest(json) {
   };
 }
 
+/**
+ * "publish": { "protocol": "lionphotos-publish-v1", "path": "/api/…", "url": "https://…", "site": "…" } — the
+ * protocol (one LionPhotos speaks), the path of its API on the site, and, optionally, the site's usual address
+ * (offered, the person can change it) and its name.
+ */
+function publishOf(p) {
+  if (!p || typeof p !== 'object' || !PROTOCOLS.includes(p.protocol)) throw new PackageError('manifest', 'publish.protocol');
+  const apiPath = typeof p.path === 'string' && /^\/[\w./-]{0,200}$/.test(p.path) && !p.path.includes('..') ? p.path.replace(/\/+$/, '') : null;
+  if (apiPath === null) throw new PackageError('manifest', 'publish.path');
+  let url = '';
+  try { url = p.url ? siteUrl(p.url) : ''; } catch { url = ''; }
+  return { protocol: p.protocol, path: apiPath, url, site: localized(p.site, 60) };
+}
+
+const PRIVATE_HOST = /^(localhost|127(\.\d{1,3}){3}|\[::1\]|10(\.\d{1,3}){3}|192\.168(\.\d{1,3}){2}|172\.(1[6-9]|2\d|3[01])(\.\d{1,3}){2}|[\w-]+\.local)$/i;
+
+/**
+ * A site's address as typed, checked: https://…, or http:// only for this computer and the local network
+ * (a key never travels unencrypted over the internet). Only the origin and a path are kept. Throws otherwise.
+ */
+function siteUrl(s) {
+  const u = new URL(String(s || '').trim());
+  if (u.username || u.password || u.search || u.hash) throw new Error('url');
+  if (u.protocol !== 'https:' && !(u.protocol === 'http:' && PRIVATE_HOST.test(u.hostname))) throw new Error('url');
+  return `${u.origin}${u.pathname.replace(/\/+$/, '')}`;
+}
+
 /** "brand": { "name": "…" or { "en": "…", … }, "logo": "assets/logo.png" } — a name (up to 40 characters), a logo, or both. */
 function brandOf(b) {
   if (!b || typeof b !== 'object') return null;
@@ -142,7 +175,8 @@ function readPackage(buf) {
   const manifestFile = files.find((f) => f.name === 'plugin.json');
   if (!manifestFile) throw new PackageError('noManifest');
   const manifest = parseManifest(manifestFile.data.toString('utf8'));
-  if (!files.some((f) => f.name === `template/${manifest.entry}`)) throw new PackageError('noEntry', `template/${manifest.entry}`);
+  // a page to export into; a publish plugin needs none (the site shows the photos)
+  if (manifest.kind === 'export' && !files.some((f) => f.name === `template/${manifest.entry}`)) throw new PackageError('noEntry', `template/${manifest.entry}`);
   const names = new Set();
   for (const f of files) { const k = f.name.toLowerCase(); if (names.has(k)) throw new PackageError('badPath', f.name); names.add(k); }
   return { manifest, files };
@@ -176,4 +210,4 @@ function writeZip(files) {
   return Buffer.concat([...locals, cd, end]);
 }
 
-module.exports = { readZip, readPackage, parseManifest, safeName, writeZip, PackageError, MAX_PACKAGE };
+module.exports = { readZip, readPackage, parseManifest, safeName, writeZip, siteUrl, PackageError, MAX_PACKAGE, PROTOCOLS };

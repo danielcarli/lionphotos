@@ -9,6 +9,11 @@ All notable changes to LionPhotos are documented here. The project follows [Sema
 - Plugin **Coordenadoria de Comunicação UFSM (Mercúrio)** (`plugins/coordenadoria-ufsm`): publishes to the photo catalog of the UFSM Communication office.
 - Texts in the 10 languages; unit checks for the manifest, the address rule and the protocol against a site in memory (only the files asked are sent, nothing twice, nothing from outside the export folder, a refused key stops at once).
 
+## [1.83.4] — 2026-11-23
+
+### Fixed
+- **LionPhotos opened and closed at once** (seen after installing an update): a copy left running with no window kept the one-instance lock, so every new start handed over to it and closed, and nothing came to the screen. A copy with no window now opens one when LionPhotos is started again, and closing always ends the process: asked to quit (the last window closed, the update, the system), it is ended a few seconds later if it is still there.
+
 ## [1.83.3] — 2026-11-19
 
 ### Fixed

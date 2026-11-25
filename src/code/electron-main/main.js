@@ -142,6 +142,17 @@ function overlayColors(dark) {
 
 let mainWindow = null;
 
+// Closing must end the process. A copy left running with no window (a hidden helper page made again while
+// closing, a service slow to stop) keeps the one-instance lock: every later start then closed at once, with
+// nothing on the screen (seen after an update). So: asked to quit, the process is ended a moment later if it
+// is still there.
+const QUIT_GRACE_MS = 4000;
+let quitTimer = null;
+function quitForSure() {
+  app.quit();
+  if (!quitTimer) { quitTimer = setTimeout(() => app.exit(0), QUIT_GRACE_MS); quitTimer.unref?.(); }
+}
+
 function createWindow() {
   const isMac = process.platform === 'darwin';
   const win = new BrowserWindow({
@@ -174,7 +185,7 @@ function createWindow() {
   win.on('closed', () => {
     if (mainWindow === win) mainWindow = null;
     // the hidden thumbnail page must not keep the app running
-    if (!BrowserWindow.getAllWindows().some((w) => w.isVisible())) app.quit();
+    if (!BrowserWindow.getAllWindows().some((w) => w.isVisible())) quitForSure();
   });
   return win;
 }
@@ -187,8 +198,10 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.on('second-instance', () => {
-    const win = mainWindow;
+    // this copy has no window (it was left running): it gets one, instead of answering with nothing
+    const win = mainWindow && !mainWindow.isDestroyed() ? mainWindow : app.isReady() ? createWindow() : null;
     if (!win) return;
+    if (quitTimer) { clearTimeout(quitTimer); quitTimer = null; }
     if (win.isMinimized()) win.restore();
     win.show();
     win.focus();
@@ -296,5 +309,7 @@ if (gotTheLock) app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') quitForSure();
 });
+// however the quit was asked (the update, the menu, the system): never left running without a window
+app.on('before-quit', () => { if (!quitTimer) { quitTimer = setTimeout(() => app.exit(0), QUIT_GRACE_MS); quitTimer.unref?.(); } });

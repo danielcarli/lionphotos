@@ -29,14 +29,16 @@ export function sphereSection({ labels }, items, { compact = false, segmented = 
   };
   // one line in the Organization section: a segmented choice (with how many, for several)
   if (segmented) {
+    // named and large, like the marks: three buttons in one line, icon and name, the chosen one filled
     return h('div.ip-sphere',
-      h('div.ip-seg', { role: 'radiogroup', 'aria-label': t('sphere.label') }, KEYS.map((key) => {
+      h('span.ip-sphere-label', { id: 'ip-sphere-label' }, t('sphere.label')),
+      h('div.ip-seg', { role: 'radiogroup', 'aria-labelledby': 'ip-sphere-label' }, KEYS.map((key) => {
         const all = counts[key] === total;
         return h('button', {
           class: `ip-seg-btn sphere-${key}${all ? ' active' : counts[key] ? ' partly' : ''}`, role: 'radio', 'aria-checked': String(all),
           title: key === 'none' ? t('sphere.clearAll') : t('sphere.set', { name: t(`sphere.${key}`) }),
           onclick: () => { if (!all) set(key); },
-        }, h('span.ip-seg-name', t(`sphere.${key}`)), total > 1 && counts[key] ? h('span.ip-seg-n', formatNumber(counts[key])) : null);
+        }, h('span.ip-seg-ic', { html: icon(ICONS[key], 14) }), h('span.ip-seg-name', t(`sphere.${key}`)), total > 1 && counts[key] ? h('span.ip-seg-n', formatNumber(counts[key])) : null);
       })),
       fromFolder ? h('p.small.muted.sphere-note', h('span', { html: icon('folder', 12) }), tn('sphere.fromFolder', fromFolder)) : null);
   }

@@ -629,3 +629,5 @@ _merge(MESSAGES, {'info': {'noneOrganize': '未选择要整理的文件。', 'no
 _merge(MESSAGES, {'adjust': {'raw': {'source': 'RAW 文件：编辑基于', 'jpgSub': '8 位，相机生成', 'rawSub': '16 位，显影', 'lineJpg': '立即打开。', 'lineRaw': '高光和阴影有更大余量。打开约需 1 秒。', 'help': '有什么不同？', 'helpClose': '关闭', 'helpJpg': 'JPG，8 位：使用相机保存在 RAW 里的成品图像。立即打开。', 'helpRaw': 'RAW，16 位：在本机上显影传感器数据。高光和阴影有更大余量；打开约需 1 秒，导出需要几秒。', 'helpSafe': '原始文件永远不会改变。'}}})
 
 _merge(MESSAGES, {'adjust': {'raw': {'develop': '显影 RAW（16 位）', 'stateOff': '关闭：相机的 8 位 JPG', 'stateOn': '开启：传感器数据', 'helpTitle': 'JPG 与 RAW 有什么不同', 'helpOff': '关闭：编辑相机保存在 RAW 里的 8 位 JPG。立即打开。', 'helpOn': '开启：以 16 位显影传感器数据。高光和阴影有更大余量；打开约需 1 秒，导出需要几秒。'}}})
+
+_merge(MESSAGES, {'sphere': {'none': '未定', 'pickTitle': '显示个人、工作、未定或全部照片', 'summary': '{personal} 个人 · {professional} 工作 · {none} 未定', 'option': {'none': '未定'}, 'scope': {'none': '来自未定照片'}}})

@@ -28,7 +28,7 @@ LionPhotos apre le cartelle dove le tue foto e i tuoi video si trovano già (il 
 
 **Nessuna importazione** · **Nulla lascia il tuo computer** · **100.000 foto scorrono come 100** · **Gratuito e open source**
 
-![Versione 1.88.2](https://img.shields.io/badge/version-1.88.2-161214)
+![Versione 1.89.0](https://img.shields.io/badge/version-1.89.0-161214)
 ![Stato: versione beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licenza: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Piattaforme: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -321,7 +321,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-foto"; npm run test:e2e
 
 ## Registro delle modifiche
 
-Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.88.2**.
+Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.89.0**.
 
 ## Riconoscimenti
 

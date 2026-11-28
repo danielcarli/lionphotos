@@ -85,7 +85,12 @@ export class PhotosView extends ViewPane {
     this.limbo = limbo;
     this.scope = limbo ? 'limbo' : 'main';
     try { this.mode = localStorage.getItem(LAYOUT_KEY) === 'list' ? 'list' : 'grid'; } catch { this.mode = 'grid'; }
-    try { this.infoOpen = localStorage.getItem(INFO_KEY) !== '0'; } catch { this.infoOpen = true; }
+    // the panel starts folded to its rail while nothing is selected (there is nothing to show yet); with the first
+    // selection it opens, if the person left it open the last time. Folding or opening it by hand ends that wait.
+    let infoPref = true;
+    try { infoPref = localStorage.getItem(INFO_KEY) !== '0'; } catch { /* storage unavailable */ }
+    this.infoOpen = false;
+    this.infoResting = infoPref;
 
     // a project's (album's, person's…) photos belong to its tab: going to any other tab leaves them, so
     // Photos shows all the photos again the next time
@@ -478,6 +483,7 @@ export class PhotosView extends ViewPane {
   }
 
   toggleInfo() {
+    this.infoResting = false;
     this.infoOpen = !this.infoOpen;
     try { localStorage.setItem(INFO_KEY, this.infoOpen ? '1' : '0'); } catch { /* storage unavailable */ }
     this.#renderToolbar();
@@ -1257,6 +1263,7 @@ export class PhotosView extends ViewPane {
    */
   async #renderInfo() {
     const sel = this.library.selection;
+    if (this.infoResting && sel.size) { this.infoResting = false; this.infoOpen = true; }
     {
       // the rail first, whatever comes next: the tabs are there with the panel folded too
       const many = sel.size > 1 ? this.library.selectedItems() : null;
@@ -1303,8 +1310,8 @@ export class PhotosView extends ViewPane {
             h('div.ip-head-text',
               h('div.ip-name', tn('photos.selected', items.length)),
               h('div.ip-meta', [f.period, tn('info.folders', f.folders), formatBytes(f.tot.bytes)].join(' · ')))),
-          // the marks belong to the Organize tab alone (not repeated in Adjust, Describe and Info)
-          tab === 'organize' || tab === 'all' ? this.#markBar(items.map((it) => it.id), items.every((it) => MARK_NAMES[it.mark || 0] === same) ? same : null) : null,
+          // the marks are at hand in every tab of the panel
+          this.#markBar(items.map((it) => it.id), items.every((it) => MARK_NAMES[it.mark || 0] === same) ? same : null),
           h('div.ip-tools',
             h('span.ip-sp'),
             marks.length ? h('span.ip-mark-counts', marks.map(([k, n]) => h('span', { class: `sel-mark ${k}` }, h('span', { html: icon(k === 'great' ? 'star' : k === 'ok' ? 'okCircle' : 'binQuestion', 11) }), formatNumber(n)))) : null)),
@@ -1368,7 +1375,7 @@ export class PhotosView extends ViewPane {
         h('div.info-thumb', this.#thumb(it, 'info-img')),
         ...nameLines(it, d),
         h('div.ip-meta', [detailsLine(d), dims].filter(Boolean).join(' · ')),
-        tab === 'organize' || tab === 'all' ? this.#markBar([id], MARK_NAMES[it.mark || 0]) : null,
+        this.#markBar([id], MARK_NAMES[it.mark || 0]),
         large ? links() : null,
         h('div.ip-tools',
           h('span.ip-sp'),

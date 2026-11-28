@@ -916,7 +916,7 @@ app.whenReady().then(async () => {
     })()`);
     check(v141.pattern === '{date}-{album}-{photographer}-{n}' && v141.fromPt === '{date}-{album}-{photographer}-{n}-x' && v141.pieces === 'date,album,photographer,n,name',
       'file-name pieces are written in the app\'s language (a pattern kept in Portuguese is read and shown in English)', JSON.stringify({ pattern: v141.pattern, fromPt: v141.fromPt, pieces: v141.pieces }));
-    check(v141.list.fits && v141.list.name >= 120 && v141.list.category === '' && v141.list.date, 'the list fits its space (no sideways scroll, the date whole), the name first; "Not categorized" is not repeated down the rows', JSON.stringify(v141.list));
+    check(v141.list.fits && v141.list.name >= 120 && v141.list.category === '' && v141.list.date, 'the list fits its space (no sideways scroll, the date whole), the name first; "Undefined" is not repeated down the rows', JSON.stringify(v141.list));
     check(v141.crumbs === 'Albums > E2E small album' && v141.years === 0 && v141.heads.length >= 1 && v141.heads.every((x) => /\d{4}/.test(x)) && v141.backTo === 'album',
       'inside an album: Albums › its name (a click goes back to Albums); a small album has months with their year, no large year heading', JSON.stringify({ crumbs: v141.crumbs, years: v141.years, heads: v141.heads, backTo: v141.backTo }));
     check(v141.introFirst === true && v141.introAfter === false && v141.introStays === false && v141.introHelp === true && !v141.eyebrow,
@@ -1291,12 +1291,12 @@ app.whenReady().then(async () => {
       check(mb.n === 3 && mb.h >= 44 && mb.names && mb.label && mb.keys === '123', 'the marks in the panel: a named group of three large buttons with their names and keys (1, 2, 3)', JSON.stringify(mb));
     }
     {
-      // the marks are in the Organize tab alone
+      // the marks are in every tab
       const only = await js(`(async () => { const w = (ms) => new Promise((r) => setTimeout(r, ms)), lib = ${S}.library, out = {};
         lib.setSelection([lib.view('main').find((x) => x.kind === 1).id]); await w(300);
         for (const tab of ['organize', 'adjust', 'describe', 'info']) { document.querySelector('.info-panel .ip-rail [data-tab="' + tab + '"]')?.click(); await w(250); out[tab] = !!document.querySelector('.info-panel .ip-markbar'); }
         localStorage.setItem('lionphotos.panel.tab', 'all'); return out; })()`);
-      check(only.organize && !only.adjust && !only.describe && !only.info, 'the marks are in the Organize tab alone, not in Adjust, Describe and Info', JSON.stringify(only));
+      check(only.organize && only.adjust && only.describe && only.info, 'the marks are at hand in every tab of the panel: Organize, Adjust, Describe and Info', JSON.stringify(only));
     }
     {
       // the rail's first button: ">" folds the panel, "<" opens it
@@ -1317,6 +1317,23 @@ app.whenReady().then(async () => {
       check(/^organize\|No file is selected to organize\.\|true\|[5-9]/.test(none.organize) && /^adjust\|No file is selected to adjust/.test(none.adjust) && /^describe\|No file is selected to describe/.test(none.describe)
         && /^info\|No file is selected to show information and metadata/.test(none.info) && none.dashes,
         'the panel with nothing selected: each tab says there is no file for its task, over a faint sketch of what it shows ("---" for the data)', JSON.stringify(none));
+    }
+    {
+      // the category in Organize: a named group of three large buttons, the third called "Undefined"
+      const cat = await js(`(() => { const g = document.querySelector('.info-panel .ip-sphere'); const b = [...(g?.querySelectorAll('.ip-seg-btn') || [])];
+        return { label: g?.querySelector('.ip-sphere-label')?.textContent || '', names: b.map((x) => x.querySelector('.ip-seg-name')?.textContent).join('|'), h: Math.min(...b.map((x) => x.offsetHeight)), icons: b.every((x) => x.querySelector('.ip-seg-ic svg')), oneLine: new Set(b.map((x) => x.offsetTop)).size === 1 && b.every((x) => getComputedStyle(x).flexDirection === 'row'), fits: b.every((x) => { const n = x.querySelector('.ip-seg-name'); return n.scrollWidth <= n.clientWidth; }) }; })()`);
+      check(cat.label === 'Category' && cat.names === 'Personal|Professional|Undefined' && cat.h >= 40 && cat.icons && cat.oneLine && cat.fits, 'the category in Organize: a named group of three buttons in one line, icon and name whole; the third is "Undefined"', JSON.stringify(cat));
+    }
+    {
+      // a fresh Photos view with nothing selected starts folded to its rail; the first selection opens it
+      const rest = await js(`(async () => { const w = (ms) => new Promise((r) => setTimeout(r, ms)), lib = ${S}.library, pv = ${S}.layout.views?.photos || window.__lionphotos.views.photos, keep = [...lib.selection];
+        const o = { was: pv.infoOpen }; lib.clearSelection(); await w(200);
+        pv.infoOpen = false; pv.infoResting = true; pv.rerenderInfo(); await w(300);
+        o.folded = document.querySelector('.info-panel').classList.contains('is-folded');
+        lib.setSelection([lib.view('main').find((x) => x.kind === 1).id]); await w(500);
+        o.opened = pv.infoOpen && !document.querySelector('.info-panel').classList.contains('is-folded') && !pv.infoResting;
+        lib.setSelection(keep); await w(300); return o; })()`);
+      check(rest.folded && rest.opened, 'the panel waits folded while nothing is selected, and opens with the first selection', JSON.stringify(rest));
     }
     const { jpegSegments } = require('../src/platform/library/node/metadataWriter');
     const { readMetadata } = require('../src/platform/library/node/metadata');

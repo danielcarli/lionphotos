@@ -2,6 +2,19 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.89.0] — 2026-11-28
+
+### Changed
+- Photos opens with the panel on the right folded to its rail while no photo is selected; the first selection opens it (if it was open the last time). Folding or opening it by hand works as before.
+- The marks (Great, OK, Limbo) are back in every tab of the panel: Organize, Adjust, Describe and Info.
+- The category (Personal, Professional, Undefined) is in one line, icon and name side by side, each button as wide as its name needs.
+
+## [1.88.3] — 2026-11-28
+
+### Changed
+- Organize tab: the category (Personal, Professional, Undefined) stands out like the marks: a group named "Category", three large buttons with their icons, the chosen one filled.
+- "Not categorized" is now called **Undefined**, wherever the category shows (the panel, the filters, the title bar, the list), in the ten languages.
+
 ## [1.88.2] — 2026-11-28
 
 ### Changed

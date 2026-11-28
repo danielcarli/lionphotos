@@ -28,7 +28,7 @@ LionPhotos는 사진과 동영상이 이미 있는 폴더(내장 디스크, 외�
 
 **가져오기 없음** · **컴퓨터 밖으로 나가는 것 없음** · **10만 장도 100장처럼 매끄럽게** · **무료 오픈 소스**
 
-![버전 1.88.2](https://img.shields.io/badge/version-1.88.2-161214)
+![버전 1.89.0](https://img.shields.io/badge/version-1.89.0-161214)
 ![상태: 베타 테스트](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![라이선스: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![플랫폼: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -321,7 +321,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 변경 내역
 
-[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.88.2**.
+[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.89.0**.
 
 ## 만든 사람들
 

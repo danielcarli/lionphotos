@@ -28,7 +28,7 @@ LionPhotos opens the folders where your photos and videos already are (your disk
 
 **No import** · **Nothing leaves your computer** · **100,000 photos scroll like 100** · **Free and open source**
 
-![Version 1.88.2](https://img.shields.io/badge/version-1.88.2-161214)
+![Version 1.89.0](https://img.shields.io/badge/version-1.89.0-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -321,7 +321,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.88.2**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.89.0**.
 
 ## Credits
 

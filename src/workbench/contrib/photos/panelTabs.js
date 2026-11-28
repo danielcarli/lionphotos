@@ -112,7 +112,7 @@ export function tabRail(current, onPick, { adjust = true, open = true, onNames }
     // at the top of the rail: the tabs' names shown or not
     h('button.icon-button.ip-rail-names', {
       type: 'button', 'aria-pressed': String(names), title: t(names ? 'panel.railIcons' : 'panel.railNames'), 'aria-label': t(names ? 'panel.railIcons' : 'panel.railNames'),
-      html: icon('list', 15), onclick: () => { setRailNames(!names); onNames?.(); },
+      html: icon('letters', 15), onclick: () => { setRailNames(!names); onNames?.(); },
     }),
     tabs.map((x) => {
       const on = open && (x.id === current || (current === 'all' && x.id === 'organize'));

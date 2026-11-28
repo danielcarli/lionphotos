@@ -2,6 +2,11 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.85.2] — 2026-11-28
+
+### Changed
+- The switch of the tabs' names, at the top of the panel's rail, has its own look: an "Aa", smaller and paler than the tabs, with a rule under it — it read as one more tab.
+
 ## [1.85.1] — 2026-11-28
 
 ### Changed

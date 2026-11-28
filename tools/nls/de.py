@@ -624,3 +624,11 @@ _merge(MESSAGES, {'panel': {'tab': {'organize': 'Organisation'}, 'railIcons': 'N
 _merge(MESSAGES, {'main': {'meta': {'write': {'details': 'Anzeigen, was geschrieben wird'}}}})
 
 _merge(MESSAGES, {'panel': {'expand': 'Bereich ausklappen ({key})', 'collapse': 'Bereich einklappen ({key})'}})
+
+_merge(MESSAGES, {'info': {'none': 'Keine Datei ausgewählt, um Informationen und Metadaten anzuzeigen.'}})
+
+_merge(MESSAGES, {'info': {'noneOrganize': 'Keine Datei zum Organisieren ausgewählt.', 'noneAdjust': 'Keine Datei zum Anpassen ausgewählt.', 'noneDescribe': 'Keine Datei zum Beschreiben ausgewählt.'}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'source': 'RAW-Datei: bearbeiten als', 'jpgSub': '8 Bit, aus der Kamera', 'rawSub': '16 Bit, entwickelt', 'lineJpg': 'Öffnet sofort.', 'lineRaw': 'Mehr Spielraum in Lichtern und Schatten. Öffnet in etwa 1 s.', 'help': 'Was ändert sich?', 'helpClose': 'Schließen', 'helpJpg': 'JPG, 8 Bit: nutzt das fertige Bild, das die Kamera im RAW gespeichert hat. Öffnet sofort.', 'helpRaw': 'RAW, 16 Bit: entwickelt die Sensordaten auf diesem Computer. Mehr Spielraum in Lichtern und Schatten; etwa 1 s zum Öffnen und einige Sekunden zum Exportieren.', 'helpSafe': 'Die Originaldatei ändert sich nie.'}}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'develop': 'RAW entwickeln (16 Bit)', 'stateOff': 'Aus: 8-Bit-JPG der Kamera', 'stateOn': 'Ein: Sensordaten', 'helpTitle': 'Was sich zwischen JPG und RAW ändert', 'helpOff': 'Aus: bearbeitet das 8-Bit-JPG, das die Kamera im RAW gespeichert hat. Öffnet sofort.', 'helpOn': 'Ein: entwickelt die Sensordaten in 16 Bit. Mehr Spielraum in Lichtern und Schatten; etwa 1 s zum Öffnen und einige Sekunden zum Exportieren.'}}})

@@ -2,6 +2,39 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.88.2] — 2026-11-28
+
+### Changed
+- Adjustments: the histogram is twice as tall (92 px; 60 px in a short window), so the shape of the lights and shadows reads better.
+
+## [1.88.1] — 2026-11-28
+
+### Changed
+- Adjustments of a RAW file: one switch, **Develop the RAW (16 bits)**, with a line that says its state (off: the camera's 8-bit JPG; on: sensor data) and a "?" that opens the explanation. It replaces the two options side by side of 1.88.0.
+- README (ten languages): the switch described in the presentation and under Beta test.
+
+## [1.88.0] — 2026-11-28
+
+### Changed
+- Adjustments of a RAW file: the long note and the "develop mode" switch gave way to two named options side by side under "RAW file: edit on", **JPG** (8 bits, from the camera) and **RAW** (16 bits, developed), with one short line about the one chosen. The whole explanation is one click away, under "What changes?", closed until asked for.
+- README (ten languages): the two sources of a RAW file are described in the presentation and under Beta test.
+
+## [1.87.3] — 2026-11-28
+
+### Changed
+- The presentation of LionPhotos in the README was rewritten, in the ten languages: a one-minute summary, then what you do with it (open the folders as they are, find a photo, sort a shoot, organize without moving files, the panel with four tasks, quick edits, describe and deliver, free up space), why, for whom, and what it is and is not. The shortcuts table names the four tabs of the panel (O, E, D, I).
+
+## [1.87.2] — 2026-11-28
+
+### Changed
+- "Stack photos": the line under the bar of Photos shows only while something is being worked out (the photos being read, the faces being looked for). Once done it goes; how many stacks and single photos there are stays in the status bar, at the foot.
+
+## [1.87.1] — 2026-11-28
+
+### Changed
+- The panel with nothing selected is the same in its four tabs: a sentence that says there is no file selected for that tab's task (to organize, to adjust, to describe, to show information and metadata), over a faint grey sketch of what the tab shows for a file, with "---" where its data go.
+- In the Adjust tab the photo is the same small picture beside its name as in Organize, Describe and Info, so the adjustments start higher in the panel.
+
 ## [1.87.0] — 2026-11-28
 
 ### Changed

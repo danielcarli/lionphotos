@@ -621,3 +621,11 @@ _merge(MESSAGES, {'panel': {'tab': {'organize': '정리'}, 'railIcons': '아이�
 _merge(MESSAGES, {'main': {'meta': {'write': {'details': '기록될 내용 보기'}}}})
 
 _merge(MESSAGES, {'panel': {'expand': '패널 펼치기 ({key})', 'collapse': '패널 접기 ({key})'}})
+
+_merge(MESSAGES, {'info': {'none': '정보와 메타데이터를 표시할 파일이 선택되지 않았습니다.'}})
+
+_merge(MESSAGES, {'info': {'noneOrganize': '정리할 파일이 선택되지 않았습니다.', 'noneAdjust': '조정할 파일이 선택되지 않았습니다.', 'noneDescribe': '설명할 파일이 선택되지 않았습니다.'}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'source': 'RAW 파일: 편집 기준', 'jpgSub': '8비트, 카메라 이미지', 'rawSub': '16비트, 현상', 'lineJpg': '바로 열립니다.', 'lineRaw': '밝은 영역과 어두운 영역에 여유가 더 있습니다. 여는 데 약 1초.', 'help': '무엇이 달라지나요?', 'helpClose': '닫기', 'helpJpg': 'JPG, 8비트: 카메라가 RAW 안에 저장한 완성 이미지를 사용합니다. 바로 열립니다.', 'helpRaw': 'RAW, 16비트: 센서 데이터를 이 컴퓨터에서 현상합니다. 밝은 영역과 어두운 영역에 여유가 더 있으며, 여는 데 약 1초, 내보내는 데 몇 초가 걸립니다.', 'helpSafe': '원본 파일은 절대 바뀌지 않습니다.'}}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'develop': 'RAW 현상(16비트)', 'stateOff': '꺼짐: 카메라의 8비트 JPG', 'stateOn': '켜짐: 센서 데이터', 'helpTitle': 'JPG와 RAW의 차이', 'helpOff': '꺼짐: 카메라가 RAW 안에 저장한 8비트 JPG를 편집합니다. 바로 열립니다.', 'helpOn': '켜짐: 센서 데이터를 16비트로 현상합니다. 밝은 영역과 어두운 영역에 여유가 더 있으며, 여는 데 약 1초, 내보내는 데 몇 초가 걸립니다.'}}})

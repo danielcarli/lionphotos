@@ -418,8 +418,12 @@ export function adjustSection(s, items, { live = null, preview: draw = null } = 
   if (raws.length && adjust) {
     const on = raws.filter((it) => adjustOf(it)?.raw).length;
     const can = adjust.canDevelop;
-    const input = h('input', { type: 'checkbox', role: 'switch', checked: on === raws.length, disabled: !can, 'aria-describedby': 'ip-raw-hint' });
-    input.indeterminate = on > 0 && on < raws.length;
+    // which data the adjustments work on: one switch, "Develop the RAW (16 bits)" — off, the JPEG the camera
+    // stored in the raw file (8 bits); on, the raw data developed here. One line says the state, and the whole
+    // explanation is one click away (the "?"), closed until asked for
+    const cur = on === raws.length ? 1 : on === 0 ? 0 : -1;
+    const input = h('input', { type: 'checkbox', role: 'switch', checked: cur === 1, disabled: !can, 'aria-describedby': 'ip-raw-line' });
+    input.indeterminate = cur === -1;
     input.addEventListener('change', async () => {
       const raw = input.checked ? 1 : 0;
       input.disabled = true;
@@ -438,12 +442,19 @@ export function adjustSection(s, items, { live = null, preview: draw = null } = 
         notifications?.warn(t('adjust.raw.failed', { error: String(err?.message || err) }));
       } finally { input.disabled = !can; }
     });
-    const dev = on === raws.length && can;
-    rawBox = h(`div.ip-raw${dev ? '.is-on' : ''}`,
-      h('p.ip-raw-note', h('span', { html: icon(dev ? 'develop' : 'info', 14) }),
-        h('span', dev ? t('adjust.raw.noteOn') : t('adjust.raw.noteOff'))),
-      h('label.ip-raw-switch', input, h('span.ip-raw-track', { 'aria-hidden': 'true' }), h('span.ip-raw-label', t('adjust.raw.switch'))),
-      h('p.small.muted.ip-raw-hint', { id: 'ip-raw-hint' }, can ? t('adjust.raw.hint') : t('adjust.raw.noGpu')));
+    let helpOpen = false;
+    const help = h('div.ip-raw-help', { id: 'ip-raw-help', hidden: true },
+      h('p', t('adjust.raw.helpOff')), h('p', t('adjust.raw.helpOn')), h('p', t('adjust.raw.helpSafe')));
+    const helpBtn = h('button.ip-raw-what', { type: 'button', title: t('adjust.raw.helpTitle'), 'aria-label': t('adjust.raw.helpTitle'), 'aria-expanded': 'false', 'aria-controls': 'ip-raw-help', onclick: () => {
+      helpOpen = !helpOpen; help.hidden = !helpOpen; helpBtn.setAttribute('aria-expanded', String(helpOpen));
+    } }, '?');
+    rawBox = h(`div.ip-raw${cur === 1 ? '.is-on' : ''}`,
+      h('div.ip-raw-row',
+        h('label.ip-raw-switch', input, h('span.ip-raw-track', { 'aria-hidden': 'true' }),
+          h('span.ip-raw-text', h('span.ip-raw-label', t('adjust.raw.develop')),
+            h('span.ip-raw-line', { id: 'ip-raw-line' }, !can ? t('adjust.raw.noGpu') : cur === 1 ? t('adjust.raw.stateOn') : cur === 0 ? t('adjust.raw.stateOff') : ''))),
+        helpBtn),
+      help);
   }
   const sec = collapsible({ id: 'adjust', icon: 'sliders', title: t('adjust.title'), summary: summary(), action: reset,
     body: [rawBox, histo, tools, ...groups, !one ? h('p.small.muted.ip-all', tn('adjust.allSelected', items.length)) : null, cropRow, buttons] });

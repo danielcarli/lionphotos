@@ -624,3 +624,11 @@ _merge(MESSAGES, {'panel': {'tab': {'organize': 'Organização'}, 'railIcons': '
 _merge(MESSAGES, {'main': {'meta': {'write': {'details': 'Ver o que vai ser gravado'}}}})
 
 _merge(MESSAGES, {'panel': {'expand': 'Expandir o painel ({key})', 'collapse': 'Recolher o painel ({key})'}})
+
+_merge(MESSAGES, {'info': {'none': 'Não existe nenhum ficheiro selecionado para mostrar informações e metadados.'}})
+
+_merge(MESSAGES, {'info': {'noneOrganize': 'Não existe nenhum ficheiro selecionado para organizar.', 'noneAdjust': 'Não existe nenhum ficheiro selecionado para ajustar.', 'noneDescribe': 'Não existe nenhum ficheiro selecionado para descrever.'}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'source': 'Ficheiro RAW: editar em', 'jpgSub': '8 bits, da câmara', 'rawSub': '16 bits, revelado', 'lineJpg': 'Abre de imediato.', 'lineRaw': 'Mais margem em luzes e sombras. Abre em cerca de 1 s.', 'help': 'O que muda?', 'helpClose': 'Fechar', 'helpJpg': 'JPG, 8 bits: usa a imagem pronta que a câmara guardou dentro do RAW. Abre de imediato.', 'helpRaw': 'RAW, 16 bits: revela os dados do sensor neste computador. Mais margem em altas luzes e sombras; cerca de 1 s para abrir e alguns segundos para exportar.', 'helpSafe': 'O ficheiro original nunca muda.'}}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'develop': 'Revelar o RAW (16 bits)', 'stateOff': 'Desligado: JPG de 8 bits da câmara', 'stateOn': 'Ligado: dados do sensor', 'helpTitle': 'O que muda entre JPG e RAW', 'helpOff': 'Desligado: edita o JPG de 8 bits que a câmara guardou dentro do RAW. Abre de imediato.', 'helpOn': 'Ligado: revela os dados do sensor em 16 bits. Mais margem em altas luzes e sombras; cerca de 1 s para abrir e alguns segundos para exportar.'}}})

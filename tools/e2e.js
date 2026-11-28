@@ -581,14 +581,20 @@ app.whenReady().then(async () => {
       const jpg = lib.items.find((x) => x.ext === 'jpg' && x.thumb === 1);
       lib.setSelection([raw.id]); await wait(400); document.querySelectorAll('.ip-sec[data-open="0"] .ip-sec-h').forEach((b) => b.click()); await wait(100);
       const box = document.querySelector('.info-panel .ip-raw');
-      const out = { box: !!box, note: box?.querySelector('.ip-raw-note')?.textContent || '', label: box?.querySelector('.ip-raw-label')?.textContent || '', disabled: !!box?.querySelector('input[role=switch]')?.disabled, hint: box?.querySelector('.ip-raw-hint')?.textContent || '', can: ${S}.adjust.canDevelop };
+      const sw = box?.querySelector('input[role=switch]');
+      const out = { box: !!box, label: box?.querySelector('.ip-raw-label')?.textContent || '', on: !!sw?.checked, line: box?.querySelector('.ip-raw-line')?.textContent || '', disabled: !!sw?.disabled,
+        helpHidden: box?.querySelector('.ip-raw-help')?.hidden, can: ${S}.adjust.canDevelop };
+      box?.querySelector('.ip-raw-what')?.click(); await wait(100);
+      out.help = box?.querySelector('.ip-raw-help')?.hidden ? '' : box?.querySelector('.ip-raw-help')?.textContent || '';
+      out.expanded = box?.querySelector('.ip-raw-what')?.getAttribute('aria-expanded');
       lib.setSelection([jpg.id]); await wait(400);
       out.jpg = !!document.querySelector('.info-panel .ip-raw');
       lib.clearSelection();
       return out;
     })()`);
-    check(rw.box && /JPEG the camera stored/.test(rw.note) && /not on the raw data/.test(rw.note) && /16 bits \(develop mode\)/.test(rw.label) && (rw.can || (rw.disabled && /WebGL 2/.test(rw.hint))) && !rw.jpg,
-      'a raw photo\'s adjustments say they are made on the camera\'s JPEG, not the raw data, with the switch to develop the raw data in 16 bits (not on a JPEG)', JSON.stringify(rw));
+    check(rw.box && rw.label === 'Develop the RAW (16 bits)' && !rw.on && rw.helpHidden === true
+      && (rw.can ? /^Off: the camera.s 8-bit JPG$/.test(rw.line) : (rw.disabled && /WebGL 2/.test(rw.line))) && /^Off: edits the 8-bit JPG/.test(rw.help) && /sensor data/.test(rw.help) && /never changes/.test(rw.help) && rw.expanded === 'true' && !rw.jpg,
+      'a raw photo\'s adjustments: one switch, "Develop the RAW (16 bits)", off (the camera\'s 8-bit JPG) with its state in a line; the explanation is behind the "?" until asked (not on a JPEG)', JSON.stringify(rw));
     // themes (1.38.0): Watermelon (the default) and City blue — the same frame, its own colours
     const th = await js(`(async () => {
       const L = ${S}.layout, wait = (ms) => new Promise((r) => setTimeout(r, ms)), root = document.documentElement;
@@ -711,7 +717,7 @@ app.whenReady().then(async () => {
         rail().querySelector('.ip-tab[data-tab="organize"]').click(); await wait(400);
         r.folded = !pv.infoOpen && document.querySelector('.info-panel').classList.contains('is-folded') && Math.round(document.querySelector('.info-panel').getBoundingClientRect().width) === 44 && tabs().length === 4;
         rail().querySelector('.ip-tab[data-tab="adjust"]').click(); await wait(600);
-        r.reopened = pv.infoOpen && secs() === 'adjust' && !document.querySelector('.info-panel .ip-head.is-compact');
+        r.reopened = pv.infoOpen && secs() === 'adjust' && !!document.querySelector('.info-panel .ip-head.is-compact');
         out.rail = r; }
       localStorage.setItem('lionphotos.panel.tab', 'describe'); pv.rerenderInfo(); await wait(600);
       out.tabs = [...document.querySelectorAll('.info-panel .ip-tab')].map((b) => b.dataset.tab + (b.getAttribute('aria-selected') === 'true' ? '*' : '')).join();
@@ -779,7 +785,7 @@ app.whenReady().then(async () => {
     })()`);
     { const r = pt.rail || {};
       check(r.first === 'organize*,adjust,describe,info' && r.secs === 'organize' && r.names === 'Organize,Adjust,Describe,Info' && r.left && r.compact && r.links && r.iconsOnly && r.namesBack && r.folded && r.reopened,
-        'the panel\'s rail: four tabs as small icons down its left edge (Organize first), names beside them or the icons alone (remembered); the photo small beside its name except in Adjust; a click on the tab shown folds the panel to the rail', JSON.stringify(r)); }
+        'the panel\'s rail: four tabs as small icons down its left edge (Organize first), names beside them or the icons alone (remembered); the photo small beside its name in every tab, Adjust too; a click on the tab shown folds the panel to the rail', JSON.stringify(r)); }
     check(pt.only?.found && pt.only.heads === 'Pets' && !pt.only.sphere && pt.only.eyebrow === 'Pets' && pt.only.railFirst,
       'a "+" of Organize opens the window with that kind alone (pets: no category, no people, places or albums); the names\' switch sits at the top of the rail', JSON.stringify(pt.only));
     { const g = pt.tag || {};
@@ -826,7 +832,7 @@ app.whenReady().then(async () => {
       lib.setFilter({ year: new Date(it.taken || it.mtime).getFullYear(), query: it.name.slice(0, 6) }); await wait(300);
       lib.setSelection([it.id]); await wait(500);
       const pv = window.__lionphotos.views.photos; if (!pv.infoOpen) pv.toggleInfo(); pv.rerenderInfo(); await wait(500);
-      const link = document.querySelector('.info-panel .ip-head .ip-day');
+      const link = document.querySelector('.info-panel .ip-links .ip-day');
       res.link = (link?.textContent || '').trim();
       link?.click(); await wait(600);
       const d = new Date(it.taken || it.mtime), day = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -1299,6 +1305,18 @@ app.whenReady().then(async () => {
         b().click(); await w(350); o.folded = p.classList.contains('is-folded') && b().getAttribute('aria-expanded') === 'false';
         b().click(); await w(350); o.back = !p.classList.contains('is-folded') && b().getAttribute('aria-expanded') === 'true'; return o; })()`);
       check(fold.open0 === 'true' && !fold.inBar && fold.folded && fold.back, 'the panel is folded and opened by the first button of its rail (no "i" in the bar)', JSON.stringify(fold));
+    }
+    {
+      // nothing selected: each tab says so for its task, over a faint sketch of what it shows ("---" for the data)
+      const none = await js(`(async () => { const w = (ms) => new Promise((r) => setTimeout(r, ms)), lib = ${S}.library, keep = [...lib.selection], pv = ${S}.layout.views?.photos; lib.clearSelection(); await w(400);
+        const o = {};
+        for (const tab of ['organize', 'adjust', 'describe', 'info']) { localStorage.setItem('lionphotos.panel.tab', tab); document.querySelector('.info-panel .ip-rail-names').click(); await w(250);
+          const e = document.querySelector('.info-panel .info-empty.is-sketch'); o[tab] = [e?.dataset.kind, e?.querySelector('.ip-ph-say strong')?.textContent || '', e?.querySelector('.ip-ph')?.getAttribute('aria-hidden'), e?.querySelector('.ip-ph')?.children.length || 0].join('|'); }
+        o.dashes = [...document.querySelectorAll('.info-panel .ip-ph-rows span:nth-child(even)')].every((x) => x.textContent === '---') && document.querySelectorAll('.info-panel .ip-ph-rows span').length === 22;
+        localStorage.setItem('lionphotos.panel.tab', 'all'); lib.setSelection(keep); await w(400); return o; })()`);
+      check(/^organize\|No file is selected to organize\.\|true\|[5-9]/.test(none.organize) && /^adjust\|No file is selected to adjust/.test(none.adjust) && /^describe\|No file is selected to describe/.test(none.describe)
+        && /^info\|No file is selected to show information and metadata/.test(none.info) && none.dashes,
+        'the panel with nothing selected: each tab says there is no file for its task, over a faint sketch of what it shows ("---" for the data)', JSON.stringify(none));
     }
     const { jpegSegments } = require('../src/platform/library/node/metadataWriter');
     const { readMetadata } = require('../src/platform/library/node/metadata');
@@ -2455,10 +2473,10 @@ app.whenReady().then(async () => {
       res.off = !document.querySelector('.view-photos .tile-stack') && lib.view('main').length === allBefore;
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
     check(st.metaOk && st.metaOff && st.barOk && st.barOff && st.followOk, 'Stack photos on: beside how many items (in the bar of Photos and in the status bar, bottom left), how many stacks and single photos, and their sum as the probable total of unique photos; off, only the items', JSON.stringify({ meta: st.meta, ok: st.metaOk, off: st.metaOff, bar: st.bar, barOk: st.barOk, barOff: st.barOff, follow: st.follow }));
-    check(st.label === 'Stack photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the stack$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && /^\d+ of \d+ photos are in a stack/.test(st.status || ''),
+    check(st.label === 'Stack photos' && st.startAll && st.near && st.on && Number(st.badge) >= 2 && st.tileHasBadge && /^\d+ similar photos: open the stack$/.test(st.title || '') && st.shown < st.all && st.all === st.allBefore && st.off && !st.status && /stack/.test(st.bar || ''),
       'the switch "Stack photos", beside "Similar photos ▾": on, it shows each group as its best photo with a stack and how many it holds (the count of Photos unchanged), a line under the bar saying what is done and what came of it; off, every photo again', JSON.stringify(st));
     { const g = st.again || {};
-      check(g.off?.tiles === 0 && g.off?.hidden === true && g.at?.on && g.at?.status && g.back,
+      check(g.off?.tiles === 0 && g.off?.hidden === true && g.at?.on && g.back,
         'stacks off and on again: the switch and the line under the bar follow the click at once, and the stacks come back', JSON.stringify(g)); }
     check(st.onlyShown > 0 && st.onlyShown < st.shown && st.onlyAll && !st.onlyChip && st.onlyMarked && st.onlyBack && st.noOldSwitch && st.noMenuItem,
       'Only stacks (in the menu of "Similar photos"): only the groups, each as its best photo, the button marked, no chip nor filter for it; again in the menu, every photo grouped again', JSON.stringify({ onlyShown: st.onlyShown, shown: st.shown, onlyAll: st.onlyAll, chip: st.onlyChip, marked: st.onlyMarked, back: st.onlyBack, noOldSwitch: st.noOldSwitch, noMenuItem: st.noMenuItem }));

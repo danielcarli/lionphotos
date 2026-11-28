@@ -1320,7 +1320,32 @@ export class PhotosView extends ViewPane {
       return;
     }
     if (!id) {
-      setChildren(this.infoBody, h('div.info-empty', h('span', { html: icon('info', 22) }), h('p', t('info.empty'))));
+      // nothing selected: each tab says so for its own task, over a faint grey sketch of what it shows for a file
+      // ("---" where the data go); the sketch is a drawing only (aria-hidden, nothing to click)
+      const tab = panelTab();
+      const kind = tab === 'all' ? 'info' : tab;
+      const head = h('div.ip-ph-head', h('span.ip-ph-thumb'), h('div', h('strong', '---'), h('span', '--- · --- · ---')));
+      const title = (text) => h('div.ip-ph-group', text);
+      const rows = (keys) => h('div.ip-ph-rows', keys.map((k) => [h('span', t(k)), h('span', '---')]));
+      const field = (key, tall) => h('div.ip-ph-field', h('span', t(key)), h(`span.ip-ph-box${tall ? '.is-tall' : ''}`, '---'));
+      const sketch = {
+        organize: () => [title(t('marks.label')),
+          h('div.ip-ph-three', ['marks.great', 'marks.ok', 'marks.rejectBadge'].map((k) => h('span.ip-ph-btn', t(k)))),
+          title(t('info.organize')),
+          h('div.ip-ph-seg', ['sphere.personal', 'sphere.professional', 'sphere.none'].map((k) => h('span', t(k)))),
+          h('div.ip-ph-rows.is-chips', ['tag', 'album', 'person', 'place'].map((k) => [h('span', t(`labels.type.${k}.plural`)), h('span.ip-ph-chip', '---')]))],
+        adjust: () => [title(t('adjust.title')), h('div.ip-ph-histo'),
+          ...['exposure', 'contrast', 'highlights', 'shadows', 'temperature', 'saturation'].map((k) =>
+            h('div.ip-ph-slider', h('span', h('span', t(`adjust.${k}`)), h('span', '---')), h('i')))],
+        describe: () => [title(t('panel.tab.describe')), field('describe.headline'), field('describe.caption', true), field('describe.alt', true), field('describe.keywords'),
+          h('div.ip-ph-two', field('describe.author'), field('describe.city'))],
+        info: () => [title(t('info.file')), rows(['info.format', 'info.size', 'info.taken', 'info.modified', 'info.folder']),
+          title(t('info.camera')), rows(['info.device', 'info.lens', 'info.exposure', 'info.aperture', 'info.iso', 'info.focal'])],
+      }[kind] || (() => []);
+      const say = { organize: 'info.noneOrganize', adjust: 'info.noneAdjust', describe: 'info.noneDescribe' }[kind] || 'info.none';
+      setChildren(this.infoBody, h('div.info-empty.is-sketch', { 'data-kind': kind },
+        h('div.ip-ph-say', { role: 'status' }, h('strong', t(say)), h('p', t('info.empty'))),
+        h('div.ip-ph', { 'aria-hidden': 'true' }, head, sketch())));
       return;
     }
     const d = await this.host.library.details(id);
@@ -1334,9 +1359,9 @@ export class PhotosView extends ViewPane {
     const index = this.indexOf.get(id);
     const hasNext = index !== undefined && index < this.list.length - 1;
     const restore = keepScroll(`one:${id}:${tab}`);
-    // the photo large only where it is worked on (Adjust: the live preview); elsewhere a small picture beside its
-    // name — the photo is already in the grid — and the links to its day and to what it shows under Organize
-    const large = tab === 'adjust' || tab === 'all';
+    // a small picture beside its name in every tab, Adjust too (the photo is already in the grid); the links to
+    // its day and to what it shows are under Organize
+    const large = false;
     const links = () => [dayLink(this, [it]), this.#shows(it)];
     setChildren(this.infoBody,
       h(`div.ip-head${large ? '' : '.is-compact'}`,
@@ -1356,7 +1381,7 @@ export class PhotosView extends ViewPane {
         describe: md.describe, place: md.place,
         file: () => fileSection(d),
       })),
-      tab === 'organize' ? h('div.ip-links', links()) : null,
+      tab === 'organize' || tab === 'all' ? h('div.ip-links', links()) : null,
       infoFooter(this, [it], { pending: md.pending, onNext: hasNext ? () => this.#stepInfo(1) : null }));
     restore();
     // after "Next photo": the same field takes the focus again
@@ -1487,8 +1512,8 @@ export class PhotosView extends ViewPane {
 
   /**
    * Under the bar, while "Group similar photos" is on: the photos being read (how many, how long still), the
-   * people being looked for in the photos of the groups, and then what came of it. Drawn on its own: the grid
-   * is not drawn again for it.
+   * people being looked for in the photos of the groups. Once that is done the line goes: what came of it is in
+   * the status bar. Drawn on its own: the grid is not drawn again for it.
    */
   #paintStackStatus() {
     const el = this.stackStatus;
@@ -1508,11 +1533,6 @@ export class PhotosView extends ViewPane {
     if (f?.running && f.total) lines.push(line('face', t('similar.statusFaces', { done: formatNumber(f.done), total: formatNumber(f.total) }), f.done, f.total, f.paused ? t('similar.statusPaused') : fromCatalog));
     // just turned on, the decisions of the person still on their way from the catalog: said, not left blank
     if (!p && sim.preparing) lines.push(line('stack', t('similar.statusPreparing')));
-    else if (!p && sim.summary) {
-      const s = sim.summary;
-      lines.push(line('stack', s.groups ? t('similar.statusIn', { grouped: formatNumber(s.grouped), photos: formatNumber(s.photos) }) : t('similar.statusNone', { photos: formatNumber(s.photos) }),
-        0, 0, !f?.running ? fromCatalog : null));
-    }
     // faces or pets that cannot be looked for on this computer: said once, quietly (the stacks go on, by likeness)
     const off = sim.whoOff;
     if (off.length) {
@@ -1522,7 +1542,8 @@ export class PhotosView extends ViewPane {
         h('span.stack-line-icon', { html: icon('info', 14) }),
         h('span.stack-line-text', t(off.length === 2 ? 'similar.whoOffBoth' : off[0] === 'face' ? 'similar.whoOffFaces' : 'similar.whoOffPets'))));
     }
-    // how alike photos must be to be grouped: in the menu of "Similar photos"
+    // at rest nothing is said here: how many stacks and single photos there are is in the status bar, at the foot
+    if (!lines.length) { el.hidden = true; el.replaceChildren(); return; }
     el.hidden = false;
     el.replaceChildren(h('div.stack-lines', lines));
   }

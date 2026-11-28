@@ -624,3 +624,11 @@ _merge(MESSAGES, {'panel': {'tab': {'organize': 'Organisation'}, 'railIcons': 'A
 _merge(MESSAGES, {'main': {'meta': {'write': {'details': 'Voir ce qui va être écrit'}}}})
 
 _merge(MESSAGES, {'panel': {'expand': 'Déployer le panneau ({key})', 'collapse': 'Replier le panneau ({key})'}})
+
+_merge(MESSAGES, {'info': {'none': 'Aucun fichier sélectionné pour afficher les informations et les métadonnées.'}})
+
+_merge(MESSAGES, {'info': {'noneOrganize': 'Aucun fichier sélectionné à organiser.', 'noneAdjust': 'Aucun fichier sélectionné à ajuster.', 'noneDescribe': 'Aucun fichier sélectionné à décrire.'}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'source': 'Fichier RAW : retoucher en', 'jpgSub': '8 bits, de l’appareil', 'rawSub': '16 bits, développé', 'lineJpg': 'S’ouvre aussitôt.', 'lineRaw': 'Plus de marge dans les hautes lumières et les ombres. S’ouvre en 1 s environ.', 'help': 'Qu’est-ce qui change ?', 'helpClose': 'Fermer', 'helpJpg': 'JPG, 8 bits : utilise l’image finie que l’appareil a enregistrée dans le RAW. S’ouvre aussitôt.', 'helpRaw': 'RAW, 16 bits : développe les données du capteur sur cet ordinateur. Plus de marge dans les hautes lumières et les ombres ; environ 1 s pour ouvrir et quelques secondes pour exporter.', 'helpSafe': 'Le fichier original ne change jamais.'}}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'develop': 'Développer le RAW (16 bits)', 'stateOff': 'Désactivé : JPG 8 bits de l’appareil', 'stateOn': 'Activé : données du capteur', 'helpTitle': 'Ce qui change entre JPG et RAW', 'helpOff': 'Désactivé : retouche le JPG 8 bits que l’appareil a enregistré dans le RAW. S’ouvre aussitôt.', 'helpOn': 'Activé : développe les données du capteur en 16 bits. Plus de marge dans les hautes lumières et les ombres ; environ 1 s pour ouvrir et quelques secondes pour exporter.'}}})

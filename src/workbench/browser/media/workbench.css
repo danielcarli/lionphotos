@@ -2486,7 +2486,7 @@ textarea.ip-in { field-sizing: content; min-height: 34px; max-height: 260px; res
 .ip-foot:has(.desc-write) .desc-undo { padding: 0 8px; }
 
 /* ---------- adjustments (exposure, contrast, shadows, saturation) ---------- */
-.ip-histo { height: 46px; border-radius: 7px; background: #1f1a1d; overflow: hidden; }
+.ip-histo { height: 92px; border-radius: 7px; background: #1f1a1d; overflow: hidden; }
 .ip-histo[hidden] { display: none; }
 .ip-histo svg { width: 100%; height: 100%; display: block; }
 .ip-histo path { fill: rgba(240, 232, 224, 0.75); }
@@ -3239,7 +3239,7 @@ body.is-resizing-panel { cursor: col-resize; user-select: none; }
 .ip-lens-mtoggle:hover .ip-lens-mtitle { text-decoration: underline; }
 .ip-lens-mbody[hidden] { display: none; }
 /* a short window: a lower histogram */
-@media (max-height: 820px) { .ip-histo { height: 30px; } }
+@media (max-height: 820px) { .ip-histo { height: 60px; } }
 
 /* "See all the photos of the day": discreet, at the foot of Organization */
 .ip-day { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 2px 0; font-size: 12px; color: var(--text-muted); }
@@ -3842,3 +3842,46 @@ html:root:root .selection-bar .limbo-send:hover { background: color-mix(in srgb,
 /* the rail starts with the button that opens ("<") and folds (">") the panel */
 .ip-rail-fold { width: 26px; height: 26px; border-radius: 6px; color: var(--text-secondary); margin-bottom: 6px; }
 .ip-rail-fold:hover { color: var(--text-primary); background: var(--hover); }
+
+/* the panel with nothing selected: each tab's sentence, then a faint grey sketch of what the tab shows ("---" for the data) */
+.ip-main > .info-empty.is-sketch { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 18px; height: auto; padding: 16px 14px 20px; text-align: left; }
+.ip-ph-say { padding: 12px; border-radius: 10px; background: var(--bg-elevated); box-shadow: inset 0 0 0 1px var(--border); color: var(--text-secondary); }
+.ip-ph-say strong { display: block; font: 700 13.5px/1.4 var(--font-ui); color: var(--text-primary); }
+.ip-ph-say p { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; }
+.ip-ph { display: flex; flex-direction: column; gap: 12px; color: var(--text-muted); font-size: 12.5px; opacity: 0.55; user-select: none; pointer-events: none; }
+.ip-ph-head { display: flex; gap: 12px; align-items: center; }
+.ip-ph-head > div { display: flex; flex-direction: column; gap: 4px; }
+.ip-ph-head strong { font: 700 15px var(--font-ui); }
+.ip-ph-thumb { width: 64px; height: 64px; flex: none; border-radius: 8px; border: 1px dashed var(--border-strong); }
+.ip-ph-group { margin-top: 4px; font: 700 12.5px var(--font-ui); }
+.ip-ph-rows { display: grid; grid-template-columns: minmax(84px, 38%) 1fr; gap: 8px 10px; align-items: center; }
+.ip-ph-rows.is-chips { gap: 10px; }
+.ip-ph-chip, .ip-ph-box { display: flex; align-items: center; height: 28px; padding: 0 12px; border: 1px dashed var(--border-strong); border-radius: 99px; }
+.ip-ph-box { height: 32px; border-radius: 8px; padding: 0 10px; }
+.ip-ph-box.is-tall { height: 56px; align-items: flex-start; padding-top: 8px; }
+.ip-ph-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.ip-ph-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ip-ph-three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ip-ph-btn { display: flex; align-items: center; justify-content: center; height: 40px; border: 1px solid var(--border-strong); border-radius: 12px; font-weight: 700; overflow: hidden; }
+.ip-ph-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; height: 32px; border: 1px solid var(--border-strong); border-radius: 8px; text-align: center; font-size: 12px; }
+.ip-ph-seg span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 4px; }
+.ip-ph-histo { height: 64px; border: 1px dashed var(--border-strong); border-radius: 8px; }
+.ip-ph-slider { display: flex; flex-direction: column; gap: 6px; }
+.ip-ph-slider > span { display: flex; justify-content: space-between; }
+.ip-ph-slider > i { height: 4px; border-radius: 4px; background: var(--border-strong); }
+
+/* a raw file's source for the adjustments: one switch, its state in a line, the explanation behind the "?" */
+.ip-raw { border: 0; background: transparent; padding: 0; margin: 2px 0 12px; }
+.ip-raw.is-on { border: 0; background: transparent; }
+.ip-raw-row { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.ip-raw-row .ip-raw-switch { flex: 1; min-width: 0; gap: 12px; align-items: center; font-weight: 400; }
+.ip-raw-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ip-raw-label { font: 700 13px var(--font-ui); color: var(--text-primary); }
+.ip-raw-line { font-size: 12px; line-height: 1.4; color: var(--text-secondary); }
+.ip-raw-what { flex: none; width: 30px; height: 30px; padding: 0; border: 1px solid var(--border-strong); border-radius: 50%; background: var(--bg-elevated); color: var(--accent); font: 800 14px var(--font-ui); cursor: pointer; }
+.ip-raw-what:hover { border-color: var(--accent); }
+.ip-raw-what[aria-expanded="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ip-raw-what:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ip-raw-help { margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: var(--bg-subtle); font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); }
+.ip-raw-help p { margin: 0 0 6px; }
+.ip-raw-help p:last-child { margin: 0; }

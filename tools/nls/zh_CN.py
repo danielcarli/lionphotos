@@ -621,3 +621,11 @@ _merge(MESSAGES, {'panel': {'tab': {'organize': '整理'}, 'railIcons': '仅显�
 _merge(MESSAGES, {'main': {'meta': {'write': {'details': '查看将写入的内容'}}}})
 
 _merge(MESSAGES, {'panel': {'expand': '展开面板 ({key})', 'collapse': '收起面板 ({key})'}})
+
+_merge(MESSAGES, {'info': {'none': '未选择文件，无法显示信息和元数据。'}})
+
+_merge(MESSAGES, {'info': {'noneOrganize': '未选择要整理的文件。', 'noneAdjust': '未选择要调整的文件。', 'noneDescribe': '未选择要描述的文件。'}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'source': 'RAW 文件：编辑基于', 'jpgSub': '8 位，相机生成', 'rawSub': '16 位，显影', 'lineJpg': '立即打开。', 'lineRaw': '高光和阴影有更大余量。打开约需 1 秒。', 'help': '有什么不同？', 'helpClose': '关闭', 'helpJpg': 'JPG，8 位：使用相机保存在 RAW 里的成品图像。立即打开。', 'helpRaw': 'RAW，16 位：在本机上显影传感器数据。高光和阴影有更大余量；打开约需 1 秒，导出需要几秒。', 'helpSafe': '原始文件永远不会改变。'}}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'develop': '显影 RAW（16 位）', 'stateOff': '关闭：相机的 8 位 JPG', 'stateOn': '开启：传感器数据', 'helpTitle': 'JPG 与 RAW 有什么不同', 'helpOff': '关闭：编辑相机保存在 RAW 里的 8 位 JPG。立即打开。', 'helpOn': '开启：以 16 位显影传感器数据。高光和阴影有更大余量；打开约需 1 秒，导出需要几秒。'}}})

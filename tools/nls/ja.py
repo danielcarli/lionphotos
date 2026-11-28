@@ -621,3 +621,11 @@ _merge(MESSAGES, {'panel': {'tab': {'organize': '整理'}, 'railIcons': 'アイ�
 _merge(MESSAGES, {'main': {'meta': {'write': {'details': '書き込まれる内容を見る'}}}})
 
 _merge(MESSAGES, {'panel': {'expand': 'パネルを開く ({key})', 'collapse': 'パネルをたたむ ({key})'}})
+
+_merge(MESSAGES, {'info': {'none': '情報とメタデータを表示するファイルが選択されていません。'}})
+
+_merge(MESSAGES, {'info': {'noneOrganize': '整理するファイルが選択されていません。', 'noneAdjust': '調整するファイルが選択されていません。', 'noneDescribe': '説明を書くファイルが選択されていません。'}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'source': 'RAW ファイル：編集に使うデータ', 'jpgSub': '8 ビット、カメラの画像', 'rawSub': '16 ビット、現像', 'lineJpg': 'すぐに開きます。', 'lineRaw': 'ハイライトとシャドウに余裕があります。開くのに約 1 秒。', 'help': '何が変わる？', 'helpClose': '閉じる', 'helpJpg': 'JPG、8 ビット：カメラが RAW の中に保存した完成画像を使います。すぐに開きます。', 'helpRaw': 'RAW、16 ビット：センサーのデータをこのコンピューターで現像します。ハイライトとシャドウに余裕があり、開くのに約 1 秒、書き出しに数秒かかります。', 'helpSafe': '元のファイルは決して変わりません。'}}})
+
+_merge(MESSAGES, {'adjust': {'raw': {'develop': 'RAW を現像（16 ビット）', 'stateOff': 'オフ：カメラの 8 ビット JPG', 'stateOn': 'オン：センサーのデータ', 'helpTitle': 'JPG と RAW で何が変わるか', 'helpOff': 'オフ：カメラが RAW の中に保存した 8 ビットの JPG を編集します。すぐに開きます。', 'helpOn': 'オン：センサーのデータを 16 ビットで現像します。ハイライトとシャドウに余裕があり、開くのに約 1 秒、書き出しに数秒かかります。'}}})

@@ -4,9 +4,9 @@
 
 # LionPhotos
 
-### Toutes les photos que vous avez prises — retrouvées en quelques secondes.
+### Toutes les photos que vous avez prises, retrouvées en quelques secondes.
 
-Parcourez, recherchez et organisez d’immenses collections de photos et de vidéos là où elles sont déjà : sur votre disque, un disque externe ou un dossier cloud. Rapide, privé et gratuit.
+LionPhotos ouvre les dossiers où se trouvent déjà vos photos et vidéos (votre disque, un disque externe, un dossier dans le cloud) et vous permet de les retrouver, de les trier, de les décrire et de les livrer. Rien n’est importé, rien ne quitte votre ordinateur, et c’est gratuit.
 
 <sub>par la <b>LionPhotos Team</b> · créé et conçu par <b>Daniel Michelon De Carli</b> · un frère de <a href="https://github.com/danielcarli/lionorganizer">LionOrganizer</a></sub>
 
@@ -28,7 +28,7 @@ Parcourez, recherchez et organisez d’immenses collections de photos et de vid�
 
 **Aucune importation** · **Rien ne quitte votre ordinateur** · **100 000 photos défilent comme 100** · **Gratuit et open source**
 
-![Version 1.87.0](https://img.shields.io/badge/version-1.87.0-161214)
+![Version 1.88.2](https://img.shields.io/badge/version-1.88.2-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -39,117 +39,99 @@ Parcourez, recherchez et organisez d’immenses collections de photos et de vid�
 
 > **Version bêta.** LionPhotos est déjà utilisable au quotidien et testé sur une vraie collection d’environ 15 000 photos et vidéos, mais il est encore en bêta : il reste des aspérités, et mieux vaut garder une sauvegarde de la collection avant de la réorganiser pour la première fois. [Ce que bêta veut dire ici](#version-bêta).
 
-**Une couverture impressionnante.** LionPhotos réunit déjà l’essentiel du module Bibliothèque de Lightroom (catalogue, marques, IPTC, RAW+JPEG, réglages non destructifs) et le meilleur de Google Photos (personnes, animaux, recherche par contenu, piles de photos semblables). Et il y a encore les Limbes, des plugins à leur propre marque et 10 langues.
+## LionPhotos en une minute
 
-**Né d’un usage réel.** Bien des fonctions sont nées de vrais problèmes de photographes : un Google Drive lent, les paires RAW+JPEG, comparer les métadonnées avant d’écarter une photo. Cela donne d’ordinaire un logiciel utile, et pas seulement joli.
+**Un organiseur et un catalogue pour ceux qui photographient beaucoup.** Il réunit l’essentiel d’une photothèque (marques, albums, descriptions IPTC, RAW + JPEG, réglages qui ne touchent jamais au fichier) et ce qu’on attend d’une galerie moderne (personnes, animaux, lieux, recherche par ce que montre la photo, piles de photos similaires).
 
-**Testé sur une grande collection.** LionPhotos est testé sur une collection de plus de 70 000 photos sur un disque externe USB 3.1, et l’interface reste simple à parcourir et fluide, même s’il lui faut plus de temps pour créer les vignettes de toute la collection.
+**Né de l’usage réel.** Ses fonctions viennent de vrais problèmes : un dossier cloud lent, des paires RAW + JPEG, la même photo à trois endroits, comparer deux prises avant d’en écarter une.
 
-## Voyez-le à l’œuvre
+**Testé sur une grande collection.** Plus de 70 000 photos sur un disque dur externe USB 3.1 restent fluides à parcourir ; seules les premières vignettes de toute la collection prennent du temps.
 
-Les collections de photos grandissent plus vite qu’on ne peut les trier : des années de prises de vue réparties dans des dossiers et des disques externes, la même photo à trois endroits, des fichiers RAW que la plupart des visionneuses n’ouvrent pas, et le travail de tri enfermé dans un seul logiciel, sur un seul ordinateur. LionPhotos est fait pour cette situation :
+## Ce que vous en faites
 
-### Vos dossiers, tels qu’ils sont
+Les collections grandissent plus vite qu’on ne peut les trier. Voici les tâches pour lesquelles LionPhotos est fait.
 
-> *« Ouvrir la collection prend une éternité. »*
+### Ouvrir vos dossiers tels qu’ils sont
 
-Pas d’import, pas de copie de vos photos : LionPhotos parcourt les dossiers tels qu’ils sont, crée chaque vignette une fois et ne la refait que si le fichier change. 100 000 éléments défilent comme 100.
+Sans importation et sans copie : LionPhotos lit les dossiers tels qu’ils sont, crée chaque vignette une fois et ne la refait que si le fichier change. 100 000 éléments défilent comme 100. Ce que vous faites des photos (albums, personnes, marques, descriptions, réglages, recadrages) est aussi conservé dans un dossier caché à l’intérieur de la collection : le même disque externe s’ouvre avec tout sur un autre ordinateur.
 
-Albums, personnes, marques, descriptions, réglages et recadrages sont aussi gardés dans un dossier caché au sein de la collection : le même disque externe s’ouvre avec tout cela sur un autre ordinateur, quelle que soit la lettre de lecteur.
+<p align="center"><img src="screenshots/photos-timeline.webp" alt="Photos" width="860"><br><sub><b>Photos</b> : une grille par mois, les années à portée de main sur le côté</sub></p>
 
-<p align="center"><img src="screenshots/photos-timeline.webp" alt="Photos" width="860"><br><sub><b>Photos</b> — une grille par mois, les années à portée de main sur le côté</sub></p>
+<p align="center"><img src="screenshots/photos-list.webp" alt="Liste" width="49%"> <img src="screenshots/photos-menu.webp" alt="Le menu Plus" width="49%"><br><sub><b>Liste</b> : dossier, type, taille, date · <b>Plus</b> : un seul menu, le même que le clic droit</sub></p>
 
-<p align="center"><img src="screenshots/photos-list.webp" alt="Liste" width="49%"> <img src="screenshots/photos-menu.webp" alt="Un seul menu" width="49%"><br><sub><b>Liste</b> — dossier, type, dimensions, taille, date · <b>Un seul menu</b> — le même sous Plus et au clic droit ; Fichier ▸ regroupe ce qui modifie le disque</sub></p>
+### Retrouver n’importe quelle photo
 
-### N’importe quelle photo en quelques secondes
+Cherchez par nom, dossier, appareil, auteur, description, album, étiquette, projet, personne, animal ou lieu, ou par ce que montre la photo : tapez *plage*, *chien* ou *anniversaire*. Les visages, les animaux et les scènes sont reconnus sur votre ordinateur.
 
-> *« Je ne retrouve pas cette photo. »*
+<p align="center"><img src="screenshots/search.webp" alt="Recherche" width="860"><br><sub><b>Recherche</b> : dans la barre de titre, dans toute la collection</sub></p>
 
-Recherche par nom, dossier, appareil, auteur, description, album, projet, personne, animal ou lieu. Les visages et les animaux sont reconnus sur votre ordinateur, et les lieux se remplissent tout seuls grâce au GPS ou au lieu inscrit dans la photo. Ou tout simplement par ce que montre la photo : tapez *plage*, *chien* ou *anniversaire*.
+### Trier une séance en quelques minutes
 
-<p align="center"><img src="screenshots/search.webp" alt="Recherche" width="860"><br><sub><b>Recherche</b> — dans la barre de titre, sur toute la collection</sub></p>
+Marquez en parcourant : `1` excellente, `2` OK, `3` vers les Limbes. *Empiler les photos* réunit les prises qui sont en pratique la même image et montre la meilleure de chaque pile ; *Comparer* en met deux ou plus côte à côte. Ce que vous écartez attend dans les Limbes, et seules les Limbes envoient des fichiers à la Corbeille.
 
-### Retouche rapide, original intact
+<p align="center"><img src="screenshots/highlights.webp" alt="Sélection" width="860"><br><sub><b>Sélection</b> : seulement les photos marquées excellentes ou OK, comme un portfolio</sub></p>
 
-Exposition, couleur, noir et blanc, recadrage, redressement, corrections d’objectif et de perspective, développement RAW — en direct, sur la carte graphique. Tout reste dans le catalogue : le fichier ne change jamais, et `\` montre l’original à tout moment.
+### Organiser sans déplacer un fichier
 
-<p align="center"><img src="screenshots/viewer.webp" alt="Visionneuse" width="49%"> <img src="screenshots/lens.webp" alt="Correction d’objectif" width="49%"><br><sub><b>Visionneuse</b> — avec le panneau de retouche (noir et blanc) · <b>Correction d’objectif</b> — perspective redressée à la main</sub></p>
+Les albums, vos propres étiquettes, les personnes, les animaux, les lieux et les projets vivent dans le catalogue : une photo peut se trouver dans plusieurs, et les fichiers restent où ils sont. *Suggérer des albums* regroupe les photos telles qu’elles ont été prises et les nomme d’après ce qu’elles montrent ; les lieux se remplissent à partir du GPS et s’affichent sur une carte du monde dessinée sur votre ordinateur.
 
-### Des albums qui se font presque seuls
+<p align="center"><img src="screenshots/albums.webp" alt="Albums" width="49%"> <img src="screenshots/album.webp" alt="Dans un album" width="49%"><br><sub><b>Albums</b> : une mosaïque par année · <b>Dans un album</b> : mosaïque, grille régulière, liste ou sélection</sub></p>
 
-*Suggérer des albums* regroupe les photos comme elles ont été prises et les nomme d’après ce qu’elles montrent — une plage, un mariage, un anniversaire — pour que vous les relisiez. Chaque album a une couverture, une description et une période, et s’ouvre en mosaïque, grille régulière, liste ou sélection ; le crayon l’ajoute à la liste de ce qui reste *à retoucher*.
+<p align="center"><img src="screenshots/places-map.webp" alt="Lieux" width="860"><br><sub><b>Lieux</b> : sur une carte du monde dessinée sur cet ordinateur</sub></p>
 
-<p align="center"><img src="screenshots/albums.webp" alt="Albums" width="49%"> <img src="screenshots/album.webp" alt="Dans un album" width="49%"><br><sub><b>Albums</b> — mosaïque par année, avec descriptions · <b>Dans un album</b> — mosaïque, grille uniforme, liste ou sélection</sub></p>
+### Un panneau, quatre tâches
 
-### Vos meilleures photos, comme un portfolio
+À côté des photos, un panneau avec quatre onglets sur une réglette étroite : **Organisation** (marque, catégorie, étiquettes, albums, personnes, lieux), **Ajuster**, **Décrire** et **Infos** (le fichier et l’appareil). Les touches `O`, `E`, `D` et `I` ouvrent chacun, et `H` replie le panneau.
 
-Marquez les excellentes photos et les bonnes avec `1` et `2` en parcourant. *Sélection* n’affiche qu’elles — albums, personnes, lieux et projets, une ligne chacun, la photo choisie en grand — une page de portfolio faite de vos propres marques.
+### Retoucher vite, sans toucher à l’original
 
-<p align="center"><img src="screenshots/highlights.webp" alt="Sélection" width="860"><br><sub><b>Sélection</b> — seulement les photos marquées étoile ou OK, comme un portfolio</sub></p>
+Exposition, couleur, noir et blanc, recadrage, redressement, corrections d’objectif et de perspective et développement RAW, en direct, sur la carte graphique. Tout reste dans le catalogue : le fichier ne change jamais, et `\` montre l’original à tout moment. Pour un fichier RAW, l’interrupteur **Développer le RAW (16 bits)** fait passer les réglages du JPG 8 bits de l’appareil aux données du capteur.
 
-### Chaque voyage sur une carte du monde
+<p align="center"><img src="screenshots/viewer.webp" alt="Visionneuse" width="49%"> <img src="screenshots/lens.webp" alt="Correction d’objectif" width="49%"><br><sub><b>Visionneuse</b> : avec le panneau de retouche · <b>Correction d’objectif</b> : perspective redressée à la main</sub></p>
 
-Les lieux se remplissent seuls à partir du GPS ou du lieu écrit dans chaque photo, et apparaissent sur une carte du monde dessinée sur votre ordinateur. Cliquez sur un point : les photos de ce lieu sont là.
+### Décrire et livrer
 
-<p align="center"><img src="screenshots/places-map.webp" alt="Lieux" width="860"><br><sub><b>Lieux</b> — sur une carte du monde dessinée sur l’ordinateur</sub></p>
+Titre, description, audiodescription, auteur, lieu et mots-clés pour une photo ou pour cent, enregistrés pendant la saisie et lisibles par d’autres programmes (IPTC et XMP). Ils ne sont écrits dans les fichiers que si vous le demandez, après avoir vu ce qui sera écrit. Les recadrages existent aux formats de chaque réseau social, et les exports ont des noms cohérents, des tailles et les métadonnées que vous choisissez.
 
-### Prêt pour chaque réseau
+<p align="center"><img src="screenshots/metadata.webp" alt="Description" width="860"><br><sub><b>Description</b> : métadonnées IPTC, enregistrées pendant la saisie</sub></p>
 
-> *« Je dois livrer. »*
+<p align="center"><img src="screenshots/crop.webp" alt="Recadrage" width="49%"> <img src="screenshots/export.webp" alt="Exporter des photos" width="49%"><br><sub><b>Recadrage</b> : pour Instagram, Stories, YouTube… · <b>Exporter des photos</b> : noms cohérents, tailles pour chaque réseau</sub></p>
 
-Retouche rapide et recadrages pour chaque réseau social, légendes et audiodescription pour l’accessibilité, et export avec des noms de fichiers cohérents et les métadonnées de votre choix. Les originaux ne changent jamais.
+### Libérer de l’espace et ranger le disque, avec annulation
 
-<p align="center"><img src="screenshots/crop.webp" alt="Recadrage" width="49%"> <img src="screenshots/export.webp" alt="Exporter les photos" width="49%"><br><sub><b>Recadrage</b> — pour Instagram, Stories, YouTube… · <b>Exporter les photos</b> — noms cohérents, tailles de chaque réseau</sub></p>
+Les fichiers en double sont trouvés par leur contenu, et leurs copies en trop vont dans les Limbes. *Réorganiser la collection* propose une structure de dossiers claire (`2025/2025-12-24-Noël`) à relire avant que rien ne bouge. Chaque modification de fichiers montre son plan, demande un code de 3 caractères à saisir et peut être annulée.
 
-### Décrit pour tous
-
-Titre, légende, audiodescription, auteur et lieu pour une photo ou cent à la fois — enregistrés pendant la saisie, lisibles par d’autres logiciels (IPTC et XMP) et écrits dans les fichiers seulement quand vous le demandez.
-
-<p align="center"><img src="screenshots/metadata.webp" alt="Description" width="860"><br><sub><b>Description</b> — métadonnées IPTC, enregistrées pendant la saisie</sub></p>
-
-### Libérez de l’espace sans crainte
-
-> *« Le disque est plein de choses inutiles. »*
-
-Marquez les rebuts au fil de l’eau et envoyez-les dans les Limbes ; trouvez les fichiers en double par leur contenu et envoyez-y aussi leurs copies en trop. Seules les Limbes envoient des fichiers à la Corbeille ; rien n’est supprimé définitivement. Écrivez vos propres étiquettes sur les photos (« à imprimer », « portfolio ») : chacune réunit ses photos dans *Étiquettes*, comme un album.
-
-<p align="center"><img src="screenshots/duplicates.webp" alt="Fichiers en double" width="860"><br><sub><b>Fichiers en double</b> — trouvés par leur contenu</sub></p>
-
-### De l’ordre sur le disque — avec annulation
-
-> *« Mes dossiers sont en désordre. »*
-
-*Réorganiser la collection* lit les dossiers et propose une structure claire sur le disque (`2025/2025-12-24-Noël`, thèmes, une boîte d’entrée, essais d’appareil), à vérifier avant que rien ne bouge — et tout peut être annulé.
+<p align="center"><img src="screenshots/duplicates.webp" alt="Fichiers en double" width="860"><br><sub><b>Fichiers en double</b> : trouvés par leur contenu</sub></p>
 
 <p align="center"><img src="screenshots/reorganize.webp" alt="Réorganiser la collection : la proposition, dossier par dossier, avant que rien ne bouge" width="860"></p>
 
-**Prêt à retrouver vos photos ?** [Téléchargez LionPhotos](#télécharger) pour Windows, macOS ou Linux — gratuit, sans compte, en 10 langues.
+**Prêt à retrouver vos photos ?** [Téléchargez LionPhotos](#télécharger) pour Windows, macOS ou Linux : gratuit, sans compte, en 10 langues.
 
 ## Pourquoi LionPhotos
 
-- **Vos dossiers, tels qu’ils sont.** Pas d’import ni de bibliothèque fermée : les photos restent là où vous les avez mises, et vos autres logiciels continuent de travailler avec elles.
-- **Local et privé.** Pas de compte, pas de télémétrie ; il ne va sur Internet que lorsque vous lui demandez de chercher une nouvelle version. La reconnaissance des visages et des animaux tourne sur votre ordinateur. Il ne lit que le dossier choisi et ses sous-dossiers.
-- **Rapide à toute échelle.** La grille ne dessine que ce qui est à l’écran ; les vignettes sont petites, gardées dans un seul fichier de cache et créées une seule fois. Les grandes collections sur disque externe restent fluides.
-- **Tous les formats, avec ses propres décodeurs.** JPEG, HEIC/HEIF, TIFF, PSD/PSB, RAW des principales marques (CR3, CR2, NEF, ARW, RAF, DNG…) et vidéos (MP4, MOV, MTS, AVI…).
-- **Sûr par conception.** Toute modification de fichiers montre d’abord son plan, demande un code de 3 caractères tapé au clavier et peut être annulée ; supprimer envoie toujours à la Corbeille.
-- **Le catalogue voyage avec les photos,** dans un format JSON ouvert et documenté que d’autres logiciels peuvent lire.
-- **Il range pour de vrai.** Albums, projets, personnes, animaux et lieux dans le catalogue — et, si vous le souhaitez, dossiers et noms de fichiers sur le disque, le RAW, le JPEG et les fichiers annexes d’une même prise restant ensemble.
+- **Vos dossiers, tels qu’ils sont.** Sans importation ni bibliothèque fermée : les photos restent où vous les avez mises, et vos autres programmes continuent de fonctionner avec elles.
+- **Local et privé.** Sans compte et sans télémétrie ; il ne va sur internet que si vous lui demandez de chercher une nouvelle version. Les visages, les animaux et les scènes sont reconnus sur votre ordinateur.
+- **Rapide à toute taille.** La grille ne dessine que ce qui est à l’écran, et chaque vignette est créée une fois. Les grandes collections sur disques externes restent fluides.
+- **Tous les formats.** JPEG, HEIC/HEIF, TIFF, PSD/PSB, RAW des grandes marques (CR3, CR2, NEF, ARW, RAF, DNG…) et vidéos (MP4, MOV, MTS, AVI…).
+- **Sûr par conception.** Chaque modification de fichiers montre d’abord son plan, demande un code de 3 caractères à saisir et peut être annulée. Supprimer passe par les Limbes puis par la Corbeille, jamais définitivement.
+- **Le catalogue voyage avec les photos,** dans un format JSON ouvert et documenté que d’autres programmes peuvent lire.
+- **Organise pour de bon.** Albums, étiquettes, projets, personnes, animaux et lieux dans le catalogue et, quand vous le voulez, dossiers et noms de fichiers sur le disque, le RAW, le JPEG et les fichiers annexes d’une prise restant ensemble.
 - **Gratuit et open source** (MIT), pour Windows, macOS et Linux, en 10 langues.
 
 ## Pour qui
 
-- **Photographes professionnels et amateurs** qui gardent leur travail dans des dossiers et sur des disques externes, photographient en RAW + JPEG et veulent trier, retrouver et livrer sans tout importer dans un catalogue.
-- **Équipes de communication, rédactions et studios** qui partagent une collection entre ordinateurs et personnes, ont besoin de noms, de crédits et de descriptions accessibles cohérents et organisent le travail par projet et par client.
-- **Familles et toute personne avec des années de photos de téléphone** éparpillées dans des dossiers, qui veut retrouver des personnes, des lieux et des moments et libérer de l’espace en toute sécurité.
+- **Les photographes, professionnels et passionnés,** qui gardent leur travail dans des dossiers et sur des disques externes, photographient en RAW + JPEG et veulent trier, retrouver et livrer sans tout importer dans un catalogue.
+- **Les équipes de communication et les studios** qui partagent une collection entre ordinateurs et personnes, ont besoin de noms cohérents, de crédits et de descriptions accessibles, et organisent le travail par projet et par client.
+- **Les familles et tous ceux qui ont des années de photos de téléphone** éparpillées dans des dossiers, et veulent retrouver des personnes, des lieux et des moments et libérer de l’espace en sécurité.
 - **Ceux qui tiennent à leur vie privée :** rien n’est envoyé, il n’y a pas de compte et rien ne passe par le réseau.
 
-## Ce qu’il est — et ce qu’il n’est pas
+## Ce que c’est, et ce que ce n’est pas
 
-LionPhotos est un **organisateur et un catalogue**. Sa fonction principale est d’organiser le travail et de tenir un catalogue simple, accessible et intuitif : retrouver une photo, trier une séance, créer des albums et des projets et livrer le résultat.
+LionPhotos est un **organiseur et un catalogue**. Son travail principal est de mettre de l’ordre : retrouver une photo, trier une séance, monter des albums et des projets et livrer le résultat.
 
-Il **retouche et corrige** aussi, pour le travail rapide et léger dont la plupart des photos ont besoin — exposition, couleur, noir et blanc, recadrage et redressement, corrections d’objectif, développement RAW — et il y est déjà très capable, avec des résultats rapides.
+Il **retouche et corrige** aussi, pour le travail rapide et léger dont la plupart des photos ont besoin : exposition, couleur, noir et blanc, recadrage et redressement, corrections d’objectif, développement RAW.
 
-Il **n’a pas pour but de remplacer Lightroom, Photoshop ni d’autres éditeurs dédiés au développement des photos numériques**. Le travail avec des calques de traitement, la retouche locale et le photomontage restent à la charge de ces logiciels plus spécialisés ; LionPhotos y ouvre la photo (*Ouvrir avec*) et ramène le résultat dans le catalogue.
+**Il n’a pas vocation à remplacer Lightroom, Photoshop ou d’autres éditeurs dédiés au développement des photos.** Les calques, la retouche locale et le montage restent à ces logiciels ; LionPhotos y ouvre la photo (*Ouvrir avec*) et reprend le résultat dans le catalogue.
 
 ## Télécharger
 
@@ -177,7 +159,7 @@ LionPhotos est en **bêta**. Cela signifie :
 - **Testé sur une grande collection, sur un disque ordinaire :** plus de 70 000 fichiers sur un disque dur externe USB 3.1 — un disque dur classique, pas un SSD. Dans ce test, les performances se sont montrées satisfaisantes.
 - Avant d’organiser, de renommer ou de réorganiser une collection pour la première fois, **gardez-en une sauvegarde** (l’onglet Sauvegarde peut la faire). Toute opération peut être annulée et rien n’est supprimé définitivement, mais une sauvegarde reste le filet le plus sûr.
 - Les installateurs ne sont pas encore signés avec un certificat payant (voir [Télécharger](#télécharger)).
-- Les photos RAW sont retouchées, par défaut, sur le JPEG que l’appareil range dedans (8 bits) ; le **mode développement** (un interrupteur dans Réglages) retouche les données du capteur, développées sur cet ordinateur en 16 bits avec LibRaw — nouveau et encore en réglage (ses couleurs ne sont ni celles de l’appareil ni celles de Lightroom). Il faut une carte graphique avec WebGL 2.
+- Un fichier RAW est retouché, par défaut, sur le JPG que l’appareil a enregistré dedans (8 bits), qui s’ouvre aussitôt. L’interrupteur **Développer le RAW (16 bits)**, dans Réglages, retouche les données du capteur, développées sur cet ordinateur avec LibRaw, avec plus de marge dans les hautes lumières et les ombres. Il est nouveau et encore en réglage (ses couleurs ne sont ni celles de l’appareil ni celles de Lightroom) et demande une carte graphique avec WebGL 2. Le **?** à côté de l’interrupteur explique les deux sur place.
 - Un problème ou une suggestion ? Ouvrez une [issue](https://github.com/danielcarli/lionphotos/issues) avec la version (dans la barre d’état) et ce que vous avez fait. LionPhotos n’envoie jamais rien de lui-même.
 
 ## Fonctionnalités
@@ -236,7 +218,7 @@ Les mêmes règles que LionOrganizer :
 | `Ctrl+B` · `\` | Afficher/masquer la barre latérale · mode concentration (les photos seules) |
 | `1` `2` `3` · `0` | Marquer la sélection excellente · correcte · à supprimer · effacer |
 | `Ctrl+A` · `Entrée` · `H` · `Suppr` · `F2` · `Échap` | Tout sélectionner · ouvrir · panneau d'informations · Corbeille · renommer · vider la sélection |
-| `E` · `D` · `I` | Panneau latéral sur Ajuster · Décrire · Infos (la même touche le replie) |
+| `O` · `E` · `D` · `I` | Panneau latéral sur Organisation · Ajuster · Décrire · Infos (la même touche à nouveau le replie) |
 | `Ctrl+G` · `Ctrl+Shift+G` | Empiler · désempiler la sélection |
 | `V` · `?` | Comparer côte à côte · Raccourcis clavier |
 | `Ctrl+E` | Exporter les photos (la sélection, ou les photos affichées) |
@@ -339,7 +321,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.87.0**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.88.2**.
 
 ## Crédits
 

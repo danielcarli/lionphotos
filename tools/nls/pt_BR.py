@@ -620,3 +620,7 @@ _merge(MESSAGES, {'views': {'tag': 'Rótulos'}, 'gs': {'group': {'tag': 'Rótulo
 _merge(MESSAGES, {'panel': {'advanced': 'Controles avançados'}})
 # 1.85.0: the panel's four tabs as a rail
 _merge(MESSAGES, {'panel': {'tab': {'organize': 'Organização'}, 'railIcons': 'Mostrar só os ícones', 'railNames': 'Mostrar os nomes das abas'}})
+
+_merge(MESSAGES, {'main': {'meta': {'write': {'details': 'Ver o que vai ser gravado'}}}})
+
+_merge(MESSAGES, {'panel': {'expand': 'Expandir o painel ({key})', 'collapse': 'Recolher o painel ({key})'}})

@@ -2,6 +2,36 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
+## [1.87.0] — 2026-11-28
+
+### Changed
+- The info panel is opened and folded on its own rail: the first button there, above "Aa", shows "<" to open the panel and ">" to fold it (the key H does the same). The "i" button left the bar of Photos and of the Limbo.
+
+## [1.86.3] — 2026-11-28
+
+### Changed
+- The marks (Great, OK, Limbo) are in the Organize tab of the panel alone: they are no longer repeated at the top of Adjust, Describe and Info. The keys 1, 2 and 3 mark from any tab.
+
+## [1.86.2] — 2026-11-28
+
+### Changed
+- The band of a selection is shorter: Mark, Album, Export and Limbo left it and are under "More", where they already were (the same menu as the right click). Compare and More stay in sight.
+
+## [1.86.1] — 2026-11-28
+
+### Changed
+- The marks in the panel always show their keys (1, 2, 3), as the viewer's bar does: beside the name when there is room, as a small keycap on the button's corner in a narrow panel.
+
+## [1.86.0] — 2026-11-28
+
+### Changed
+- The marks (Great, OK, Limbo) are easy to find: in the panel of a photo or a selection they are a group named "Mark", three 44px buttons across the panel, each with its name and its colour even when off, and filled when on; with room, the key (1, 2, 3) shows too. In the viewer's bar they are one capsule with the same names, colours and keys; in a narrow window the names go and the large coloured icons stay.
+
+## [1.85.3] — 2026-11-28
+
+### Added
+- The confirmation of "Write to the file" has a folded item, "See what is going to be written": opened, it lists what goes into each file (headline, description, audio description, keywords, author, place, instructions and the mark), field by field, before the code is typed.
+
 ## [1.85.2] — 2026-11-28
 
 ### Changed

@@ -3771,3 +3771,74 @@ html:root:root .selection-bar .limbo-send:hover { background: color-mix(in srgb,
 .ip-rail-names[aria-pressed="true"] { color: var(--text-primary); background: var(--hover); }
 .ip-rail-names::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: -6px; height: 1px; background: var(--border); }
 .ip-rail-names { position: relative; margin-bottom: 8px; }
+
+/* confirmation: what is going to be written, folded until asked */
+.cm-details { margin: 0 0 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-subtle); }
+.cm-details > summary { display: flex; align-items: center; gap: 8px; padding: 9px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; list-style: none; border-radius: 10px; }
+.cm-details > summary::-webkit-details-marker { display: none; }
+.cm-details > summary:hover { background: var(--bg-elevated); }
+.cm-details > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.cm-details-chevron { display: inline-flex; color: var(--text-muted); transition: transform .12s ease; }
+.cm-details[open] .cm-details-chevron { transform: rotate(90deg); }
+.cm-details-body { max-height: 220px; overflow: auto; padding: 2px 12px 10px; border-top: 1px solid var(--border); }
+.cm-details-body h3 { margin: 10px 0 2px; font-size: 12px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cm-details-body dl { display: grid; grid-template-columns: minmax(84px, max-content) minmax(0, 1fr); gap: 4px 12px; margin: 8px 0 0; font-size: 12px; }
+.cm-details-body dt { color: var(--text-muted); }
+.cm-details-body dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+@media (prefers-reduced-motion: reduce) { .cm-details-chevron { transition: none; } }
+
+/* ---------------------------------------------------------------- marks, large: a named group the eye finds at once
+   (the info panel and the viewer's bar): 44px, each with its colour even when off, filled when on */
+:root { --mark-great-ink: #7a5c00; --mark-ok-ink: #086f86; --mark-reject-ink: #a8390c; --mark-great-fill: #f5d73a; --mark-great-on: #161214;
+  --mark-ok-fill: #087a93; --mark-ok-on: #fff; --mark-reject-fill: #ff7a3d; --mark-reject-on: #2d0c08; }
+:root[data-theme="dark"] { --mark-great-ink: #eecd25; --mark-ok-ink: #4cc4dc; --mark-reject-ink: #ff8f5c; --mark-ok-fill: #4cc4dc; --mark-ok-on: #0c1f24; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="teal"]) { --mark-great-ink: #eecd25; --mark-ok-ink: #4cc4dc; --mark-reject-ink: #ff8f5c; --mark-ok-fill: #4cc4dc; --mark-ok-on: #0c1f24; }
+}
+.mark-btn.is-big { height: 44px; min-width: 0; gap: 8px; padding: 0 10px 0 12px; font: 700 13.5px var(--font-ui); }
+.mark-btn.is-big .mark-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mark-btn.is-big .mark-key { margin-left: auto; padding: 1px 5px; border-radius: 5px; font: 700 11px var(--font-mono); background: var(--bg-subtle); color: var(--text-secondary); }
+.mark-btn.is-big.mark-great { color: var(--mark-great-ink); }
+.mark-btn.is-big.mark-ok { color: var(--mark-ok-ink); }
+.mark-btn.is-big.mark-reject { color: var(--mark-reject-ink); }
+.mark-btn.is-big.mark-great.on { background: var(--mark-great-fill); color: var(--mark-great-on); }
+.mark-btn.is-big.mark-ok.on { background: var(--mark-ok-fill); color: var(--mark-ok-on); }
+.mark-btn.is-big.mark-reject.on { background: var(--mark-reject-fill); color: var(--mark-reject-on); }
+.mark-btn.is-big.on .mark-key { background: rgba(22, 18, 20, 0.16); color: inherit; }
+.mark-btn.is-big:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.ip-markbar { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 4px; container-type: inline-size; }
+.ip-markbar-label { font: 700 12.5px var(--font-ui); color: var(--text-primary); }
+.ip-markbar .info-mark-btns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ip-markbar .mark-btn.is-big { justify-content: flex-start; border-radius: 12px; background: var(--bg-elevated); box-shadow: inset 0 0 0 1px var(--border-strong); }
+.ip-markbar .mark-btn.is-big:hover { box-shadow: inset 0 0 0 2px currentColor; }
+.ip-markbar .mark-btn.is-big.on { box-shadow: inset 0 0 0 1px rgba(22, 18, 20, 0.18); }
+.ip-markbar .mark-btn.is-big { position: relative; gap: 5px; padding: 0 7px 0 9px; }
+.ip-markbar .mark-key { padding: 1px 4px; }
+/* a narrow panel: the key stays, as a keycap on the button's corner */
+@container (max-width: 325px) {
+  .ip-markbar .mark-btn.is-big { padding: 0 8px; }
+  .ip-markbar .mark-key { position: absolute; top: -6px; right: -4px; margin: 0; background: var(--bg-elevated); color: var(--text-secondary); box-shadow: 0 0 0 1px var(--border-strong); }
+  .ip-markbar .mark-btn.is-big.on .mark-key { background: var(--bg-elevated); color: var(--text-secondary); }
+}
+
+.vw-marks { gap: 4px; padding: 4px; margin-right: 10px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 99px; background: rgba(255, 255, 255, 0.07); }
+.vw-marks .mark-btn.is-big { height: 40px; border-radius: 99px; padding: 0 10px 0 12px; }
+.vw-marks .mark-btn.is-big.mark-great { color: #eecd25; }
+.vw-marks .mark-btn.is-big.mark-ok { color: #4cc4dc; }
+.vw-marks .mark-btn.is-big.mark-reject { color: #ff8f5c; }
+.vw-marks .mark-btn.is-big:hover { background: rgba(255, 255, 255, 0.12); }
+.vw-marks .mark-btn.is-big.mark-great.on { background: #f5d73a; color: #161214; }
+.vw-marks .mark-btn.is-big.mark-ok.on { background: #4cc4dc; color: #0c1f24; padding: 0 10px 0 12px; }
+.vw-marks .mark-btn.is-big.mark-reject.on { background: #ff7a3d; color: #2d0c08; padding: 0 10px 0 12px; }
+.vw-marks .mark-key { margin-left: 2px !important; background: rgba(0, 0, 0, 0.35) !important; color: #c9bfb4 !important; }
+.vw-marks .mark-btn.on .mark-key { background: rgba(22, 18, 20, 0.18) !important; color: inherit !important; }
+/* a narrow window: the icons stay large and coloured, the names and keys go */
+@media (max-width: 1180px) { .vw-marks .mark-name, .vw-marks .mark-key { display: none; } .vw-marks .mark-btn.is-big { min-width: 40px; padding: 0 !important; } }
+.ip-head.is-compact > .ip-markbar { grid-column: 1 / -1; }
+.ip-head.is-compact > .ip-markbar ~ * { grid-column: 1 / -1; }
+.mark-btn.is-big .mark-key { border: 0; box-shadow: none; }
+
+/* the rail starts with the button that opens ("<") and folds (">") the panel */
+.ip-rail-fold { width: 26px; height: 26px; border-radius: 6px; color: var(--text-secondary); margin-bottom: 6px; }
+.ip-rail-fold:hover { color: var(--text-primary); background: var(--hover); }

@@ -95,6 +95,16 @@ export class ConfirmationService {
         h('span.cm-item-detail', { title: it.detail }, it.detail || ''),
         it.size !== undefined ? h('span.cm-item-size', formatBytes(it.size)) : null));
 
+      // what the operation is going to write, folded until the person asks to see it
+      const d = view.details;
+      const details = d?.groups?.length ? h('details.cm-details',
+        h('summary', h('span.cm-details-chevron', { html: icon('chevronRight', 14) }), h('span', d.label)),
+        h('div.cm-details-body',
+          d.groups.map((g) => h('section',
+            d.groups.length > 1 || d.more ? h('h3', { title: g.label }, g.label) : null,
+            h('dl', g.rows.map((r) => [h('dt', r.label), h('dd', r.value)])))),
+          d.more ? h('p.cm-more', tn('confirm.more', d.more)) : null)) : null;
+
       const dialog = h(`div.cm-dialog${view.danger ? '.danger' : ''}`, { role: 'alertdialog', 'aria-modal': 'true', 'aria-labelledby': 'cm-title', 'aria-describedby': 'cm-msg' },
         h('header.cm-head',
           h('span.cm-icon', { html: icon(view.danger ? 'trash' : 'shield', 20) }),
@@ -105,6 +115,7 @@ export class ConfirmationService {
         this.#bytes(view),
         items.length ? h('ul.cm-items', items, view.more ? h('li.cm-more', tn('confirm.more', view.more)) : null) : null,
         view.skipped ? h('p.cm-note', view.skippedText || tn('confirm.skipped', view.skipped)) : null,
+        details,
         view.note ? h('p.cm-note', view.note) : null,
         progress,
         h('div.cm-code-box',
@@ -120,7 +131,7 @@ export class ConfirmationService {
         else if (e.key === 'Enter' && document.activeElement === input) { e.preventDefault(); doSubmit(); }
         else if (e.key === 'Tab') {
           // keep focus inside the dialog
-          const focusables = [...dialog.querySelectorAll('button:not(:disabled), input:not(:disabled)')];
+          const focusables = [...dialog.querySelectorAll('button:not(:disabled), input:not(:disabled), summary')];
           const first = focusables[0], last = focusables[focusables.length - 1];
           if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
           else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }

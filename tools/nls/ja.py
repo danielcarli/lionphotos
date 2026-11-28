@@ -617,3 +617,7 @@ _merge(MESSAGES, {'views': {'tag': 'ラベル'}, 'gs': {'group': {'tag': 'ラベ
 _merge(MESSAGES, {'panel': {'advanced': '詳細コントロール'}})
 # 1.85.0: the panel's four tabs as a rail
 _merge(MESSAGES, {'panel': {'tab': {'organize': '整理'}, 'railIcons': 'アイコンのみ表示', 'railNames': 'タブ名を表示'}})
+
+_merge(MESSAGES, {'main': {'meta': {'write': {'details': '書き込まれる内容を見る'}}}})
+
+_merge(MESSAGES, {'panel': {'expand': 'パネルを開く ({key})', 'collapse': 'パネルをたたむ ({key})'}})

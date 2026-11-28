@@ -233,9 +233,9 @@ export class PhotosView extends ViewPane {
       h('button.btn.btn-secondary.btn-sm.filters-btn', { class: `btn btn-secondary btn-sm filters-btn${chips.length ? ' is-active' : ''}`, title: t('photos.filtersTitle'), 'aria-haspopup': 'menu', onclick: (e) => this.#filtersMenu(e.currentTarget) },
         h('span', { html: icon('filter', 14) }), t('photos.filters'), chips.length ? h('span.filters-count', String(chips.length)) : null),
       chips.length ? h('div.filter-chips', chips) : null,
-      // how the photos are shown (grid or list, their size, the order): one menu at the end of the row, beside the panel
-      this.#viewButton(),
-      this.#infoToggle());
+      // how the photos are shown (grid or list, their size, the order): one menu at the end of the row
+      // (the panel is opened and folded on its own rail)
+      this.#viewButton());
   }
 
   /** The modes this place offers: inside a label mosaic, even grid, list and highlights; elsewhere grid and list. */
@@ -278,9 +278,6 @@ export class PhotosView extends ViewPane {
     ]);
   }
 
-  #infoToggle() {
-    return h('button.icon-button.info-toggle', { class: `icon-button info-toggle${this.infoOpen ? ' active' : ''}`, title: t('photos.toggleInfo', { key: 'H' }), html: icon('info', 16), onclick: () => this.toggleInfo() });
-  }
 
   /** Start page › folder › subfolder · how many items are shown and their size. */
   #crumbs(count) {
@@ -446,6 +443,17 @@ export class PhotosView extends ViewPane {
       }, h('span.mark-icon', { html: icon(ic, 14) }), name === 'reject' ? h('span.mark-text', t('marks.rejectBadge')) : null)));
   }
 
+  /** The marks in the info panel: a named group of three wide buttons, each with its colour, name and key. */
+  #markBar(ids, current) {
+    return h('div.ip-markbar',
+      h('span.ip-markbar-label', { id: 'ip-markbar-label' }, t('marks.label')),
+      h('span.info-mark-btns', { role: 'group', 'aria-labelledby': 'ip-markbar-label' }, MARK_BUTTONS.map(([name, ic, key]) =>
+        h('button', {
+          type: 'button', class: `mark-btn is-big mark-${name}${current === name ? ' on' : ''}`, title: t(`marks.${name}Title`, { key }), 'aria-pressed': String(current === name),
+          onclick: () => applyMark(this.library, ids, name),
+        }, h('span.mark-icon', { html: icon(ic, 18) }), h('span.mark-name', t(name === 'reject' ? 'marks.rejectBadge' : `marks.${name}`)), h('kbd.mark-key', { 'aria-hidden': 'true' }, key)))));
+  }
+
   #setMode(m) {
     // inside a label: the mosaic or the even grid, kept for that kind of label
     const type = this.#labelType();
@@ -505,21 +513,10 @@ export class PhotosView extends ViewPane {
       // in an album: taking the selection out of it (only the album changes; the files stay)
       album && !this.limbo ? h('button.btn.btn-sm.selbar-unalbum', { title: t('albums.removeTitle', { name: album.name }), onclick: () => removeFromAlbum(this, album.id, sel) },
         h('span', { html: icon('albumRemove', 14) }), tn('albums.removeMany', sel.length)) : null,
-      // the everyday actions in sight (mark, album, compare, export); the rest under "More"; the Limbo last, apart
+      // only Compare stays in sight; Mark, Album, Export and the Limbo are under "More" (the same menu as the right click)
       ...(this.limbo ? [] : [
-        h('button.btn.btn-secondary.btn-sm.selbar-mark', { title: t('marks.label'), 'aria-haspopup': 'menu', onclick: (e) => {
-          const r = e.currentTarget.getBoundingClientRect();
-          showContextMenu(r.left, r.bottom + 4, this.#markItems(sel, ids));
-        } }, h('span', { html: icon('star', 13) }), t('selbar.mark'), h('span.btn-chevron', { html: icon('chevronDown', 11) })),
-        h('button.btn.btn-secondary.btn-sm.selbar-album', { title: t('contextMenu.addToAlbum'), 'aria-haspopup': 'menu', onclick: (e) => {
-          const r = e.currentTarget.getBoundingClientRect();
-          const item = albumMenuItem(this.services, ids);
-          showContextMenu(r.left, r.bottom + 4, item.submenu || [item]);
-        } }, h('span', { html: icon('albumAdd', 13) }), t('selbar.album'), h('span.btn-chevron', { html: icon('chevronDown', 11) })),
         h('button.btn.btn-secondary.btn-sm.selbar-compare', { title: `${t('compare.menu')} (V)`, disabled: !comparable(this.services, sel).length, onclick: () => this.compareSelection() },
           h('span', { html: icon('columns', 13) }), t('selbar.compare')),
-        h('button.btn.btn-secondary.btn-sm.selbar-export', { title: `${t('export.menu')} (Ctrl+E)`, onclick: () => exportMenuItem(this.services, sel).run() },
-          h('span', { html: icon('export', 13) }), t('selbar.export')),
       ]),
       this.limbo
         ? h('button.btn.btn-secondary.btn-sm', { title: t('limbo.restoreTitle'), onclick: () => library.setMark(ids, 0) }, h('span', { html: icon('undo', 13) }), t('limbo.restoreSelected'))
@@ -528,10 +525,7 @@ export class PhotosView extends ViewPane {
       h('button.btn.btn-secondary.btn-sm.more-btn', { title: t('photos.moreTitle'), 'aria-haspopup': 'menu', onclick: async (e) => {
         const r = e.currentTarget.getBoundingClientRect();
         showContextMenu(Math.max(8, r.right - 280), r.bottom + 4, await this.#actionMenu(sel));
-      } }, h('span', { html: icon('more', 14) }), t('photos.more')),
-      // before the Recycle Bin, the Limbo: the selection leaves Photos and waits there (asks first)
-      this.limbo ? null : h('span.selbar-sep', { 'aria-hidden': 'true' }),
-      this.limbo ? null : h('button.btn.btn-ghost.btn-sm.limbo-send', { title: `${t('limbo.sendTitle')} (Delete)`, onclick: () => applyMark(library, ids, 'reject') }, h('span', { html: icon('binQuestion', 13) }), t('selbar.limbo')));
+      } }, h('span', { html: icon('more', 14) }), t('photos.more')));
   }
 
   /** Great, OK, no mark — for the selection. */
@@ -1269,7 +1263,7 @@ export class PhotosView extends ViewPane {
       const one = many ? null : this.library.byId.get(this.focusId && sel.has(this.focusId) ? this.focusId : sel.size === 1 ? [...sel][0] : 0);
       const canAdjust = many ? many.some((x) => x.kind === KIND.image) : !one || one.kind === KIND.image;
       setChildren(this.infoRail, tabRail(usableTab(panelTab(), { adjust: canAdjust }), (x) => this.showTab(x, true),
-        { adjust: canAdjust, open: this.infoOpen, onNames: () => this.#renderInfo() }));
+        { adjust: canAdjust, open: this.infoOpen, onNames: () => this.#renderInfo(), onFold: () => this.toggleInfo() }));
     }
     this.info.classList.toggle('is-folded', !this.infoOpen);
     this.infoBody.hidden = !this.infoOpen;
@@ -1309,8 +1303,9 @@ export class PhotosView extends ViewPane {
             h('div.ip-head-text',
               h('div.ip-name', tn('photos.selected', items.length)),
               h('div.ip-meta', [f.period, tn('info.folders', f.folders), formatBytes(f.tot.bytes)].join(' · ')))),
+          // the marks belong to the Organize tab alone (not repeated in Adjust, Describe and Info)
+          tab === 'organize' || tab === 'all' ? this.#markBar(items.map((it) => it.id), items.every((it) => MARK_NAMES[it.mark || 0] === same) ? same : null) : null,
           h('div.ip-tools',
-            this.#marks(items.map((it) => it.id), items.every((it) => MARK_NAMES[it.mark || 0] === same) ? same : null, 'info-mark-btns'),
             h('span.ip-sp'),
             marks.length ? h('span.ip-mark-counts', marks.map(([k, n]) => h('span', { class: `sel-mark ${k}` }, h('span', { html: icon(k === 'great' ? 'star' : k === 'ok' ? 'okCircle' : 'binQuestion', 11) }), formatNumber(n)))) : null)),
         asOnly(sectionsFor(tab, {
@@ -1348,9 +1343,9 @@ export class PhotosView extends ViewPane {
         h('div.info-thumb', this.#thumb(it, 'info-img')),
         ...nameLines(it, d),
         h('div.ip-meta', [detailsLine(d), dims].filter(Boolean).join(' · ')),
+        tab === 'organize' || tab === 'all' ? this.#markBar([id], MARK_NAMES[it.mark || 0]) : null,
         large ? links() : null,
         h('div.ip-tools',
-          this.#marks([id], MARK_NAMES[it.mark || 0], 'info-mark-btns'),
           h('span.ip-sp'),
           h('button.icon-button', { title: t('common.showIn', { explorer: this.actions.explorerName }), 'aria-label': t('info.reveal'), html: icon('reveal', 15), onclick: () => this.host.shell.reveal(id) }),
           h('button.icon-button', { title: t('info.openDefault'), 'aria-label': t('info.openDefault'), html: icon('external', 15), onclick: () => this.host.shell.open(id) }),

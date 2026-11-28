@@ -617,3 +617,7 @@ _merge(MESSAGES, {'views': {'tag': '标签'}, 'gs': {'group': {'tag': '标签'}}
 _merge(MESSAGES, {'panel': {'advanced': '高级控制'}})
 # 1.85.0: the panel's four tabs as a rail
 _merge(MESSAGES, {'panel': {'tab': {'organize': '整理'}, 'railIcons': '仅显示图标', 'railNames': '显示选项卡名称'}})
+
+_merge(MESSAGES, {'main': {'meta': {'write': {'details': '查看将写入的内容'}}}})
+
+_merge(MESSAGES, {'panel': {'expand': '展开面板 ({key})', 'collapse': '收起面板 ({key})'}})

@@ -620,3 +620,7 @@ _merge(MESSAGES, {'views': {'tag': 'Etiquetas'}, 'gs': {'group': {'tag': 'Etique
 _merge(MESSAGES, {'panel': {'advanced': 'Controles avanzados'}})
 # 1.85.0: the panel's four tabs as a rail
 _merge(MESSAGES, {'panel': {'tab': {'organize': 'Organización'}, 'railIcons': 'Mostrar solo los iconos', 'railNames': 'Mostrar los nombres de las pestañas'}})
+
+_merge(MESSAGES, {'main': {'meta': {'write': {'details': 'Ver lo que se va a grabar'}}}})
+
+_merge(MESSAGES, {'panel': {'expand': 'Expandir el panel ({key})', 'collapse': 'Contraer el panel ({key})'}})

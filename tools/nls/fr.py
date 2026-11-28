@@ -620,3 +620,7 @@ _merge(MESSAGES, {'views': {'tag': 'Étiquettes'}, 'gs': {'group': {'tag': 'Éti
 _merge(MESSAGES, {'panel': {'advanced': 'Commandes avancées'}})
 # 1.85.0: the panel's four tabs as a rail
 _merge(MESSAGES, {'panel': {'tab': {'organize': 'Organisation'}, 'railIcons': 'Afficher seulement les icônes', 'railNames': 'Afficher les noms des onglets'}})
+
+_merge(MESSAGES, {'main': {'meta': {'write': {'details': 'Voir ce qui va être écrit'}}}})
+
+_merge(MESSAGES, {'panel': {'expand': 'Déployer le panneau ({key})', 'collapse': 'Replier le panneau ({key})'}})

@@ -617,3 +617,7 @@ _merge(MESSAGES, {'views': {'tag': '라벨'}, 'gs': {'group': {'tag': '라벨'}}
 _merge(MESSAGES, {'panel': {'advanced': '고급 컨트롤'}})
 # 1.85.0: the panel's four tabs as a rail
 _merge(MESSAGES, {'panel': {'tab': {'organize': '정리'}, 'railIcons': '아이콘만 보기', 'railNames': '탭 이름 보기'}})
+
+_merge(MESSAGES, {'main': {'meta': {'write': {'details': '기록될 내용 보기'}}}})
+
+_merge(MESSAGES, {'panel': {'expand': '패널 펼치기 ({key})', 'collapse': '패널 접기 ({key})'}})

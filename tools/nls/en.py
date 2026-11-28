@@ -620,3 +620,7 @@ _merge(MESSAGES, {'views': {'tag': 'Labels'}, 'gs': {'group': {'tag': 'Labels'}}
 _merge(MESSAGES, {'panel': {'advanced': 'Advanced controls'}})
 # 1.85.0: the panel's four tabs as a rail
 _merge(MESSAGES, {'panel': {'tab': {'organize': 'Organize'}, 'railIcons': 'Show the icons only', 'railNames': 'Show the names of the tabs'}})
+
+_merge(MESSAGES, {'main': {'meta': {'write': {'details': 'See what is going to be written'}}}})
+
+_merge(MESSAGES, {'panel': {'expand': 'Open the panel ({key})', 'collapse': 'Fold the panel ({key})'}})

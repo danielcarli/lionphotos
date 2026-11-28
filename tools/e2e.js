@@ -635,8 +635,8 @@ app.whenReady().then(async () => {
     await wait(150);
     // the view modes at the end of the row, as on every page; nothing that leads back to all the photos inside a label
     const row = await js(`(() => { const tb = document.querySelector('.view-photos .photos-toolbar') || document.querySelector('.photos-toolbar'); const kids = [...(tb?.children || [])].filter((x) => !x.hidden); return { last: kids.slice(-2).map((x) => x.className), first: kids[0]?.className || '' }; })()`);
-    check(/view-btn/.test(row.last[0] || '') && /info-toggle/.test(row.last[1] || '') && /photos-crumbs/.test(row.first),
-      'Photos: where you are first in the row; "View ▾" (grid or list, size, order) at its end, before the info panel switch', JSON.stringify(row));
+    check(/view-btn/.test(row.last[1] || '') && !/info-toggle/.test(row.last.join(' ')) && /photos-crumbs/.test(row.first),
+      'Photos: where you are first in the row; "View ▾" (grid or list, size, order) at its end (the panel switch is on the panel\'s rail)', JSON.stringify(row));
     // photos selected: the bar of the view stays (filters, sort, zoom), the selection's band right under it, and
     // the photos do not move when it comes or goes
     const sb = await js(`(async () => {
@@ -736,7 +736,7 @@ app.whenReady().then(async () => {
         btn?.click(); await wait(400);
         const dlg = document.querySelector('.labels-dialog');
         out.only = { found: !!btn, heads: [...(dlg?.querySelectorAll('.lbl-head') || [])].map((x) => x.textContent).join(), sphere: !!dlg?.querySelector('.lbl-sphere'), eyebrow: dlg?.querySelector('.eyebrow')?.textContent,
-          railFirst: document.querySelector('.info-panel .ip-rail-in')?.firstElementChild?.classList.contains('ip-rail-names') };
+          railFirst: (() => { const k = [...(document.querySelector('.info-panel .ip-rail-in')?.children || [])]; return k[0]?.classList.contains('ip-rail-fold') && k[1]?.classList.contains('ip-rail-names'); })() };
         dlg?.querySelector('.btn-secondary')?.click(); await wait(200); }
       localStorage.setItem('lionphotos.panel.tab', 'describe'); pv.rerenderInfo(); await wait(600);
       document.querySelector('.info-panel .ip-tab[data-tab="adjust"]').click(); await wait(600);
@@ -1278,11 +1278,39 @@ app.whenReady().then(async () => {
       await js(`${S}.library.describe(${JSON.stringify(xp.ids || [])}, { author: '', adjust: null }, { history: false }).then(() => true)`);
       fs.rmSync(EXP, { recursive: true, force: true });
     }
+    {
+      // the marks in the panel: a named group of three large buttons, each with its name
+      await js(`(${S}.photos?.clearSelection?.(), document.querySelector('.tile')?.click(), true)`); await wait(600);
+      const mb = await js(`(() => { const b = [...document.querySelectorAll('.info-panel .ip-markbar .mark-btn.is-big')]; return { n: b.length, h: Math.min(...b.map((x) => x.offsetHeight)), names: b.every((x) => x.querySelector('.mark-name')?.textContent), keys: b.map((x) => { const k = x.querySelector('.mark-key'); return k && k.offsetWidth ? k.textContent : ''; }).join(''), label: !!document.querySelector('.ip-markbar-label')?.textContent }; })()`);
+      check(mb.n === 3 && mb.h >= 44 && mb.names && mb.label && mb.keys === '123', 'the marks in the panel: a named group of three large buttons with their names and keys (1, 2, 3)', JSON.stringify(mb));
+    }
+    {
+      // the marks are in the Organize tab alone
+      const only = await js(`(async () => { const w = (ms) => new Promise((r) => setTimeout(r, ms)), lib = ${S}.library, out = {};
+        lib.setSelection([lib.view('main').find((x) => x.kind === 1).id]); await w(300);
+        for (const tab of ['organize', 'adjust', 'describe', 'info']) { document.querySelector('.info-panel .ip-rail [data-tab="' + tab + '"]')?.click(); await w(250); out[tab] = !!document.querySelector('.info-panel .ip-markbar'); }
+        localStorage.setItem('lionphotos.panel.tab', 'all'); return out; })()`);
+      check(only.organize && !only.adjust && !only.describe && !only.info, 'the marks are in the Organize tab alone, not in Adjust, Describe and Info', JSON.stringify(only));
+    }
+    {
+      // the rail's first button: ">" folds the panel, "<" opens it
+      const fold = await js(`(async () => { const w = (ms) => new Promise((r) => setTimeout(r, ms)), b = () => document.querySelector('.info-panel .ip-rail-fold'), p = document.querySelector('.info-panel');
+        const o = { open0: b()?.getAttribute('aria-expanded'), inBar: !!document.querySelector('.view-photos .photos-toolbar .info-toggle') };
+        b().click(); await w(350); o.folded = p.classList.contains('is-folded') && b().getAttribute('aria-expanded') === 'false';
+        b().click(); await w(350); o.back = !p.classList.contains('is-folded') && b().getAttribute('aria-expanded') === 'true'; return o; })()`);
+      check(fold.open0 === 'true' && !fold.inBar && fold.folded && fold.back, 'the panel is folded and opened by the first button of its rail (no "i" in the bar)', JSON.stringify(fold));
+    }
     const { jpegSegments } = require('../src/platform/library/node/metadataWriter');
     const { readMetadata } = require('../src/platform/library/node/metadata');
     const jpgBefore = fs.readFileSync(md.jpg.path);
     const sideBefore = (() => { try { return fs.readFileSync(md.raw.path.replace(/\.[^.]+$/, '.xmp'), 'utf8'); } catch { return null; } })();
     const wm = await op('writeMetadata', { ids: [md.jpg.id, md.raw.id] });
+    {
+      const dg = wm.view.details?.groups || [];
+      const vals = (dg[0]?.rows || []).map((r) => r.value);
+      check(dg.length === 2 && vals.includes('Carla Mendes') && vals.includes('Escolas no Planetário') && dg.every((g) => g.label && g.rows.length),
+        'writing metadata: the confirmation carries what goes into each file, to unfold', JSON.stringify(dg).slice(0, 300));
+    }
     const jpgAfter = fs.readFileSync(md.jpg.path);
     const metaAfter = await readMetadata(md.jpg.path, 'jpg', 1, jpgAfter.length);
     const sideFile = md.raw.path.replace(/\.[^.]+$/, '.xmp');
@@ -3429,8 +3457,8 @@ app.whenReady().then(async () => {
       return res; } catch (e) { return { error: String(e?.stack || e) }; } })()`);
     check(calm.switches?.length === 1 && /Stack photos/.test(calm.switches[0]) && calm.similar && !calm.sort && !calm.zoom,
       'Photos bar: "Stack photos" and "Similar photos" as they were; sort, size and grid/list under "View"; "Only photos in no album" in Filters', JSON.stringify(calm));
-    check(calm.bar === 'selbar-clear selbar-count selbar-mark selbar-album selbar-compare selbar-export more-btn limbo-send' && calm.limboLast && calm.corner === 0,
-      'the selection band: Mark, Album, Compare, Export, More and the Limbo last; no Limbo nor "show in folder" in a tile\'s corner', JSON.stringify(calm));
+    check(calm.bar === 'selbar-clear selbar-count selbar-compare more-btn' && !calm.limboLast && calm.corner === 0,
+      'the selection band: Compare and More (Mark, Album, Export and the Limbo are in "More"); no Limbo nor "show in folder" in a tile\'s corner', JSON.stringify(calm));
     check(calm.more?.join('|') === calm.ctx?.join('|') && (calm.more || []).filter((x) => x !== 'Open with').join('|') === 'Open|Mark|Add to album|Category|Labels…|Compare side by side|Similar photos|File|Export photos…|Send to the Limbo',
       'one menu: "More" and the right click list the same actions in the same order', JSON.stringify({ more: calm.more, ctx: calm.ctx }));
     check(calm.renameWhy === 'Rename works on one file at a time' && calm.byDate, 'File ▸ holds what changes the disk; a disabled item says why (Rename with 2 photos)', JSON.stringify(calm));

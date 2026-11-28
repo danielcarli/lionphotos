@@ -470,10 +470,10 @@ export class Viewer {
           this.#chips())),
       h('div.vw-actions',
         this.#slideControls(),
-        h('span.vw-marks', [['great', 'star', '1'], ['ok', 'okCircle', '2'], ['reject', 'binQuestion', '3']].map(([name, ic, key]) => {
+        h('span.vw-marks', { role: 'group', 'aria-label': t('marks.label') }, [['great', 'star', '1'], ['ok', 'okCircle', '2'], ['reject', 'binQuestion', '3']].map(([name, ic, key]) => {
           const on = MARK_NAMES[it.mark || 0] === name;
-          return h('button', { class: `vw-btn mark-btn mark-${name}${on ? ' on' : ''}`, title: t(`marks.${name}Title`, { key: name === 'reject' ? `${key} · Delete` : key }), 'aria-pressed': String(on), onclick: () => this.#mark(name) },
-            h('span.mark-icon', { html: icon(ic, 16) }), name === 'reject' && on ? h('span.mark-text', t('marks.rejectBadge')) : null);
+          return h('button', { class: `vw-btn mark-btn is-big mark-${name}${on ? ' on' : ''}`, title: t(`marks.${name}Title`, { key: name === 'reject' ? `${key} · Delete` : key }), 'aria-pressed': String(on), onclick: () => this.#mark(name) },
+            h('span.mark-icon', { html: icon(ic, 18) }), h('span.mark-name', t(name === 'reject' ? 'marks.rejectBadge' : `marks.${name}`)), h('kbd.mark-key', { 'aria-hidden': 'true' }, key));
         })),
         it.kind === KIND.video
           ? h('button.vw-btn', { title: t('previews.one'), onclick: () => this.thumbs.generatePreviews({ ids: [it.id] }, t('previews.scope.one')) }, h('span', { html: icon('film', 16) }), t('previews.generate'))

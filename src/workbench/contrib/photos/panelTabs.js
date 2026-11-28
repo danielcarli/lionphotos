@@ -104,11 +104,17 @@ export function setRailNames(on) { write(RAIL_KEY, on ? '1' : '0'); }
  * upwards beside it — or the icons alone, by the button at the top of the rail (remembered). `open` false =
  * the panel folded: no tab is the selected one, and a click opens it.
  * @param {string} current @param {(tab:string) => void} onPick @param {() => void} onNames the names switched
+ * @param {() => void} [onFold] the panel opened or folded: with it, the rail starts with that button
  */
-export function tabRail(current, onPick, { adjust = true, open = true, onNames } = {}) {
+export function tabRail(current, onPick, { adjust = true, open = true, onNames, onFold } = {}) {
   const names = railNames();
   const tabs = TABS.filter((x) => adjust || x.id !== 'adjust');
   const rail = h('div.ip-rail-in', { role: 'tablist', 'aria-orientation': 'vertical', 'aria-label': t('panel.tabs') },
+    // first of all: the panel opened ("<", it grows to the left) or folded (">", it goes back to the edge)
+    onFold ? h('button.icon-button.ip-rail-fold.info-toggle', {
+      type: 'button', 'aria-expanded': String(open), title: t(open ? 'panel.collapse' : 'panel.expand', { key: 'H' }), 'aria-label': t(open ? 'panel.collapse' : 'panel.expand', { key: 'H' }),
+      html: icon(open ? 'chevronRight' : 'chevronLeft', 16), onclick: () => onFold(),
+    }) : null,
     // at the top of the rail: the tabs' names shown or not
     h('button.icon-button.ip-rail-names', {
       type: 'button', 'aria-pressed': String(names), title: t(names ? 'panel.railIcons' : 'panel.railNames'), 'aria-label': t(names ? 'panel.railIcons' : 'panel.railNames'),

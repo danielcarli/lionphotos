@@ -45,6 +45,20 @@ function fieldsOf(r) {
   return f;
 }
 
+// the order the fields are shown in, with the label each one has in the Describe tab
+const FIELD_LABELS = [['headline', 'describe.headline'], ['caption', 'describe.caption'], ['alt', 'describe.alt'], ['keywords', 'describe.keywords'],
+  ['author', 'describe.author'], ['authorTitle', 'describe.authorTitle'], ['sublocation', 'describe.sublocation'], ['city', 'describe.city'],
+  ['state', 'describe.state'], ['country', 'describe.country'], ['instructions', 'describe.instructions'], ['rating', 'marks.label']];
+const RATING_NAMES = { 5: 'marks.great', 3: 'marks.ok', '-1': 'marks.rejectBadge' };
+
+/** The fields of one file as label and value, for the confirmation to list before anything is written. */
+function fieldRows(fields) {
+  return FIELD_LABELS.filter(([k]) => fields[k] !== undefined).map(([k, label]) => ({
+    label: t(label),
+    value: k === 'rating' ? t(RATING_NAMES[fields.rating] || 'marks.none') : Array.isArray(fields[k]) ? fields[k].join(', ') : String(fields[k]),
+  }));
+}
+
 /** The sidecar of a file: the one that exists (photo.xmp, photo.CR2.xmp), else photo.xmp. */
 function sidecarOf(file) {
   const a = file.replace(/\.[^.\\/]+$/, '.xmp');
@@ -85,6 +99,12 @@ class MetadataWriteMainService {
         more: Math.max(0, jobs.length - PREVIEW),
         count: jobs.length,
         confirmLabel: t('main.meta.write.confirm'), danger: false,
+        // what goes into each file, for who wants to read it before typing the code (folded until asked)
+        details: {
+          label: t('main.meta.write.details'),
+          groups: jobs.slice(0, PREVIEW).map((j) => ({ label: j.r.name, rows: fieldRows(j.fields) })),
+          more: Math.max(0, jobs.length - PREVIEW),
+        },
         note: [inside ? tn('main.meta.write.noteInside', inside) : '', jobs.length - inside ? tn('main.meta.write.noteSidecar', jobs.length - inside) : '', rows.length - jobs.length ? tn('main.meta.write.skipped', rows.length - jobs.length) : ''].filter(Boolean).join(' '),
       },
     };
@@ -270,4 +290,4 @@ class MetadataWriteMainService {
   }
 }
 
-module.exports = { MetadataWriteMainService, fieldsOf };
+module.exports = { MetadataWriteMainService, fieldsOf, fieldRows };

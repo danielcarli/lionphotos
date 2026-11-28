@@ -14,7 +14,10 @@ import { fold } from '../../services/library/browser/libraryService.js';
 
 const NEW = '__new__';
 
-/** @param {{ folders?: string[], ids?: number[], title: string }} target */
+/**
+ * @param {{ folders?: string[], ids?: number[], title: string, only?: string }} target `only`: one kind of label
+ *   (people, pets, places…) shown alone — asked for from the panel, where the category and the other kinds already are
+ */
 export function showLabelsDialog(services, target) {
   const { labels, library, notifications } = services;
   const warn = (err) => notifications.warn(String(err?.message || err).replace(/^Error invoking remote method '[^']+': (Error: )?/, ''));
@@ -43,13 +46,17 @@ export function showLabelsDialog(services, target) {
     inheritedIds.push(...[...parent.ids]);
   }
 
+  const only = LABEL_TYPES.some((x) => x.type === target.only && x.type !== 'sphere') ? target.only : null;
+  const kinds = only ? LABEL_TYPES.filter((x) => x.type === only) : LABEL_TYPES;
+
   return new Promise((resolve) => {
     const body = h('div.lbl-body');
     // what is typed in each field of albums, people…: it finds them (the chips filtered as one types), or names a new one
     const queries = {};
     const render = () => {
       const focused = document.activeElement?.dataset?.labelType;
-      setChildren(body, LABEL_TYPES.map((ty) => section(ty)));
+      setChildren(body, kinds.map((ty) => section(ty)));
+      if (only && !focused) requestAnimationFrame(() => body.querySelector('.lbl-add, select')?.focus());
       if (focused) body.querySelector(`.lbl-add[data-label-type="${focused}"]`)?.focus();
     };
 
@@ -141,8 +148,8 @@ export function showLabelsDialog(services, target) {
     const save = h('button.btn.btn-primary', t('labels.save'));
     const cancel = h('button.btn.btn-secondary', t('common.cancel'));
     const dialog = h('div.cm-dialog.labels-dialog', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'lb-title' },
-      h('header.cm-head', h('span.cm-icon', { html: icon('tag', 20) }), h('div', h('div.eyebrow', t('labels.eyebrow')), h('h2#lb-title', target.title))),
-      h('p.cm-message', target.folders?.length ? t('labels.folderHint') : t('labels.filesHint')),
+      h('header.cm-head', h('span.cm-icon', { html: icon(only ? kinds[0].icon : 'tag', 20) }), h('div', h('div.eyebrow', only ? t(`labels.type.${only}.plural`) : t('labels.eyebrow')), h('h2#lb-title', target.title))),
+      only ? null : h('p.cm-message', target.folders?.length ? t('labels.folderHint') : t('labels.filesHint')),
       body,
       h('footer.cm-actions', cancel, save));
     const overlay = h('div.cm-overlay', dialog);

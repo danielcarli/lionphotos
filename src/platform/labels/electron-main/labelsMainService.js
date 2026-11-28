@@ -11,7 +11,7 @@ const { t } = require('../../nls/common/nls');
 
 // "client" was a type until 1.0.0 — personal / professional replaced it; old client labels stay in the
 // catalog, but none can be created or linked any more
-const TYPES = ['project', 'person', 'pet', 'place', 'album'];
+const TYPES = ['project', 'person', 'pet', 'place', 'album', 'tag'];
 const SINGLE = ['project', 'sphere'];
 // personal or professional: two fixed labels of the type "sphere" (their names are keys, translated by the
 // window), one per item like a project — a folder's covers everything inside, a file's own wins

@@ -698,9 +698,47 @@ app.whenReady().then(async () => {
       if (!pv.infoOpen) pv.toggleInfo();
       const secs = () => [...document.querySelectorAll('.info-panel .ip-secs > .ip-sec')].map((x) => x.dataset.sec).join();
       const out = {};
+      // the rail (1.85.0): four tabs as small icons down the panel's left edge, their names written beside them or
+      // not (remembered); Organize first; a click on the tab shown folds the panel to the rail alone
+      { localStorage.removeItem('lionphotos.panel.tab'); localStorage.removeItem('lionphotos.panel.railNames'); pv.rerenderInfo(); await wait(600);
+        const rail = () => document.querySelector('.info-panel > .ip-rail'); const tabs = () => [...rail().querySelectorAll('.ip-tab')];
+        const r = { first: tabs().map((b) => b.dataset.tab + (b.getAttribute('aria-selected') === 'true' ? '*' : '')).join(), secs: secs(),
+          names: tabs().map((b) => b.querySelector('.ip-rail-name')?.textContent).join(), left: rail().getBoundingClientRect().left <= document.querySelector('.info-panel .ip-main').getBoundingClientRect().left,
+          compact: !!document.querySelector('.info-panel .ip-head.is-compact'), links: !!document.querySelector('.info-panel .ip-links') };
+        rail().querySelector('.ip-rail-names').click(); await wait(400);
+        r.iconsOnly = !rail().querySelector('.ip-rail-name') && localStorage.getItem('lionphotos.panel.railNames') === '0' && tabs().every((b) => b.getAttribute('aria-label'));
+        rail().querySelector('.ip-rail-names').click(); await wait(400); r.namesBack = !!rail().querySelector('.ip-rail-name');
+        rail().querySelector('.ip-tab[data-tab="organize"]').click(); await wait(400);
+        r.folded = !pv.infoOpen && document.querySelector('.info-panel').classList.contains('is-folded') && Math.round(document.querySelector('.info-panel').getBoundingClientRect().width) === 44 && tabs().length === 4;
+        rail().querySelector('.ip-tab[data-tab="adjust"]').click(); await wait(600);
+        r.reopened = pv.infoOpen && secs() === 'adjust' && !document.querySelector('.info-panel .ip-head.is-compact');
+        out.rail = r; }
       localStorage.setItem('lionphotos.panel.tab', 'describe'); pv.rerenderInfo(); await wait(600);
       out.tabs = [...document.querySelectorAll('.info-panel .ip-tab')].map((b) => b.dataset.tab + (b.getAttribute('aria-selected') === 'true' ? '*' : '')).join();
       out.describe = secs();
+      // the person's own labels (1.84.0): written in the field of the Organize tab, each one a set of photos in Labels
+      { localStorage.setItem('lionphotos.panel.tab', 'organize'); pv.rerenderInfo(); await wait(600);
+        const top = () => document.querySelector('.info-panel .ip-sec[data-sec="organize"]');
+        top().querySelectorAll('.ip-sec[data-open="0"] .ip-sec-h').forEach((b) => b.click()); await wait(150);
+        const type = async (name) => { const f = top().querySelector('.ip-tag-input'); f.focus(); f.value = name; f.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); await wait(600); };
+        await type('Para imprimir'); await type('para IMPRIMIR');
+        const tag = s.labels.ofType('tag');
+        out.tag = { chips: [...top().querySelectorAll('.ip-tags .sel-chip-name')].map((x) => x.textContent).join(), made: tag.map((l) => l.name).join(), focus: document.activeElement?.classList.contains('ip-tag-input'),
+          has: tag.length === 1 && s.labels.of(lib.byId.get(jpg.id)).ids.has(tag[0].id), tab: !!document.querySelector('.activity-tag') };
+        if (tag.length) { lib.openLabel(tag[0].id, 'tag'); await wait(300); out.tag.opened = lib.view('main').map((x) => x.id).join() === String(jpg.id); lib.closeLabel(); await wait(200);
+          await s.labels.remove(tag[0].id); await wait(300); out.tag.removed = !s.labels.ofType('tag').length; }
+        lib.setSelection([jpg.id]); await wait(500); }
+      // "+ Pet" in Organize (1.85.1): the window with the pets alone (no category, no other kind); the names' switch
+      // at the top of the rail
+      { localStorage.setItem('lionphotos.panel.tab', 'organize'); pv.rerenderInfo(); await wait(600);
+        const org = document.querySelector('.info-panel .ip-sec[data-sec="organize"]');
+        const btn = [...org.querySelectorAll('.ip-add-chip, .ip-add')].find((b) => /Pet/.test(b.textContent + (b.title || '') + (b.getAttribute('aria-label') || '')));
+        btn?.click(); await wait(400);
+        const dlg = document.querySelector('.labels-dialog');
+        out.only = { found: !!btn, heads: [...(dlg?.querySelectorAll('.lbl-head') || [])].map((x) => x.textContent).join(), sphere: !!dlg?.querySelector('.lbl-sphere'), eyebrow: dlg?.querySelector('.eyebrow')?.textContent,
+          railFirst: document.querySelector('.info-panel .ip-rail-in')?.firstElementChild?.classList.contains('ip-rail-names') };
+        dlg?.querySelector('.btn-secondary')?.click(); await wait(200); }
+      localStorage.setItem('lionphotos.panel.tab', 'describe'); pv.rerenderInfo(); await wait(600);
       document.querySelector('.info-panel .ip-tab[data-tab="adjust"]').click(); await wait(600);
       out.adjust = secs(); out.one = !!document.querySelector('.info-panel .ip-secs.is-one') && document.querySelector('.info-panel .ip-sec[data-sec="adjust"]')?.dataset.open === '1';
       out.remembered = localStorage.getItem('lionphotos.panel.tab');
@@ -739,13 +777,21 @@ app.whenReady().then(async () => {
       out.vwSplitBtn = !!document.querySelector('.vw-info .ip-split');
       return out;
     })()`);
-    check(pt.tabs === 'adjust,describe*,info' && pt.describe === 'describe,organize,place' && pt.adjust === 'adjust' && pt.one && pt.remembered === 'adjust'
+    { const r = pt.rail || {};
+      check(r.first === 'organize*,adjust,describe,info' && r.secs === 'organize' && r.names === 'Organize,Adjust,Describe,Info' && r.left && r.compact && r.links && r.iconsOnly && r.namesBack && r.folded && r.reopened,
+        'the panel\'s rail: four tabs as small icons down its left edge (Organize first), names beside them or the icons alone (remembered); the photo small beside its name except in Adjust; a click on the tab shown folds the panel to the rail', JSON.stringify(r)); }
+    check(pt.only?.found && pt.only.heads === 'Pets' && !pt.only.sphere && pt.only.eyebrow === 'Pets' && pt.only.railFirst,
+      'a "+" of Organize opens the window with that kind alone (pets: no category, no people, places or albums); the names\' switch sits at the top of the rail', JSON.stringify(pt.only));
+    { const g = pt.tag || {};
+      check(g.chips === 'Para imprimir' && g.made === 'Para imprimir' && g.focus && g.has && g.tab && g.opened && g.removed,
+        'labels: written in the field of the Organize tab (the same word again makes no second label), the photo has it, Labels opens its photos like an album', JSON.stringify(g)); }
+    check(pt.tabs === 'organize,adjust,describe*,info' && pt.describe === 'describe,place' && pt.adjust === 'adjust' && pt.one && pt.remembered === 'adjust'
       && pt.accordion1 === 'color' && pt.accordion2 === 'lens' && pt.manualFolded && pt.safeLine,
       'the panel by task: Adjust · Describe · Info tabs (Describe: the words, the organization, author and place), the last one remembered; one adjustment group open at a time; the lens by hand folded; the footer in one line', JSON.stringify(pt));
-    check(pt.keyI === 'file' && pt.keyIAgain === 'closed' && pt.keyD === 'describe,organize,place' && pt.keyH === 'closed'
+    check(pt.keyI === 'file' && pt.keyIAgain === 'closed' && pt.keyD === 'describe,place' && pt.keyH === 'closed'
       && pt.width[1] === pt.width[0] + 20 && pt.width[2] === pt.width[1] && pt.widthBack,
       'E, D, I open the panel on their tab (that tab\'s key again folds it), H folds it; its edge makes it wider, remembered (double-click: back)', JSON.stringify({ keyI: pt.keyI, keyIAgain: pt.keyIAgain, keyD: pt.keyD, keyH: pt.keyH, width: pt.width, back: pt.widthBack }));
-    check(pt.vwTabs === 'adjust,describe*,info' && pt.vwLeft === true && !pt.vwSplitBtn, 'the viewer, narrower than 1680 px: one panel with the same tabs', JSON.stringify({ tabs: pt.vwTabs, left: pt.vwLeft, split: pt.vwSplitBtn }));
+    check(pt.vwTabs === 'organize,adjust,describe*,info' && pt.vwLeft === true && !pt.vwSplitBtn, 'the viewer, narrower than 1680 px: one panel with the same tabs', JSON.stringify({ tabs: pt.vwTabs, left: pt.vwLeft, split: pt.vwSplitBtn }));
     // wider than 1680 px: Describe and Info on the left, Adjust on the right; the switch keeps one panel
     const [ww, wh] = win.getSize();
     win.setSize(1840, 920); await wait(900);
@@ -759,14 +805,14 @@ app.whenReady().then(async () => {
         rightTabs: R.querySelectorAll('.ip-tab[role=tab]').length, footLeft: !!L.querySelector('.ip-foot'),
         arrows: Math.round(document.querySelector('.vw-prev').getBoundingClientRect().left - L.getBoundingClientRect().right) };
       R.querySelector('.ip-split').click(); await wait(500);
-      out.one = document.querySelector('.vw-info-left').hidden && [...document.querySelectorAll('.vw-info:not(.vw-info-left) .ip-tab[role=tab]')].length === 3 && localStorage.getItem('lionphotos.panel.split') === 'off';
+      out.one = document.querySelector('.vw-info-left').hidden && [...document.querySelectorAll('.vw-info:not(.vw-info-left) .ip-tab[role=tab]')].length === 4 && localStorage.getItem('lionphotos.panel.split') === 'off';
       document.querySelector('.vw-info .ip-split').click(); await wait(500);
       out.two = !document.querySelector('.vw-info-left').hidden;
       ${S}.viewer.close(); await wait(200);
       return out;
     })()`);
     win.setSize(ww, wh); await wait(400);
-    check(wide.inner >= 1680 && wide.left && wide.leftSecs === 'describe,organize,place,file' && wide.rightSecs === 'adjust' && wide.rightTabs === 0 && wide.footLeft && wide.arrows >= 0 && wide.one && wide.two,
+    check(wide.inner >= 1680 && wide.left && wide.leftSecs === 'organize,describe,place,file' && wide.rightSecs === 'adjust' && wide.rightTabs === 0 && wide.footLeft && wide.arrows >= 0 && wide.one && wide.two,
       'the viewer from 1680 px: Describe and Info on the left, Adjust on the right (the arrows clear of both); the switch keeps one panel with tabs, and back', JSON.stringify(wide));
     await js(`localStorage.setItem('lionphotos.panel.tab', 'all'), window.__lionphotos.views.photos.rerenderInfo(), true`);
     // "Photos of the day" (1.40.1): discreet, at the foot of Organization; it leaves the filters
@@ -3306,9 +3352,9 @@ app.whenReady().then(async () => {
       const pv = window.__lionphotos.views.photos;
       lib.setFilter({ day: '', year: 0, folder: '', recursive: true, labelId: 0, query: '' }); s.layout.openView('photos'); await wait(300);
       if (!pv.infoOpen) document.querySelector('.view-photos .info-toggle')?.click();
-      try { localStorage.setItem('lionphotos.panel.tab', 'describe'); } catch {}
+      try { localStorage.setItem('lionphotos.panel.tab', 'all'); } catch {} // every section: tall enough to scroll
       const imgs = lib.view('main').filter((x) => x.kind === 1).slice(0, 3);
-      const panel = document.querySelector('.view-photos .info-panel');
+      const panel = document.querySelector('.view-photos .info-panel .ip-main');
       const one = async (ids) => { lib.setSelection(ids); await wait(700); panel.scrollTop = panel.scrollHeight; await wait(100); const at = panel.scrollTop; pv.rerenderInfo(); await wait(700); return [at, panel.scrollTop]; };
       const single = await one([imgs[0].id]);
       const many = await one(imgs.map((x) => x.id));

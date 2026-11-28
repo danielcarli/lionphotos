@@ -127,8 +127,10 @@ export function organizeSection(s, items, { title, onLeave } = {}) {
   const all = tally(labels, items);
 
   const open = (id) => { library.openLabel(id, layout.activeView); layout.openView('photos'); };
-  const editLabels = () => showLabelsDialog(s, { ids, title: title || tn('labels.forFiles', total) });
-  const addFor = (type) => (type === 'album' ? () => addToAlbum(s, ids) : editLabels);
+  // "+" of a row (people, pets, places, projects): the window with that kind alone — the category and the other
+  // kinds are right here in the panel
+  const editLabels = (type) => () => showLabelsDialog(s, { ids, title: title || tn('labels.forFiles', total), only: type });
+  const addFor = (type) => (type === 'album' ? () => addToAlbum(s, ids) : editLabels(type));
   const count = (n) => (total === 1 ? null : n === total ? h('span.sel-chip-all', { title: t('selection.allTitle'), html: icon('check', 11) }) : h('span.sel-chip-count', t('selection.some', { n: formatNumber(n), total: formatNumber(total) })));
   const chip = (e, onRemove) => h('span.sel-chip', { class: `sel-chip${e.items.length === total ? ' all' : ''}` },
     h('button.sel-chip-main', { title: t(`labels.type.${e.label.type}.one`), onclick: () => open(e.label.id) },
@@ -141,6 +143,33 @@ export function organizeSection(s, items, { title, onLeave } = {}) {
   // taking a label off: only from the items that have it themselves (a folder's label stays with the folder)
   const removeLabel = (e) => (e.own.length ? { n: e.own.length, run: () => labels.link({ ids: e.own.map((it) => it.id), remove: [e.label.id] }) } : null);
   const removeAlbum = (e) => ({ n: e.items.length, run: () => removeFromAlbum(s, e.label.id, e.items) });
+
+  // the person's own labels: always there, with a field to write one (Enter adds it; a new word makes the label)
+  const tags = all.filter((e) => e.label.type === 'tag');
+  const known = labels.ofType('tag');
+  const listId = `ip-tags-${ids[0]}`;
+  const field = h('input.ip-tag-input', {
+    type: 'text', maxlength: '60', list: listId, placeholder: t('labels.tagField'), 'aria-label': t('labels.tagFieldTitle'), title: t('labels.tagFieldTitle'), 'data-desc': 'tag',
+    onkeydown: async (e) => {
+      e.stopPropagation();
+      if (e.key === 'Escape') { field.value = ''; field.blur(); return; }
+      if (e.key !== 'Enter' && e.key !== ',') return;
+      e.preventDefault();
+      const name = field.value.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!name) return;
+      field.disabled = true;
+      try {
+        const same = known.find((l) => l.name.localeCompare(name, undefined, { sensitivity: 'base' }) === 0);
+        const id = same?.id ?? await labels.save({ type: 'tag', name });
+        s.refocus = 'tag'; // the panel is drawn again: the field keeps the focus, for the next label
+        await labels.link({ ids, add: [id] });
+      } catch (err) { s.notifications?.warn(String(err?.message || err)); field.disabled = false; }
+    },
+  });
+  const tagRow = h('div.ip-lr.ip-tags', { 'data-kind': 'tag' },
+    h('span.ip-lr-k', h('span', { html: icon('tag', 13) }), t('labels.type.tag.plural')),
+    h('div.sel-chips', tags.map((e) => chip(e, removeLabel(e))), field,
+      h('datalist', { id: listId }, known.filter((l) => !tags.some((e) => e.label.id === l.id && e.items.length === total)).slice(0, 200).map((l) => h('option', { value: l.name })))));
 
   const rows = [];
   const empty = [];
@@ -167,5 +196,5 @@ export function organizeSection(s, items, { title, onLeave } = {}) {
   const summary = names.length || sameSphere
     ? h('span', [sameSphere ? t(`sphere.${sphere}`) : null, ...names.slice(0, 4)].filter(Boolean).join(' · ') + (names.length > 4 ? ` +${names.length - 4}` : ''))
     : h('span.muted', t('info.notOrganized'));
-  return collapsible({ id: 'organize', icon: 'tag', title: t('info.organize'), summary, body: [sphereSection(s, items, { segmented: true }), ...rows, addTo, sameDay] });
+  return collapsible({ id: 'organize', icon: 'tag', title: t('info.organize'), summary, body: [sphereSection(s, items, { segmented: true }), tagRow, ...rows, addTo, sameDay] });
 }

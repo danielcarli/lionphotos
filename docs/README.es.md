@@ -28,7 +28,7 @@ Explora, busca y organiza colecciones enormes de fotos y vídeos allí donde ya 
 
 **Sin importar nada** · **Nada sale de tu ordenador** · **100 000 fotos se desplazan como 100** · **Gratuito y de código abierto**
 
-![Versión 1.83.4](https://img.shields.io/badge/version-1.83.4-161214)
+![Versión 1.85.1](https://img.shields.io/badge/version-1.85.1-161214)
 ![Estado: prueba beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licencia: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plataformas: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -111,7 +111,7 @@ Titular, pie de foto, audiodescripción, autor y lugar para una foto o cien a la
 
 > *«El disco está lleno de cosas que no necesito.»*
 
-Marque los descartes mientras mira y envíelos al Limbo; encuentre archivos repetidos por su contenido y envíe también allí sus copias de más. Solo el Limbo envía archivos a la Papelera; nada se borra para siempre.
+Marque los descartes mientras mira y envíelos al Limbo; encuentre archivos repetidos por su contenido y envíe también allí sus copias de más. Solo el Limbo envía archivos a la Papelera; nada se borra para siempre. Escriba sus propias etiquetas en las fotos ("para imprimir", "portafolio"): cada una reúne sus fotos en *Etiquetas*, como un álbum.
 
 <p align="center"><img src="screenshots/duplicates.webp" alt="Archivos repetidos" width="860"><br><sub><b>Archivos repetidos</b> — encontrados por su contenido</sub></p>
 
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-fotos"; npm run test:e2e
 
 ## Historial de cambios
 
-Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.83.4**.
+Consulte [CHANGELOG.md](../CHANGELOG.md) (en inglés). Versión actual: **1.85.1**.
 
 ## Créditos
 

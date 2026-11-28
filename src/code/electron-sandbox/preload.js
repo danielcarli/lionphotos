@@ -155,10 +155,6 @@ contextBridge.exposeInMainWorld('host', {
     setEnabled: (id, on) => ipcRenderer.invoke('plugins:setEnabled', id, on),
     openLast: (what) => ipcRenderer.invoke('plugins:openLast', what),
     cancelExport: () => ipcRenderer.invoke('plugins:cancelExport'),
-    // publish plugins: the site's address and the key (kept encrypted in the main process; never read back)
-    publishTarget: (id) => ipcRenderer.invoke('plugins:publishTarget', id),
-    savePublishTarget: (id, target) => ipcRenderer.invoke('plugins:savePublishTarget', id, target),
-    checkPublishTarget: (id) => ipcRenderer.invoke('plugins:checkPublishTarget', id),
     onExport: on('plugins:export'),
     // an adjusted photo is drawn by the window (the same shader as the screen) and handed back
     onRender: on('plugins:render'),

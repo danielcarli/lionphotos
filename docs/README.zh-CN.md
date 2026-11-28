@@ -28,7 +28,7 @@
 
 **无需导入** · **数据不出本机** · **10 万张照片如 100 张般流畅** · **免费开源**
 
-![版本 1.83.4](https://img.shields.io/badge/version-1.83.4-161214)
+![版本 1.85.1](https://img.shields.io/badge/version-1.85.1-161214)
 ![状态：Beta 测试](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![许可证：MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![平台：Windows、macOS、Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -111,7 +111,7 @@
 
 > *“磁盘里塞满了不需要的东西。”*
 
-边看边标记废片并送进 Limbo；按内容找出重复文件，并把多余副本也送进那里。只有 Limbo 会把文件移到回收站，绝不永久删除。
+边看边标记废片并送进 Limbo；按内容找出重复文件，并把多余副本也送进那里。只有 Limbo 会把文件移到回收站，绝不永久删除。还可以给照片写上自己的标签（“待打印”“作品集”），在“标签”里像相册一样打开。
 
 <p align="center"><img src="screenshots/duplicates.webp" alt="重复文件" width="860"><br><sub><b>重复文件</b> — 按内容查找</sub></p>
 
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 更新日志
 
-参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.83.4**。
+参见 [CHANGELOG.md](../CHANGELOG.md)（英文）— 当前版本：**1.85.1**。
 
 ## 致谢
 

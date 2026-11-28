@@ -1,0 +1,1687 @@
+From f9e312b0ce5c7fe1d224cb28dee14544298ec2ab Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 25 Nov 2026 11:18:16 +0000
+Subject: [PATCH] Publishing plugins: send albums straight to a site
+ (lionphotos-publish-v1)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A plugin with kind "publish" sends albums and projects to a site that
+speaks the publish protocol instead of exporting a page to a folder. The
+export dialog asks for the site's address and an upload key, checks the
+connection and publishes with the typed code; photos the site already
+has are not sent again and the ones taken out of the album leave the
+site. The key is kept encrypted by the system (safeStorage).
+
+Adds the Coordenadoria de Comunicação UFSM (Mercúrio) plugin, texts in
+the 10 languages, docs and unit checks.
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01K9hMzBG5JuzK7PLskYcV93
+---
+ CHANGELOG.md                                  |   7 +
+ docs/PLUGINS.md                               |  57 +++++++
+ plugins/coordenadoria-ufsm/README.md          |  13 ++
+ plugins/coordenadoria-ufsm/assets/icon.svg    |  41 +++++
+ plugins/coordenadoria-ufsm/plugin.json        |  21 +++
+ src/code/electron-sandbox/preload.js          |   4 +
+ src/nls/de.json                               |  38 +++++
+ src/nls/en.json                               |  38 +++++
+ src/nls/es.json                               |  38 +++++
+ src/nls/fr.json                               |  38 +++++
+ src/nls/it.json                               |  38 +++++
+ src/nls/ja.json                               |  38 +++++
+ src/nls/ko.json                               |  38 +++++
+ src/nls/pt-BR.json                            |  38 +++++
+ src/nls/pt-PT.json                            |  38 +++++
+ src/nls/zh-CN.json                            |  38 +++++
+ .../electron-main/pluginsMainService.js       | 134 +++++++++++++++-
+ src/platform/plugins/node/pluginPackage.js    |  44 ++++-
+ src/platform/plugins/node/publisher.js        | 150 ++++++++++++++++++
+ src/workbench/browser/media/workbench.css     |   5 +
+ src/workbench/contrib/plugins/exportDialog.js |  48 +++++-
+ src/workbench/contrib/plugins/pluginView.js   |   4 +-
+ .../plugins/browser/pluginsService.js         |  30 +++-
+ tools/nls/de.py                               |   2 +
+ tools/nls/en.py                               |   2 +
+ tools/nls/es.py                               |   2 +
+ tools/nls/fr.py                               |   2 +
+ tools/nls/it.py                               |   2 +
+ tools/nls/ja.py                               |   2 +
+ tools/nls/ko.py                               |   2 +
+ tools/nls/pt_BR.py                            |   2 +
+ tools/nls/pt_PT.py                            |   2 +
+ tools/nls/zh_CN.py                            |   2 +
+ tools/test-plugins.js                         |  82 ++++++++++
+ 34 files changed, 1015 insertions(+), 25 deletions(-)
+ create mode 100644 plugins/coordenadoria-ufsm/README.md
+ create mode 100644 plugins/coordenadoria-ufsm/assets/icon.svg
+ create mode 100644 plugins/coordenadoria-ufsm/plugin.json
+ create mode 100644 src/platform/plugins/node/publisher.js
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 10a9c30..e395f3f 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -2,6 +2,13 @@
+ 
+ All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
+ 
++## [Unreleased]
++
++### Added
++- **Publishing plugins** (`"kind": "publish"`): albums and projects go straight to a site — a photo catalog, an agency's archive — instead of a folder. The export dialog asks for the site's address and an upload key, checks the connection (whose key it is, on which site) and publishes with the typed code; the photos are made as for an export, in a temporary folder, sent and the folder removed. Photos the site already has with the same picture are not sent again, and the ones taken out of the album leave the site. The key is kept encrypted by the system and never goes back to the window; `https://` only, or `http://` for this computer and the local network. Protocol `lionphotos-publish-v1`, described in docs/PLUGINS.md.
++- Plugin **Coordenadoria de Comunicação UFSM (Mercúrio)** (`plugins/coordenadoria-ufsm`): publishes to the photo catalog of the UFSM Communication office.
++- Texts in the 10 languages; unit checks for the manifest, the address rule and the protocol against a site in memory (only the files asked are sent, nothing twice, nothing from outside the export folder, a refused key stops at once).
++
+ ## [1.83.3] — 2026-11-19
+ 
+ ### Fixed
+diff --git a/docs/PLUGINS.md b/docs/PLUGINS.md
+index 29dbc5e..6627d65 100644
+--- a/docs/PLUGINS.md
++++ b/docs/PLUGINS.md
+@@ -121,6 +121,63 @@ are only added.
+ `image` is `null` for a file that could not be rendered (a raw file without a preview, for example). Use
+ `alt` as the image's `alt` text: it is what screen readers say.
+ 
++## Publishing plugins
++
++A plugin with `"kind": "publish"` brings no page: it **sends the albums and projects to a site** — a photo
++catalog, an agency's archive — that speaks the publish protocol. It needs no `template/`; `assets/` holds its
++icon.
++
++```json
++{
++  "id": "my-site",
++  "version": "1.0.0",
++  "kind": "publish",
++  "name": { "en": "My photo site" },
++  "accepts": ["album", "project"],
++  "icon": "assets/icon.svg",
++  "photo": { "sizes": [2048, 3000], "thumb": 560, "web": 1600 },
++  "publish": {
++    "protocol": "lionphotos-publish-v1",
++    "path": "/api/photos/publish",
++    "url": "https://photos.example.org",
++    "site": { "en": "Example photos" }
++  }
++}
++```
++
++- `publish.protocol`: `lionphotos-publish-v1` (the only one for now).
++- `publish.path`: where the protocol's API is on the site; the person gives the site's address.
++- `publish.url` (optional): the address offered at first; the person can change it. `https://` only — or
++  `http://` for this computer and the local network (`localhost`, `192.168.…`, `10.…`, `*.local`), so a key never
++  crosses the internet unencrypted.
++- `publish.site` (optional): the site's name in the confirmation.
++
++In the export dialog the person types the address and the **upload key** the site gave them, and can check the
++connection (the site answers whose key it is). The key is kept encrypted by the system (Windows DPAPI, macOS
++Keychain, the Linux keyring) and never goes back to the window; where the system cannot encrypt it, it is kept
++only until LionPhotos is closed. Publishing asks for the typed confirmation code like an export; it is made in a
++temporary folder (the same files an export makes), sent, and the folder removed.
++
++### The protocol (lionphotos-publish-v1)
++
++Every request carries `Authorization: Bearer <key>`; answers are JSON, errors `{ "error": "…" }` with a 4xx
++status (401 or 403: the key). `API` is the site's address + `publish.path`.
++
++1. `GET API/` → `{ "protocol": "lionphotos-publish-v1", "system": "Site name", "user": "Whose key" }`.
++2. For each collection, `POST API/collections` with the collection as in `data.js` (above), each item with
++   `hash`: the SHA-256 (hex) of its `image` file. The site answers which files it still needs:
++   `{ "id": 7, "photos": [{ "index": 0, "id": 41, "file": "IMG_1091.CR2", "send": ["thumb", "web", "original", "image"] }], "same": 12, "keep": [41, …] }`
++   — `index` is the item's position; items not listed are already there with the same picture (only their data
++   is updated); `keep` is every photo of the collection on the site.
++3. For each file asked, `PUT API/photos/{id}/{kind}` with the file as the body (`thumb`, `web`, `original`, and
++   `image` last: then the photo is complete).
++4. `POST API/collections/{id}/finish` with `{ "keep": […] }` → `{ "photos": 13, "removed": 1, "published": false, "url": "https://…" }`:
++   photos not kept (taken out of the album in LionPhotos, or left half-sent) leave the site. `url` is the
++   collection's page there, offered as *Open on the site* when it is on the address the person chose.
++
++A collection is matched by its name; sending the same album again sends only new and changed photos. Network
++failures and 5xx answers are tried again (three times). LionPhotos sends only the files of the export folder.
++
+ ## Safety
+ 
+ Installing, removing and exporting change files, so each one asks for the typed confirmation code, like every
+diff --git a/plugins/coordenadoria-ufsm/README.md b/plugins/coordenadoria-ufsm/README.md
+new file mode 100644
+index 0000000..e1dc68c
+--- /dev/null
++++ b/plugins/coordenadoria-ufsm/README.md
+@@ -0,0 +1,13 @@
++# Coordenadoria de Comunicação UFSM (Mercúrio)
++
++Plugin de publicação: envia álbuns e projetos do LionPhotos direto para o catálogo de fotos do sistema da
++Coordenadoria (Mercúrio), pelo protocolo `lionphotos-publish-v1`.
++
++1. No sistema, em **Fotos › Publicar direto do LionPhotos**, crie uma chave de envio e copie.
++2. No LionPhotos, instale este plugin (`node tools/build-plugin.js plugins/coordenadoria-ufsm`), escolha os
++   álbuns e clique em **Publicar…**.
++3. Informe o endereço do sistema (por padrão `http://localhost:8080`) e cole a chave. **Testar a conexão** mostra
++   em nome de quem as fotos vão entrar.
++
++Coberturas novas entram como rascunho. Publicar de novo o mesmo álbum atualiza os dados, envia só as fotos novas
++ou alteradas e tira do site as que saíram do álbum.
+diff --git a/plugins/coordenadoria-ufsm/assets/icon.svg b/plugins/coordenadoria-ufsm/assets/icon.svg
+new file mode 100644
+index 0000000..b4faa8d
+--- /dev/null
++++ b/plugins/coordenadoria-ufsm/assets/icon.svg
+@@ -0,0 +1,41 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<svg id="Camada_1" data-name="Camada 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 357.03 362.74">
++  <defs>
++    <style>
++      .cls-1 {
++        fill: #045385;
++      }
++
++      .cls-2 {
++        fill: #b47eb5;
++      }
++
++      .cls-3 {
++        fill: #e8630c;
++      }
++
++      .cls-4 {
++        fill: #26b2b0;
++      }
++
++      .cls-5 {
++        fill: #b17bb2;
++      }
++    </style>
++  </defs>
++  <g>
++    <path class="cls-4" d="M170.77,230.52l-12.41,21.27,29.65-19.81c3.46-2.31,5.41-6.31,5.09-10.46l-.37-4.85c-6.43,3.77-13.44,6.65-20.88,8.46.24,1.84-.12,3.73-1.09,5.39Z"/>
++    <path class="cls-5" d="M230.73,158.53c-2.13,18.36-10.63,34.76-23.25,46.95,15.95-5.59,27.38-20.94,26.92-38.96l-.37-14.66c-1,2.29-2.1,4.51-3.3,6.68Z"/>
++    <path class="cls-4" d="M216.2,87.92c.12,1.71.21,3.42.21,5.16,0,3.29-.24,6.51-.68,9.68,9.76,13.01,15.55,29.18,15.55,46.7,0,3.07-.2,6.09-.54,9.07,1.2-2.17,2.3-4.39,3.3-6.68l-.92-36.09c-.31-12.13-7.13-22.43-16.91-27.84Z"/>
++    <path class="cls-4" d="M215.72,102.76c.44-3.16.68-6.39.68-9.68,0-1.74-.09-3.45-.21-5.16-5.87-3.25-12.81-4.74-20.04-3.8l-.33.04c7.67,5,14.41,11.29,19.89,18.6Z"/>
++    <path class="cls-2" d="M230.73,158.53c-13.29,23.93-38.82,40.13-68.13,40.13-13.96,0-27.04-3.69-38.37-10.11,4.24,9.8,13.55,17.17,25.15,18.23l13.01,1.18,8.33,13.88c.62,1.03.99,2.15,1.14,3.3,7.44-1.81,14.45-4.69,20.88-8.46l-.68-8.97c5.42.29,10.62-.55,15.42-2.24,12.62-12.19,21.12-28.59,23.25-46.95Z"/>
++    <path class="cls-1" d="M215.72,102.76c-.27,1.97-.63,3.91-1.07,5.82,6.17,6.66,6.58,17.41-1.52,26.75-2.51,2.89-5.66,5.18-9.06,6.94-43.48,22.51-28.11,45.94,3.11,22.48,8.12-6.9,14.58.83,7.56,7.23-38.32,34.1-74.01,19.15-74.76-9.53-5.17-.5-10.17-1.56-14.95-3.13l-2.43,10.01c-1.63,6.72-.89,13.39,1.63,19.21,11.33,6.43,24.42,10.11,38.37,10.11,29.32,0,54.84-16.2,68.13-40.13.35-2.98.54-6,.54-9.07,0-17.52-5.79-33.69-15.55-46.7Z"/>
++    <path class="cls-3" d="M133.46,124.62l-8.43,34.71c4.78,1.56,9.78,2.63,14.95,3.13-.27-10.33,3.99-22.45,14.3-34.69,27.37-29.98,50.81-29.5,60.37-19.18.43-1.91.79-3.85,1.07-5.82-5.48-7.31-12.22-13.6-19.89-18.6l-20.13,2.61c-20.55,2.66-37.35,17.71-42.24,37.85Z"/>
++  </g>
++  <g>
++    <path class="cls-1" d="M149.22,282.87c-1.02-.53-1.8-1.32-2.34-2.37-.54-1.05-.81-2.32-.81-3.81v-11.2h3.64v11.57c0,1.3.3,2.29.91,2.96.61.68,1.48,1.01,2.63,1.01s1.99-.34,2.59-1.01c.6-.68.9-1.66.9-2.96v-11.57h2.91v11.2c0,2.25-.6,3.98-1.79,5.17-1.2,1.19-2.87,1.79-5.02,1.79-1.39,0-2.59-.27-3.61-.79Z"/>
++    <path class="cls-1" d="M162.87,265.5h10.94v2.63h-7.38v4.73h6.86v2.63h-6.86v7.85h-3.56v-17.83Z"/>
++    <path class="cls-1" d="M176.48,282.29c-1.08-.92-1.67-2.23-1.75-3.92l2.94-.37c.12,1.15.48,1.94,1.08,2.39.6.45,1.4.68,2.4.68.94,0,1.68-.19,2.22-.57.55-.38.82-.96.82-1.74,0-.48-.11-.89-.34-1.21-.23-.32-.61-.62-1.16-.91-.55-.28-1.35-.61-2.4-.98-1.25-.43-2.24-.9-2.98-1.39-.74-.5-1.27-1.08-1.6-1.74s-.49-1.46-.49-2.38c0-1.04.24-1.93.73-2.69.48-.75,1.17-1.33,2.04-1.71.87-.39,1.88-.59,3.03-.59,1.89,0,3.35.42,4.38,1.26,1.03.84,1.62,2,1.75,3.49l-2.86.29c-.16-.92-.49-1.57-.99-1.95-.5-.38-1.2-.57-2.08-.57-.83,0-1.48.18-1.94.55-.46.36-.69.87-.69,1.51,0,.45.12.83.35,1.14.23.31.61.6,1.12.86.51.26,1.28.56,2.3.91,1.39.47,2.47.96,3.25,1.48.78.52,1.34,1.12,1.69,1.8.35.68.52,1.48.52,2.42,0,1.75-.59,3.07-1.77,3.98-1.18.9-2.78,1.35-4.81,1.35s-3.69-.46-4.77-1.38Z"/>
++    <path class="cls-1" d="M190.03,265.5h4.05l4.21,8.24,4.18-8.24h4.08v17.83h-3.56v-12.66l-4.08,7.95h-1.95l-4.03-7.93v12.63h-2.91v-17.83Z"/>
++  </g>
++</svg>
+\ No newline at end of file
+diff --git a/plugins/coordenadoria-ufsm/plugin.json b/plugins/coordenadoria-ufsm/plugin.json
+new file mode 100644
+index 0000000..90f232e
+--- /dev/null
++++ b/plugins/coordenadoria-ufsm/plugin.json
+@@ -0,0 +1,21 @@
++{
++  "id": "coordenadoria-ufsm",
++  "version": "1.0.0",
++  "kind": "publish",
++  "name": { "en": "UFSM Communication office (Mercúrio)", "pt-BR": "Coordenadoria de Comunicação UFSM (Mercúrio)", "pt-PT": "Coordenadoria de Comunicação UFSM (Mercúrio)" },
++  "shortName": { "en": "Mercúrio", "pt-BR": "Mercúrio" },
++  "description": {
++    "en": "Publishes albums and projects straight to the photo catalog of the UFSM Communication office, with authors, captions and credits. They arrive as drafts; publishing them is decided in the system.",
++    "pt-BR": "Publica álbuns e projetos direto no catálogo de fotos da Coordenadoria de Comunicação da UFSM, com autores, legendas e créditos. Chegam como rascunho; quem publica decide no sistema."
++  },
++  "author": "Coordenadoria de Comunicação UFSM",
++  "accepts": ["album", "project"],
++  "icon": "assets/icon.svg",
++  "photo": { "sizes": [2048, 3000], "thumb": 560, "web": 1600 },
++  "publish": {
++    "protocol": "lionphotos-publish-v1",
++    "path": "/api/catalogo/publicar",
++    "url": "http://localhost:8080",
++    "site": { "en": "Mercúrio", "pt-BR": "Mercúrio" }
++  }
++}
+diff --git a/src/code/electron-sandbox/preload.js b/src/code/electron-sandbox/preload.js
+index ebae682..e22b5b1 100644
+--- a/src/code/electron-sandbox/preload.js
++++ b/src/code/electron-sandbox/preload.js
+@@ -155,6 +155,10 @@ contextBridge.exposeInMainWorld('host', {
+     setEnabled: (id, on) => ipcRenderer.invoke('plugins:setEnabled', id, on),
+     openLast: (what) => ipcRenderer.invoke('plugins:openLast', what),
+     cancelExport: () => ipcRenderer.invoke('plugins:cancelExport'),
++    // publish plugins: the site's address and the key (kept encrypted in the main process; never read back)
++    publishTarget: (id) => ipcRenderer.invoke('plugins:publishTarget', id),
++    savePublishTarget: (id, target) => ipcRenderer.invoke('plugins:savePublishTarget', id, target),
++    checkPublishTarget: (id) => ipcRenderer.invoke('plugins:checkPublishTarget', id),
+     onExport: on('plugins:export'),
+     // an adjusted photo is drawn by the window (the same shader as the screen) and handed back
+     onRender: on('plugins:render'),
+diff --git a/src/nls/de.json b/src/nls/de.json
+index a9ed734..857b40f 100644
+--- a/src/nls/de.json
++++ b/src/nls/de.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "Weiter",
+   "plugins.givesBrand": "Gibt der App den Namen „{name}“ und das Logo, solange es eingeschaltet ist.",
+   "plugins.givesLogo": "Gibt der App das Logo, solange es eingeschaltet ist.",
++  "plugins.publish.preparing": "Fotos werden vorbereitet…",
++  "plugins.publish.sending": "Wird an die Website gesendet…",
++  "plugins.publish.canceled": "Veröffentlichung abgebrochen. Bereits Gesendetes bleibt auf der Website, wie es war.",
++  "plugins.publish.failed": "Die Veröffentlichung ist fehlgeschlagen: {error}",
++  "plugins.publish.done.one": "{count} Foto auf {system} veröffentlicht.",
++  "plugins.publish.done.other": "{count} Fotos auf {system} veröffentlicht.",
++  "plugins.publish.sentSame.one": "{count} gesendet, {same} schon vorhanden.",
++  "plugins.publish.sentSame.other": "{count} gesendet, {same} schon vorhanden.",
++  "plugins.publish.openSite": "Auf der Website öffnen",
++  "plugins.publish.where": "Wohin veröffentlichen",
++  "plugins.publish.url": "Adresse der Website",
++  "plugins.publish.key": "Upload-Schlüssel",
++  "plugins.publish.keyKept": "Gespeichert (endet auf {end}); einen neuen eingeben, um ihn zu ersetzen",
++  "plugins.publish.keyHint": "Den auf der Website erstellten Schlüssel einfügen",
++  "plugins.publish.check": "Verbindung prüfen",
++  "plugins.publish.connected": "Verbunden mit {system} als {user}.",
++  "plugins.publish.notRemembered": "Dieses System kann den Schlüssel nicht verschlüsselt speichern: Er bleibt nur, bis LionPhotos geschlossen wird.",
++  "plugins.publish.note": "Die Fotos werden in der gewählten Größe an die Website gesendet; schon vorhandene werden nicht erneut gesendet. Ihre Fotos werden nicht verändert.",
++  "plugins.publish.next": "Veröffentlichen…",
++  "plugins.publish.chosen.one": "{count} ausgewähltes veröffentlichen…",
++  "plugins.publish.chosen.other": "{count} ausgewählte veröffentlichen…",
++  "plugins.publish.button": "Veröffentlichen…",
+   "crop.title": "Zuschneiden und begradigen",
+   "crop.open": "Zuschneiden und begradigen…",
+   "crop.canvasLabel": "Das Foto mit dem Zuschnitt: innen ziehen zum Verschieben, an Ecken und Seiten zum Ändern der Größe",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "Es läuft bereits ein Export.",
+   "main.plugins.export.summary.one": "Export von {count} Foto nach {folder}",
+   "main.plugins.export.summary.other": "Export von {count} Fotos nach {folder}",
++  "main.plugins.publish.badUrl": "Geben Sie die Adresse der Website mit https:// ein (http:// nur für diesen Computer oder das lokale Netz).",
++  "main.plugins.publish.badKey": "Der Schlüssel ist ungültig: Fügen Sie ihn so ein, wie die Website ihn zeigt.",
++  "main.plugins.publish.noKey": "Geben Sie den auf der Website erstellten Upload-Schlüssel ein.",
++  "main.plugins.publish.title.one": "{count} Foto auf {site} veröffentlichen",
++  "main.plugins.publish.title.other": "{count} Fotos auf {site} veröffentlichen",
++  "main.plugins.publish.message": "Die Fotos gehen an {host}, mit Ihrem Upload-Schlüssel.",
++  "main.plugins.publish.confirm": "Veröffentlichen",
++  "main.plugins.publish.note": "Es werden Kopien in der gewählten Größe gesendet; Ihre Fotos werden nicht verändert.",
++  "main.plugins.publish.noteOriginals": "Die Originaldateien werden ebenfalls gesendet; sie werden nicht verändert.",
++  "main.plugins.publish.summary.one": "{count} Foto auf {host} veröffentlicht",
++  "main.plugins.publish.summary.other": "{count} Fotos auf {host} veröffentlicht",
++  "main.plugins.publish.errors.unreachable": "Die Website ist nicht erreichbar ({detail}).",
++  "main.plugins.publish.errors.key": "Die Website hat den Schlüssel abgelehnt: {detail}",
++  "main.plugins.publish.errors.protocol": "Die Website spricht das Veröffentlichungsprotokoll von LionPhotos nicht ({detail}).",
++  "main.plugins.publish.errors.refused": "Die Website hat die Fotos abgelehnt: {detail}",
++  "main.plugins.publish.errors.canceled": "Abgebrochen.",
+   "main.openWith.title": "Programm zum Öffnen auswählen",
+   "main.openWith.programs": "Programme",
+   "main.library.errors.noFolder": "Öffnen Sie zuerst einen Ordner.",
+diff --git a/src/nls/en.json b/src/nls/en.json
+index 501d38c..940efe9 100644
+--- a/src/nls/en.json
++++ b/src/nls/en.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "Continue",
+   "plugins.givesBrand": "Gives the app its name, “{name}”, and its logo while it is on.",
+   "plugins.givesLogo": "Gives the app its logo while it is on.",
++  "plugins.publish.preparing": "Preparing the photos…",
++  "plugins.publish.sending": "Sending to the site…",
++  "plugins.publish.canceled": "Publishing canceled. What was sent stays on the site as it was.",
++  "plugins.publish.failed": "Publishing failed: {error}",
++  "plugins.publish.done.one": "{count} photo published on {system}.",
++  "plugins.publish.done.other": "{count} photos published on {system}.",
++  "plugins.publish.sentSame.one": "{count} sent, {same} already there.",
++  "plugins.publish.sentSame.other": "{count} sent, {same} already there.",
++  "plugins.publish.openSite": "Open on the site",
++  "plugins.publish.where": "Where to publish",
++  "plugins.publish.url": "Address of the site",
++  "plugins.publish.key": "Upload key",
++  "plugins.publish.keyKept": "Kept (ends in {end}); type a new one to replace it",
++  "plugins.publish.keyHint": "Paste the key created on the site",
++  "plugins.publish.check": "Check the connection",
++  "plugins.publish.connected": "Connected to {system} as {user}.",
++  "plugins.publish.notRemembered": "This system cannot keep the key encrypted: it is kept only until LionPhotos is closed.",
++  "plugins.publish.note": "The photos are sent to the site at the size chosen; photos already there are not sent again. Your photos are not changed.",
++  "plugins.publish.next": "Publish…",
++  "plugins.publish.chosen.one": "Publish {count} selected…",
++  "plugins.publish.chosen.other": "Publish {count} selected…",
++  "plugins.publish.button": "Publish…",
+   "crop.title": "Crop and straighten",
+   "crop.open": "Crop and straighten…",
+   "crop.canvasLabel": "The photo with the crop: drag inside to move it, the corners and sides to resize it",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "An export is already running.",
+   "main.plugins.export.summary.one": "Export of {count} photo to {folder}",
+   "main.plugins.export.summary.other": "Export of {count} photos to {folder}",
++  "main.plugins.publish.badUrl": "Type the site’s address with https:// (http:// only for this computer or the local network).",
++  "main.plugins.publish.badKey": "The key is not valid: paste it as the site shows it.",
++  "main.plugins.publish.noKey": "Type the upload key created on the site.",
++  "main.plugins.publish.title.one": "Publish {count} photo on {site}",
++  "main.plugins.publish.title.other": "Publish {count} photos on {site}",
++  "main.plugins.publish.message": "The photos go to {host}, with your upload key.",
++  "main.plugins.publish.confirm": "Publish",
++  "main.plugins.publish.note": "Copies at the size chosen are sent; your photos are not changed.",
++  "main.plugins.publish.noteOriginals": "The original files are sent too; they are not changed.",
++  "main.plugins.publish.summary.one": "{count} photo published on {host}",
++  "main.plugins.publish.summary.other": "{count} photos published on {host}",
++  "main.plugins.publish.errors.unreachable": "The site could not be reached ({detail}).",
++  "main.plugins.publish.errors.key": "The site refused the key: {detail}",
++  "main.plugins.publish.errors.protocol": "The site does not speak the LionPhotos publish protocol ({detail}).",
++  "main.plugins.publish.errors.refused": "The site refused the photos: {detail}",
++  "main.plugins.publish.errors.canceled": "Canceled.",
+   "main.openWith.title": "Choose the program to open with",
+   "main.openWith.programs": "Programs",
+   "main.library.errors.noFolder": "Open a folder first.",
+diff --git a/src/nls/es.json b/src/nls/es.json
+index ea62957..22fb41a 100644
+--- a/src/nls/es.json
++++ b/src/nls/es.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "Continuar",
+   "plugins.givesBrand": "Da a la app el nombre «{name}» y el logotipo mientras está activado.",
+   "plugins.givesLogo": "Da el logotipo a la app mientras está activado.",
++  "plugins.publish.preparing": "Preparando las fotos…",
++  "plugins.publish.sending": "Enviando al sitio…",
++  "plugins.publish.canceled": "Publicación cancelada. Lo ya enviado queda en el sitio como estaba.",
++  "plugins.publish.failed": "La publicación falló: {error}",
++  "plugins.publish.done.one": "{count} foto publicada en {system}.",
++  "plugins.publish.done.other": "{count} fotos publicadas en {system}.",
++  "plugins.publish.sentSame.one": "{count} enviada, {same} ya estaban.",
++  "plugins.publish.sentSame.other": "{count} enviadas, {same} ya estaban.",
++  "plugins.publish.openSite": "Abrir en el sitio",
++  "plugins.publish.where": "Dónde publicar",
++  "plugins.publish.url": "Dirección del sitio",
++  "plugins.publish.key": "Clave de envío",
++  "plugins.publish.keyKept": "Guardada (termina en {end}); escribe otra para cambiarla",
++  "plugins.publish.keyHint": "Pega la clave creada en el sitio",
++  "plugins.publish.check": "Probar la conexión",
++  "plugins.publish.connected": "Conectado a {system} como {user}.",
++  "plugins.publish.notRemembered": "Este sistema no puede guardar la clave cifrada: se guarda solo hasta cerrar LionPhotos.",
++  "plugins.publish.note": "Las fotos se envían al sitio en el tamaño elegido; las que ya están no se envían de nuevo. Tus fotos no cambian.",
++  "plugins.publish.next": "Publicar…",
++  "plugins.publish.chosen.one": "Publicar {count} seleccionado…",
++  "plugins.publish.chosen.other": "Publicar {count} seleccionados…",
++  "plugins.publish.button": "Publicar…",
+   "crop.title": "Recortar y enderezar",
+   "crop.open": "Recortar y enderezar…",
+   "crop.canvasLabel": "La foto con el recorte: arrastra dentro para moverlo, las esquinas y los lados para cambiar su tamaño",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "Ya hay una exportación en curso.",
+   "main.plugins.export.summary.one": "Exportación de {count} foto a {folder}",
+   "main.plugins.export.summary.other": "Exportación de {count} fotos a {folder}",
++  "main.plugins.publish.badUrl": "Escribe la dirección del sitio con https:// (http:// solo para este equipo o la red local).",
++  "main.plugins.publish.badKey": "La clave no es válida: pégala como la muestra el sitio.",
++  "main.plugins.publish.noKey": "Escribe la clave de envío creada en el sitio.",
++  "main.plugins.publish.title.one": "Publicar {count} foto en {site}",
++  "main.plugins.publish.title.other": "Publicar {count} fotos en {site}",
++  "main.plugins.publish.message": "Las fotos van a {host}, con tu clave de envío.",
++  "main.plugins.publish.confirm": "Publicar",
++  "main.plugins.publish.note": "Se envían copias en el tamaño elegido; tus fotos no cambian.",
++  "main.plugins.publish.noteOriginals": "También se envían los archivos originales; no cambian.",
++  "main.plugins.publish.summary.one": "{count} foto publicada en {host}",
++  "main.plugins.publish.summary.other": "{count} fotos publicadas en {host}",
++  "main.plugins.publish.errors.unreachable": "No se pudo contactar con el sitio ({detail}).",
++  "main.plugins.publish.errors.key": "El sitio rechazó la clave: {detail}",
++  "main.plugins.publish.errors.protocol": "El sitio no usa el protocolo de publicación de LionPhotos ({detail}).",
++  "main.plugins.publish.errors.refused": "El sitio rechazó las fotos: {detail}",
++  "main.plugins.publish.errors.canceled": "Cancelado.",
+   "main.openWith.title": "Elija el programa para abrir",
+   "main.openWith.programs": "Programas",
+   "main.library.errors.noFolder": "Abra primero una carpeta.",
+diff --git a/src/nls/fr.json b/src/nls/fr.json
+index 9a49bf0..03ea683 100644
+--- a/src/nls/fr.json
++++ b/src/nls/fr.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "Continuer",
+   "plugins.givesBrand": "Donne à l’application le nom « {name} » et le logo tant qu’il est activé.",
+   "plugins.givesLogo": "Donne le logo à l’application tant qu’il est activé.",
++  "plugins.publish.preparing": "Préparation des photos…",
++  "plugins.publish.sending": "Envoi vers le site…",
++  "plugins.publish.canceled": "Publication annulée. Ce qui a été envoyé reste sur le site tel quel.",
++  "plugins.publish.failed": "La publication a échoué : {error}",
++  "plugins.publish.done.one": "{count} photo publiée sur {system}.",
++  "plugins.publish.done.other": "{count} photos publiées sur {system}.",
++  "plugins.publish.sentSame.one": "{count} envoyée, {same} déjà présentes.",
++  "plugins.publish.sentSame.other": "{count} envoyées, {same} déjà présentes.",
++  "plugins.publish.openSite": "Ouvrir sur le site",
++  "plugins.publish.where": "Où publier",
++  "plugins.publish.url": "Adresse du site",
++  "plugins.publish.key": "Clé d’envoi",
++  "plugins.publish.keyKept": "Enregistrée (se termine par {end}) ; saisissez-en une autre pour la remplacer",
++  "plugins.publish.keyHint": "Collez la clé créée sur le site",
++  "plugins.publish.check": "Tester la connexion",
++  "plugins.publish.connected": "Connecté à {system} en tant que {user}.",
++  "plugins.publish.notRemembered": "Ce système ne peut pas garder la clé chiffrée : elle n’est gardée que jusqu’à la fermeture de LionPhotos.",
++  "plugins.publish.note": "Les photos sont envoyées au site à la taille choisie ; celles déjà présentes ne sont pas renvoyées. Vos photos ne sont pas modifiées.",
++  "plugins.publish.next": "Publier…",
++  "plugins.publish.chosen.one": "Publier {count} sélectionné…",
++  "plugins.publish.chosen.other": "Publier {count} sélectionnés…",
++  "plugins.publish.button": "Publier…",
+   "crop.title": "Recadrer et redresser",
+   "crop.open": "Recadrer et redresser…",
+   "crop.canvasLabel": "La photo et son cadre : glissez à l’intérieur pour le déplacer, les coins et les côtés pour le redimensionner",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "Un export est déjà en cours.",
+   "main.plugins.export.summary.one": "Export de {count} photo vers {folder}",
+   "main.plugins.export.summary.other": "Export de {count} photos vers {folder}",
++  "main.plugins.publish.badUrl": "Saisissez l’adresse du site avec https:// (http:// seulement pour cet ordinateur ou le réseau local).",
++  "main.plugins.publish.badKey": "La clé n’est pas valide : collez-la telle que le site l’affiche.",
++  "main.plugins.publish.noKey": "Saisissez la clé d’envoi créée sur le site.",
++  "main.plugins.publish.title.one": "Publier {count} photo sur {site}",
++  "main.plugins.publish.title.other": "Publier {count} photos sur {site}",
++  "main.plugins.publish.message": "Les photos vont vers {host}, avec votre clé d’envoi.",
++  "main.plugins.publish.confirm": "Publier",
++  "main.plugins.publish.note": "Des copies à la taille choisie sont envoyées ; vos photos ne sont pas modifiées.",
++  "main.plugins.publish.noteOriginals": "Les fichiers originaux sont aussi envoyés ; ils ne sont pas modifiés.",
++  "main.plugins.publish.summary.one": "{count} photo publiée sur {host}",
++  "main.plugins.publish.summary.other": "{count} photos publiées sur {host}",
++  "main.plugins.publish.errors.unreachable": "Impossible de joindre le site ({detail}).",
++  "main.plugins.publish.errors.key": "Le site a refusé la clé : {detail}",
++  "main.plugins.publish.errors.protocol": "Le site ne parle pas le protocole de publication de LionPhotos ({detail}).",
++  "main.plugins.publish.errors.refused": "Le site a refusé les photos : {detail}",
++  "main.plugins.publish.errors.canceled": "Annulé.",
+   "main.openWith.title": "Choisissez le programme pour ouvrir",
+   "main.openWith.programs": "Programmes",
+   "main.library.errors.noFolder": "Ouvrez d’abord un dossier.",
+diff --git a/src/nls/it.json b/src/nls/it.json
+index 9d4f684..ba27682 100644
+--- a/src/nls/it.json
++++ b/src/nls/it.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "Continua",
+   "plugins.givesBrand": "Dà all’app il nome «{name}» e il logo finché è attivo.",
+   "plugins.givesLogo": "Dà il logo all’app finché è attivo.",
++  "plugins.publish.preparing": "Preparazione delle foto…",
++  "plugins.publish.sending": "Invio al sito…",
++  "plugins.publish.canceled": "Pubblicazione annullata. Ciò che è stato inviato resta sul sito com’era.",
++  "plugins.publish.failed": "La pubblicazione non è riuscita: {error}",
++  "plugins.publish.done.one": "{count} foto pubblicata su {system}.",
++  "plugins.publish.done.other": "{count} foto pubblicate su {system}.",
++  "plugins.publish.sentSame.one": "{count} inviata, {same} già presenti.",
++  "plugins.publish.sentSame.other": "{count} inviate, {same} già presenti.",
++  "plugins.publish.openSite": "Apri sul sito",
++  "plugins.publish.where": "Dove pubblicare",
++  "plugins.publish.url": "Indirizzo del sito",
++  "plugins.publish.key": "Chiave di invio",
++  "plugins.publish.keyKept": "Salvata (termina con {end}); scrivine un’altra per sostituirla",
++  "plugins.publish.keyHint": "Incolla la chiave creata sul sito",
++  "plugins.publish.check": "Prova la connessione",
++  "plugins.publish.connected": "Connesso a {system} come {user}.",
++  "plugins.publish.notRemembered": "Questo sistema non può conservare la chiave cifrata: resta solo fino alla chiusura di LionPhotos.",
++  "plugins.publish.note": "Le foto vengono inviate al sito nella dimensione scelta; quelle già presenti non vengono reinviate. Le tue foto non vengono modificate.",
++  "plugins.publish.next": "Pubblica…",
++  "plugins.publish.chosen.one": "Pubblica {count} selezionato…",
++  "plugins.publish.chosen.other": "Pubblica {count} selezionati…",
++  "plugins.publish.button": "Pubblica…",
+   "crop.title": "Ritaglia e raddrizza",
+   "crop.open": "Ritaglia e raddrizza…",
+   "crop.canvasLabel": "La foto con il ritaglio: trascina all’interno per spostarlo, angoli e lati per ridimensionarlo",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "È già in corso un’esportazione.",
+   "main.plugins.export.summary.one": "Esportazione di {count} foto in {folder}",
+   "main.plugins.export.summary.other": "Esportazione di {count} foto in {folder}",
++  "main.plugins.publish.badUrl": "Scrivi l’indirizzo del sito con https:// (http:// solo per questo computer o la rete locale).",
++  "main.plugins.publish.badKey": "La chiave non è valida: incollala come la mostra il sito.",
++  "main.plugins.publish.noKey": "Scrivi la chiave di invio creata sul sito.",
++  "main.plugins.publish.title.one": "Pubblica {count} foto su {site}",
++  "main.plugins.publish.title.other": "Pubblica {count} foto su {site}",
++  "main.plugins.publish.message": "Le foto vanno a {host}, con la tua chiave di invio.",
++  "main.plugins.publish.confirm": "Pubblica",
++  "main.plugins.publish.note": "Vengono inviate copie nella dimensione scelta; le tue foto non vengono modificate.",
++  "main.plugins.publish.noteOriginals": "Vengono inviati anche i file originali; non vengono modificati.",
++  "main.plugins.publish.summary.one": "{count} foto pubblicata su {host}",
++  "main.plugins.publish.summary.other": "{count} foto pubblicate su {host}",
++  "main.plugins.publish.errors.unreachable": "Impossibile raggiungere il sito ({detail}).",
++  "main.plugins.publish.errors.key": "Il sito ha rifiutato la chiave: {detail}",
++  "main.plugins.publish.errors.protocol": "Il sito non usa il protocollo di pubblicazione di LionPhotos ({detail}).",
++  "main.plugins.publish.errors.refused": "Il sito ha rifiutato le foto: {detail}",
++  "main.plugins.publish.errors.canceled": "Annullato.",
+   "main.openWith.title": "Scegli il programma con cui aprire",
+   "main.openWith.programs": "Programmi",
+   "main.library.errors.noFolder": "Apri prima una cartella.",
+diff --git a/src/nls/ja.json b/src/nls/ja.json
+index 6250e65..d96c6a8 100644
+--- a/src/nls/ja.json
++++ b/src/nls/ja.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "続ける",
+   "plugins.givesBrand": "有効なあいだ、アプリの名前を「{name}」にし、ロゴを設定します。",
+   "plugins.givesLogo": "有効なあいだ、アプリのロゴを設定します。",
++  "plugins.publish.preparing": "写真を準備しています…",
++  "plugins.publish.sending": "サイトへ送信しています…",
++  "plugins.publish.canceled": "公開をキャンセルしました。送信済みの分はサイトにそのまま残ります。",
++  "plugins.publish.failed": "公開に失敗しました：{error}",
++  "plugins.publish.done.one": "{system} に {count} 枚の写真を公開しました。",
++  "plugins.publish.done.other": "{system} に {count} 枚の写真を公開しました。",
++  "plugins.publish.sentSame.one": "{count} 枚を送信、{same} 枚は既にあります。",
++  "plugins.publish.sentSame.other": "{count} 枚を送信、{same} 枚は既にあります。",
++  "plugins.publish.openSite": "サイトで開く",
++  "plugins.publish.where": "公開先",
++  "plugins.publish.url": "サイトのアドレス",
++  "plugins.publish.key": "アップロードキー",
++  "plugins.publish.keyKept": "保存済み（末尾 {end}）。置き換えるには新しいキーを入力",
++  "plugins.publish.keyHint": "サイトで作成したキーを貼り付け",
++  "plugins.publish.check": "接続を確認",
++  "plugins.publish.connected": "{user} として {system} に接続しました。",
++  "plugins.publish.notRemembered": "このシステムではキーを暗号化して保存できません。LionPhotos を閉じるまでだけ保持されます。",
++  "plugins.publish.note": "写真は選んだサイズでサイトに送信されます。既にある写真は再送信されません。元の写真は変更されません。",
++  "plugins.publish.next": "公開…",
++  "plugins.publish.chosen.one": "選択した {count} 件を公開…",
++  "plugins.publish.chosen.other": "選択した {count} 件を公開…",
++  "plugins.publish.button": "公開…",
+   "crop.title": "切り抜きと傾き補正",
+   "crop.open": "切り抜きと傾き補正…",
+   "crop.canvasLabel": "切り抜き枠付きの写真：内側をドラッグで移動、角と辺でサイズ変更",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "すでに書き出しが進行中です。",
+   "main.plugins.export.summary.one": "写真 {count} 枚を {folder} に書き出し",
+   "main.plugins.export.summary.other": "写真 {count} 枚を {folder} に書き出し",
++  "main.plugins.publish.badUrl": "サイトのアドレスを https:// で入力してください（http:// はこのコンピューターかローカルネットワークのみ）。",
++  "main.plugins.publish.badKey": "キーが無効です。サイトに表示されたとおりに貼り付けてください。",
++  "main.plugins.publish.noKey": "サイトで作成したアップロードキーを入力してください。",
++  "main.plugins.publish.title.one": "{site} に {count} 枚の写真を公開",
++  "main.plugins.publish.title.other": "{site} に {count} 枚の写真を公開",
++  "main.plugins.publish.message": "写真はあなたのアップロードキーで {host} に送られます。",
++  "main.plugins.publish.confirm": "公開",
++  "main.plugins.publish.note": "選んだサイズのコピーが送信されます。元の写真は変更されません。",
++  "main.plugins.publish.noteOriginals": "元のファイルも送信されます。変更はされません。",
++  "main.plugins.publish.summary.one": "{host} に {count} 枚の写真を公開",
++  "main.plugins.publish.summary.other": "{host} に {count} 枚の写真を公開",
++  "main.plugins.publish.errors.unreachable": "サイトに接続できません（{detail}）。",
++  "main.plugins.publish.errors.key": "サイトがキーを拒否しました：{detail}",
++  "main.plugins.publish.errors.protocol": "このサイトは LionPhotos の公開プロトコルに対応していません（{detail}）。",
++  "main.plugins.publish.errors.refused": "サイトが写真を拒否しました：{detail}",
++  "main.plugins.publish.errors.canceled": "キャンセルしました。",
+   "main.openWith.title": "開くプログラムを選択",
+   "main.openWith.programs": "プログラム",
+   "main.library.errors.noFolder": "まずフォルダーを開いてください。",
+diff --git a/src/nls/ko.json b/src/nls/ko.json
+index 7eba74e..1a99e69 100644
+--- a/src/nls/ko.json
++++ b/src/nls/ko.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "계속",
+   "plugins.givesBrand": "켜져 있는 동안 앱 이름을 “{name}”(으)로, 로고도 바꿉니다.",
+   "plugins.givesLogo": "켜져 있는 동안 앱 로고를 바꿉니다.",
++  "plugins.publish.preparing": "사진을 준비하는 중…",
++  "plugins.publish.sending": "사이트로 보내는 중…",
++  "plugins.publish.canceled": "게시를 취소했습니다. 이미 보낸 내용은 사이트에 그대로 남습니다.",
++  "plugins.publish.failed": "게시하지 못했습니다: {error}",
++  "plugins.publish.done.one": "{system}에 사진 {count}장을 게시했습니다.",
++  "plugins.publish.done.other": "{system}에 사진 {count}장을 게시했습니다.",
++  "plugins.publish.sentSame.one": "{count}장 전송, {same}장은 이미 있습니다.",
++  "plugins.publish.sentSame.other": "{count}장 전송, {same}장은 이미 있습니다.",
++  "plugins.publish.openSite": "사이트에서 열기",
++  "plugins.publish.where": "게시할 곳",
++  "plugins.publish.url": "사이트 주소",
++  "plugins.publish.key": "업로드 키",
++  "plugins.publish.keyKept": "저장됨({end}(으)로 끝남). 바꾸려면 새 키를 입력하세요",
++  "plugins.publish.keyHint": "사이트에서 만든 키를 붙여 넣으세요",
++  "plugins.publish.check": "연결 확인",
++  "plugins.publish.connected": "{user}(으)로 {system}에 연결되었습니다.",
++  "plugins.publish.notRemembered": "이 시스템은 키를 암호화해 저장할 수 없어 LionPhotos를 닫을 때까지만 보관합니다.",
++  "plugins.publish.note": "사진은 선택한 크기로 사이트에 전송되며, 이미 있는 사진은 다시 보내지 않습니다. 원본 사진은 바뀌지 않습니다.",
++  "plugins.publish.next": "게시…",
++  "plugins.publish.chosen.one": "선택한 {count}개 게시…",
++  "plugins.publish.chosen.other": "선택한 {count}개 게시…",
++  "plugins.publish.button": "게시…",
+   "crop.title": "자르기 및 수평 맞추기",
+   "crop.open": "자르기 및 수평 맞추기…",
+   "crop.canvasLabel": "자르기 틀이 있는 사진: 안쪽을 끌어 이동하고, 모서리와 변을 끌어 크기를 바꿉니다",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "이미 내보내기가 진행 중입니다.",
+   "main.plugins.export.summary.one": "사진 {count}장을 {folder}(으)로 내보내기",
+   "main.plugins.export.summary.other": "사진 {count}장을 {folder}(으)로 내보내기",
++  "main.plugins.publish.badUrl": "사이트 주소를 https://로 입력하세요(http://는 이 컴퓨터나 로컬 네트워크만 가능).",
++  "main.plugins.publish.badKey": "키가 올바르지 않습니다. 사이트에 표시된 그대로 붙여 넣으세요.",
++  "main.plugins.publish.noKey": "사이트에서 만든 업로드 키를 입력하세요.",
++  "main.plugins.publish.title.one": "{site}에 사진 {count}장 게시",
++  "main.plugins.publish.title.other": "{site}에 사진 {count}장 게시",
++  "main.plugins.publish.message": "사진은 업로드 키와 함께 {host}(으)로 전송됩니다.",
++  "main.plugins.publish.confirm": "게시",
++  "main.plugins.publish.note": "선택한 크기의 사본이 전송되며, 원본 사진은 바뀌지 않습니다.",
++  "main.plugins.publish.noteOriginals": "원본 파일도 전송되며, 바뀌지 않습니다.",
++  "main.plugins.publish.summary.one": "{host}에 사진 {count}장 게시",
++  "main.plugins.publish.summary.other": "{host}에 사진 {count}장 게시",
++  "main.plugins.publish.errors.unreachable": "사이트에 연결할 수 없습니다({detail}).",
++  "main.plugins.publish.errors.key": "사이트가 키를 거부했습니다: {detail}",
++  "main.plugins.publish.errors.protocol": "이 사이트는 LionPhotos 게시 프로토콜을 지원하지 않습니다({detail}).",
++  "main.plugins.publish.errors.refused": "사이트가 사진을 거부했습니다: {detail}",
++  "main.plugins.publish.errors.canceled": "취소되었습니다.",
+   "main.openWith.title": "열 프로그램 선택",
+   "main.openWith.programs": "프로그램",
+   "main.library.errors.noFolder": "먼저 폴더를 여세요.",
+diff --git a/src/nls/pt-BR.json b/src/nls/pt-BR.json
+index f624d58..f38c002 100644
+--- a/src/nls/pt-BR.json
++++ b/src/nls/pt-BR.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "Continuar",
+   "plugins.givesBrand": "Dá ao app o nome “{name}” e a logo enquanto estiver ligado.",
+   "plugins.givesLogo": "Dá a logo ao app enquanto estiver ligado.",
++  "plugins.publish.preparing": "Preparando as fotos…",
++  "plugins.publish.sending": "Enviando para o site…",
++  "plugins.publish.canceled": "Publicação cancelada. O que já foi enviado fica no site como estava.",
++  "plugins.publish.failed": "A publicação falhou: {error}",
++  "plugins.publish.done.one": "{count} foto publicada em {system}.",
++  "plugins.publish.done.other": "{count} fotos publicadas em {system}.",
++  "plugins.publish.sentSame.one": "{count} enviada, {same} já estavam lá.",
++  "plugins.publish.sentSame.other": "{count} enviadas, {same} já estavam lá.",
++  "plugins.publish.openSite": "Abrir no site",
++  "plugins.publish.where": "Onde publicar",
++  "plugins.publish.url": "Endereço do site",
++  "plugins.publish.key": "Chave de envio",
++  "plugins.publish.keyKept": "Guardada (termina em {end}); digite outra para trocar",
++  "plugins.publish.keyHint": "Cole a chave criada no site",
++  "plugins.publish.check": "Testar a conexão",
++  "plugins.publish.connected": "Conectado a {system} como {user}.",
++  "plugins.publish.notRemembered": "Este sistema não guarda a chave criptografada: ela fica só até o LionPhotos ser fechado.",
++  "plugins.publish.note": "As fotos vão para o site no tamanho escolhido; as que já estão lá não são enviadas de novo. Suas fotos não são alteradas.",
++  "plugins.publish.next": "Publicar…",
++  "plugins.publish.chosen.one": "Publicar {count} selecionado…",
++  "plugins.publish.chosen.other": "Publicar {count} selecionados…",
++  "plugins.publish.button": "Publicar…",
+   "crop.title": "Recortar e endireitar",
+   "crop.open": "Recortar e endireitar…",
+   "crop.canvasLabel": "A foto com o recorte: arraste dentro para mover, os cantos e os lados para mudar o tamanho",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "Já há uma exportação em andamento.",
+   "main.plugins.export.summary.one": "Exportação de {count} foto para {folder}",
+   "main.plugins.export.summary.other": "Exportação de {count} fotos para {folder}",
++  "main.plugins.publish.badUrl": "Digite o endereço do site com https:// (http:// só para este computador ou a rede local).",
++  "main.plugins.publish.badKey": "A chave não é válida: cole como o site mostra.",
++  "main.plugins.publish.noKey": "Digite a chave de envio criada no site.",
++  "main.plugins.publish.title.one": "Publicar {count} foto em {site}",
++  "main.plugins.publish.title.other": "Publicar {count} fotos em {site}",
++  "main.plugins.publish.message": "As fotos vão para {host}, com a sua chave de envio.",
++  "main.plugins.publish.confirm": "Publicar",
++  "main.plugins.publish.note": "São enviadas cópias no tamanho escolhido; suas fotos não são alteradas.",
++  "main.plugins.publish.noteOriginals": "Os arquivos originais também são enviados; eles não são alterados.",
++  "main.plugins.publish.summary.one": "{count} foto publicada em {host}",
++  "main.plugins.publish.summary.other": "{count} fotos publicadas em {host}",
++  "main.plugins.publish.errors.unreachable": "Não foi possível falar com o site ({detail}).",
++  "main.plugins.publish.errors.key": "O site recusou a chave: {detail}",
++  "main.plugins.publish.errors.protocol": "O site não usa o protocolo de publicação do LionPhotos ({detail}).",
++  "main.plugins.publish.errors.refused": "O site recusou as fotos: {detail}",
++  "main.plugins.publish.errors.canceled": "Cancelado.",
+   "main.openWith.title": "Escolha o programa para abrir",
+   "main.openWith.programs": "Programas",
+   "main.library.errors.noFolder": "Abra uma pasta primeiro.",
+diff --git a/src/nls/pt-PT.json b/src/nls/pt-PT.json
+index f19a9b1..cc382e5 100644
+--- a/src/nls/pt-PT.json
++++ b/src/nls/pt-PT.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "Continuar",
+   "plugins.givesBrand": "Dá à aplicação o nome “{name}” e o logótipo enquanto estiver ligado.",
+   "plugins.givesLogo": "Dá o logótipo à aplicação enquanto estiver ligado.",
++  "plugins.publish.preparing": "A preparar as fotografias…",
++  "plugins.publish.sending": "A enviar para o site…",
++  "plugins.publish.canceled": "Publicação cancelada. O que já foi enviado fica no site como estava.",
++  "plugins.publish.failed": "A publicação falhou: {error}",
++  "plugins.publish.done.one": "{count} fotografia publicada em {system}.",
++  "plugins.publish.done.other": "{count} fotografias publicadas em {system}.",
++  "plugins.publish.sentSame.one": "{count} enviada, {same} já lá estavam.",
++  "plugins.publish.sentSame.other": "{count} enviadas, {same} já lá estavam.",
++  "plugins.publish.openSite": "Abrir no site",
++  "plugins.publish.where": "Onde publicar",
++  "plugins.publish.url": "Endereço do site",
++  "plugins.publish.key": "Chave de envio",
++  "plugins.publish.keyKept": "Guardada (termina em {end}); escreva outra para a substituir",
++  "plugins.publish.keyHint": "Cole a chave criada no site",
++  "plugins.publish.check": "Testar a ligação",
++  "plugins.publish.connected": "Ligado a {system} como {user}.",
++  "plugins.publish.notRemembered": "Este sistema não guarda a chave cifrada: fica apenas até o LionPhotos ser fechado.",
++  "plugins.publish.note": "As fotografias vão para o site no tamanho escolhido; as que já lá estão não são enviadas de novo. As suas fotografias não são alteradas.",
++  "plugins.publish.next": "Publicar…",
++  "plugins.publish.chosen.one": "Publicar {count} selecionado…",
++  "plugins.publish.chosen.other": "Publicar {count} selecionados…",
++  "plugins.publish.button": "Publicar…",
+   "crop.title": "Recortar e endireitar",
+   "crop.open": "Recortar e endireitar…",
+   "crop.canvasLabel": "A fotografia com o recorte: arraste dentro para mover, os cantos e os lados para mudar o tamanho",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "Já há uma exportação em curso.",
+   "main.plugins.export.summary.one": "Exportação de {count} fotografia para {folder}",
+   "main.plugins.export.summary.other": "Exportação de {count} fotografias para {folder}",
++  "main.plugins.publish.badUrl": "Escreva o endereço do site com https:// (http:// só para este computador ou a rede local).",
++  "main.plugins.publish.badKey": "A chave não é válida: cole-a como o site a mostra.",
++  "main.plugins.publish.noKey": "Escreva a chave de envio criada no site.",
++  "main.plugins.publish.title.one": "Publicar {count} fotografia em {site}",
++  "main.plugins.publish.title.other": "Publicar {count} fotografias em {site}",
++  "main.plugins.publish.message": "As fotografias vão para {host}, com a sua chave de envio.",
++  "main.plugins.publish.confirm": "Publicar",
++  "main.plugins.publish.note": "São enviadas cópias no tamanho escolhido; as suas fotografias não são alteradas.",
++  "main.plugins.publish.noteOriginals": "Os ficheiros originais também são enviados; não são alterados.",
++  "main.plugins.publish.summary.one": "{count} fotografia publicada em {host}",
++  "main.plugins.publish.summary.other": "{count} fotografias publicadas em {host}",
++  "main.plugins.publish.errors.unreachable": "Não foi possível contactar o site ({detail}).",
++  "main.plugins.publish.errors.key": "O site recusou a chave: {detail}",
++  "main.plugins.publish.errors.protocol": "O site não usa o protocolo de publicação do LionPhotos ({detail}).",
++  "main.plugins.publish.errors.refused": "O site recusou as fotografias: {detail}",
++  "main.plugins.publish.errors.canceled": "Cancelado.",
+   "main.openWith.title": "Escolha o programa para abrir",
+   "main.openWith.programs": "Programas",
+   "main.library.errors.noFolder": "Abra primeiro uma pasta.",
+diff --git a/src/nls/zh-CN.json b/src/nls/zh-CN.json
+index 57d8ace..b8060fd 100644
+--- a/src/nls/zh-CN.json
++++ b/src/nls/zh-CN.json
+@@ -1133,6 +1133,28 @@
+   "plugins.same.continue": "继续",
+   "plugins.givesBrand": "启用时将应用名称设为“{name}”并设置标志。",
+   "plugins.givesLogo": "启用时设置应用标志。",
++  "plugins.publish.preparing": "正在准备照片…",
++  "plugins.publish.sending": "正在发送到网站…",
++  "plugins.publish.canceled": "已取消发布。已发送的内容保留在网站上。",
++  "plugins.publish.failed": "发布失败：{error}",
++  "plugins.publish.done.one": "已在 {system} 发布 {count} 张照片。",
++  "plugins.publish.done.other": "已在 {system} 发布 {count} 张照片。",
++  "plugins.publish.sentSame.one": "已发送 {count} 张，{same} 张已存在。",
++  "plugins.publish.sentSame.other": "已发送 {count} 张，{same} 张已存在。",
++  "plugins.publish.openSite": "在网站上打开",
++  "plugins.publish.where": "发布到哪里",
++  "plugins.publish.url": "网站地址",
++  "plugins.publish.key": "上传密钥",
++  "plugins.publish.keyKept": "已保存（以 {end} 结尾）；输入新的密钥可替换",
++  "plugins.publish.keyHint": "粘贴在网站上创建的密钥",
++  "plugins.publish.check": "测试连接",
++  "plugins.publish.connected": "已以 {user} 的身份连接到 {system}。",
++  "plugins.publish.notRemembered": "此系统无法加密保存密钥：密钥仅保留到关闭 LionPhotos 为止。",
++  "plugins.publish.note": "照片按所选尺寸发送到网站；已存在的照片不会重复发送。你的照片不会被更改。",
++  "plugins.publish.next": "发布…",
++  "plugins.publish.chosen.one": "发布所选的 {count} 个…",
++  "plugins.publish.chosen.other": "发布所选的 {count} 个…",
++  "plugins.publish.button": "发布…",
+   "crop.title": "裁剪和拉直",
+   "crop.open": "裁剪和拉直…",
+   "crop.canvasLabel": "带裁剪框的照片：在框内拖动可移动，拖动角和边可调整大小",
+@@ -1611,6 +1633,22 @@
+   "main.plugins.export.busy": "已有一个导出正在进行。",
+   "main.plugins.export.summary.one": "将 {count} 张照片导出到 {folder}",
+   "main.plugins.export.summary.other": "将 {count} 张照片导出到 {folder}",
++  "main.plugins.publish.badUrl": "请输入以 https:// 开头的网站地址（http:// 仅限本机或局域网）。",
++  "main.plugins.publish.badKey": "密钥无效：请按网站显示的内容粘贴。",
++  "main.plugins.publish.noKey": "请输入在网站上创建的上传密钥。",
++  "main.plugins.publish.title.one": "在 {site} 发布 {count} 张照片",
++  "main.plugins.publish.title.other": "在 {site} 发布 {count} 张照片",
++  "main.plugins.publish.message": "照片将使用你的上传密钥发送到 {host}。",
++  "main.plugins.publish.confirm": "发布",
++  "main.plugins.publish.note": "发送的是所选尺寸的副本；你的照片不会被更改。",
++  "main.plugins.publish.noteOriginals": "原始文件也会被发送；它们不会被更改。",
++  "main.plugins.publish.summary.one": "已在 {host} 发布 {count} 张照片",
++  "main.plugins.publish.summary.other": "已在 {host} 发布 {count} 张照片",
++  "main.plugins.publish.errors.unreachable": "无法连接到网站（{detail}）。",
++  "main.plugins.publish.errors.key": "网站拒绝了密钥：{detail}",
++  "main.plugins.publish.errors.protocol": "该网站不支持 LionPhotos 发布协议（{detail}）。",
++  "main.plugins.publish.errors.refused": "网站拒绝了照片：{detail}",
++  "main.plugins.publish.errors.canceled": "已取消。",
+   "main.openWith.title": "选择用来打开的程序",
+   "main.openWith.programs": "程序",
+   "main.library.errors.noFolder": "请先打开一个文件夹。",
+diff --git a/src/platform/plugins/electron-main/pluginsMainService.js b/src/platform/plugins/electron-main/pluginsMainService.js
+index 0b13aca..0049990 100644
+--- a/src/platform/plugins/electron-main/pluginsMainService.js
++++ b/src/platform/plugins/electron-main/pluginsMainService.js
+@@ -8,15 +8,20 @@
+ // inside LionPhotos. Installing, removing and exporting write files, so each one is planned, shown and
+ // confirmed with the typed code (operationsMainService). Packages and destinations chosen in the system's
+ // dialogs stay here; the window only gets tokens for them.
++// A publish plugin sends the albums to a site instead (publisher.js): the export is made in a temporary
++// folder, sent, and the folder removed. The site's address and the key stay here, the key encrypted by the
++// system (safeStorage); the window only learns whether there is one and its last characters.
+ 'use strict';
+ 
+-const { app, dialog, shell, BrowserWindow } = require('electron');
++const { app, dialog, shell, net, safeStorage, BrowserWindow } = require('electron');
+ const fs = require('fs');
+ const path = require('path');
+ const crypto = require('crypto');
+ const { t, tn, formatBytes, getLocale } = require('../../nls/common/nls');
+-const { readPackage, parseManifest, PackageError, MAX_PACKAGE } = require('../node/pluginPackage');
++const os = require('os');
++const { readPackage, parseManifest, siteUrl, PackageError, MAX_PACKAGE } = require('../node/pluginPackage');
+ const { runExport } = require('../node/exporter');
++const { publish, checkSite, PublishError } = require('../node/publisher');
+ 
+ const PREVIEW = 8;
+ 
+@@ -37,6 +42,8 @@ class PluginsMainService {
+     this.ui = ui; // () => the window's webContents
+     this.dir = path.join(app.getPath('userData'), 'plugins');
+     this.stateFile = path.join(app.getPath('userData'), 'plugins.json');
++    this.publishFile = path.join(app.getPath('userData'), 'plugins-publish.json');
++    this.sessionKeys = new Map(); // keys kept only while the app is open (when the system cannot encrypt them)
+     this.tokens = new Map(); // token → { kind: 'package' | 'dest', value, expires }
+     this.lastExport = null;
+     this.exporting = null;
+@@ -49,6 +56,9 @@ class PluginsMainService {
+     ipc.handle('plugins:setEnabled', (_e, id, on) => this.setEnabled(String(id), !!on));
+     ipc.handle('plugins:openLast', (_e, what) => this.openLast(what));
+     ipc.handle('plugins:cancelExport', () => { if (this.exporting) this.exporting.canceled = true; return true; });
++    ipc.handle('plugins:publishTarget', (_e, id) => this.publishTarget(String(id)));
++    ipc.handle('plugins:savePublishTarget', (_e, id, t) => this.savePublishTarget(String(id), t));
++    ipc.handle('plugins:checkPublishTarget', (_e, id) => this.checkPublishTarget(String(id)));
+     ipc.handle('plugins:rendered', (_e, req, res) => { const done = this.renders.get(Number(req)); if (done) { this.renders.delete(Number(req)); done(res); } return true; });
+     this.ops.register('installPlugin', { plan: (p) => this.#planInstall(p), run: (plan) => this.#runInstall(plan) });
+     this.ops.register('removePlugin', { plan: (p) => this.#planRemove(p), run: (plan) => this.#runRemove(plan) });
+@@ -205,6 +215,70 @@ class PluginsMainService {
+     return { removed: plan.id, plugins: await this.list() };
+   }
+ 
++  // ------------------------------------------------------------------ publish: where to, with which key
++  #targets() {
++    try { const j = JSON.parse(fs.readFileSync(this.publishFile, 'utf8')); return j && typeof j === 'object' ? j : {}; } catch { return {}; }
++  }
++
++  #key(id) {
++    const t = this.#targets()[id];
++    if (t?.key && safeStorage.isEncryptionAvailable()) {
++      try { return safeStorage.decryptString(Buffer.from(t.key, 'base64')); } catch { return ''; }
++    }
++    return this.sessionKeys.get(id) || '';
++  }
++
++  async #publishPlugin(id) {
++    const p = await this.#installed(id).catch(() => null);
++    if (!p || p.manifest.kind !== 'publish') throw new Error(t('main.ops.errors.unknownOperation'));
++    return p;
++  }
++
++  /** The site and whether a key is kept: { url, hasKey, keyEnd, remembered } (never the key itself). */
++  async publishTarget(id) {
++    const p = await this.#publishPlugin(id);
++    const key = this.#key(id);
++    return { url: this.#targets()[id]?.url || p.manifest.publish.url || '', hasKey: !!key, keyEnd: key ? key.slice(-4) : '', remembered: safeStorage.isEncryptionAvailable() };
++  }
++
++  /** Keeps the site's address and, when one is given, a new key. { ok } or { error }. */
++  async savePublishTarget(id, target) {
++    await this.#publishPlugin(id);
++    let url;
++    try { url = siteUrl(target?.url); } catch { return { error: t('main.plugins.publish.badUrl') }; }
++    const all = this.#targets();
++    const entry = { ...(all[id] || {}), url };
++    const key = typeof target?.key === 'string' ? target.key.trim() : '';
++    if (key) {
++      if (key.length > 400 || /[\s\u0000-\u001f]/.test(key)) return { error: t('main.plugins.publish.badKey') };
++      if (safeStorage.isEncryptionAvailable()) { entry.key = safeStorage.encryptString(key).toString('base64'); this.sessionKeys.delete(id); } else { delete entry.key; this.sessionKeys.set(id, key); }
++    }
++    all[id] = entry;
++    fs.writeFileSync(this.publishFile, JSON.stringify(all, null, 2), { mode: 0o600 });
++    return { ok: true, ...(await this.publishTarget(id)) };
++  }
++
++  #api(manifest, url) { return url + manifest.publish.path; }
++
++  #publishError(err) {
++    if (err instanceof PublishError) return t(`main.plugins.publish.errors.${err.code}`, { detail: err.detail || '' });
++    return String(err?.message || err);
++  }
++
++  /** Asks the site who the key belongs to: { system, user } or { error }. */
++  async checkPublishTarget(id) {
++    const p = await this.#publishPlugin(id);
++    const target = await this.publishTarget(id);
++    if (!target.url) return { error: t('main.plugins.publish.badUrl') };
++    if (!target.hasKey) return { error: t('main.plugins.publish.noKey') };
++    try {
++      const r = await checkSite({ api: this.#api(p.manifest, target.url), key: this.#key(id), fetch: net.fetch });
++      return { system: r.system, user: r.user };
++    } catch (err) {
++      return { error: this.#publishError(err) };
++    }
++  }
++
+   // ------------------------------------------------------------------ export
+   async pickDestination(win) {
+     const res = await dialog.showOpenDialog(win, { title: t('main.plugins.destTitle'), properties: ['openDirectory', 'createDirectory'], defaultPath: app.getPath('documents') });
+@@ -219,7 +293,11 @@ class PluginsMainService {
+     if (this.exporting) throw new Error(t('main.plugins.export.busy'));
+     const plugin = await this.#installed(String(pluginId)).catch(() => null);
+     if (!plugin || !this.#state().disabled.every((x) => x !== plugin.manifest.id)) throw new Error(t('main.ops.errors.unknownOperation'));
+-    const to = this.#take(dest, 'dest');
++    const publishing = plugin.manifest.kind === 'publish';
++    // a publish plugin goes to its site: the export is made in a temporary folder, removed after
++    const target = publishing ? await this.publishTarget(plugin.manifest.id) : null;
++    if (publishing && (!target.url || !target.hasKey)) throw new Error(t(target.url ? 'main.plugins.publish.noKey' : 'main.plugins.publish.badUrl'));
++    const to = publishing ? null : this.#take(dest, 'dest');
+     const labels = new Map(this.library.db.labels().map((l) => [l.id, l]));
+     const list = [];
+     for (const c of Array.isArray(collections) ? collections.slice(0, 200) : []) {
+@@ -241,13 +319,29 @@ class PluginsMainService {
+     const total = list.reduce((s, c) => s + c.rows.length, 0);
+     if (!total) throw new Error(t('main.plugins.export.nothing'));
+     // only the options the plugin declares, and the two of every export
+-    const opts = { size: Number(options?.size) || plugin.manifest.photo.sizes.at(-1), originals: !!options?.originals, zip: options?.zip !== false };
++    const opts = { size: Number(options?.size) || plugin.manifest.photo.sizes.at(-1), originals: !!options?.originals, zip: !publishing && options?.zip !== false };
+     for (const o of plugin.manifest.options) {
+       const v = options?.[o.id];
+       opts[o.id] = o.type === 'bool' ? !!v : o.type === 'choice' ? (o.choices.some((c) => c.value === v) ? v : o.default) : String(v ?? o.default).slice(0, 200);
+     }
+     const bytes = list.reduce((s, c) => s + c.rows.reduce((a, r) => a + r.size, 0), 0);
+     const name = typeof plugin.manifest.name === 'string' ? plugin.manifest.name : (plugin.manifest.name[getLocale()] || plugin.manifest.name.en || plugin.manifest.id);
++    if (publishing) {
++      const host = new URL(target.url).host;
++      const site = (typeof plugin.manifest.publish.site === 'string' ? plugin.manifest.publish.site : plugin.manifest.publish.site?.[getLocale()] || plugin.manifest.publish.site?.en || Object.values(plugin.manifest.publish.site || {})[0]) || host;
++      return {
++        plugin, publishTo: target.url, collections: list, options: opts,
++        view: {
++          title: tn('main.plugins.publish.title', total, { site }),
++          message: t('main.plugins.publish.message', { host }),
++          items: list.slice(0, PREVIEW).map((c) => ({ label: c.label.name, detail: tn('main.plugins.export.photos', c.rows.length), size: c.rows.reduce((a, r) => a + r.size, 0) })),
++          more: Math.max(0, list.length - PREVIEW),
++          count: total, bytes: opts.originals ? bytes : undefined,
++          confirmLabel: t('main.plugins.publish.confirm'), danger: false,
++          note: t(opts.originals ? 'main.plugins.publish.noteOriginals' : 'main.plugins.publish.note'),
++        },
++      };
++    }
+     return {
+       plugin, dest: to, collections: list, options: opts,
+       view: {
+@@ -286,10 +380,14 @@ class PluginsMainService {
+     const job = (this.exporting = { canceled: false });
+     const total = plan.collections.reduce((s, c) => s + c.rows.length, 0);
+     const adjusted = new Set(plan.collections.flatMap((c) => c.rows).filter((r) => r.kind !== 2 && r.adjust && r.adjust !== '{}').map((r) => r.id));
++    const publishing = !!plan.publishTo;
+     (async () => {
++      let temp = null;
+       try {
++        // publishing: the export goes to a temporary folder of ours, sent to the site, then removed
++        if (publishing) temp = await fs.promises.mkdtemp(path.join(app.getPath('temp') || os.tmpdir(), 'lionphotos-publish-'));
+         const res = await runExport({
+-          plugin: plan.plugin, dest: plan.dest, collections: plan.collections, options: plan.options,
++          plugin: plan.plugin, dest: publishing ? temp : plan.dest, collections: plan.collections, options: plan.options,
+           // what was adjusted in LionPhotos goes adjusted: those photos are drawn by the window; the others
+           // (and the videos' frames) by the thumbnail maker. An adjusted photo that cannot be drawn is not
+           // exported as the file is — it is reported with the ones that failed.
+@@ -298,18 +396,34 @@ class PluginsMainService {
+             const res = await this.#windowRender(id, max);
+             return res.plain ? this.thumbs.renderJpeg(id, max) : res;
+           },
+-          onProgress: (done) => tell({ done, total }),
++          onProgress: (done) => tell({ done, total, phase: publishing ? 'prepare' : 'export' }),
+           isCanceled: () => job.canceled,
+           generator: `LionPhotos ${app.getVersion()}`, locale: getLocale(),
+         });
++        if (publishing) {
++          const id = plan.plugin.manifest.id;
++          const sent = await publish({
++            dir: res.dir, api: this.#api(plan.plugin.manifest, plan.publishTo), key: this.#key(id), fetch: net.fetch,
++            onProgress: (done, all) => tell({ done, total: all, phase: 'publish' }), isCanceled: () => job.canceled,
++          });
++          // the site's page of the last collection, opened only when it is on the site the person chose
++          const page = sent.collections.map((c) => c.url).filter((u) => { try { return new URL(u).origin === new URL(plan.publishTo).origin; } catch { return false; } }).at(-1) || '';
++          this.lastExport = { site: page || plan.publishTo };
++          const photos = sent.collections.reduce((s, c) => s + c.photos, 0);
++          this.library.db.logOperation({ kind: 'export', root: this.library.currentRoot, summary: tn('main.plugins.publish.summary', photos, { host: new URL(plan.publishTo).host }), items: [{ dst: plan.publishTo }] });
++          tell({ finished: true, published: true, done: photos, total, system: sent.system, user: sent.user, sent: sent.sent, same: sent.same, failed: res.failed.length });
++          return;
++        }
+         this.lastExport = res;
+         this.library.db.logOperation({ kind: 'export', root: this.library.currentRoot, summary: tn('main.plugins.export.summary', res.count, { folder: path.basename(res.dir) }), items: [{ dst: res.dir }] });
+         tell({ done: res.count, total, finished: true, folder: path.basename(res.dir), failed: res.failed.length, zip: res.zip ? path.basename(res.zip) : '', zipSkipped: res.zipSkipped });
+       } catch (err) {
+         console.warn('[plugins] export', err);
+-        tell({ finished: true, error: job.canceled ? 'canceled' : String(err?.message || err) });
++        tell({ finished: true, published: publishing, error: job.canceled || err?.code === 'canceled' ? 'canceled' : publishing ? this.#publishError(err) : String(err?.message || err) });
+       } finally {
+         this.exporting = null;
++        // our own temporary folder, never one of the person's
++        if (temp) await fs.promises.rm(temp, { recursive: true, force: true }).catch(() => {});
+       }
+     })();
+     return { started: total };
+@@ -318,6 +432,12 @@ class PluginsMainService {
+   /** The page of the last export in the default browser, its folder or its .zip in the file manager. */
+   async openLast(what) {
+     if (!this.lastExport) return false;
++    if (what === 'site') {
++      if (!this.lastExport.site || !/^https?:\/\//.test(this.lastExport.site)) return false;
++      await shell.openExternal(this.lastExport.site);
++      return true;
++    }
++    if (!this.lastExport.entry) return false;
+     if (what === 'folder') { shell.showItemInFolder(this.lastExport.entry); return true; }
+     if (what === 'zip') { if (!this.lastExport.zip) return false; shell.showItemInFolder(this.lastExport.zip); return true; }
+     const err = await shell.openPath(this.lastExport.entry);
+diff --git a/src/platform/plugins/node/pluginPackage.js b/src/platform/plugins/node/pluginPackage.js
+index 8f922b4..931390b 100644
+--- a/src/platform/plugins/node/pluginPackage.js
++++ b/src/platform/plugins/node/pluginPackage.js
+@@ -4,7 +4,8 @@
+  *  Licensed under the MIT License. See LICENSE in the project root.
+  *--------------------------------------------------------------------------------------------*/
+ // A plugin package (.lionplugin): a ZIP with a plugin.json and the files of a page model — no code that
+-// runs in LionPhotos. This reads the ZIP (stored or deflated entries, no other library) and checks it
++// runs in LionPhotos. A "publish" plugin brings no page: it sends the albums to a site that speaks the
++// publish protocol (docs/PLUGINS.md), at the address and with the key the person gives. This reads the ZIP (stored or deflated entries, no other library) and checks it
+ // strictly: only the expected kinds of files, no path that leaves the package, sizes bounded.
+ 'use strict';
+ 
+@@ -17,6 +18,8 @@ const ALLOWED_EXT = new Set(['html', 'htm', 'css', 'js', 'mjs', 'json', 'txt', '
+ const TOP = /^(plugin\.json|README(\.[a-z-]+)?\.md|LICENSE(\.[a-z]+)?|template\/.+|assets\/.+)$/i;
+ const ID = /^[a-z0-9][a-z0-9.-]{1,63}$/;
+ const VERSION = /^\d+\.\d+\.\d+([-.+][0-9A-Za-z.-]+)?$/;
++/** The publish protocols LionPhotos speaks. */
++const PROTOCOLS = ['lionphotos-publish-v1'];
+ 
+ class PackageError extends Error {
+   constructor(code, detail = '') { super(detail ? `${code}: ${detail}` : code); this.code = code; this.detail = detail; }
+@@ -94,7 +97,8 @@ function parseManifest(json) {
+   if (!m || typeof m !== 'object') throw new PackageError('manifest');
+   if (!ID.test(m.id || '')) throw new PackageError('manifest', 'id');
+   if (!VERSION.test(m.version || '')) throw new PackageError('manifest', 'version');
+-  if (m.kind !== 'export') throw new PackageError('manifest', 'kind');
++  if (m.kind !== 'export' && m.kind !== 'publish') throw new PackageError('manifest', 'kind');
++  const publish = m.kind === 'publish' ? publishOf(m.publish) : null;
+   const accepts = (Array.isArray(m.accepts) ? m.accepts : ['album', 'project']).filter((x) => ['album', 'project', 'person', 'pet', 'place'].includes(x));
+   if (!accepts.length) throw new PackageError('manifest', 'accepts');
+   const options = (Array.isArray(m.options) ? m.options : []).slice(0, 12).map((o) => {
+@@ -106,7 +110,9 @@ function parseManifest(json) {
+   });
+   const sizes = (Array.isArray(m.photo?.sizes) ? m.photo.sizes : [1600, 2048]).map(Number).filter((n) => Number.isInteger(n) && n >= 320 && n <= 8000).slice(0, 6);
+   return {
+-    id: m.id, version: m.version, kind: 'export',
++    id: m.id, version: m.version, kind: m.kind,
++    // publish: where the albums go ({ protocol, path, url, site }); null for an export to a folder
++    publish,
+     name: localized(m.name, 80) || m.id,
+     // the name under its icon in the activity bar (the full name when it has none)
+     shortName: localized(m.shortName, 24),
+@@ -127,6 +133,33 @@ function parseManifest(json) {
+   };
+ }
+ 
++/**
++ * "publish": { "protocol": "lionphotos-publish-v1", "path": "/api/…", "url": "https://…", "site": "…" } — the
++ * protocol (one LionPhotos speaks), the path of its API on the site, and, optionally, the site's usual address
++ * (offered, the person can change it) and its name.
++ */
++function publishOf(p) {
++  if (!p || typeof p !== 'object' || !PROTOCOLS.includes(p.protocol)) throw new PackageError('manifest', 'publish.protocol');
++  const apiPath = typeof p.path === 'string' && /^\/[\w./-]{0,200}$/.test(p.path) && !p.path.includes('..') ? p.path.replace(/\/+$/, '') : null;
++  if (apiPath === null) throw new PackageError('manifest', 'publish.path');
++  let url = '';
++  try { url = p.url ? siteUrl(p.url) : ''; } catch { url = ''; }
++  return { protocol: p.protocol, path: apiPath, url, site: localized(p.site, 60) };
++}
++
++const PRIVATE_HOST = /^(localhost|127(\.\d{1,3}){3}|\[::1\]|10(\.\d{1,3}){3}|192\.168(\.\d{1,3}){2}|172\.(1[6-9]|2\d|3[01])(\.\d{1,3}){2}|[\w-]+\.local)$/i;
++
++/**
++ * A site's address as typed, checked: https://…, or http:// only for this computer and the local network
++ * (a key never travels unencrypted over the internet). Only the origin and a path are kept. Throws otherwise.
++ */
++function siteUrl(s) {
++  const u = new URL(String(s || '').trim());
++  if (u.username || u.password || u.search || u.hash) throw new Error('url');
++  if (u.protocol !== 'https:' && !(u.protocol === 'http:' && PRIVATE_HOST.test(u.hostname))) throw new Error('url');
++  return `${u.origin}${u.pathname.replace(/\/+$/, '')}`;
++}
++
+ /** "brand": { "name": "…" or { "en": "…", … }, "logo": "assets/logo.png" } — a name (up to 40 characters), a logo, or both. */
+ function brandOf(b) {
+   if (!b || typeof b !== 'object') return null;
+@@ -142,7 +175,8 @@ function readPackage(buf) {
+   const manifestFile = files.find((f) => f.name === 'plugin.json');
+   if (!manifestFile) throw new PackageError('noManifest');
+   const manifest = parseManifest(manifestFile.data.toString('utf8'));
+-  if (!files.some((f) => f.name === `template/${manifest.entry}`)) throw new PackageError('noEntry', `template/${manifest.entry}`);
++  // a page to export into; a publish plugin needs none (the site shows the photos)
++  if (manifest.kind === 'export' && !files.some((f) => f.name === `template/${manifest.entry}`)) throw new PackageError('noEntry', `template/${manifest.entry}`);
+   const names = new Set();
+   for (const f of files) { const k = f.name.toLowerCase(); if (names.has(k)) throw new PackageError('badPath', f.name); names.add(k); }
+   return { manifest, files };
+@@ -176,4 +210,4 @@ function writeZip(files) {
+   return Buffer.concat([...locals, cd, end]);
+ }
+ 
+-module.exports = { readZip, readPackage, parseManifest, safeName, writeZip, PackageError, MAX_PACKAGE };
++module.exports = { readZip, readPackage, parseManifest, safeName, writeZip, siteUrl, PackageError, MAX_PACKAGE, PROTOCOLS };
+diff --git a/src/platform/plugins/node/publisher.js b/src/platform/plugins/node/publisher.js
+new file mode 100644
+index 0000000..6b03d5a
+--- /dev/null
++++ b/src/platform/plugins/node/publisher.js
+@@ -0,0 +1,150 @@
++/*---------------------------------------------------------------------------------------------
++ *  LionPhotos — Copyright (C) 2026 LionPhotos Team.
++ *  Created and conceived by Daniel Michelon De Carli.
++ *  Licensed under the MIT License. See LICENSE in the project root.
++ *--------------------------------------------------------------------------------------------*/
++// Publishing: an export folder (data.js and its photos, made by the exporter in a temporary folder) sent to
++// a site that speaks "lionphotos-publish-v1" (docs/PLUGINS.md). For each collection the site answers which
++// files it still needs: photos it already has with the same picture are not sent again, the ones that left
++// the album leave the site's copy too. Every request carries the key the person gave, and nothing else of
++// the computer: only what the export folder holds.
++'use strict';
++
++const fs = require('fs');
++const path = require('path');
++const crypto = require('crypto');
++
++const PROTOCOL = 'lionphotos-publish-v1';
++const KINDS = ['thumb', 'web', 'original', 'image'];
++
++class PublishError extends Error {
++  /** code: 'unreachable' | 'key' | 'protocol' | 'refused' | 'canceled'; detail: what the site said, if anything. */
++  constructor(code, detail = '', status = 0) { super(detail ? `${code}: ${detail}` : code); this.code = code; this.detail = detail; this.status = status; }
++}
++
++/** The collections of an export folder's data.js (a script that sets window.LIONPHOTOS_EXPORT). */
++function readExport(dir) {
++  const text = fs.readFileSync(path.join(dir, 'data.js'), 'utf8');
++  return JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
++}
++
++/** A path from data.js, inside the export folder only. */
++function inside(dir, rel) {
++  if (typeof rel !== 'string' || !rel) return null;
++  const p = path.resolve(dir, ...rel.split('/'));
++  return p.startsWith(path.resolve(dir) + path.sep) ? p : null;
++}
++
++function sha256(file) {
++  return new Promise((resolve, reject) => {
++    const h = crypto.createHash('sha256');
++    fs.createReadStream(file).on('error', reject).on('data', (d) => h.update(d)).on('end', () => resolve(h.digest('hex')));
++  });
++}
++
++const wait = (ms) => new Promise((r) => setTimeout(r, ms));
++
++/**
++ * A client of the site's publish API. `fetch` is the one to use (Electron's net.fetch in the app, a fake one
++ * in the tests). Network failures and the site's 5xx are tried again (3 times, waiting longer each time).
++ */
++function client({ api, key, fetch, isCanceled = () => false, timeout = 120000 }) {
++  return async function call(method, rel, body, type = 'application/json') {
++    for (let attempt = 0; ; attempt++) {
++      if (isCanceled()) throw new PublishError('canceled');
++      const ctl = new AbortController();
++      const timer = setTimeout(() => ctl.abort(), timeout);
++      let res, text;
++      try {
++        res = await fetch(api + rel, {
++          method, signal: ctl.signal, redirect: 'error',
++          headers: { Authorization: `Bearer ${key}`, Accept: 'application/json', ...(body !== undefined ? { 'Content-Type': type } : {}) },
++          body: body === undefined ? undefined : type === 'application/json' ? JSON.stringify(body) : body,
++        });
++        text = await res.text();
++      } catch (err) {
++        clearTimeout(timer);
++        if (attempt < 3 && !isCanceled()) { await wait(1000 * 2 ** attempt); continue; }
++        throw new PublishError('unreachable', String(err?.message || err));
++      }
++      clearTimeout(timer);
++      let json = null;
++      try { json = text ? JSON.parse(text) : {}; } catch { json = null; }
++      if (res.status >= 500 && attempt < 3) { await wait(1000 * 2 ** attempt); continue; }
++      if (res.status === 401 || res.status === 403) throw new PublishError('key', String(json?.error || '').slice(0, 300), res.status);
++      if (!res.ok) throw new PublishError('refused', String(json?.error || `HTTP ${res.status}`).slice(0, 300), res.status);
++      if (json === null) throw new PublishError('protocol', 'not JSON');
++      return json;
++    }
++  };
++}
++
++/**
++ * Who the key belongs to, on which site: { system, user, maxPhoto, maxOriginal }. Throws a PublishError.
++ * @param {{ api:string, key:string, fetch:Function }} p  api: the site's address + the plugin's path
++ */
++async function checkSite({ api, key, fetch }) {
++  const info = await client({ api, key, fetch, timeout: 20000 })('GET', '/');
++  if (info?.protocol !== PROTOCOL) throw new PublishError('protocol', String(info?.protocol || ''));
++  return { system: String(info.system || '').slice(0, 120), user: String(info.user || '').slice(0, 120), maxPhoto: Number(info.maxPhoto) || 0, maxOriginal: Number(info.maxOriginal) || 0 };
++}
++
++/**
++ * Sends the collections of an export folder.
++ * @param {object} p
++ * @param {string} p.dir           the export folder (data.js and the photos)
++ * @param {string} p.api           the site's address + the plugin's path, e.g. https://site/api/catalogo/publicar
++ * @param {string} p.key           the key the person gave
++ * @param {Function} p.fetch
++ * @param {(done:number, total:number) => void} [p.onProgress]  photos dealt with (sent or already there)
++ * @param {() => boolean} [p.isCanceled]
++ * @returns {Promise<{ system:string, user:string, collections:{ name:string, id:number, photos:number, sent:number, same:number, removed:number, published:boolean, url:string }[], sent:number, same:number }>}
++ */
++async function publish({ dir, api, key, fetch, onProgress = () => {}, isCanceled = () => false }) {
++  const site = await checkSite({ api, key, fetch });
++  const call = client({ api, key, fetch, isCanceled, timeout: 15 * 60 * 1000 });
++  const data = readExport(dir);
++  const collections = (data.collections || []).filter((c) => Array.isArray(c.items) && c.items.some((i) => i.image || i.web));
++  const total = collections.reduce((s, c) => s + c.items.length, 0);
++  let done = 0, sent = 0, same = 0;
++  const out = [];
++  for (const col of collections) {
++    // the picture's fingerprint: the site skips the photos it already has, the same
++    const items = [];
++    for (const it of col.items) {
++      if (isCanceled()) throw new PublishError('canceled');
++      const file = inside(dir, it.image || it.web);
++      items.push({ ...it, hash: file && fs.existsSync(file) ? await sha256(file) : null });
++    }
++    const { items: _, ...head } = col;
++    const plan = await call('POST', '/collections', { ...head, items });
++    if (!Number.isInteger(plan?.id) || !Array.isArray(plan.photos)) throw new PublishError('protocol', 'collections');
++    const asked = new Set();
++    for (const ph of plan.photos) {
++      const it = items[ph?.index];
++      if (!it || !Number.isInteger(ph.id) || !Array.isArray(ph.send)) throw new PublishError('protocol', 'photos');
++      asked.add(ph.index);
++      // in the order the site gives ("image" last: then the photo is complete)
++      for (const kind of ph.send.filter((k) => KINDS.includes(k))) {
++        const rel = { thumb: it.thumb, web: it.web, original: it.original, image: it.image || it.web }[kind];
++        const file = inside(dir, rel);
++        if (!file || !fs.existsSync(file)) continue;
++        const type = /\.jpe?g$/i.test(file) ? 'image/jpeg' : 'application/octet-stream';
++        await call('PUT', `/photos/${ph.id}/${kind}`, await fs.promises.readFile(file), type);
++      }
++      sent++;
++      onProgress(++done, total);
++    }
++    // the ones the site already had
++    for (let i = 0; i < items.length; i++) if (!asked.has(i)) onProgress(++done, total);
++    same += Number(plan.same) || 0;
++    const end = await call('POST', `/collections/${plan.id}/finish`, { keep: Array.isArray(plan.keep) ? plan.keep : [] });
++    out.push({
++      name: col.name, id: plan.id, photos: Number(end.photos) || 0, sent: plan.photos.length, same: Number(plan.same) || 0,
++      removed: Number(end.removed) || 0, published: !!end.published, url: typeof end.url === 'string' ? end.url : '',
++    });
++  }
++  return { ...site, collections: out, sent, same };
++}
++
++module.exports = { publish, checkSite, readExport, PublishError, PROTOCOL };
+diff --git a/src/workbench/browser/media/workbench.css b/src/workbench/browser/media/workbench.css
+index ab61bf5..0925566 100644
+--- a/src/workbench/browser/media/workbench.css
++++ b/src/workbench/browser/media/workbench.css
+@@ -2233,6 +2233,11 @@ input.desc-input { min-height: 32px; resize: none; }
+ .exp-opt { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+ .exp-opt.col { flex-direction: column; align-items: stretch; gap: 4px; }
+ .exp-opt.col .small { color: var(--text-secondary); }
++.exp-site { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
++.exp-site .text-input { width: 100%; }
++.exp-site-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
++.exp-site-status.is-ok { color: var(--success, #12807e); }
++.exp-site-status.is-error { color: var(--danger, #c2410c); }
+ .exp-empty { display: grid; justify-items: center; gap: 6px; padding: 18px 8px; text-align: center; color: var(--text-secondary); }
+ .exp-empty p { margin: 0; }
+ .exp-summary { align-self: center; }
+diff --git a/src/workbench/contrib/plugins/exportDialog.js b/src/workbench/contrib/plugins/exportDialog.js
+index 58759b2..a138cea 100644
+--- a/src/workbench/contrib/plugins/exportDialog.js
++++ b/src/workbench/contrib/plugins/exportDialog.js
+@@ -26,12 +26,15 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
+   let current = list.find((p) => p.id === pluginId) || list.find((p) => !type || p.accepts.includes(type)) || list[0] || null;
+   const chosen = new Set(labelIds);
+   const values = {};
++  // a publish plugin: where to send, and the key (typed here, kept by the main process)
++  const target = { url: '', key: '', hasKey: false, keyEnd: '', loadedFor: '', status: null };
+ 
+   return new Promise((resolve) => {
+     const body = h('div.exp-body');
+     const confirm = h('button.btn.btn-primary', { onclick: () => go() });
+     const cancel = h('button.btn.btn-secondary', { onclick: () => close(null) }, t('common.cancel'));
+     const summary = h('span.muted.small.exp-summary');
++    const note = h('span', t('plugins.export.note'));
+ 
+     const draw = () => {
+       if (!current) {
+@@ -69,6 +72,34 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
+       const originals = h('input', { type: 'checkbox', checked: !!values.originals, onchange: (e) => { values.originals = e.target.checked; } });
+       values.zip ??= true;
+       const zip = h('input', { type: 'checkbox', checked: !!values.zip, onchange: (e) => { values.zip = e.target.checked; } });
++      const publishing = m.kind === 'publish';
++      if (publishing && target.loadedFor !== m.id) {
++        target.loadedFor = m.id;
++        plugins.publishTarget(m.id).then((r) => { Object.assign(target, { url: r.url, hasKey: r.hasKey, keyEnd: r.keyEnd, remembered: r.remembered, key: '', status: null }); draw(); }).catch(() => {});
++      }
++      const status = h('span', { class: `small exp-site-status${target.status ? (target.status.error ? ' is-error' : ' is-ok') : ''}`, role: 'status' },
++        target.status ? (target.status.error || t('plugins.publish.connected', { system: target.status.system, user: target.status.user })) : '');
++      const save = async () => {
++        const r = await plugins.savePublishTarget(m.id, { url: target.url, key: target.key });
++        if (r?.error) { target.status = { error: r.error }; return false; }
++        Object.assign(target, { url: r.url, hasKey: r.hasKey, keyEnd: r.keyEnd, key: '' });
++        return true;
++      };
++      const site = publishing ? h('div.exp-site',
++        h('div.exp-group-title.small', t('plugins.publish.where')),
++        h('label.exp-opt.col', h('span.small', t('plugins.publish.url')),
++          h('input.text-input', { type: 'url', value: target.url, placeholder: 'https://', spellcheck: false, oninput: (e) => { target.url = e.target.value; target.status = null; count(); } })),
++        h('label.exp-opt.col', h('span.small', t('plugins.publish.key')),
++          h('input.text-input', { type: 'password', value: target.key, autocomplete: 'off', spellcheck: false,
++            placeholder: target.hasKey ? t('plugins.publish.keyKept', { end: target.keyEnd }) : t('plugins.publish.keyHint'),
++            oninput: (e) => { target.key = e.target.value; target.status = null; count(); } })),
++        h('div.exp-site-row',
++          h('button.btn.btn-secondary.btn-sm', { type: 'button', onclick: async () => {
++            target.status = (await save()) ? await plugins.checkPublishTarget(m.id) : target.status;
++            draw();
++          } }, t('plugins.publish.check')),
++          status),
++        target.remembered === false ? h('p.small.muted', t('plugins.publish.notRemembered')) : null) : null;
+       const opts = m.options.map((o) => {
+         values[o.id] ??= o.default;
+         if (o.type === 'bool') return h('label.exp-opt', h('input', { type: 'checkbox', checked: !!values[o.id], onchange: (e) => { values[o.id] = e.target.checked; } }), h('span', textOf(o.label)));
+@@ -84,21 +115,28 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
+             WHICH.map((w) => h('option', { value: w, selected: plugins.which === w }, t(`plugins.which.${w}`))))),
+           h('label.exp-opt.col', h('span.small', t('plugins.export.size')), sizeSel),
+           h('label.exp-opt', originals, h('span', t('plugins.export.originals'))),
+-          h('label.exp-opt', { title: t('plugins.export.zipHint') }, zip, h('span', t('plugins.export.zip'))),
+-          opts));
++          publishing ? null : h('label.exp-opt', { title: t('plugins.export.zipHint') }, zip, h('span', t('plugins.export.zip'))),
++          opts),
++        site);
++      note.textContent = t(publishing ? 'plugins.publish.note' : 'plugins.export.note');
+       count();
+     };
+ 
+     const count = () => {
+       const ids = [...chosen].filter((id) => current && current.accepts.includes(labels.get(id)?.type));
+       const n = ids.reduce((a, id) => a + plugins.itemsOf(id).length, 0);
+-      confirm.replaceChildren(h('span', { html: icon('external', 14) }), t('plugins.export.next'));
+-      confirm.disabled = !n;
++      const publishing = current?.kind === 'publish';
++      confirm.replaceChildren(h('span', { html: icon('external', 14) }), t(publishing ? 'plugins.publish.next' : 'plugins.export.next'));
++      confirm.disabled = !n || (publishing && (!target.url.trim() || (!target.hasKey && !target.key.trim())));
+       summary.textContent = n ? tn('plugins.export.count', n, { collections: tn('plugins.export.collections', ids.length) }) : '';
+     };
+ 
+     const go = async () => {
+       const ids = [...chosen].filter((id) => current.accepts.includes(labels.get(id)?.type));
++      if (current.kind === 'publish') {
++        const r = await plugins.savePublishTarget(current.id, { url: target.url, key: target.key });
++        if (r?.error) { target.status = { error: r.error }; draw(); return; }
++      }
+       close(true);
+       // two photos with the same name in one of them: which one goes
+       const same = plugins.sameNames(ids);
+@@ -111,7 +149,7 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
+       h('header.cm-head', h('span.cm-icon', { html: icon('external', 20) }),
+         h('div', h('div.eyebrow', t('plugins.eyebrow')), h('h2#exp-title', t('plugins.export.title')))),
+       body,
+-      h('p.choice-note', h('span', { html: icon('info', 14) }), h('span', t('plugins.export.note'))),
++      h('p.choice-note', h('span', { html: icon('info', 14) }), note),
+       h('footer.cm-actions', summary, h('span.toolbar-spacer'), cancel, confirm));
+     const overlay = h('div.cm-overlay', dialog);
+     const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); close(null); } };
+diff --git a/src/workbench/contrib/plugins/pluginView.js b/src/workbench/contrib/plugins/pluginView.js
+index d8f3e46..78711b6 100644
+--- a/src/workbench/contrib/plugins/pluginView.js
++++ b/src/workbench/contrib/plugins/pluginView.js
+@@ -76,7 +76,7 @@ export class PluginView extends ViewPane {
+         el.querySelector('.plg-check').innerHTML = on ? icon('check', 14) : '';
+       }
+       const photos = [...chosen].reduce((a, id) => a + plugins.itemsOf(id).length, 0);
+-      exportLabel.textContent = chosen.size ? tn('plugins.view.exportChosen', chosen.size) : t('plugins.export.button');
++      exportLabel.textContent = chosen.size ? tn(p.kind === 'publish' ? 'plugins.publish.chosen' : 'plugins.view.exportChosen', chosen.size) : t(p.kind === 'publish' ? 'plugins.publish.button' : 'plugins.export.button');
+       if (pick) pick.textContent = chosen.size === all.length ? t('plugins.view.clear') : t('plugins.view.selectAll');
+       summary.textContent = chosen.size ? tn('plugins.export.count', photos, { collections: tn('plugins.export.collections', chosen.size) }) : (all.length ? t('plugins.view.pickHint') : '');
+     };
+@@ -135,7 +135,7 @@ export class PluginView extends ViewPane {
+           h('div.coll-year', h('span.coll-year-label', t(`views.${g.type}`)), h('span.coll-year-count', formatNumber(g.list.length)), h('span.coll-year-line')),
+           h('div.lbl-grid', g.list.map(card))))
+         : h('div.empty-state', h('span', { html: icon('package', 28) }), h('h3', t('plugins.view.empty')), h('p.muted', t('plugins.view.emptyHint', { types: types.map((ty) => t(`views.${ty}`)).join(', ') }))),
+-      h('p.choice-note.plg-note', h('span', { html: icon('info', 14) }), h('span', t('plugins.export.note'))));
++      h('p.choice-note.plg-note', h('span', { html: icon('info', 14) }), h('span', t(p.kind === 'publish' ? 'plugins.publish.note' : 'plugins.export.note'))));
+     sync();
+     this.element.scrollTop = scroll;
+   }
+diff --git a/src/workbench/services/plugins/browser/pluginsService.js b/src/workbench/services/plugins/browser/pluginsService.js
+index 101e595..5af9f75 100644
+--- a/src/workbench/services/plugins/browser/pluginsService.js
++++ b/src/workbench/services/plugins/browser/pluginsService.js
+@@ -44,15 +44,22 @@ export class PluginsService {
+     this.host.plugins.onExport((p) => {
+       if (p.finished) this.#drawn = null;
+       if (!p.finished) {
+-        toast ||= this.notifications.progress(t('plugins.export.running'), { label: t('common.cancel'), run: () => this.host.plugins.cancelExport() });
+-        toast.update(tn('plugins.export.progress', p.total, { done: p.done }), p.total ? p.done / p.total : 0);
++        const running = p.phase === 'prepare' ? 'plugins.publish.preparing' : p.phase === 'publish' ? 'plugins.publish.sending' : 'plugins.export.running';
++        toast ||= this.notifications.progress(t(running), { label: t('common.cancel'), run: () => this.host.plugins.cancelExport() });
++        toast.update(`${t(running)} ${tn('plugins.export.progress', p.total, { done: p.done })}`, p.total ? p.done / p.total : 0);
+         return;
+       }
+       toast?.close();
+       toast = null;
+       if (p.error) {
+-        if (p.error === 'canceled') this.notifications.info(t('plugins.export.canceled'));
+-        else this.notifications.warn(t('plugins.export.failed', { error: p.error }));
++        if (p.error === 'canceled') this.notifications.info(t(p.published ? 'plugins.publish.canceled' : 'plugins.export.canceled'));
++        else this.notifications.warn(t(p.published ? 'plugins.publish.failed' : 'plugins.export.failed', { error: p.error }));
++        return;
++      }
++      if (p.published) {
++        const msg = tn('plugins.publish.done', p.done, { system: p.system || '—' }) + ' ' + tn('plugins.publish.sentSame', p.sent, { same: p.same })
++          + (p.failed ? ' ' + tn('plugins.export.someFailed', p.failed) : '');
++        this.notifications.success(msg, 15000, [{ label: t('plugins.publish.openSite'), run: () => this.host.plugins.openLast('site') }]);
+         return;
+       }
+       const msg = tn('plugins.export.done', p.done, { folder: p.folder }) + (p.zip ? ' ' + t('plugins.export.zipDone', { zip: p.zip }) : '')
+@@ -93,10 +100,19 @@ export class PluginsService {
+   }
+ 
+   /** The plugins with a tab in the activity bar: the enabled ones. */
+-  get tabs() { return this.plugins.filter((p) => p.enabled && p.kind === 'export'); }
++  get tabs() { return this.plugins.filter((p) => p.enabled && (p.kind === 'export' || p.kind === 'publish')); }
+ 
+   /** The enabled plugins that export this kind of label (album, project…). */
+-  exportersFor(type) { return this.plugins.filter((p) => p.enabled && p.kind === 'export' && (!type || p.accepts.includes(type))); }
++  exportersFor(type) { return this.plugins.filter((p) => p.enabled && (p.kind === 'export' || p.kind === 'publish') && (!type || p.accepts.includes(type))); }
++
++  /** A publish plugin's site and key: { url, hasKey, keyEnd, remembered }. */
++  publishTarget(id) { return this.host.plugins.publishTarget(id); }
++
++  /** Keeps the site's address and, when typed, a new key: { ok, … } or { error }. */
++  savePublishTarget(id, target) { return this.host.plugins.savePublishTarget(id, target); }
++
++  /** Asks the site who the key belongs to: { system, user } or { error }. */
++  checkPublishTarget(id) { return this.host.plugins.checkPublishTarget(id); }
+ 
+   async install() {
+     const pick = await this.host.plugins.pickPackage();
+@@ -225,6 +241,8 @@ export class PluginsService {
+     const collections = labelIds.map((labelId) => this.collectionOf(labelId))
+       .map((c) => (skip?.size ? { ...c, ids: c.ids.filter((id) => !skip.has(id)) } : c)).filter((c) => c.ids.length);
+     if (!collections.length) { this.notifications.warn(t('plugins.export.empty')); return null; }
++    // a publish plugin sends to its site: no folder to choose
++    if (this.plugins.find((p) => p.id === pluginId)?.kind === 'publish') return this.services.operations.run('export', { pluginId, dest: null, collections, options });
+     const dest = await this.host.plugins.pickDestination();
+     if (!dest || dest.canceled) return null;
+     return this.services.operations.run('export', { pluginId, dest: dest.token, collections, options });
+diff --git a/tools/nls/de.py b/tools/nls/de.py
+index 73e82c9..0551bf6 100644
+--- a/tools/nls/de.py
++++ b/tools/nls/de.py
+@@ -614,3 +614,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': 'Angehakte doppelte Dateien', 'checkedCo
+ _merge(MESSAGES, {'dupes': {'lead': 'Findet identische Kopien am Inhalt, nicht am Namen: zuerst die Größen, dann Anfang und Ende jeder Datei, und die ganze Datei nur, wenn es noch nötig ist. Wählen Sie die Kopie, die bleibt; die anderen kommen in den Limbo, wo Sie sie endgültig löschen oder zurückholen.', 'toTrash': 'Limbo', 'trashCopies': P('{count} Kopie in den Limbo senden…', '{count} Kopien in den Limbo senden…'), 'keepThis': 'Diese Kopie behalten (die anderen kommen in den Limbo)', 'setsLead': 'Ordner, die sich wiederholen, jeweils vollständig. Wählen Sie den Ordner, der bleibt: Die Kopien der anderen Ordner der Gruppe kommen in den Limbo, wenn Sie die Kopien senden.', 'setToTrash': 'in den Limbo', 'trashChecked': P('{count} Kopie der ausgewählten in den Limbo senden…', '{count} Kopien der ausgewählten in den Limbo senden…'), 'trashNone': 'Kopien der ausgewählten in den Limbo senden…', 'checkHint': 'Wählen Sie doppelte Dateien aus, um ihre überzähligen Kopien auf einmal in den Limbo zu senden.', 'barLabel': 'Ausgewählte doppelte Dateien', 'checkedCount': P('{count} von {total} doppelten Dateien ausgewählt', '{count} von {total} doppelten Dateien ausgewählt'), 'checkGroup': 'Diese doppelte Datei auswählen', 'checkSet': P('Diese {count} doppelte Datei auswählen', 'Diese {count} doppelten Dateien auswählen')}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': 'Stapel werden vorbereitet…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "Fotos werden vorbereitet…", 'sending': "Wird an die Website gesendet…", 'canceled': "Veröffentlichung abgebrochen. Bereits Gesendetes bleibt auf der Website, wie es war.", 'failed': "Die Veröffentlichung ist fehlgeschlagen: {error}", 'done': P("{count} Foto auf {system} veröffentlicht.", "{count} Fotos auf {system} veröffentlicht."), 'sentSame': P("{count} gesendet, {same} schon vorhanden.", "{count} gesendet, {same} schon vorhanden."), 'openSite': "Auf der Website öffnen", 'where': "Wohin veröffentlichen", 'url': "Adresse der Website", 'key': "Upload-Schlüssel", 'keyKept': "Gespeichert (endet auf {end}); einen neuen eingeben, um ihn zu ersetzen", 'keyHint': "Den auf der Website erstellten Schlüssel einfügen", 'check': "Verbindung prüfen", 'connected': "Verbunden mit {system} als {user}.", 'notRemembered': "Dieses System kann den Schlüssel nicht verschlüsselt speichern: Er bleibt nur, bis LionPhotos geschlossen wird.", 'note': "Die Fotos werden in der gewählten Größe an die Website gesendet; schon vorhandene werden nicht erneut gesendet. Ihre Fotos werden nicht verändert.", 'next': "Veröffentlichen…", 'chosen': P("{count} ausgewähltes veröffentlichen…", "{count} ausgewählte veröffentlichen…"), 'button': "Veröffentlichen…"}}, 'main': {'plugins': {'publish': {'badUrl': "Geben Sie die Adresse der Website mit https:// ein (http:// nur für diesen Computer oder das lokale Netz).", 'badKey': "Der Schlüssel ist ungültig: Fügen Sie ihn so ein, wie die Website ihn zeigt.", 'noKey': "Geben Sie den auf der Website erstellten Upload-Schlüssel ein.", 'title': P("{count} Foto auf {site} veröffentlichen", "{count} Fotos auf {site} veröffentlichen"), 'message': "Die Fotos gehen an {host}, mit Ihrem Upload-Schlüssel.", 'confirm': "Veröffentlichen", 'note': "Es werden Kopien in der gewählten Größe gesendet; Ihre Fotos werden nicht verändert.", 'noteOriginals': "Die Originaldateien werden ebenfalls gesendet; sie werden nicht verändert.", 'summary': P("{count} Foto auf {host} veröffentlicht", "{count} Fotos auf {host} veröffentlicht"), 'errors': {'unreachable': "Die Website ist nicht erreichbar ({detail}).", 'key': "Die Website hat den Schlüssel abgelehnt: {detail}", 'protocol': "Die Website spricht das Veröffentlichungsprotokoll von LionPhotos nicht ({detail}).", 'refused': "Die Website hat die Fotos abgelehnt: {detail}", 'canceled': "Abgebrochen."}}}}})
+diff --git a/tools/nls/en.py b/tools/nls/en.py
+index 025876f..3a0831f 100644
+--- a/tools/nls/en.py
++++ b/tools/nls/en.py
+@@ -614,3 +614,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': 'Ticked repeated files', 'checkedCount':
+ _merge(MESSAGES, {'dupes': {'lead': 'Finds identical copies by content, not by name: sizes first, then the beginning and end of each file, and the whole file only when still needed. Pick the copy to keep; the others go to the Limbo, where you delete them for good or bring them back.', 'toTrash': 'Limbo', 'trashCopies': P('Send {count} copy to the Limbo…', 'Send {count} copies to the Limbo…'), 'keepThis': 'Keep this copy (the others go to the Limbo)', 'setsLead': 'Folders that repeat each other, each in full. Choose the folder to keep: the copies in the other folders of the set go to the Limbo when you send the copies.', 'setToTrash': 'to the Limbo', 'trashChecked': P('Send {count} copy of the selected to the Limbo…', 'Send {count} copies of the selected to the Limbo…'), 'trashNone': 'Send the copies of the selected to the Limbo…', 'checkHint': 'Select the repeated files to send their extra copies to the Limbo at once.', 'barLabel': 'Selected repeated files', 'checkedCount': P('{count} of {total} repeated files selected', '{count} of {total} repeated files selected'), 'checkGroup': 'Select this repeated file', 'checkSet': P('Select this {count} repeated file', 'Select these {count} repeated files')}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': 'Preparing the stacks…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "Preparing the photos…", 'sending': "Sending to the site…", 'canceled': "Publishing canceled. What was sent stays on the site as it was.", 'failed': "Publishing failed: {error}", 'done': P("{count} photo published on {system}.", "{count} photos published on {system}."), 'sentSame': P("{count} sent, {same} already there.", "{count} sent, {same} already there."), 'openSite': "Open on the site", 'where': "Where to publish", 'url': "Address of the site", 'key': "Upload key", 'keyKept': "Kept (ends in {end}); type a new one to replace it", 'keyHint': "Paste the key created on the site", 'check': "Check the connection", 'connected': "Connected to {system} as {user}.", 'notRemembered': "This system cannot keep the key encrypted: it is kept only until LionPhotos is closed.", 'note': "The photos are sent to the site at the size chosen; photos already there are not sent again. Your photos are not changed.", 'next': "Publish…", 'chosen': P("Publish {count} selected…", "Publish {count} selected…"), 'button': "Publish…"}}, 'main': {'plugins': {'publish': {'badUrl': "Type the site’s address with https:// (http:// only for this computer or the local network).", 'badKey': "The key is not valid: paste it as the site shows it.", 'noKey': "Type the upload key created on the site.", 'title': P("Publish {count} photo on {site}", "Publish {count} photos on {site}"), 'message': "The photos go to {host}, with your upload key.", 'confirm': "Publish", 'note': "Copies at the size chosen are sent; your photos are not changed.", 'noteOriginals': "The original files are sent too; they are not changed.", 'summary': P("{count} photo published on {host}", "{count} photos published on {host}"), 'errors': {'unreachable': "The site could not be reached ({detail}).", 'key': "The site refused the key: {detail}", 'protocol': "The site does not speak the LionPhotos publish protocol ({detail}).", 'refused': "The site refused the photos: {detail}", 'canceled': "Canceled."}}}}})
+diff --git a/tools/nls/es.py b/tools/nls/es.py
+index 9bd134a..283e65d 100644
+--- a/tools/nls/es.py
++++ b/tools/nls/es.py
+@@ -614,3 +614,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': 'Archivos repetidos marcados', 'checkedC
+ _merge(MESSAGES, {'dupes': {'lead': 'Encuentra copias idénticas por su contenido, no por el nombre: primero los tamaños, después el principio y el final de cada archivo, y el archivo entero solo cuando aún hace falta. Elija la copia que conservar; las demás van al Limbo, donde las elimina del todo o las devuelve.', 'toTrash': 'Limbo', 'trashCopies': P('Enviar {count} copia al Limbo…', 'Enviar {count} copias al Limbo…'), 'keepThis': 'Mantener esta copia (las demás van al Limbo)', 'setsLead': 'Carpetas que se repiten, cada una completa. Elige la carpeta que se queda: las copias de las otras carpetas del conjunto van al Limbo cuando envíes las copias.', 'setToTrash': 'al Limbo', 'trashChecked': P('Enviar al Limbo {count} copia de los seleccionados…', 'Enviar al Limbo {count} copias de los seleccionados…'), 'trashNone': 'Enviar al Limbo las copias de los seleccionados…', 'checkHint': 'Selecciona los archivos repetidos para enviar sus copias extra al Limbo de una vez.', 'barLabel': 'Archivos repetidos seleccionados', 'checkedCount': P('{count} de {total} archivos repetidos seleccionados', '{count} de {total} archivos repetidos seleccionados'), 'checkGroup': 'Seleccionar este archivo repetido', 'checkSet': P('Seleccionar este {count} archivo repetido', 'Seleccionar estos {count} archivos repetidos')}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': 'Preparando las pilas…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "Preparando las fotos…", 'sending': "Enviando al sitio…", 'canceled': "Publicación cancelada. Lo ya enviado queda en el sitio como estaba.", 'failed': "La publicación falló: {error}", 'done': P("{count} foto publicada en {system}.", "{count} fotos publicadas en {system}."), 'sentSame': P("{count} enviada, {same} ya estaban.", "{count} enviadas, {same} ya estaban."), 'openSite': "Abrir en el sitio", 'where': "Dónde publicar", 'url': "Dirección del sitio", 'key': "Clave de envío", 'keyKept': "Guardada (termina en {end}); escribe otra para cambiarla", 'keyHint': "Pega la clave creada en el sitio", 'check': "Probar la conexión", 'connected': "Conectado a {system} como {user}.", 'notRemembered': "Este sistema no puede guardar la clave cifrada: se guarda solo hasta cerrar LionPhotos.", 'note': "Las fotos se envían al sitio en el tamaño elegido; las que ya están no se envían de nuevo. Tus fotos no cambian.", 'next': "Publicar…", 'chosen': P("Publicar {count} seleccionado…", "Publicar {count} seleccionados…"), 'button': "Publicar…"}}, 'main': {'plugins': {'publish': {'badUrl': "Escribe la dirección del sitio con https:// (http:// solo para este equipo o la red local).", 'badKey': "La clave no es válida: pégala como la muestra el sitio.", 'noKey': "Escribe la clave de envío creada en el sitio.", 'title': P("Publicar {count} foto en {site}", "Publicar {count} fotos en {site}"), 'message': "Las fotos van a {host}, con tu clave de envío.", 'confirm': "Publicar", 'note': "Se envían copias en el tamaño elegido; tus fotos no cambian.", 'noteOriginals': "También se envían los archivos originales; no cambian.", 'summary': P("{count} foto publicada en {host}", "{count} fotos publicadas en {host}"), 'errors': {'unreachable': "No se pudo contactar con el sitio ({detail}).", 'key': "El sitio rechazó la clave: {detail}", 'protocol': "El sitio no usa el protocolo de publicación de LionPhotos ({detail}).", 'refused': "El sitio rechazó las fotos: {detail}", 'canceled': "Cancelado."}}}}})
+diff --git a/tools/nls/fr.py b/tools/nls/fr.py
+index a78d678..425760c 100644
+--- a/tools/nls/fr.py
++++ b/tools/nls/fr.py
+@@ -614,3 +614,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': 'Fichiers répétés cochés', 'checkedC
+ _merge(MESSAGES, {'dupes': {'lead': 'Trouve les copies identiques par leur contenu, pas par leur nom : d’abord les tailles, puis le début et la fin de chaque fichier, et le fichier entier seulement si nécessaire. Choisissez la copie à garder ; les autres vont aux Limbes, où vous les supprimez pour de bon ou les ramenez.', 'toTrash': 'Limbes', 'trashCopies': P('Envoyer {count} copie aux Limbes…', 'Envoyer {count} copies aux Limbes…'), 'keepThis': 'Garder cette copie (les autres vont aux Limbes)', 'setsLead': 'Les dossiers qui se répètent, chacun en entier. Choisissez le dossier à garder : les copies des autres dossiers de l’ensemble iront aux Limbes quand vous enverrez les copies.', 'setToTrash': 'vers les Limbes', 'trashChecked': P('Envoyer aux Limbes {count} copie des sélectionnés…', 'Envoyer aux Limbes {count} copies des sélectionnés…'), 'trashNone': 'Envoyer aux Limbes les copies des sélectionnés…', 'checkHint': 'Sélectionnez les fichiers répétés pour envoyer leurs copies en trop aux Limbes en une fois.', 'barLabel': 'Fichiers répétés sélectionnés', 'checkedCount': P('{count} fichier répété sélectionné sur {total}', '{count} fichiers répétés sélectionnés sur {total}'), 'checkGroup': 'Sélectionner ce fichier répété', 'checkSet': P('Sélectionner ce {count} fichier répété', 'Sélectionner ces {count} fichiers répétés')}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': 'Préparation des piles…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "Préparation des photos…", 'sending': "Envoi vers le site…", 'canceled': "Publication annulée. Ce qui a été envoyé reste sur le site tel quel.", 'failed': "La publication a échoué : {error}", 'done': P("{count} photo publiée sur {system}.", "{count} photos publiées sur {system}."), 'sentSame': P("{count} envoyée, {same} déjà présentes.", "{count} envoyées, {same} déjà présentes."), 'openSite': "Ouvrir sur le site", 'where': "Où publier", 'url': "Adresse du site", 'key': "Clé d’envoi", 'keyKept': "Enregistrée (se termine par {end}) ; saisissez-en une autre pour la remplacer", 'keyHint': "Collez la clé créée sur le site", 'check': "Tester la connexion", 'connected': "Connecté à {system} en tant que {user}.", 'notRemembered': "Ce système ne peut pas garder la clé chiffrée : elle n’est gardée que jusqu’à la fermeture de LionPhotos.", 'note': "Les photos sont envoyées au site à la taille choisie ; celles déjà présentes ne sont pas renvoyées. Vos photos ne sont pas modifiées.", 'next': "Publier…", 'chosen': P("Publier {count} sélectionné…", "Publier {count} sélectionnés…"), 'button': "Publier…"}}, 'main': {'plugins': {'publish': {'badUrl': "Saisissez l’adresse du site avec https:// (http:// seulement pour cet ordinateur ou le réseau local).", 'badKey': "La clé n’est pas valide : collez-la telle que le site l’affiche.", 'noKey': "Saisissez la clé d’envoi créée sur le site.", 'title': P("Publier {count} photo sur {site}", "Publier {count} photos sur {site}"), 'message': "Les photos vont vers {host}, avec votre clé d’envoi.", 'confirm': "Publier", 'note': "Des copies à la taille choisie sont envoyées ; vos photos ne sont pas modifiées.", 'noteOriginals': "Les fichiers originaux sont aussi envoyés ; ils ne sont pas modifiés.", 'summary': P("{count} photo publiée sur {host}", "{count} photos publiées sur {host}"), 'errors': {'unreachable': "Impossible de joindre le site ({detail}).", 'key': "Le site a refusé la clé : {detail}", 'protocol': "Le site ne parle pas le protocole de publication de LionPhotos ({detail}).", 'refused': "Le site a refusé les photos : {detail}", 'canceled': "Annulé."}}}}})
+diff --git a/tools/nls/it.py b/tools/nls/it.py
+index ec0a976..edc525f 100644
+--- a/tools/nls/it.py
++++ b/tools/nls/it.py
+@@ -613,3 +613,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': 'File ripetuti spuntati', 'checkedCount'
+ _merge(MESSAGES, {'dupes': {'lead': 'Trova copie identiche dal contenuto, non dal nome: prima le dimensioni, poi inizio e fine di ogni file, e il file intero solo quando serve ancora. Scegli la copia da tenere; le altre vanno nel Limbo, dove le elimini del tutto o le riporti indietro.', 'toTrash': 'Limbo', 'trashCopies': P('Manda {count} copia nel Limbo…', 'Manda {count} copie nel Limbo…'), 'keepThis': 'Tieni questa copia (le altre vanno nel Limbo)', 'setsLead': 'Cartelle che si ripetono, ognuna per intero. Scegli la cartella da tenere: le copie delle altre cartelle dell’insieme vanno nel Limbo quando mandi le copie.', 'setToTrash': 'nel Limbo', 'trashChecked': P('Manda nel Limbo {count} copia dei selezionati…', 'Manda nel Limbo {count} copie dei selezionati…'), 'trashNone': 'Manda nel Limbo le copie dei selezionati…', 'checkHint': 'Seleziona i file ripetuti per mandarne le copie in più nel Limbo in una volta.', 'barLabel': 'File ripetuti selezionati', 'checkedCount': P('{count} di {total} file ripetuti selezionati', '{count} di {total} file ripetuti selezionati'), 'checkGroup': 'Seleziona questo file ripetuto', 'checkSet': P('Seleziona questo {count} file ripetuto', 'Seleziona questi {count} file ripetuti')}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': 'Preparazione delle pile…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "Preparazione delle foto…", 'sending': "Invio al sito…", 'canceled': "Pubblicazione annullata. Ciò che è stato inviato resta sul sito com’era.", 'failed': "La pubblicazione non è riuscita: {error}", 'done': P("{count} foto pubblicata su {system}.", "{count} foto pubblicate su {system}."), 'sentSame': P("{count} inviata, {same} già presenti.", "{count} inviate, {same} già presenti."), 'openSite': "Apri sul sito", 'where': "Dove pubblicare", 'url': "Indirizzo del sito", 'key': "Chiave di invio", 'keyKept': "Salvata (termina con {end}); scrivine un’altra per sostituirla", 'keyHint': "Incolla la chiave creata sul sito", 'check': "Prova la connessione", 'connected': "Connesso a {system} come {user}.", 'notRemembered': "Questo sistema non può conservare la chiave cifrata: resta solo fino alla chiusura di LionPhotos.", 'note': "Le foto vengono inviate al sito nella dimensione scelta; quelle già presenti non vengono reinviate. Le tue foto non vengono modificate.", 'next': "Pubblica…", 'chosen': P("Pubblica {count} selezionato…", "Pubblica {count} selezionati…"), 'button': "Pubblica…"}}, 'main': {'plugins': {'publish': {'badUrl': "Scrivi l’indirizzo del sito con https:// (http:// solo per questo computer o la rete locale).", 'badKey': "La chiave non è valida: incollala come la mostra il sito.", 'noKey': "Scrivi la chiave di invio creata sul sito.", 'title': P("Pubblica {count} foto su {site}", "Pubblica {count} foto su {site}"), 'message': "Le foto vanno a {host}, con la tua chiave di invio.", 'confirm': "Pubblica", 'note': "Vengono inviate copie nella dimensione scelta; le tue foto non vengono modificate.", 'noteOriginals': "Vengono inviati anche i file originali; non vengono modificati.", 'summary': P("{count} foto pubblicata su {host}", "{count} foto pubblicate su {host}"), 'errors': {'unreachable': "Impossibile raggiungere il sito ({detail}).", 'key': "Il sito ha rifiutato la chiave: {detail}", 'protocol': "Il sito non usa il protocollo di pubblicazione di LionPhotos ({detail}).", 'refused': "Il sito ha rifiutato le foto: {detail}", 'canceled': "Annullato."}}}}})
+diff --git a/tools/nls/ja.py b/tools/nls/ja.py
+index c4da09b..02ee89c 100644
+--- a/tools/nls/ja.py
++++ b/tools/nls/ja.py
+@@ -611,3 +611,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': 'チェックした重複ファイル',
+ _merge(MESSAGES, {'dupes': {'lead': '名前ではなく内容で同一のコピーを探します。まずサイズ、次に各ファイルの先頭と末尾、必要なときだけファイル全体を比べます。残すコピーを選ぶと、ほかは保留へ送られ、そこで完全に削除するか元に戻せます。', 'toTrash': '保留', 'trashCopies': '{count} 個のコピーを保留に送る…', 'keepThis': 'このコピーを残す（ほかは保留へ）', 'setsLead': '互いに重複しているフォルダーを、パス全体で表示します。残すフォルダーを選ぶと、コピーを送るときにセット内の他のフォルダーのコピーが保留に入ります。', 'setToTrash': '保留へ', 'trashChecked': {'one': '選択したもののコピー {count} 個を保留に送る…', 'other': '選択したもののコピー {count} 個を保留に送る…'}, 'trashNone': '選択したもののコピーを保留に送る…', 'checkHint': '重複ファイルを選択すると、余分なコピーをまとめて保留に送れます。', 'barLabel': '選択した重複ファイル', 'checkedCount': {'one': '{total} 個中 {count} 個の重複ファイルを選択', 'other': '{total} 個中 {count} 個の重複ファイルを選択'}, 'checkGroup': 'この重複ファイルを選択', 'checkSet': {'one': 'この {count} 個の重複ファイルを選択', 'other': 'この {count} 個の重複ファイルを選択'}}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': 'スタックを準備中…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "写真を準備しています…", 'sending': "サイトへ送信しています…", 'canceled': "公開をキャンセルしました。送信済みの分はサイトにそのまま残ります。", 'failed': "公開に失敗しました：{error}", 'done': "{system} に {count} 枚の写真を公開しました。", 'sentSame': "{count} 枚を送信、{same} 枚は既にあります。", 'openSite': "サイトで開く", 'where': "公開先", 'url': "サイトのアドレス", 'key': "アップロードキー", 'keyKept': "保存済み（末尾 {end}）。置き換えるには新しいキーを入力", 'keyHint': "サイトで作成したキーを貼り付け", 'check': "接続を確認", 'connected': "{user} として {system} に接続しました。", 'notRemembered': "このシステムではキーを暗号化して保存できません。LionPhotos を閉じるまでだけ保持されます。", 'note': "写真は選んだサイズでサイトに送信されます。既にある写真は再送信されません。元の写真は変更されません。", 'next': "公開…", 'chosen': "選択した {count} 件を公開…", 'button': "公開…"}}, 'main': {'plugins': {'publish': {'badUrl': "サイトのアドレスを https:// で入力してください（http:// はこのコンピューターかローカルネットワークのみ）。", 'badKey': "キーが無効です。サイトに表示されたとおりに貼り付けてください。", 'noKey': "サイトで作成したアップロードキーを入力してください。", 'title': "{site} に {count} 枚の写真を公開", 'message': "写真はあなたのアップロードキーで {host} に送られます。", 'confirm': "公開", 'note': "選んだサイズのコピーが送信されます。元の写真は変更されません。", 'noteOriginals': "元のファイルも送信されます。変更はされません。", 'summary': "{host} に {count} 枚の写真を公開", 'errors': {'unreachable': "サイトに接続できません（{detail}）。", 'key': "サイトがキーを拒否しました：{detail}", 'protocol': "このサイトは LionPhotos の公開プロトコルに対応していません（{detail}）。", 'refused': "サイトが写真を拒否しました：{detail}", 'canceled': "キャンセルしました。"}}}}})
+diff --git a/tools/nls/ko.py b/tools/nls/ko.py
+index f6078d3..1197b91 100644
+--- a/tools/nls/ko.py
++++ b/tools/nls/ko.py
+@@ -611,3 +611,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': '체크한 중복 파일', 'checkedCount
+ _merge(MESSAGES, {'dupes': {'lead': '이름이 아니라 내용으로 똑같은 사본을 찾습니다. 먼저 크기, 그다음 각 파일의 앞부분과 끝부분을 비교하고, 필요할 때만 파일 전체를 읽습니다. 남길 사본을 고르면 나머지는 보류함으로 가고, 거기서 완전히 삭제하거나 되돌릴 수 있습니다.', 'toTrash': '보류함', 'trashCopies': '사본 {count}개를 보류함으로 보내기…', 'keepThis': '이 사본 남기기(나머지는 보류함으로)', 'setsLead': '서로 중복되는 폴더를 전체 경로로 보여 줍니다. 남길 폴더를 고르면 사본을 보낼 때 같은 묶음의 다른 폴더 사본이 보류함으로 갑니다.', 'setToTrash': '보류함으로', 'trashChecked': {'one': '선택한 항목의 사본 {count}개를 보류함으로 보내기…', 'other': '선택한 항목의 사본 {count}개를 보류함으로 보내기…'}, 'trashNone': '선택한 항목의 사본을 보류함으로 보내기…', 'checkHint': '중복 파일을 선택하면 남는 사본을 한 번에 보류함으로 보낼 수 있습니다.', 'barLabel': '선택한 중복 파일', 'checkedCount': {'one': '중복 파일 {total}개 중 {count}개 선택', 'other': '중복 파일 {total}개 중 {count}개 선택'}, 'checkGroup': '이 중복 파일 선택', 'checkSet': {'one': '이 중복 파일 {count}개 선택', 'other': '이 중복 파일 {count}개 선택'}}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': '스택 준비 중…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "사진을 준비하는 중…", 'sending': "사이트로 보내는 중…", 'canceled': "게시를 취소했습니다. 이미 보낸 내용은 사이트에 그대로 남습니다.", 'failed': "게시하지 못했습니다: {error}", 'done': "{system}에 사진 {count}장을 게시했습니다.", 'sentSame': "{count}장 전송, {same}장은 이미 있습니다.", 'openSite': "사이트에서 열기", 'where': "게시할 곳", 'url': "사이트 주소", 'key': "업로드 키", 'keyKept': "저장됨({end}(으)로 끝남). 바꾸려면 새 키를 입력하세요", 'keyHint': "사이트에서 만든 키를 붙여 넣으세요", 'check': "연결 확인", 'connected': "{user}(으)로 {system}에 연결되었습니다.", 'notRemembered': "이 시스템은 키를 암호화해 저장할 수 없어 LionPhotos를 닫을 때까지만 보관합니다.", 'note': "사진은 선택한 크기로 사이트에 전송되며, 이미 있는 사진은 다시 보내지 않습니다. 원본 사진은 바뀌지 않습니다.", 'next': "게시…", 'chosen': "선택한 {count}개 게시…", 'button': "게시…"}}, 'main': {'plugins': {'publish': {'badUrl': "사이트 주소를 https://로 입력하세요(http://는 이 컴퓨터나 로컬 네트워크만 가능).", 'badKey': "키가 올바르지 않습니다. 사이트에 표시된 그대로 붙여 넣으세요.", 'noKey': "사이트에서 만든 업로드 키를 입력하세요.", 'title': "{site}에 사진 {count}장 게시", 'message': "사진은 업로드 키와 함께 {host}(으)로 전송됩니다.", 'confirm': "게시", 'note': "선택한 크기의 사본이 전송되며, 원본 사진은 바뀌지 않습니다.", 'noteOriginals': "원본 파일도 전송되며, 바뀌지 않습니다.", 'summary': "{host}에 사진 {count}장 게시", 'errors': {'unreachable': "사이트에 연결할 수 없습니다({detail}).", 'key': "사이트가 키를 거부했습니다: {detail}", 'protocol': "이 사이트는 LionPhotos 게시 프로토콜을 지원하지 않습니다({detail}).", 'refused': "사이트가 사진을 거부했습니다: {detail}", 'canceled': "취소되었습니다."}}}}})
+diff --git a/tools/nls/pt_BR.py b/tools/nls/pt_BR.py
+index c8b1b78..0165383 100644
+--- a/tools/nls/pt_BR.py
++++ b/tools/nls/pt_BR.py
+@@ -614,3 +614,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': 'Arquivos repetidos marcados', 'checkedC
+ _merge(MESSAGES, {'dupes': {'lead': 'Encontra cópias idênticas pelo conteúdo, não pelo nome: primeiro os tamanhos, depois o início e o fim de cada arquivo, e o arquivo inteiro só quando ainda for preciso. Escolha a cópia a manter; as outras vão para o Limbo, onde você as exclui de vez ou devolve.', 'toTrash': 'Limbo', 'trashCopies': P('Enviar {count} cópia para o Limbo…', 'Enviar {count} cópias para o Limbo…'), 'keepThis': 'Manter esta cópia (as outras vão para o Limbo)', 'setsLead': 'Pastas que se repetem, cada uma por inteiro. Escolha a pasta que fica: as cópias das outras pastas do conjunto vão para o Limbo quando você enviar as cópias.', 'setToTrash': 'para o Limbo', 'trashChecked': P('Enviar para o Limbo {count} cópia dos selecionados…', 'Enviar para o Limbo {count} cópias dos selecionados…'), 'trashNone': 'Enviar para o Limbo as cópias dos selecionados…', 'checkHint': 'Selecione os arquivos repetidos para enviar as cópias extras ao Limbo de uma vez.', 'barLabel': 'Arquivos repetidos selecionados', 'checkedCount': P('{count} de {total} arquivos repetidos selecionados', '{count} de {total} arquivos repetidos selecionados'), 'checkGroup': 'Selecionar este arquivo repetido', 'checkSet': P('Selecionar este {count} arquivo repetido', 'Selecionar estes {count} arquivos repetidos')}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': 'Preparando as pilhas…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "Preparando as fotos…", 'sending': "Enviando para o site…", 'canceled': "Publicação cancelada. O que já foi enviado fica no site como estava.", 'failed': "A publicação falhou: {error}", 'done': P("{count} foto publicada em {system}.", "{count} fotos publicadas em {system}."), 'sentSame': P("{count} enviada, {same} já estavam lá.", "{count} enviadas, {same} já estavam lá."), 'openSite': "Abrir no site", 'where': "Onde publicar", 'url': "Endereço do site", 'key': "Chave de envio", 'keyKept': "Guardada (termina em {end}); digite outra para trocar", 'keyHint': "Cole a chave criada no site", 'check': "Testar a conexão", 'connected': "Conectado a {system} como {user}.", 'notRemembered': "Este sistema não guarda a chave criptografada: ela fica só até o LionPhotos ser fechado.", 'note': "As fotos vão para o site no tamanho escolhido; as que já estão lá não são enviadas de novo. Suas fotos não são alteradas.", 'next': "Publicar…", 'chosen': P("Publicar {count} selecionado…", "Publicar {count} selecionados…"), 'button': "Publicar…"}}, 'main': {'plugins': {'publish': {'badUrl': "Digite o endereço do site com https:// (http:// só para este computador ou a rede local).", 'badKey': "A chave não é válida: cole como o site mostra.", 'noKey': "Digite a chave de envio criada no site.", 'title': P("Publicar {count} foto em {site}", "Publicar {count} fotos em {site}"), 'message': "As fotos vão para {host}, com a sua chave de envio.", 'confirm': "Publicar", 'note': "São enviadas cópias no tamanho escolhido; suas fotos não são alteradas.", 'noteOriginals': "Os arquivos originais também são enviados; eles não são alterados.", 'summary': P("{count} foto publicada em {host}", "{count} fotos publicadas em {host}"), 'errors': {'unreachable': "Não foi possível falar com o site ({detail}).", 'key': "O site recusou a chave: {detail}", 'protocol': "O site não usa o protocolo de publicação do LionPhotos ({detail}).", 'refused': "O site recusou as fotos: {detail}", 'canceled': "Cancelado."}}}}})
+diff --git a/tools/nls/pt_PT.py b/tools/nls/pt_PT.py
+index 154db5a..ae6a999 100644
+--- a/tools/nls/pt_PT.py
++++ b/tools/nls/pt_PT.py
+@@ -614,3 +614,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': 'Ficheiros repetidos marcados', 'checked
+ _merge(MESSAGES, {'dupes': {'lead': 'Encontra cópias idênticas pelo conteúdo, não pelo nome: primeiro os tamanhos, depois o início e o fim de cada ficheiro, e o ficheiro inteiro só quando ainda é preciso. Escolha a cópia a manter; as outras vão para o Limbo, onde as elimina de vez ou devolve.', 'toTrash': 'Limbo', 'trashCopies': P('Enviar {count} cópia para o Limbo…', 'Enviar {count} cópias para o Limbo…'), 'keepThis': 'Manter esta cópia (as outras vão para o Limbo)', 'setsLead': 'Pastas que se repetem, cada uma por inteiro. Escolha a pasta que fica: as cópias das outras pastas do conjunto vão para o Limbo quando enviar as cópias.', 'setToTrash': 'para o Limbo', 'trashChecked': P('Enviar para o Limbo {count} cópia dos selecionados…', 'Enviar para o Limbo {count} cópias dos selecionados…'), 'trashNone': 'Enviar para o Limbo as cópias dos selecionados…', 'checkHint': 'Selecione os ficheiros repetidos para enviar as cópias extra para o Limbo de uma vez.', 'barLabel': 'Ficheiros repetidos selecionados', 'checkedCount': P('{count} de {total} ficheiros repetidos selecionados', '{count} de {total} ficheiros repetidos selecionados'), 'checkGroup': 'Selecionar este ficheiro repetido', 'checkSet': P('Selecionar este {count} ficheiro repetido', 'Selecionar estes {count} ficheiros repetidos')}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': 'A preparar as pilhas…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "A preparar as fotografias…", 'sending': "A enviar para o site…", 'canceled': "Publicação cancelada. O que já foi enviado fica no site como estava.", 'failed': "A publicação falhou: {error}", 'done': P("{count} fotografia publicada em {system}.", "{count} fotografias publicadas em {system}."), 'sentSame': P("{count} enviada, {same} já lá estavam.", "{count} enviadas, {same} já lá estavam."), 'openSite': "Abrir no site", 'where': "Onde publicar", 'url': "Endereço do site", 'key': "Chave de envio", 'keyKept': "Guardada (termina em {end}); escreva outra para a substituir", 'keyHint': "Cole a chave criada no site", 'check': "Testar a ligação", 'connected': "Ligado a {system} como {user}.", 'notRemembered': "Este sistema não guarda a chave cifrada: fica apenas até o LionPhotos ser fechado.", 'note': "As fotografias vão para o site no tamanho escolhido; as que já lá estão não são enviadas de novo. As suas fotografias não são alteradas.", 'next': "Publicar…", 'chosen': P("Publicar {count} selecionado…", "Publicar {count} selecionados…"), 'button': "Publicar…"}}, 'main': {'plugins': {'publish': {'badUrl': "Escreva o endereço do site com https:// (http:// só para este computador ou a rede local).", 'badKey': "A chave não é válida: cole-a como o site a mostra.", 'noKey': "Escreva a chave de envio criada no site.", 'title': P("Publicar {count} fotografia em {site}", "Publicar {count} fotografias em {site}"), 'message': "As fotografias vão para {host}, com a sua chave de envio.", 'confirm': "Publicar", 'note': "São enviadas cópias no tamanho escolhido; as suas fotografias não são alteradas.", 'noteOriginals': "Os ficheiros originais também são enviados; não são alterados.", 'summary': P("{count} fotografia publicada em {host}", "{count} fotografias publicadas em {host}"), 'errors': {'unreachable': "Não foi possível contactar o site ({detail}).", 'key': "O site recusou a chave: {detail}", 'protocol': "O site não usa o protocolo de publicação do LionPhotos ({detail}).", 'refused': "O site recusou as fotografias: {detail}", 'canceled': "Cancelado."}}}}})
+diff --git a/tools/nls/zh_CN.py b/tools/nls/zh_CN.py
+index 8a88545..7191aa2 100644
+--- a/tools/nls/zh_CN.py
++++ b/tools/nls/zh_CN.py
+@@ -611,3 +611,5 @@ _merge(MESSAGES, {'dupes': {'barLabel': '已勾选的重复文件', 'checkedCoun
+ _merge(MESSAGES, {'dupes': {'lead': '按内容而不是名称查找完全相同的副本：先比较大小，再比较每个文件的开头和结尾，只有必要时才读取整个文件。选择要保留的副本；其余的移入待删区，可在那里彻底删除或恢复。', 'toTrash': '待删区', 'trashCopies': '将 {count} 个副本移入待删区…', 'keepThis': '保留此副本（其他移入待删区）', 'setsLead': '相互重复的文件夹，每个都显示完整路径。选择要保留的文件夹：移入副本时，该组中其他文件夹的副本会进入待删区。', 'setToTrash': '移入待删区', 'trashChecked': {'one': '将所选项的 {count} 个副本移入待删区…', 'other': '将所选项的 {count} 个副本移入待删区…'}, 'trashNone': '将所选项的副本移入待删区…', 'checkHint': '选择重复文件，即可一次将多余副本移入待删区。', 'barLabel': '已选择的重复文件', 'checkedCount': {'one': '已选择 {total} 个重复文件中的 {count} 个', 'other': '已选择 {total} 个重复文件中的 {count} 个'}, 'checkGroup': '选择此重复文件', 'checkSet': {'one': '选择这 {count} 个重复文件', 'other': '选择这 {count} 个重复文件'}}})
+ # 1.83.2: stacks just turned on, said at once
+ _merge(MESSAGES, {'similar': {'statusPreparing': '正在准备堆叠…'}})
++# publish plugins: send albums to a site (lionphotos-publish-v1)
++_merge(MESSAGES, {'plugins': {'publish': {'preparing': "正在准备照片…", 'sending': "正在发送到网站…", 'canceled': "已取消发布。已发送的内容保留在网站上。", 'failed': "发布失败：{error}", 'done': "已在 {system} 发布 {count} 张照片。", 'sentSame': "已发送 {count} 张，{same} 张已存在。", 'openSite': "在网站上打开", 'where': "发布到哪里", 'url': "网站地址", 'key': "上传密钥", 'keyKept': "已保存（以 {end} 结尾）；输入新的密钥可替换", 'keyHint': "粘贴在网站上创建的密钥", 'check': "测试连接", 'connected': "已以 {user} 的身份连接到 {system}。", 'notRemembered': "此系统无法加密保存密钥：密钥仅保留到关闭 LionPhotos 为止。", 'note': "照片按所选尺寸发送到网站；已存在的照片不会重复发送。你的照片不会被更改。", 'next': "发布…", 'chosen': "发布所选的 {count} 个…", 'button': "发布…"}}, 'main': {'plugins': {'publish': {'badUrl': "请输入以 https:// 开头的网站地址（http:// 仅限本机或局域网）。", 'badKey': "密钥无效：请按网站显示的内容粘贴。", 'noKey': "请输入在网站上创建的上传密钥。", 'title': "在 {site} 发布 {count} 张照片", 'message': "照片将使用你的上传密钥发送到 {host}。", 'confirm': "发布", 'note': "发送的是所选尺寸的副本；你的照片不会被更改。", 'noteOriginals': "原始文件也会被发送；它们不会被更改。", 'summary': "已在 {host} 发布 {count} 张照片", 'errors': {'unreachable': "无法连接到网站（{detail}）。", 'key': "网站拒绝了密钥：{detail}", 'protocol': "该网站不支持 LionPhotos 发布协议（{detail}）。", 'refused': "网站拒绝了照片：{detail}", 'canceled': "已取消。"}}}}})
+diff --git a/tools/test-plugins.js b/tools/test-plugins.js
+index e66f9c6..68bf38a 100644
+--- a/tools/test-plugins.js
++++ b/tools/test-plugins.js
+@@ -127,6 +127,88 @@ check(branded({ name: 'x'.repeat(80), logo: '../../secret.png' }).name.length ==
+   check(a3.featured === true && b3.featured === false && c3.featured === 1 && c3.cover === a3.thumb, 'photos marked great are the highlights (and the cover)');
+   check(sizes3.includes(1600) && sizes3.includes(3000) && fs.existsSync(path.join(res3.dir, a3.web)) && a3.imageWidth === 2000 && a3.imageHeight === 3000,
+     'a web JPEG besides the size chosen; the picture’s own (upright) size', a3.web);
++  // ------------------------------------------------------------------ publish plugins
++  const pubManifest = { id: 'site-test', version: '1.0.0', kind: 'publish', name: 'Site', accepts: ['album'],
++    publish: { protocol: 'lionphotos-publish-v1', path: '/api/publish', url: 'https://fotos.example.org/', site: { en: 'Example' } } };
++  const pub = readPackage(writeZip([{ name: 'plugin.json', data: JSON.stringify(pubManifest) }, { name: 'assets/icon.svg', data: '<svg/>' }])).manifest;
++  check(pub.kind === 'publish' && pub.publish.path === '/api/publish' && pub.publish.url === 'https://fotos.example.org', 'a publish plugin needs no page; its protocol, path and site are kept', JSON.stringify(pub.publish));
++  const pubRefused = (publish) => refused([{ name: 'plugin.json', data: JSON.stringify({ ...pubManifest, publish }) }], 'manifest');
++  check(pubRefused({ ...pubManifest.publish, protocol: 'other-v9' }) && pubRefused({ ...pubManifest.publish, path: '../../x' }) && pubRefused(undefined),
++    'an unknown protocol, a bad path or no "publish" is refused');
++  const { siteUrl } = require('../src/platform/plugins/node/pluginPackage');
++  const urlOk = (u) => { try { siteUrl(u); return true; } catch { return false; } };
++  check(urlOk('https://site.org') && urlOk('http://localhost:8080') && urlOk('http://192.168.1.20') && !urlOk('http://site.org') && !urlOk('https://u:p@site.org') && !urlOk('file:///etc') && !urlOk('javascript:x'),
++    'the key goes only over https (http only for this computer and the local network)');
++
++  // a site that speaks the protocol, in memory
++  const { publish, PublishError } = require('../src/platform/plugins/node/publisher');
++  const crypto = require('crypto');
++  const site = { photos: new Map(), cols: new Map(), seq: 0, calls: [] };
++  const fakeFetch = async (url, init) => {
++    const u = new URL(url); const rel = u.pathname.replace(/^\/api\/publish/, '');
++    site.calls.push(`${init.method} ${rel}`);
++    const json = (status, body) => ({ ok: status < 300, status, text: async () => JSON.stringify(body) });
++    if (init.headers.Authorization !== 'Bearer qcf_good') return json(401, { error: 'bad key' });
++    if (init.method === 'GET' && rel === '/') return json(200, { protocol: 'lionphotos-publish-v1', system: 'Test site', user: 'Ana' });
++    if (init.method === 'POST' && rel === '/collections') {
++      const col = JSON.parse(init.body);
++      let c = [...site.cols.values()].find((x) => x.name === col.name);
++      if (!c) { c = { id: ++site.seq, name: col.name, photos: new Map() }; site.cols.set(c.id, c); }
++      const photos = [], keep = []; let same = 0;
++      col.items.forEach((it, index) => {
++        const had = [...c.photos.values()].find((p) => p.file === it.file && p.hash === it.hash && p.ready);
++        if (had) { same++; keep.push(had.id); return; }
++        const id = ++site.seq; c.photos.set(id, { id, file: it.file, hash: it.hash, ready: false, got: {} });
++        keep.push(id);
++        photos.push({ index, id, file: it.file, send: [it.thumb && 'thumb', it.original && 'original', 'image'].filter(Boolean) });
++      });
++      c.keep = keep;
++      return json(200, { id: c.id, created: true, photos, same, keep });
++    }
++    let m = rel.match(/^\/photos\/(\d+)\/(\w+)$/);
++    if (init.method === 'PUT' && m) {
++      const ph = [...site.cols.values()].flatMap((c) => [...c.photos.values()]).find((p) => p.id === Number(m[1]));
++      ph.got[m[2]] = Buffer.from(init.body);
++      if (m[2] === 'image') { if (crypto.createHash('sha256').update(ph.got.image).digest('hex') !== ph.hash) return json(400, { error: 'hash' }); ph.ready = true; }
++      return { ok: true, status: 204, text: async () => '' };
++    }
++    m = rel.match(/^\/collections\/(\d+)\/finish$/);
++    if (init.method === 'POST' && m) {
++      const c = site.cols.get(Number(m[1])); const keep = new Set(JSON.parse(init.body).keep); let removed = 0;
++      for (const id of [...c.photos.keys()]) if (!keep.has(id) || !c.photos.get(id).ready) { c.photos.delete(id); removed++; }
++      return json(200, { id: c.id, photos: c.photos.size, removed, published: false, url: `https://fotos.example.org/c/${c.id}` });
++    }
++    return json(404, { error: 'no route' });
++  };
++  const api = 'https://fotos.example.org/api/publish';
++  let progress = 0;
++  const r1 = await publish({ dir: res.dir, api, key: 'qcf_good', fetch: fakeFetch, onProgress: (d) => { progress = d; } });
++  const col1 = [...site.cols.values()][0];
++  const img0 = fs.readFileSync(path.join(res.dir, c.items[0].image));
++  check(r1.system === 'Test site' && r1.collections[0].photos === 2 && r1.sent === 2 && progress === 2 && [...col1.photos.values()].every((p) => p.ready)
++    && [...col1.photos.values()][0].got.image.equals(img0) && !!([...col1.photos.values()][0].got.original),
++  'publishing sends each photo (thumbnail, original, picture last) and closes the collection', JSON.stringify(r1.collections[0]));
++  const before = site.calls.length;
++  const r2 = await publish({ dir: res.dir, api, key: 'qcf_good', fetch: fakeFetch });
++  check(r2.sent === 0 && r2.same === 2 && !site.calls.slice(before).some((x) => x.startsWith('PUT')), 'published again unchanged: nothing is sent again', JSON.stringify(site.calls.slice(before)));
++  // a photo left out of the album leaves the site
++  const d1 = path.join(tmp, 'one'); fs.cpSync(res.dir, d1, { recursive: true });
++  const data1 = JSON.parse(fs.readFileSync(path.join(d1, 'data.js'), 'utf8').replace(/^window\.LIONPHOTOS_EXPORT = /, '').replace(/;\s*$/, ''));
++  data1.collections[0].items.pop();
++  fs.writeFileSync(path.join(d1, 'data.js'), `window.LIONPHOTOS_EXPORT = ${JSON.stringify(data1)};\n`);
++  const r3 = await publish({ dir: d1, api, key: 'qcf_good', fetch: fakeFetch });
++  check(r3.collections[0].photos === 1 && r3.collections[0].removed === 1, 'a photo taken out of the album is taken off the site', JSON.stringify(r3.collections[0]));
++  const err = await publish({ dir: res.dir, api, key: 'qcf_wrong', fetch: fakeFetch }).catch((e) => e);
++  check(err instanceof PublishError && err.code === 'key', 'a key the site refuses stops before sending anything');
++  // data.js cannot make LionPhotos send a file from outside the export folder
++  const d2p = path.join(tmp, 'evil'); fs.cpSync(res.dir, d2p, { recursive: true });
++  const dataE = JSON.parse(fs.readFileSync(path.join(d2p, 'data.js'), 'utf8').replace(/^window\.LIONPHOTOS_EXPORT = /, '').replace(/;\s*$/, ''));
++  dataE.collections[0].name = 'Evil'; dataE.collections[0].items[0].original = '../../../../etc/passwd'; dataE.collections[0].items[1].original = '/etc/passwd';
++  fs.writeFileSync(path.join(d2p, 'data.js'), `window.LIONPHOTOS_EXPORT = ${JSON.stringify(dataE)};\n`);
++  await publish({ dir: d2p, api, key: 'qcf_good', fetch: fakeFetch });
++  const evil = [...site.cols.values()].find((x) => x.name === 'Evil');
++  check([...evil.photos.values()].every((p) => !p.got.original), 'a path out of the export folder is never sent');
++
+   fs.rmSync(tmp, { recursive: true, force: true });
+   console.log(failures ? `\n${failures} failed` : '\nall checks passed');
+   process.exit(failures ? 1 : 0);
+-- 
+2.43.0
+

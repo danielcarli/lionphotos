@@ -28,7 +28,7 @@ Sfoglia, cerca e organizza enormi raccolte di foto e video là dove sono già: s
 
 **Nessuna importazione** · **Nulla lascia il tuo computer** · **100.000 foto scorrono come 100** · **Gratuito e open source**
 
-![Versione 1.83.4](https://img.shields.io/badge/version-1.83.4-161214)
+![Versione 1.85.1](https://img.shields.io/badge/version-1.85.1-161214)
 ![Stato: versione beta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licenza: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Piattaforme: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -111,7 +111,7 @@ Titolo, didascalia, audiodescrizione, autore e luogo per una foto o cento insiem
 
 > *«Il disco è pieno di cose che non mi servono.»*
 
-Segna gli scarti mentre guardi e mandali nel Limbo; trova i file ripetuti dal contenuto e manda lì anche le copie in più. Solo il Limbo manda i file nel Cestino; niente viene eliminato per sempre.
+Segna gli scarti mentre guardi e mandali nel Limbo; trova i file ripetuti dal contenuto e manda lì anche le copie in più. Solo il Limbo manda i file nel Cestino; niente viene eliminato per sempre. Scrivi le tue etichette sulle foto ("da stampare", "portfolio"): ognuna raccoglie le sue foto in *Etichette*, come un album.
 
 <p align="center"><img src="screenshots/duplicates.webp" alt="File ripetuti" width="860"><br><sub><b>File ripetuti</b> — trovati dal contenuto</sub></p>
 
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copia-foto"; npm run test:e2e
 
 ## Registro delle modifiche
 
-Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.83.4**.
+Vedi [CHANGELOG.md](../CHANGELOG.md) (in inglese) — versione attuale: **1.85.1**.
 
 ## Riconoscimenti
 

@@ -28,7 +28,7 @@
 
 **インポート不要** · **何もコンピューターの外に出ない** · **10万枚でも100枚のように軽快** · **無料・オープンソース**
 
-![バージョン 1.83.4](https://img.shields.io/badge/version-1.83.4-161214)
+![バージョン 1.85.1](https://img.shields.io/badge/version-1.85.1-161214)
 ![ステータス：ベータテスト](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![ライセンス: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![対応: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -111,7 +111,7 @@
 
 > *「ディスクが要らないものでいっぱい」*
 
-見ながら不要な写真に印を付けて Limbo へ。内容が同じファイルも見つけ、余分なコピーも Limbo へ送れます。ごみ箱へ移すのは Limbo だけで、完全に消すことはありません。
+見ながら不要な写真に印を付けて Limbo へ。内容が同じファイルも見つけ、余分なコピーも Limbo へ送れます。ごみ箱へ移すのは Limbo だけで、完全に消すことはありません。写真には自分のラベル（「印刷用」「ポートフォリオ」など）を付けられ、*ラベル* でアルバムのようにまとめて開けます。
 
 <p align="center"><img src="screenshots/duplicates.webp" alt="重複ファイル" width="860"><br><sub><b>重複ファイル</b> — 内容で検出</sub></p>
 
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 変更履歴
 
-[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.83.4**。
+[CHANGELOG.md](../CHANGELOG.md)（英語）を参照してください。現在のバージョン：**1.85.1**。
 
 ## クレジット
 

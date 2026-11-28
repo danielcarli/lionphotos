@@ -26,15 +26,12 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
   let current = list.find((p) => p.id === pluginId) || list.find((p) => !type || p.accepts.includes(type)) || list[0] || null;
   const chosen = new Set(labelIds);
   const values = {};
-  // a publish plugin: where to send, and the key (typed here, kept by the main process)
-  const target = { url: '', key: '', hasKey: false, keyEnd: '', loadedFor: '', status: null };
 
   return new Promise((resolve) => {
     const body = h('div.exp-body');
     const confirm = h('button.btn.btn-primary', { onclick: () => go() });
     const cancel = h('button.btn.btn-secondary', { onclick: () => close(null) }, t('common.cancel'));
     const summary = h('span.muted.small.exp-summary');
-    const note = h('span', t('plugins.export.note'));
 
     const draw = () => {
       if (!current) {
@@ -72,34 +69,6 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
       const originals = h('input', { type: 'checkbox', checked: !!values.originals, onchange: (e) => { values.originals = e.target.checked; } });
       values.zip ??= true;
       const zip = h('input', { type: 'checkbox', checked: !!values.zip, onchange: (e) => { values.zip = e.target.checked; } });
-      const publishing = m.kind === 'publish';
-      if (publishing && target.loadedFor !== m.id) {
-        target.loadedFor = m.id;
-        plugins.publishTarget(m.id).then((r) => { Object.assign(target, { url: r.url, hasKey: r.hasKey, keyEnd: r.keyEnd, remembered: r.remembered, key: '', status: null }); draw(); }).catch(() => {});
-      }
-      const status = h('span', { class: `small exp-site-status${target.status ? (target.status.error ? ' is-error' : ' is-ok') : ''}`, role: 'status' },
-        target.status ? (target.status.error || t('plugins.publish.connected', { system: target.status.system, user: target.status.user })) : '');
-      const save = async () => {
-        const r = await plugins.savePublishTarget(m.id, { url: target.url, key: target.key });
-        if (r?.error) { target.status = { error: r.error }; return false; }
-        Object.assign(target, { url: r.url, hasKey: r.hasKey, keyEnd: r.keyEnd, key: '' });
-        return true;
-      };
-      const site = publishing ? h('div.exp-site',
-        h('div.exp-group-title.small', t('plugins.publish.where')),
-        h('label.exp-opt.col', h('span.small', t('plugins.publish.url')),
-          h('input.text-input', { type: 'url', value: target.url, placeholder: 'https://', spellcheck: false, oninput: (e) => { target.url = e.target.value; target.status = null; count(); } })),
-        h('label.exp-opt.col', h('span.small', t('plugins.publish.key')),
-          h('input.text-input', { type: 'password', value: target.key, autocomplete: 'off', spellcheck: false,
-            placeholder: target.hasKey ? t('plugins.publish.keyKept', { end: target.keyEnd }) : t('plugins.publish.keyHint'),
-            oninput: (e) => { target.key = e.target.value; target.status = null; count(); } })),
-        h('div.exp-site-row',
-          h('button.btn.btn-secondary.btn-sm', { type: 'button', onclick: async () => {
-            target.status = (await save()) ? await plugins.checkPublishTarget(m.id) : target.status;
-            draw();
-          } }, t('plugins.publish.check')),
-          status),
-        target.remembered === false ? h('p.small.muted', t('plugins.publish.notRemembered')) : null) : null;
       const opts = m.options.map((o) => {
         values[o.id] ??= o.default;
         if (o.type === 'bool') return h('label.exp-opt', h('input', { type: 'checkbox', checked: !!values[o.id], onchange: (e) => { values[o.id] = e.target.checked; } }), h('span', textOf(o.label)));
@@ -115,28 +84,21 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
             WHICH.map((w) => h('option', { value: w, selected: plugins.which === w }, t(`plugins.which.${w}`))))),
           h('label.exp-opt.col', h('span.small', t('plugins.export.size')), sizeSel),
           h('label.exp-opt', originals, h('span', t('plugins.export.originals'))),
-          publishing ? null : h('label.exp-opt', { title: t('plugins.export.zipHint') }, zip, h('span', t('plugins.export.zip'))),
-          opts),
-        site);
-      note.textContent = t(publishing ? 'plugins.publish.note' : 'plugins.export.note');
+          h('label.exp-opt', { title: t('plugins.export.zipHint') }, zip, h('span', t('plugins.export.zip'))),
+          opts));
       count();
     };
 
     const count = () => {
       const ids = [...chosen].filter((id) => current && current.accepts.includes(labels.get(id)?.type));
       const n = ids.reduce((a, id) => a + plugins.itemsOf(id).length, 0);
-      const publishing = current?.kind === 'publish';
-      confirm.replaceChildren(h('span', { html: icon('external', 14) }), t(publishing ? 'plugins.publish.next' : 'plugins.export.next'));
-      confirm.disabled = !n || (publishing && (!target.url.trim() || (!target.hasKey && !target.key.trim())));
+      confirm.replaceChildren(h('span', { html: icon('external', 14) }), t('plugins.export.next'));
+      confirm.disabled = !n;
       summary.textContent = n ? tn('plugins.export.count', n, { collections: tn('plugins.export.collections', ids.length) }) : '';
     };
 
     const go = async () => {
       const ids = [...chosen].filter((id) => current.accepts.includes(labels.get(id)?.type));
-      if (current.kind === 'publish') {
-        const r = await plugins.savePublishTarget(current.id, { url: target.url, key: target.key });
-        if (r?.error) { target.status = { error: r.error }; draw(); return; }
-      }
       close(true);
       // two photos with the same name in one of them: which one goes
       const same = plugins.sameNames(ids);
@@ -149,7 +111,7 @@ export async function showExportDialog(s, { labelIds = [], type = '', pluginId =
       h('header.cm-head', h('span.cm-icon', { html: icon('external', 20) }),
         h('div', h('div.eyebrow', t('plugins.eyebrow')), h('h2#exp-title', t('plugins.export.title')))),
       body,
-      h('p.choice-note', h('span', { html: icon('info', 14) }), note),
+      h('p.choice-note', h('span', { html: icon('info', 14) }), h('span', t('plugins.export.note'))),
       h('footer.cm-actions', summary, h('span.toolbar-spacer'), cancel, confirm));
     const overlay = h('div.cm-overlay', dialog);
     const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); close(null); } };

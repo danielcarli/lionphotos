@@ -2233,11 +2233,6 @@ input.desc-input { min-height: 32px; resize: none; }
 .exp-opt { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
 .exp-opt.col { flex-direction: column; align-items: stretch; gap: 4px; }
 .exp-opt.col .small { color: var(--text-secondary); }
-.exp-site { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
-.exp-site .text-input { width: 100%; }
-.exp-site-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.exp-site-status.is-ok { color: var(--success, #12807e); }
-.exp-site-status.is-error { color: var(--danger, #c2410c); }
 .exp-empty { display: grid; justify-items: center; gap: 6px; padding: 18px 8px; text-align: center; color: var(--text-secondary); }
 .exp-empty p { margin: 0; }
 .exp-summary { align-self: center; }
@@ -3722,3 +3717,51 @@ html:root:root .selection-bar .limbo-send:hover { background: color-mix(in srgb,
 .dup-set-head .dup-check { margin-right: 2px; }
 /* 1.83.1: at the end of Repeated files, the same send to the Limbo as on the bar */
 .dup-foot { display: flex; justify-content: center; margin: 20px 0 8px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+/* 1.84.0: the organization at the top of the panel, over its tabs; the person's own labels with a field */
+.ip-top { padding: 4px 34px 0 0; border-bottom: 1px solid var(--border); background: var(--bg-sidebar); }
+.ip-top > .ip-sec { border-bottom: 0; }
+.vw-info .ip-top { padding-right: 0; background: #141113; }
+.ip-tag-input { flex: 1 1 96px; min-width: 96px; height: 26px; padding: 0 9px; border-radius: 13px; border: 1px dashed color-mix(in srgb, var(--accent) 50%, transparent); background: transparent; color: var(--text-primary); font: inherit; font-size: 12px; }
+.ip-tag-input::placeholder { color: var(--accent); opacity: 0.9; }
+.ip-tag-input:focus { outline: none; border-style: solid; border-color: var(--accent); background: var(--bg-elevated); }
+
+/* 1.84.1: "Advanced controls": the panel's tabs and what they show, folded until asked for */
+.ip-adv { border-top: 1px solid var(--border); flex: 1 0 auto; display: flex; flex-direction: column; }
+.ip-adv-h { display: flex; align-items: center; gap: 7px; width: 100%; padding: 10px 12px; color: var(--text-secondary); text-align: left; border-radius: 0; }
+.ip-adv-h:hover .ip-sec-t { color: var(--text-primary); }
+.ip-adv-h .ip-chev { display: inline-grid; color: var(--text-muted); }
+.ip-adv-body { display: flex; flex-direction: column; flex: 1 0 auto; }
+.ip-adv-body[hidden] { display: none; }
+.ip-adv .ip-tabs { padding-right: 10px; border-top: 1px solid var(--border); }
+
+/* 1.85.0: the panel of Photos — its four tabs as a rail of small icons down its left edge (names written upwards
+   beside them, or the icons alone), one tab's content at a time; folded, the rail alone stays */
+.info-panel { width: 364px; overflow: hidden; }
+.info-panel:not([hidden]) { display: flex; flex-direction: row; }
+.info-panel.is-folded { width: 44px !important; flex-basis: 44px !important; }
+.ip-rail { flex: none; width: 44px; display: flex; border-right: 1px solid var(--border); background: var(--bg-sidebar); }
+.ip-rail-in { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0; }
+.ip-rail-tab { flex-direction: column; width: 32px; height: auto; min-height: 32px; padding: 8px 0; gap: 8px; border-radius: 8px; white-space: nowrap; }
+.ip-rail-tab.is-on { background: var(--accent); color: var(--text-on-accent, #fff); box-shadow: none; }
+.ip-rail-tab.is-on:hover { background: var(--accent); color: var(--text-on-accent, #fff); }
+.ip-rail-ic { display: inline-grid; }
+.ip-rail-name { writing-mode: vertical-rl; transform: rotate(180deg); font: 600 11.5px var(--font-ui); letter-spacing: 0.2px; }
+.ip-rail-sp { flex: 1; }
+.ip-rail-names[aria-pressed="true"] { color: var(--accent); }
+.ip-main { flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto; position: relative; }
+.ip-main:not([hidden]) { display: flex; flex-direction: column; }
+.ip-main > .info-empty { flex: 1; padding-top: 24px; }
+.info-panel .ip-main .info-thumb { margin-top: 12px; }
+.info-panel .ip-main .sel-summary { padding-top: 12px; }
+/* the photo small beside its name (every tab but Adjust) */
+.ip-head.is-compact { display: grid; grid-template-columns: 64px minmax(0, 1fr); column-gap: 12px; align-items: start; padding: 12px 14px 8px; }
+.ip-head.is-compact > * { grid-column: 2; min-width: 0; }
+.ip-head.is-compact > .info-thumb { grid-column: 1; grid-row: 1 / span 6; width: 64px; height: 64px; aspect-ratio: auto; margin: 0 !important; border-radius: 8px; }
+.ip-head.is-compact .info-img { object-fit: cover; }
+.ip-links { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--border); }
+.ip-secs:has(+ .ip-links) { flex: 0 0 auto; }
+.ip-links { flex: 1 0 auto; }
+
+/* 1.85.1: the switch of the tabs' names at the top of the rail */
+.ip-rail-names { margin-bottom: 4px; }

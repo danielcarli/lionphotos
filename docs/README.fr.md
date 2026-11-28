@@ -28,7 +28,7 @@ Parcourez, recherchez et organisez d’immenses collections de photos et de vid�
 
 **Aucune importation** · **Rien ne quitte votre ordinateur** · **100 000 photos défilent comme 100** · **Gratuit et open source**
 
-![Version 1.83.4](https://img.shields.io/badge/version-1.83.4-161214)
+![Version 1.85.1](https://img.shields.io/badge/version-1.85.1-161214)
 ![Statut : version bêta](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Licence : MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plateformes : Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -111,7 +111,7 @@ Titre, légende, audiodescription, auteur et lieu pour une photo ou cent à la f
 
 > *« Le disque est plein de choses inutiles. »*
 
-Marquez les rebuts au fil de l’eau et envoyez-les dans les Limbes ; trouvez les fichiers en double par leur contenu et envoyez-y aussi leurs copies en trop. Seules les Limbes envoient des fichiers à la Corbeille ; rien n’est supprimé définitivement.
+Marquez les rebuts au fil de l’eau et envoyez-les dans les Limbes ; trouvez les fichiers en double par leur contenu et envoyez-y aussi leurs copies en trop. Seules les Limbes envoient des fichiers à la Corbeille ; rien n’est supprimé définitivement. Écrivez vos propres étiquettes sur les photos (« à imprimer », « portfolio ») : chacune réunit ses photos dans *Étiquettes*, comme un album.
 
 <p align="center"><img src="screenshots/duplicates.webp" alt="Fichiers en double" width="860"><br><sub><b>Fichiers en double</b> — trouvés par leur contenu</sub></p>
 
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\copie-photos"; npm run test:e2e
 
 ## Historique des versions
 
-Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.83.4**.
+Voir [CHANGELOG.md](../CHANGELOG.md) (en anglais) — version actuelle : **1.85.1**.
 
 ## Crédits
 

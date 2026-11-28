@@ -2,12 +2,38 @@
 
 All notable changes to LionPhotos are documented here. The project follows [Semantic Versioning](https://semver.org).
 
-## [Unreleased]
+## [1.85.1] — 2026-11-28
+
+### Changed
+- **"+" of a row in Organize opens that kind alone:** add a pet and the window shows the pets only; a person, the people only; a place, the places only; a project, the projects only. The category (personal or professional) and the other kinds are no longer repeated in that window: they are in the panel. *Labels…* in the menus and on a folder still opens the whole window.
+- The switch of the tabs' names is at the top of the rail (it was at its foot).
+- End-to-end check.
+
+## [1.85.0] — 2026-11-28
+
+### Changed
+- **The panel of Photos, less crowded: four tabs as a rail of small icons** down its left edge — **Organize**, Adjust, Describe, Info (keys O, E, D, I) — and one tab's content at a time. The organization is now a tab of its own (it was a block over the tabs), and it is the tab the panel opens on. It replaces the three tabs across the top and the folding "Advanced controls" of 1.84.1.
+- **Names beside the icons, or the icons alone:** each tab's name is written upwards beside its icon; the button at the foot of the rail leaves the icons alone (the name then on hover), remembered.
+- **A click on the tab shown folds the panel** to the rail alone, and a click on any tab opens it again (H still shows or folds it). The × at the top of the panel is gone.
+- **The photo small beside its name**, with its date and marks, in Organize, Describe and Info: the photo is already in the grid. Adjust keeps it large, for the live preview. "Photos of the day", "Similar" and what the photo shows are under Organize.
+- The viewer's panel has the same four tabs (across its top, as before); in two panels, the organization leads the left one.
+- Strings in the 10 languages; end-to-end checks.
+
+## [1.84.1] — 2026-11-27
+
+### Changed
+- **"Advanced controls" in the panel of Photos:** the tabs (Adjust, Describe, Info) and what they show are now inside one item that starts folded. The panel opens with the organization and the photo (name, date, marks); a click on *Advanced controls* opens the tabs, and that choice is remembered. Asking for a tab by its key (E, D, I) or by a button opens it too. The viewer's panel is as before.
+- Strings in the 10 languages; end-to-end check.
+
+## [1.84.0] — 2026-11-27
 
 ### Added
-- **Publishing plugins** (`"kind": "publish"`): albums and projects go straight to a site — a photo catalog, an agency's archive — instead of a folder. The export dialog asks for the site's address and an upload key, checks the connection (whose key it is, on which site) and publishes with the typed code; the photos are made as for an export, in a temporary folder, sent and the folder removed. Photos the site already has with the same picture are not sent again, and the ones taken out of the album leave the site. The key is kept encrypted by the system and never goes back to the window; `https://` only, or `http://` for this computer and the local network. Protocol `lionphotos-publish-v1`, described in docs/PLUGINS.md.
-- Plugin **Coordenadoria de Comunicação UFSM (Mercúrio)** (`plugins/coordenadoria-ufsm`): publishes to the photo catalog of the UFSM Communication office.
-- Texts in the 10 languages; unit checks for the manifest, the address rule and the protocol against a site in memory (only the files asked are sent, nothing twice, nothing from outside the export folder, a refused key stops at once).
+- **Labels: your own words on the photos.** A new kind of label, free ("to print", "portfolio", "send to the client"), beside albums, people, pets, places and projects. **Labels** in the activity bar (Ctrl+Shift+L) shows each one as a card with its photos, like an album: open it, rename it, describe it, delete it (the photos stay). They are found by the search of the title bar, travel with the portable catalog, and a folder can have them too.
+- **A field for labels in the panel:** write a word and press Enter (or a comma) to put it on the photo or on the whole selection; a word that already exists is reused, whatever its capitals, and suggested as you type. The field keeps the focus, for the next label; × takes a label off.
+
+### Changed
+- **The organization at the top of the panel**, over the tabs, in the panel of Photos and in the viewer's: category, labels, albums, people, pets, places and projects are in sight whatever the tab shown (they were inside *Describe*, under the description). It folds to one line, as before.
+- README in the 10 languages; strings in the 10 languages; end-to-end check for the labels and for the organization over the tabs.
 
 ## [1.83.4] — 2026-11-23
 

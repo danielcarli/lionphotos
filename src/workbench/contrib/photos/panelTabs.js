@@ -3,8 +3,8 @@
  *  Created and conceived by Daniel Michelon De Carli.
  *  Licensed under the MIT License. See LICENSE in the project root.
  *--------------------------------------------------------------------------------------------*/
-// The side panel by task (decided 15/11/2026, "Painel de edição do visualizador — estudo de layout"): three tabs,
-// Adjust · Describe · Info, in the same place in the photos' panel and in the viewer, the last one remembered
+// The side panel by task (decided 15/11/2026, "Painel de edição do visualizador — estudo de layout"; a fourth tab,
+// Organize, and the rail of Photos on 28/11/2026): Organize · Adjust · Describe · Info, in the same place in the photos' panel and in the viewer, the last one remembered
 // (keys E, D, I: the active tab's key folds the panel). In a wide window (1680 px or more) the viewer shows two
 // panels instead — Describe and Info on the left, Adjust on the right — unless the person keeps one. Each panel's
 // width can be dragged (300–480 px) and is remembered.
@@ -13,12 +13,13 @@ import { icon } from '../../../base/browser/icons.js';
 import { t } from '../../../base/common/nls.js';
 
 export const TABS = [
+  { id: 'organize', icon: 'tag', label: 'panel.tab.organize', key: 'O' },
   { id: 'adjust', icon: 'sliders', label: 'panel.tab.adjust', key: 'E' },
   { id: 'describe', icon: 'rename', label: 'panel.tab.describe', key: 'D' },
   { id: 'info', icon: 'info', label: 'panel.tab.info', key: 'I' },
 ];
 /** the key of each tab (lower case), as typed */
-export const TAB_KEYS = { e: 'adjust', d: 'describe', i: 'info' };
+export const TAB_KEYS = { o: 'organize', e: 'adjust', d: 'describe', i: 'info' };
 export const WIDE = 1680;
 export const MIN_W = 300;
 export const MAX_W = 480;
@@ -33,7 +34,7 @@ const write = (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage
 /** The tab shown: 'adjust' | 'describe' | 'info' — or 'all' (every section, one after the other: kept for the tests). */
 export function panelTab() {
   const v = read(TAB_KEY);
-  return v === 'adjust' || v === 'describe' || v === 'info' || v === 'all' ? v : 'describe';
+  return v === 'organize' || v === 'adjust' || v === 'describe' || v === 'info' || v === 'all' ? v : 'organize';
 }
 export function setPanelTab(tab) { write(TAB_KEY, tab); }
 
@@ -49,11 +50,11 @@ function setPanelWidth(id, w) { write(WIDTH_KEY, JSON.stringify({ ...widths(), [
 
 /**
  * Which sections a tab shows, in its order: Adjust → the adjustments; Describe → the words (title, caption,
- * audio description), then the organization (category, albums, people…), then author and place; Info → the file.
+ * audio description), then author and place; Info → the file.
  * @param {{organize?:Node|Function, adjust?:Node|Function, describe?:Node|Function, place?:Node|Function, file?:Node|Function}} s
  */
 export function sectionsFor(tab, s) {
-  const order = tab === 'adjust' ? ['adjust'] : tab === 'info' ? ['file'] : tab === 'all' ? ['organize', 'adjust', 'describe', 'place', 'file'] : ['describe', 'organize', 'place'];
+  const order = tab === 'adjust' ? ['adjust'] : tab === 'info' ? ['file'] : tab === 'organize' ? ['organize'] : tab === 'all' ? ['organize', 'adjust', 'describe', 'place', 'file'] : ['describe', 'place'];
   // a section is made only when its tab shows it (the adjustments draw a histogram, the file reads its metadata)
   return order.map((k) => (typeof s[k] === 'function' ? s[k]() : s[k])).filter(Boolean);
 }
@@ -91,6 +92,48 @@ export function tabBar(current, onPick, { adjust = true, extra = null } = {}) {
     next.focus(); next.click();
   });
   return bar;
+}
+
+const RAIL_KEY = 'lionphotos.panel.railNames';
+/** The tabs' names written down the rail, beside their icons (on unless the person keeps the icons alone). */
+export function railNames() { return read(RAIL_KEY) !== '0'; }
+export function setRailNames(on) { write(RAIL_KEY, on ? '1' : '0'); }
+
+/**
+ * The tabs as a narrow rail down the panel's left edge (Photos): small icons, each with its name written
+ * upwards beside it — or the icons alone, by the button at the top of the rail (remembered). `open` false =
+ * the panel folded: no tab is the selected one, and a click opens it.
+ * @param {string} current @param {(tab:string) => void} onPick @param {() => void} onNames the names switched
+ */
+export function tabRail(current, onPick, { adjust = true, open = true, onNames } = {}) {
+  const names = railNames();
+  const tabs = TABS.filter((x) => adjust || x.id !== 'adjust');
+  const rail = h('div.ip-rail-in', { role: 'tablist', 'aria-orientation': 'vertical', 'aria-label': t('panel.tabs') },
+    // at the top of the rail: the tabs' names shown or not
+    h('button.icon-button.ip-rail-names', {
+      type: 'button', 'aria-pressed': String(names), title: t(names ? 'panel.railIcons' : 'panel.railNames'), 'aria-label': t(names ? 'panel.railIcons' : 'panel.railNames'),
+      html: icon('list', 15), onclick: () => { setRailNames(!names); onNames?.(); },
+    }),
+    tabs.map((x) => {
+      const on = open && (x.id === current || (current === 'all' && x.id === 'organize'));
+      return h('button.ip-tab.ip-rail-tab', {
+        type: 'button', role: 'tab', 'data-tab': x.id, 'aria-selected': String(on), 'aria-label': t(x.label),
+        class: `ip-tab ip-rail-tab${on ? ' is-on' : ''}`, tabindex: on || (!open && x.id === current) ? '0' : '-1',
+        title: `${t(x.label)} (${x.key})`, onclick: () => onPick(x.id),
+      }, h('span.ip-rail-ic', { html: icon(x.icon, 16) }), names ? h('span.ip-rail-name', t(x.label)) : null);
+    }),
+    );
+  // ↑ ↓ move between the tabs, as in any vertical tablist
+  rail.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    const btns = [...rail.querySelectorAll('.ip-tab')];
+    const at = btns.indexOf(document.activeElement);
+    if (at < 0) return;
+    e.preventDefault(); e.stopPropagation();
+    const next = btns.at((at + (e.key === 'ArrowDown' ? 1 : -1)) % btns.length);
+    next.focus(); next.click();
+  });
+  return rail;
 }
 
 /** The title row of a panel that shows one task only (in two panels): its name, and what goes at the end. */

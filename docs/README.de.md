@@ -28,7 +28,7 @@ Riesige Foto- und Videosammlungen dort durchsuchen und ordnen, wo sie schon lieg
 
 **Kein Import** · **Nichts verlässt Ihren Computer** · **100.000 Fotos scrollen wie 100** · **Kostenlos und Open Source**
 
-![Version 1.83.4](https://img.shields.io/badge/version-1.83.4-161214)
+![Version 1.85.1](https://img.shields.io/badge/version-1.85.1-161214)
 ![Status: Betatest](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![Lizenz: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Plattformen: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -111,7 +111,7 @@ Schnelle Bearbeitung und Zuschnitte für jedes soziale Netzwerk, Bildunterschrif
 
 > *„Die Platte ist voll mit Dingen, die ich nicht brauche.“*
 
-Markieren Sie Ausschuss beim Durchsehen und schicken Sie ihn in den Limbo; finden Sie doppelte Dateien anhand ihres Inhalts und schicken Sie ihre überzähligen Kopien ebenfalls dorthin. Nur der Limbo verschiebt Dateien in den Papierkorb; nichts wird endgültig gelöscht.
+Markieren Sie Ausschuss beim Durchsehen und schicken Sie ihn in den Limbo; finden Sie doppelte Dateien anhand ihres Inhalts und schicken Sie ihre überzähligen Kopien ebenfalls dorthin. Nur der Limbo verschiebt Dateien in den Papierkorb; nichts wird endgültig gelöscht. Schreiben Sie eigene Etiketten an die Fotos („zum Drucken“, „Portfolio“): Jedes sammelt seine Fotos unter *Etiketten*, wie ein Album.
 
 <p align="center"><img src="screenshots/duplicates.webp" alt="Doppelte Dateien" width="860"><br><sub><b>Doppelte Dateien</b> — am Inhalt erkannt</sub></p>
 
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\fotos-kopie"; npm run test:e2e
 
 ## Änderungsprotokoll
 
-Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.83.4**.
+Siehe [CHANGELOG.md](../CHANGELOG.md) (Englisch) – aktuelle Version: **1.85.1**.
 
 ## Mitwirkende
 

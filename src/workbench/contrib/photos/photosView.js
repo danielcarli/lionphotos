@@ -28,7 +28,7 @@ import { todoPin } from '../todo/todoPin.js';
 import { dayLink, nameLines, organizeSection, selectionFacts, selectionList } from './selectionSummary.js';
 import { metadataSections } from './descriptionSection.js';
 import { collapsible, fileSection, infoFooter } from './infoSections.js';
-import { panelTab, setPanelTab, sectionsFor, asOnly, usableTab, tabBar, TAB_KEYS, attachResizer } from './panelTabs.js';
+import { panelTab, setPanelTab, sectionsFor, asOnly, usableTab, TAB_KEYS, attachResizer, tabRail } from './panelTabs.js';
 import { showExportDialog } from '../plugins/exportDialog.js';
 import { renderProjectPanel } from '../labels/projectPanel.js';
 import { textOf } from '../../services/plugins/browser/pluginsService.js';
@@ -111,9 +111,13 @@ export class PhotosView extends ViewPane {
     this.railMarks = h('div.date-rail-marks');
     this.rail = h('div.date-rail', { hidden: true, role: 'scrollbar', 'aria-orientation': 'vertical', 'aria-label': t('photos.timeline'), 'aria-controls': '' }, this.railMarks, this.railNow, this.railTip);
     this.#railEvents();
-    this.info = h('aside.info-panel');
+    // the panel: its tabs as a rail of small icons down its left edge (always there; a click on the tab shown
+    // folds the panel to the rail alone), and what the tab shows beside it
+    this.infoRail = h('nav.ip-rail');
+    this.infoBody = h('div.ip-main');
+    this.info = h('aside.info-panel', this.infoRail, this.infoBody);
     // where the panel is scrolled to, as the person scrolls it (kept across its redraws: see #renderInfo)
-    this.info.addEventListener('scroll', () => { if (!this.infoDrawing) this.infoTop = this.info.scrollTop; }, { passive: true });
+    this.infoBody.addEventListener('scroll', () => { if (!this.infoDrawing) this.infoTop = this.infoBody.scrollTop; }, { passive: true });
     // its left edge is dragged to make it wider (300–480 px, remembered)
     this.infoGrip = attachResizer(this.info, 'grid', 'right');
     // Alt+↓ / Alt+↑ in the panel (even in a field): the next / previous photo, the same field keeps the focus
@@ -1189,7 +1193,7 @@ export class PhotosView extends ViewPane {
     // Delete: to the Limbo (a confirmation); in the Limbo, to the Recycle Bin (typed code)
     if (e.key === 'Delete' && library.selection.size) { e.preventDefault(); if (this.limbo) this.operations.trash([...library.selection]); else applyMark(library, [...library.selection], 'reject'); return; }
     if (e.key === 'Enter' && this.focusId) { e.preventDefault(); this.#openViewer(this.focusId); return; }
-    // E · D · I: the panel's tabs (Adjust, Describe, Info); H shows or folds the panel
+    // O · E · D · I: the panel's tabs (Organize, Adjust, Describe, Info); H shows or folds the panel
     const tabKey = !mod && !e.altKey && !e.shiftKey && TAB_KEYS[e.key.toLowerCase()];
     if (tabKey) { e.preventDefault(); this.showTab(tabKey, true); return; }
     if (!mod && !e.altKey && (e.key === 'h' || e.key === 'H')) { e.preventDefault(); this.toggleInfo(); return; }
@@ -1258,9 +1262,19 @@ export class PhotosView extends ViewPane {
    * with Undo, Next photo and Write to the files.
    */
   async #renderInfo() {
-    this.info.hidden = !this.infoOpen;
-    if (!this.infoOpen) return;
     const sel = this.library.selection;
+    {
+      // the rail first, whatever comes next: the tabs are there with the panel folded too
+      const many = sel.size > 1 ? this.library.selectedItems() : null;
+      const one = many ? null : this.library.byId.get(this.focusId && sel.has(this.focusId) ? this.focusId : sel.size === 1 ? [...sel][0] : 0);
+      const canAdjust = many ? many.some((x) => x.kind === KIND.image) : !one || one.kind === KIND.image;
+      setChildren(this.infoRail, tabRail(usableTab(panelTab(), { adjust: canAdjust }), (x) => this.showTab(x, true),
+        { adjust: canAdjust, open: this.infoOpen, onNames: () => this.#renderInfo() }));
+    }
+    this.info.classList.toggle('is-folded', !this.infoOpen);
+    this.infoBody.hidden = !this.infoOpen;
+    this.infoGrip.hidden = !this.infoOpen;
+    if (!this.infoOpen) return;
     const id = this.focusId && sel.has(this.focusId) ? this.focusId : sel.size === 1 ? [...sel][0] : null;
     const token = (this.infoToken = (this.infoToken || 0) + 1);
     const rerender = () => this.#renderInfo();
@@ -1273,7 +1287,7 @@ export class PhotosView extends ViewPane {
       this.infoKey = key;
       this.infoDrawing = true;
       return () => {
-        this.info.scrollTop = top;
+        this.infoBody.scrollTop = top;
         this.infoTop = top;
         requestAnimationFrame(() => { this.infoDrawing = false; });
       };
@@ -1288,7 +1302,7 @@ export class PhotosView extends ViewPane {
       const marks = Object.entries(f.marks).filter(([k, n]) => n && k !== 'none');
       const same = MARK_NAMES[items[0].mark || 0];
       const restore = keepScroll(`many:${items.length}:${items[0].id}:${items.at(-1).id}:${tab}`);
-      setChildren(this.info, this.#infoClose(), this.#tabs(tab, images.length > 0),
+      setChildren(this.infoBody,
         h('div.ip-head.ip-head-many',
           h('div.ip-head-top',
             h('div.ip-mosaic', { class: `ip-mosaic n${Math.min(items.length, 4)}` }, shown.map((it) => this.#thumb(it, 'ip-mos-img')), items.length > 4 ? h('span.ip-mos-more', `+${formatNumber(items.length - 3)}`) : null),
@@ -1307,10 +1321,11 @@ export class PhotosView extends ViewPane {
         })),
         infoFooter(this, items));
       restore();
+      if (this.refocus) { const el = this.info.querySelector(`[data-desc="${this.refocus}"]`); this.refocus = null; el?.focus(); }
       return;
     }
     if (!id) {
-      setChildren(this.info, this.#infoClose(), h('div.info-empty', h('span', { html: icon('info', 22) }), h('p', t('info.empty'))));
+      setChildren(this.infoBody, h('div.info-empty', h('span', { html: icon('info', 22) }), h('p', t('info.empty'))));
       return;
     }
     const d = await this.host.library.details(id);
@@ -1324,13 +1339,16 @@ export class PhotosView extends ViewPane {
     const index = this.indexOf.get(id);
     const hasNext = index !== undefined && index < this.list.length - 1;
     const restore = keepScroll(`one:${id}:${tab}`);
-    setChildren(this.info, this.#infoClose(), this.#tabs(tab, image),
-      h('div.ip-head',
+    // the photo large only where it is worked on (Adjust: the live preview); elsewhere a small picture beside its
+    // name — the photo is already in the grid — and the links to its day and to what it shows under Organize
+    const large = tab === 'adjust' || tab === 'all';
+    const links = () => [dayLink(this, [it]), this.#shows(it)];
+    setChildren(this.infoBody,
+      h(`div.ip-head${large ? '' : '.is-compact'}`,
         h('div.info-thumb', this.#thumb(it, 'info-img')),
         ...nameLines(it, d),
         h('div.ip-meta', [detailsLine(d), dims].filter(Boolean).join(' · ')),
-        dayLink(this, [it]),
-        this.#shows(it),
+        large ? links() : null,
         h('div.ip-tools',
           this.#marks([id], MARK_NAMES[it.mark || 0], 'info-mark-btns'),
           h('span.ip-sp'),
@@ -1343,6 +1361,7 @@ export class PhotosView extends ViewPane {
         describe: md.describe, place: md.place,
         file: () => fileSection(d),
       })),
+      tab === 'organize' ? h('div.ip-links', links()) : null,
       infoFooter(this, [it], { pending: md.pending, onNext: hasNext ? () => this.#stepInfo(1) : null }));
     restore();
     // after "Next photo": the same field takes the focus again
@@ -1366,23 +1385,16 @@ export class PhotosView extends ViewPane {
   /** Draws the info panel again (after copying adjustments, a value picked for all…). */
   rerenderInfo() { this.#renderInfo(); }
 
-  /** The panel's tabs: Adjust · Describe · Info (Adjust only with photos). */
-  #tabs(tab, adjust) {
-    return tabBar(tab, (x) => {
-      setPanelTab(x);
-      this.#renderInfo().then(() => this.info.querySelector(`.ip-tab[data-tab="${x}"]`)?.focus());
-    }, { adjust });
-  }
-
   /**
-   * E, D, I: the panel on that tab — opened if folded, folded if that tab is already shown (H folds it whatever
-   * the tab).
+   * O, E, D, I (or a click on the rail): the panel on that tab — opened if folded, folded to its rail if that tab
+   * is already shown (H folds it whatever the tab).
    */
   showTab(tab, toggle = false) {
     if (this.infoOpen && toggle && panelTab() === tab) { this.toggleInfo(); return; }
     setPanelTab(tab);
     if (!this.infoOpen) this.toggleInfo();
     else this.#renderInfo();
+    requestAnimationFrame(() => { if (this.infoRail.contains(document.activeElement)) this.infoRail.querySelector(`.ip-tab[data-tab="${tab}"]`)?.focus(); });
   }
 
   /** Crop and straighten a photo: the viewer opens on it with the crop editor. */
@@ -1563,9 +1575,6 @@ export class PhotosView extends ViewPane {
   }
 
   /** The info panel can be hidden (and shown again with ⓘ in the header, or the I key). */
-  #infoClose() {
-    return h('button.icon-button.info-close', { title: t('photos.toggleInfo', { key: 'H' }), 'aria-label': t('photos.toggleInfo', { key: 'H' }), html: icon('close', 14), onclick: () => this.toggleInfo() });
-  }
 
   #renderEmpty() {
     const f = this.library.filter;

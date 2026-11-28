@@ -17,7 +17,7 @@ import { dateOf, editsOf, fold, matches } from '../../services/library/browser/l
 import { POWERED_BY } from '../../services/brand/browser/brandService.js';
 
 const PER_GROUP = { label: 4, people: 4, author: 4, camera: 3, keyword: 5, folder: 4, photo: 5, content: 4 };
-const TYPES = [['album', 'album'], ['project', 'layers'], ['person', 'users'], ['pet', 'paw'], ['place', 'pin']];
+const TYPES = [['album', 'album'], ['tag', 'tag'], ['project', 'layers'], ['person', 'users'], ['pet', 'paw'], ['place', 'pin']];
 
 export class GlobalSearch {
   constructor(services) {

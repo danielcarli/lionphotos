@@ -28,7 +28,7 @@
 
 **가져오기 없음** · **컴퓨터 밖으로 나가는 것 없음** · **10만 장도 100장처럼 매끄럽게** · **무료 오픈 소스**
 
-![버전 1.83.4](https://img.shields.io/badge/version-1.83.4-161214)
+![버전 1.85.1](https://img.shields.io/badge/version-1.85.1-161214)
 ![상태: 베타 테스트](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![라이선스: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![플랫폼: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -111,7 +111,7 @@
 
 > *"디스크가 필요 없는 것으로 가득해요."*
 
-보면서 버릴 사진에 표시해 Limbo로 보내고, 내용이 같은 중복 파일을 찾아 남는 사본도 그곳으로 보내세요. 휴지통으로 보내는 것은 Limbo뿐이며, 영구 삭제되지 않습니다.
+보면서 버릴 사진에 표시해 Limbo로 보내고, 내용이 같은 중복 파일을 찾아 남는 사본도 그곳으로 보내세요. 휴지통으로 보내는 것은 Limbo뿐이며, 영구 삭제되지 않습니다. 사진에 나만의 라벨("인화용", "포트폴리오")을 쓰면 *라벨*에서 앨범처럼 모아 볼 수 있습니다.
 
 <p align="center"><img src="screenshots/duplicates.webp" alt="중복 파일" width="860"><br><sub><b>중복 파일</b> — 내용으로 찾기</sub></p>
 
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## 변경 내역
 
-[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.83.4**.
+[CHANGELOG.md](../CHANGELOG.md)(영어)를 참고하세요. 현재 버전: **1.85.1**.
 
 ## 만든 사람들
 

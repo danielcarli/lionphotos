@@ -1019,7 +1019,7 @@ export class Viewer {
       setChildren(this.sideLeft,
         panelTitle(t('panel.describeInfo'), 'rename', canAdjust ? null : splitSwitch(true, toggleSplit)),
         head(),
-        h('div.ip-secs', sectionsFor('describe', sections), sections.file()),
+        h('div.ip-secs', sections.organize(), sectionsFor('describe', sections), sections.file()),
         footer());
       if (canAdjust) setChildren(this.side, panelTitle(t('panel.tab.adjust'), 'sliders', splitSwitch(true, toggleSplit)), asOnly(sectionsFor('adjust', sections)));
     } else {

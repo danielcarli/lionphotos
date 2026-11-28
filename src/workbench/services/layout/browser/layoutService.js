@@ -13,6 +13,8 @@ import { t } from '../../../../base/common/nls.js';
 export const VIEWS = [
   { id: 'photos', icon: 'image', shortcut: 'Ctrl+1', group: 'library' },
   { id: 'album', icon: 'album', shortcut: 'Ctrl+Shift+A', group: 'library' },
+  // the person's own labels, each one opened like an album
+  { id: 'tag', icon: 'tag', shortcut: 'Ctrl+Shift+L', group: 'library' },
   { id: 'person', icon: 'users', shortcut: 'Ctrl+7', group: 'library' },
   { id: 'pet', icon: 'paw', shortcut: 'Ctrl+8', group: 'library' },
   { id: 'place', icon: 'pin', shortcut: 'Ctrl+9', group: 'library' },

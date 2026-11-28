@@ -121,63 +121,6 @@ are only added.
 `image` is `null` for a file that could not be rendered (a raw file without a preview, for example). Use
 `alt` as the image's `alt` text: it is what screen readers say.
 
-## Publishing plugins
-
-A plugin with `"kind": "publish"` brings no page: it **sends the albums and projects to a site** — a photo
-catalog, an agency's archive — that speaks the publish protocol. It needs no `template/`; `assets/` holds its
-icon.
-
-```json
-{
-  "id": "my-site",
-  "version": "1.0.0",
-  "kind": "publish",
-  "name": { "en": "My photo site" },
-  "accepts": ["album", "project"],
-  "icon": "assets/icon.svg",
-  "photo": { "sizes": [2048, 3000], "thumb": 560, "web": 1600 },
-  "publish": {
-    "protocol": "lionphotos-publish-v1",
-    "path": "/api/photos/publish",
-    "url": "https://photos.example.org",
-    "site": { "en": "Example photos" }
-  }
-}
-```
-
-- `publish.protocol`: `lionphotos-publish-v1` (the only one for now).
-- `publish.path`: where the protocol's API is on the site; the person gives the site's address.
-- `publish.url` (optional): the address offered at first; the person can change it. `https://` only — or
-  `http://` for this computer and the local network (`localhost`, `192.168.…`, `10.…`, `*.local`), so a key never
-  crosses the internet unencrypted.
-- `publish.site` (optional): the site's name in the confirmation.
-
-In the export dialog the person types the address and the **upload key** the site gave them, and can check the
-connection (the site answers whose key it is). The key is kept encrypted by the system (Windows DPAPI, macOS
-Keychain, the Linux keyring) and never goes back to the window; where the system cannot encrypt it, it is kept
-only until LionPhotos is closed. Publishing asks for the typed confirmation code like an export; it is made in a
-temporary folder (the same files an export makes), sent, and the folder removed.
-
-### The protocol (lionphotos-publish-v1)
-
-Every request carries `Authorization: Bearer <key>`; answers are JSON, errors `{ "error": "…" }` with a 4xx
-status (401 or 403: the key). `API` is the site's address + `publish.path`.
-
-1. `GET API/` → `{ "protocol": "lionphotos-publish-v1", "system": "Site name", "user": "Whose key" }`.
-2. For each collection, `POST API/collections` with the collection as in `data.js` (above), each item with
-   `hash`: the SHA-256 (hex) of its `image` file. The site answers which files it still needs:
-   `{ "id": 7, "photos": [{ "index": 0, "id": 41, "file": "IMG_1091.CR2", "send": ["thumb", "web", "original", "image"] }], "same": 12, "keep": [41, …] }`
-   — `index` is the item's position; items not listed are already there with the same picture (only their data
-   is updated); `keep` is every photo of the collection on the site.
-3. For each file asked, `PUT API/photos/{id}/{kind}` with the file as the body (`thumb`, `web`, `original`, and
-   `image` last: then the photo is complete).
-4. `POST API/collections/{id}/finish` with `{ "keep": […] }` → `{ "photos": 13, "removed": 1, "published": false, "url": "https://…" }`:
-   photos not kept (taken out of the album in LionPhotos, or left half-sent) leave the site. `url` is the
-   collection's page there, offered as *Open on the site* when it is on the address the person chose.
-
-A collection is matched by its name; sending the same album again sends only new and changed photos. Network
-failures and 5xx answers are tried again (three times). LionPhotos sends only the files of the export folder.
-
 ## Safety
 
 Installing, removing and exporting change files, so each one asks for the typed confirmation code, like every

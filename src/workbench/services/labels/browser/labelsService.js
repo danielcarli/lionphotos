@@ -20,6 +20,8 @@ export const LABEL_TYPES = [
   { type: 'pet', single: false, icon: 'paw' },
   { type: 'place', single: false, icon: 'pin' },
   { type: 'album', single: false, icon: 'album' },
+  // the person's own labels ("to print", "portfolio"…): free words, each one a set of photos like an album
+  { type: 'tag', single: false, icon: 'tag' },
 ];
 export const LABEL_ICON = Object.fromEntries(LABEL_TYPES.map((x) => [x.type, x.icon]));
 export const SPHERES = ['personal', 'professional'];

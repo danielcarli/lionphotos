@@ -28,7 +28,7 @@ Browse, search and organize huge collections of photos and videos right where th
 
 **No import** · **Nothing leaves your computer** · **100,000 photos scroll like 100** · **Free and open source**
 
-![Version 1.83.4](https://img.shields.io/badge/version-1.83.4-161214)
+![Version 1.85.1](https://img.shields.io/badge/version-1.85.1-161214)
 ![Status: beta test](https://img.shields.io/badge/status-beta%20test-e5307a)
 ![License: MIT](https://img.shields.io/badge/license-MIT-0194b2)
 ![Platforms: Windows, macOS, Linux](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-161214)
@@ -111,7 +111,7 @@ Headline, caption, audio description, author and place for one photo or a hundre
 
 > *"The disk is full of things I don't need."*
 
-Mark rejects as you go and send them to the Limbo; find repeated files by their content and send their extra copies there too. Only the Limbo sends files to the Recycle Bin; nothing is deleted for good.
+Mark rejects as you go and send them to the Limbo; find repeated files by their content and send their extra copies there too. Only the Limbo sends files to the Recycle Bin; nothing is deleted for good. Write your own labels on the photos ("to print", "portfolio"): each one gathers its photos in *Labels*, like an album.
 
 <p align="center"><img src="docs/screenshots/duplicates.webp" alt="Repeated files" width="860"><br><sub><b>Repeated files</b> — found by their content</sub></p>
 
@@ -339,7 +339,7 @@ $env:LIONPHOTOS_FOLDER="C:\temp\photos-copy"; npm run test:e2e
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) — current version: **1.83.4**.
+See [CHANGELOG.md](CHANGELOG.md) — current version: **1.85.1**.
 
 ## Credits
 

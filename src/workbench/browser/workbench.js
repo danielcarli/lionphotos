@@ -101,6 +101,7 @@ const views = {
   person: new PeopleView(services, { type: 'person' }), // people, with face recognition
   pet: new PeopleView(services, { type: 'pet' }),       // pets, recognized the same way
   place: new LabelsView(services, 'place'),
+  tag: new LabelsView(services, 'tag'), // the person's own labels: each one a set of photos, opened like an album
   todo: new TodoView(services), // the albums and projects to edit, first things first
   plugin: new PluginView(services), // the page of the plugin chosen in the activity bar
 };
@@ -175,6 +176,7 @@ window.addEventListener('keydown', (e) => {
   else if (e.altKey && e.key === 'ArrowLeft' && services.layout.activeView === 'photos' && services.library.filter.labelId) { e.preventDefault(); views.photos.backFromLabel(); }
   else if (e.altKey && e.key === 'Home') { e.preventDefault(); services.library.goHome(); services.layout.openView('photos'); }
   else if (mod && e.shiftKey && key === 'a') { e.preventDefault(); services.layout.openView('album'); }
+  else if (mod && e.shiftKey && key === 'l') { e.preventDefault(); services.layout.openView('tag'); }
   else if (mod && e.shiftKey && key === 'e') { e.preventDefault(); services.layout.openView('todo'); }
   else if (mod && key === 'l') { e.preventDefault(); services.layout.openView('limbo'); }
   else if (mod && /^[0-9]$/.test(e.key)) { const v = VIEWS.find((x) => x.shortcut === `Ctrl+${e.key}`); if (v) { e.preventDefault(); services.layout.openView(v.id); } }

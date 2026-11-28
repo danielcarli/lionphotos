@@ -44,22 +44,15 @@ export class PluginsService {
     this.host.plugins.onExport((p) => {
       if (p.finished) this.#drawn = null;
       if (!p.finished) {
-        const running = p.phase === 'prepare' ? 'plugins.publish.preparing' : p.phase === 'publish' ? 'plugins.publish.sending' : 'plugins.export.running';
-        toast ||= this.notifications.progress(t(running), { label: t('common.cancel'), run: () => this.host.plugins.cancelExport() });
-        toast.update(`${t(running)} ${tn('plugins.export.progress', p.total, { done: p.done })}`, p.total ? p.done / p.total : 0);
+        toast ||= this.notifications.progress(t('plugins.export.running'), { label: t('common.cancel'), run: () => this.host.plugins.cancelExport() });
+        toast.update(tn('plugins.export.progress', p.total, { done: p.done }), p.total ? p.done / p.total : 0);
         return;
       }
       toast?.close();
       toast = null;
       if (p.error) {
-        if (p.error === 'canceled') this.notifications.info(t(p.published ? 'plugins.publish.canceled' : 'plugins.export.canceled'));
-        else this.notifications.warn(t(p.published ? 'plugins.publish.failed' : 'plugins.export.failed', { error: p.error }));
-        return;
-      }
-      if (p.published) {
-        const msg = tn('plugins.publish.done', p.done, { system: p.system || '—' }) + ' ' + tn('plugins.publish.sentSame', p.sent, { same: p.same })
-          + (p.failed ? ' ' + tn('plugins.export.someFailed', p.failed) : '');
-        this.notifications.success(msg, 15000, [{ label: t('plugins.publish.openSite'), run: () => this.host.plugins.openLast('site') }]);
+        if (p.error === 'canceled') this.notifications.info(t('plugins.export.canceled'));
+        else this.notifications.warn(t('plugins.export.failed', { error: p.error }));
         return;
       }
       const msg = tn('plugins.export.done', p.done, { folder: p.folder }) + (p.zip ? ' ' + t('plugins.export.zipDone', { zip: p.zip }) : '')
@@ -100,19 +93,10 @@ export class PluginsService {
   }
 
   /** The plugins with a tab in the activity bar: the enabled ones. */
-  get tabs() { return this.plugins.filter((p) => p.enabled && (p.kind === 'export' || p.kind === 'publish')); }
+  get tabs() { return this.plugins.filter((p) => p.enabled && p.kind === 'export'); }
 
   /** The enabled plugins that export this kind of label (album, project…). */
-  exportersFor(type) { return this.plugins.filter((p) => p.enabled && (p.kind === 'export' || p.kind === 'publish') && (!type || p.accepts.includes(type))); }
-
-  /** A publish plugin's site and key: { url, hasKey, keyEnd, remembered }. */
-  publishTarget(id) { return this.host.plugins.publishTarget(id); }
-
-  /** Keeps the site's address and, when typed, a new key: { ok, … } or { error }. */
-  savePublishTarget(id, target) { return this.host.plugins.savePublishTarget(id, target); }
-
-  /** Asks the site who the key belongs to: { system, user } or { error }. */
-  checkPublishTarget(id) { return this.host.plugins.checkPublishTarget(id); }
+  exportersFor(type) { return this.plugins.filter((p) => p.enabled && p.kind === 'export' && (!type || p.accepts.includes(type))); }
 
   async install() {
     const pick = await this.host.plugins.pickPackage();
@@ -241,8 +225,6 @@ export class PluginsService {
     const collections = labelIds.map((labelId) => this.collectionOf(labelId))
       .map((c) => (skip?.size ? { ...c, ids: c.ids.filter((id) => !skip.has(id)) } : c)).filter((c) => c.ids.length);
     if (!collections.length) { this.notifications.warn(t('plugins.export.empty')); return null; }
-    // a publish plugin sends to its site: no folder to choose
-    if (this.plugins.find((p) => p.id === pluginId)?.kind === 'publish') return this.services.operations.run('export', { pluginId, dest: null, collections, options });
     const dest = await this.host.plugins.pickDestination();
     if (!dest || dest.canceled) return null;
     return this.services.operations.run('export', { pluginId, dest: dest.token, collections, options });
